@@ -7,9 +7,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "tsc && eslint .",
-    "prepare-build": "tsup lib/index.ts --format cjs,esm --dts --clean --treeshake",
-    "build": "npm run prepare-build -- --minify",
-    "build-dev": "npm run prepare-build -- --sourcemap --watch",
+    "build-common": "tsup lib/index.ts --format cjs,esm --dts --clean --treeshake",
+    "build": "npm run build-common -- --minify",
+    "dev": "npm run build-common -- --sourcemap --watch",
     "publish-package": "npm run build && changeset publish"
   },
   "repository": {
