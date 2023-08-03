@@ -1,0 +1,7 @@
+.changeset/
+.github/
+lib/
+.eslintrc.cjs
+.gitignore
+.npmignore
+tsconfig.json
