@@ -1,7 +1,9 @@
+import type { FetchAdvancedOpts } from "./types";
+
 /**
  * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
- * @param num If this is an array, the amount of items is used
+ * @param num If this is an array or NodeList, the amount of items is used
  */
 export function autoPlural(word: string, num: number | unknown[] | NodeList) {
   if(Array.isArray(num) || num instanceof NodeList)
@@ -34,7 +36,7 @@ export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(
 }
 
 /**
- * Returns `unsafeWindow` if it is available (if `@grant unsafeWindow` is set), otherwise falls back to the regular `window`
+ * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
 export function getUnsafeWindow() {
   try {
@@ -47,15 +49,18 @@ export function getUnsafeWindow() {
 }
 
 /**
- * Inserts `afterNode` as a sibling just after the provided `beforeNode`
- * @returns Returns the `afterNode`
+ * Inserts `afterElement` as a sibling just after the provided `beforeElement`
+ * @returns Returns the `afterElement`
  */
-export function insertAfter(beforeNode: HTMLElement, afterNode: HTMLElement) {
-  beforeNode.parentNode?.insertBefore(afterNode, beforeNode.nextSibling);
-  return afterNode;
+export function insertAfter(beforeElement: HTMLElement, afterElement: HTMLElement) {
+  beforeElement.parentNode?.insertBefore(afterElement, beforeElement.nextSibling);
+  return afterElement;
 }
 
-/** Adds a parent container around the provided element - returns the new parent node */
+/**
+ * Adds a parent container around the provided element
+ * @returns Returns the new parent element
+ */
 export function addParent(element: HTMLElement, newParent: HTMLElement) {
   const oldParent = element.parentNode;
 
@@ -69,8 +74,8 @@ export function addParent(element: HTMLElement, newParent: HTMLElement) {
 }
 
 /**
- * Adds global CSS style through a `<style>` element in the document's `<head>`  
- * This needs to be run after the `DOMContentLoaded` event has fired on the document object.
+ * Adds global CSS style in the form of a `<style>` element in the document's `<head>`  
+ * This needs to be run after the `DOMContentLoaded` event has fired on the document object (or instantly if `@run-at document-end` is used).
  * @param style CSS string
  */
 export function addGlobalStyle(style: string) {
@@ -79,24 +84,24 @@ export function addGlobalStyle(style: string) {
   document.head.appendChild(styleElem);
 }
 
-/** Preloads an array of image URLs so they can be loaded instantly from the browser cache later on */
+/**
+ * Preloads an array of image URLs so they can be loaded instantly from the browser cache later on
+ * @param rejects If set to `true`, the returned PromiseSettledResults will contain rejections for any of the images that failed to load
+ * @returns Returns an array of `PromiseSettledResult` - each resolved result will contain the loaded image element, while each rejected result will contain an `ErrorEvent`
+ */
 export function preloadImages(srcUrls: string[], rejects = false) {
   const promises = srcUrls.map(src => new Promise((res, rej) => {
     const image = new Image();
     image.src = src;
     image.addEventListener("load", () => res(image));
-    image.addEventListener("error", () => rejects && rej(`Failed to preload image with URL '${src}'`));
+    image.addEventListener("error", (evt) => rejects && rej(evt));
   }));
 
   return Promise.allSettled(promises);
 }
 
-type FetchOpts = RequestInit & Partial<{
-  timeout: number;
-}>;
-
-/** Calls the fetch API with special options */
-export async function fetchAdvanced(url: string, options: FetchOpts = {}) {
+/** Calls the fetch API with special options like a timeout */
+export async function fetchAdvanced(url: string, options: FetchAdvancedOpts = {}) {
   const { timeout = 10000 } = options;
 
   const controller = new AbortController();
@@ -112,8 +117,10 @@ export async function fetchAdvanced(url: string, options: FetchOpts = {}) {
 }
 
 /**
- * Creates an invisible anchor with _blank target and clicks it.  
- * This has to be run in relatively quick succession to a user interaction event, else the browser rejects it.
+ * Creates an invisible anchor with a `_blank` target and clicks it.  
+ * Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
+ *   
+ * This function has to be run in relatively quick succession in response to a user interaction event, else the browser might reject it.
  */
 export function openInNewTab(href: string) {
   const openElem = document.createElement("a");
@@ -128,11 +135,12 @@ export function openInNewTab(href: string) {
   document.body.appendChild(openElem);
   openElem.click();
   // timeout just to be safe
-  setTimeout(openElem.remove, 100);
+  setTimeout(openElem.remove, 50);
 }
 
 /**
- * Intercepts the specified event on the passed object and prevents it from being called if the called `predicate` function returns `true`
+ * Intercepts the specified event on the passed object and prevents it from being called if the called `predicate` function returns a truthy value.  
+ * Calling this function will set the `stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
 export function interceptEvent<TEvtObj extends EventTarget>(eventObject: TEvtObj, eventName: Parameters<TEvtObj["addEventListener"]>[0], predicate: () => boolean) {  
   // default is between 10 and 100 on conventional browsers so this should hopefully be more than enough
@@ -155,8 +163,9 @@ export function interceptEvent<TEvtObj extends EventTarget>(eventObject: TEvtObj
 }
 
 /**
- * Intercepts the specified event on the window object and prevents it from being called if the called `predicate` function returns `true`
+ * Intercepts the specified event on the window object and prevents it from being called if the called `predicate` function returns a truthy value.  
+ * Calling this function will set the `stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
 export function interceptWindowEvent(eventName: keyof WindowEventMap, predicate: () => boolean) {  
-  interceptEvent(getUnsafeWindow(), eventName, predicate);
+  return interceptEvent(getUnsafeWindow(), eventName, predicate);
 }

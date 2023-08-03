@@ -6,3 +6,7 @@ export type SelectorExistsOpts = {
   /** Whether to call the listener continuously instead of once */
   continuous?: boolean;
 };
+
+export type FetchAdvancedOpts = RequestInit & Partial<{
+  timeout: number;
+}>;
