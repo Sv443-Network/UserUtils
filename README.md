@@ -1,6 +1,6 @@
 ## UserUtils
 Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
-Contains builtin TypeScript definitions.
+Contains builtin TypeScript declarations.
 
 <br>
 
