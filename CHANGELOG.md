@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.1.1
+
+### Patch Changes
+
+- bb60db0: minor fixes
+
 ## 0.1.0
 
 ### Minor Changes
