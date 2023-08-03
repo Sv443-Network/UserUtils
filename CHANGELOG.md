@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.1.4
+
+### Patch Changes
+
+- a1e8dec: please just work thanks
+
 ## 0.1.3
 
 ### Patch Changes
