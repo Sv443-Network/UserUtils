@@ -25,6 +25,8 @@ jobs:
       - name: Create Release PR using Changesets
         uses: changesets/action@v1
         id: changesets
+        with:
+          publish: npm run publish-package
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
