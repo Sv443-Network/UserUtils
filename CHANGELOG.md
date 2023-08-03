@@ -1,23 +1,5 @@
 # @sv443-network/userutils
 
-## 0.1.4
-
-### Patch Changes
-
-- a1e8dec: please just work thanks
-
-## 0.1.3
-
-### Patch Changes
-
-- 9673cad: more testing
-
-## 0.1.2
-
-### Patch Changes
-
-- 6eafb79: test publish workflow lol
-
 ## 0.1.1
 
 ### Patch Changes
