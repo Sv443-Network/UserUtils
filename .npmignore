@@ -5,3 +5,4 @@ lib/
 .gitignore
 .npmignore
 tsconfig.json
+test.ts

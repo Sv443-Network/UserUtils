@@ -4,11 +4,7 @@
     "moduleResolution": "node",
     "target": "ES2016",
     "outDir": "dist/out",
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "forceConsistentCasingInFileNames": true,
@@ -20,10 +16,7 @@
     "useDefineForClassFields": true,
     "noImplicitThis": false,
     "noUncheckedIndexedAccess": true,
-    "noEmit": true,
+    "noEmit": true
   },
-  "exclude": [
-    "**/*.js",
-    "dist/**",
-  ],
+  "exclude": ["**/*.js", "dist/**"]
 }

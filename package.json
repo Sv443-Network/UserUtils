@@ -9,8 +9,7 @@
     "lint": "tsc && eslint .",
     "prepare-build": "tsup lib/index.ts --format cjs,esm --dts --clean --treeshake",
     "build": "npm run prepare-build -- --minify",
-    "build-dev": "npm run prepare-build -- --sourcemap --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-dev": "npm run prepare-build -- --sourcemap --watch"
   },
   "repository": {
     "type": "git",
