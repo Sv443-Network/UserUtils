@@ -1,5 +1,8 @@
-## v0.1.0
-Features:
+---
+"@sv443-network/userutils": minor
+---
+
+Initial release - Features:
 - `onSelector()` to call a listener once a selector is found in the DOM
 - `autoPlural()` to automatically pluralize a string
 - `clamp()` to clamp a number between a min and max value
