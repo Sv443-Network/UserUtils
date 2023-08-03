@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.2.0
+
+### Minor Changes
+
+- 0cf2254: add onSelector() to call a listener once a selector is found in the DOM
+
 ## 0.1.1
 
 ### Patch Changes
