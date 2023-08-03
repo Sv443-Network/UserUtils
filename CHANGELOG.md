@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.1.2
+
+### Patch Changes
+
+- 6eafb79: test publish workflow lol
+
 ## 0.1.1
 
 ### Patch Changes
