@@ -22,7 +22,7 @@ jobs:
         run: npm ci
       - name: Build package
         run: npm run build
-      - name: Create Release PR using Changesets
+      - name: Create Release
         uses: changesets/action@v1
         id: changesets
         with:
