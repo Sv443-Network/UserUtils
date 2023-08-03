@@ -7,7 +7,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  lint:
+  publish:
     runs-on: ubuntu-latest
     strategy:
       matrix:
