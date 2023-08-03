@@ -8,6 +8,7 @@ Contains builtin TypeScript declarations.
 - [Installation](#installation)
 - [Features](#features)
   - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
+  - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
   - [autoPlural()](#autoplural) - automatically pluralize a string
   - [clamp()](#clamp) - clamp a number between a min and max value
   - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
@@ -54,15 +55,88 @@ If you like using this library, please consider [supporting development](https:/
 ## Features:
 
 ### onSelector()
-\- UNFINISHED -  
+Usage:  
+```ts
+onSelector<TElement = HTMLElement>(selector: string, options: {
+  listener: (elements: TElement | NodeListOf<TElement>) => void,
+  all?: boolean,
+  continuous?: boolean,
+}): void
+```
   
 Registers a listener to be called whenever the element(s) behind a selector is/are found in the DOM.  
-In order to use this function, the MutationObservers have to be initialized with `initOnSelector()` first.  
+If the selector already exists, the listener will be called immediately.  
   
-Example:
+If `all` is set to `true`, querySelectorAll() will be used instead and the listener will return a NodeList of matching elements.  
+This will also include elements that were already found in a previous listener call.  
+If set to `false` (default), querySelector() will be used and only the first element will be returned.  
+  
+If `continuous` is set to `true`, the listener will not be deregistered after it was called once (defaults to false).  
+  
+When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
+  
+⚠️ In order to use this function, [`initOnSelector()`](#initonselector) has to be called as soon as possible.  
+This initialization function has to be called after `DOMContentLoaded` is fired (or immediately if `@run-at document-end` is set).  
+  
+Calling onSelector() before `DOMContentLoaded` is fired will not throw an error, but it also won't trigger listeners until the DOM is accessible.
+  
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
-// TODO
+document.addEventListener("DOMContentLoaded", initOnSelector);
+
+// Continuously checks if `div` elements are added to the DOM, then returns all of them (even previously detected ones) in a NodeList
+onSelector("div", {
+  listener: (element) => {
+    console.log("Elements found:", element);
+  },
+  all: true,
+  continuous: true,
+});
+
+// Checks if an input element with a value attribute of "5" is added to the DOM, then returns it and deregisters the listener
+onSelector("input[value=\"5\"]", {
+  listener: (element) => {
+    console.log("Element found:", element);
+  },
+});
 ```
+
+</details>
+
+<br>
+
+### initOnSelector()
+Usage:  
+```ts
+initOnSelector(options: {
+  attributes?: boolean,
+  characterData?: boolean,
+}): void
+```
+
+Initializes the MutationObserver that is used by [`onSelector()`](#onselector) to check for the registered selectors whenever a DOM change occurs on the `<body>`  
+By default, this only checks if elements are added or removed (at any depth).  
+  
+Set `attributes` to `true` to also check for attribute changes on every single descendant of the `<body>` (defaults to false).  
+Set `characterData` to `true` to also check for character data changes on every single descendant of the `<body>` (defaults to false).  
+  
+⚠️ Using these extra options can have a performance impact on larger sites or sites with a constantly changing DOM.  
+  
+⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+document.addEventListener("DOMContentLoaded", () => {
+  initOnSelector({
+    attributes: true,
+    characterData: true,
+  });
+});
+```
+
+</details>
 
 <br>
 
@@ -72,7 +146,8 @@ Usage: `autoPlural(str: string, num: number | Array | NodeList): string`
 Automatically pluralizes a string if the given number is not 1.  
 If an array or NodeList is passed, the length of it will be used.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 autoPlural("apple", 0); // "apples"
 autoPlural("apple", 1); // "apple"
@@ -82,6 +157,8 @@ autoPlural("apple", [1]);    // "apple"
 autoPlural("apple", [1, 2]); // "apples"
 ```
 
+</details>
+
 <br>
 
 ### clamp()
@@ -89,12 +166,15 @@ Usage: `clamp(num: number, min: number, max: number): number`
   
 Clamps a number between a min and max value.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 clamp(5, 0, 10);        // 5
 clamp(-1, 0, 10);       // 0
 clamp(Infinity, 0, 10); // 10
 ```
+
+</details>
 
 <br>
 
@@ -103,7 +183,8 @@ Usage: `pauseFor(ms: number): Promise<void>`
   
 Pauses async execution for a given amount of time.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 async function run() {
   console.log("Hello");
@@ -111,6 +192,8 @@ async function run() {
   console.log("World");
 }
 ```
+
+</details>
 
 <br>
 
@@ -121,12 +204,15 @@ Debounces a function, meaning that it will only be called once after a given amo
 This is very useful for functions that are called repeatedly, like event listeners, to remove extraneous calls.  
 The timeout will default to 300ms if left undefined.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 window.addEventListener("resize", debounce((event) => {
   console.log("Window was resized:", event);
 }, 500)); // 500ms timeout
 ```
+
+</details>
 
 <br>
 
@@ -136,7 +222,8 @@ Usage: `getUnsafeWindow(): Window`
 Returns the unsafeWindow object or falls back to the regular window object if the `@grant unsafeWindow` is not given.  
 Userscripts are sandboxed and do not have access to the regular window object, so this function is useful for websites that reject some events that were dispatched by the userscript.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 const mouseEvent = new MouseEvent("click", {
   view: getUnsafeWindow(),
@@ -144,15 +231,20 @@ const mouseEvent = new MouseEvent("click", {
 document.body.dispatchEvent(mouseEvent);
 ```
 
+</details>
+
 <br>
 
 ### insertAfter()
 Usage: `insertAfter(beforeElement: HTMLElement, afterElement: HTMLElement): HTMLElement`  
   
 Inserts the element passed as `afterElement` as a sibling after the passed `beforeElement`.  
-The `afterElement` will be returned.  
+The passed `afterElement` will be returned.  
   
-Example:
+⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 const beforeElement = document.querySelector("#before");
 const afterElement = document.createElement("div");
@@ -160,15 +252,20 @@ afterElement.innerText = "After";
 insertAfter(beforeElement, afterElement);
 ```
 
+</details>
+
 <br>
 
 ### addParent()
 Usage: `addParent(element: HTMLElement, newParent: HTMLElement): HTMLElement`  
   
 Adds a parent element around the passed `element` and returns the new parent.  
-Previously registered event listeners should be kept intact.  
+Previously registered event listeners are kept intact.  
   
-Example:
+⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 const element = document.querySelector("#element");
 const newParent = document.createElement("a");
@@ -176,15 +273,18 @@ newParent.href = "https://example.org/";
 addParent(element, newParent);
 ```
 
+</details>
+
 <br>
 
 ### addGlobalStyle()
 Usage: `addGlobalStyle(css: string): void`  
   
 Adds a global style to the page in form of a `<style>` element that's inserted into the `<head>`.  
-This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 document.addEventListener("DOMContentLoaded", () => {
   addGlobalStyle(`
@@ -195,42 +295,60 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 ```
 
+</details>
+
 <br>
 
 ### preloadImages()
-Usage: `preloadImages(...urls: string[]): Promise<void>`  
+Usage: `preloadImages(urls: string[], rejects?: boolean): Promise<void>`  
   
 Preloads images into browser cache by creating an invisible `<img>` element for each URL passed.  
 The images will be loaded in parallel and the returned Promise will only resolve once all images have been loaded.  
-The resulting PromiseSettledResult array will contain the image elements if resolved, or an ErrorEvent if rejected.  
+The resulting PromiseSettledResult array will contain the image elements if resolved, or an ErrorEvent if rejected, but only if `rejects` is set to true.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
-preloadImages(
+preloadImages([
   "https://example.org/image1.png",
   "https://example.org/image2.png",
   "https://example.org/image3.png",
-).then((results) => {
-  console.log("Images preloaded. Results:", results);
-});
+], true)
+  .then((results) => {
+    console.log("Images preloaded. Results:", results);
+  });
 ```
+
+</details>
 
 <br>
 
 ### fetchAdvanced()
-Usage: `fetchAdvanced(url: string, options?: FetchAdvancedOptions): Promise<Response>`  
+Usage:  
+```ts
+fetchAdvanced(url: string, options?: {
+  timeout?: number,
+  // any other options from fetch() except for signal
+}): Promise<Response>
+```
   
 A wrapper around the native `fetch()` function that adds options like a timeout property.  
 The timeout will default to 10 seconds if left undefined.  
   
-Example:
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
-fetchAdvanced("https://example.org/", {
+fetchAdvanced("https://api.example.org/data", {
   timeout: 5000,
-}).then((response) => {
-  console.log("Response:", response);
+  headers: {
+    "Accept": "application/json",
+  },
+}).then(async (response) => {
+  console.log("Data:", await response.json());
 });
 ```
+
+</details>
 
 <br>
 
@@ -241,12 +359,17 @@ Creates an invisible anchor with a `_blank` target and clicks it.
 Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
 This function has to be run in relatively quick succession in response to a user interaction event, else the browser might reject it.  
   
-Example:
+⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 document.querySelector("#button").addEventListener("click", () => {
   openInNewTab("https://example.org/");
 });
 ```
+
+</details>
 
 <br>
 
@@ -254,15 +377,19 @@ document.querySelector("#button").addEventListener("click", () => {
 Usage: `interceptEvent(eventObject: EventTarget, eventName: string, predicate: () => boolean): void`  
   
 Intercepts all events dispatched on the `eventObject` and prevents the listeners from being called as long as the predicate function returns a truthy value.  
-This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
 Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.  
   
-Example:
+⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 interceptEvent(document.body, "click", () => {
   return true; // prevent all click events on the body
 });
 ```
+
+</details>
 
 <br>
 
@@ -272,12 +399,17 @@ Usage: `interceptWindowEvent(eventName: string, predicate: () => boolean): void`
 Intercepts all events dispatched on the `window` object and prevents the listeners from being called as long as the predicate function returns a truthy value.  
 This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` (or falls back to regular `window`).  
   
-Example:
+⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
 ```ts
 interceptWindowEvent("beforeunload", () => {
   return true; // prevent the pesky "Are you sure you want to leave this page?" popup
 });
 ```
+
+</details>
 
 
 <br><br>
