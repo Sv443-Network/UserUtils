@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.1.3
+
+### Patch Changes
+
+- 9673cad: more testing
+
 ## 0.1.2
 
 ### Patch Changes
