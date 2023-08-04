@@ -155,6 +155,9 @@ autoPlural("apple", 2); // "apples"
 
 autoPlural("apple", [1]);    // "apple"
 autoPlural("apple", [1, 2]); // "apples"
+
+const items = [1, 2, 3, 4, "foo", "bar"];
+console.log(`Found ${items.length} ${autoPlural("item", items)}`); // "Found 6 items"
 ```
 
 </details>
@@ -171,6 +174,7 @@ Clamps a number between a min and max value.
 ```ts
 clamp(5, 0, 10);        // 5
 clamp(-1, 0, 10);       // 0
+clamp(7, 0, 10);        // 7
 clamp(Infinity, 0, 10); // 10
 ```
 
@@ -225,8 +229,13 @@ Userscripts are sandboxed and do not have access to the regular window object, s
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-const mouseEvent = new MouseEvent("click", {
+// trick the site into thinking the mouse was moved:
+const mouseEvent = new MouseEvent("mousemove", {
   view: getUnsafeWindow(),
+  screenY: 69,
+  screenX: 420,
+  movementX: 10,
+  movementY: 0,
 });
 document.body.dispatchEvent(mouseEvent);
 ```
@@ -246,6 +255,7 @@ The passed `afterElement` will be returned.
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
+// insert a <div> as a sibling next to an element
 const beforeElement = document.querySelector("#before");
 const afterElement = document.createElement("div");
 afterElement.innerText = "After";
@@ -267,6 +277,7 @@ Previously registered event listeners are kept intact.
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
+// add an <a> around an element
 const element = document.querySelector("#element");
 const newParent = document.createElement("a");
 newParent.href = "https://example.org/";
@@ -340,6 +351,7 @@ The timeout will default to 10 seconds if left undefined.
 ```ts
 fetchAdvanced("https://api.example.org/data", {
   timeout: 5000,
+  // also accepts any other fetch options like headers:
   headers: {
     "Accept": "application/json",
   },
@@ -364,7 +376,7 @@ This function has to be run in relatively quick succession in response to a user
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-document.querySelector("#button").addEventListener("click", () => {
+document.querySelector("#my-button").addEventListener("click", () => {
   openInNewTab("https://example.org/");
 });
 ```
@@ -377,7 +389,7 @@ document.querySelector("#button").addEventListener("click", () => {
 Usage: `interceptEvent(eventObject: EventTarget, eventName: string, predicate: () => boolean): void`  
   
 Intercepts all events dispatched on the `eventObject` and prevents the listeners from being called as long as the predicate function returns a truthy value.  
-Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.  
+Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not already higher) to ensure the stack trace is preserved.  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
   
@@ -385,7 +397,7 @@ Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the
 
 ```ts
 interceptEvent(document.body, "click", () => {
-  return true; // prevent all click events on the body
+  return true; // prevent all click events on the body element
 });
 ```
 
