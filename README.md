@@ -86,18 +86,18 @@ Calling onSelector() before `DOMContentLoaded` is fired will not throw an error,
 document.addEventListener("DOMContentLoaded", initOnSelector);
 
 // Continuously checks if `div` elements are added to the DOM, then returns all of them (even previously detected ones) in a NodeList
-onSelector("div", {
-  listener: (element) => {
-    console.log("Elements found:", element);
+onSelector<HTMLDivElement>("div", {
+  listener: (elements) => {
+    console.log("Elements found:", elements); // type = NodeListOf<HTMLDivElement>
   },
   all: true,
   continuous: true,
 });
 
 // Checks if an input element with a value attribute of "5" is added to the DOM, then returns it and deregisters the listener
-onSelector("input[value=\"5\"]", {
+onSelector<HTMLInputElement>("input[value=\"5\"]", {
   listener: (element) => {
-    console.log("Element found:", element);
+    console.log("Element found:", element); // type = HTMLInputElement
   },
 });
 ```
