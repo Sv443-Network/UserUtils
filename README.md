@@ -69,7 +69,7 @@ If the selector already exists, the listener will be called immediately.
   
 If `all` is set to `true`, querySelectorAll() will be used instead and the listener will return a NodeList of matching elements.  
 This will also include elements that were already found in a previous listener call.  
-If set to `false` (default), querySelector() will be used and only the first element will be returned.  
+If set to `false` (default), querySelector() will be used and only the first matching element will be returned.  
   
 If `continuous` is set to `true`, the listener will not be deregistered after it was called once (defaults to false).  
   
@@ -109,7 +109,7 @@ onSelector<HTMLInputElement>("input[value=\"5\"]", {
 ### initOnSelector()
 Usage:  
 ```ts
-initOnSelector(options: {
+initOnSelector(options?: {
   attributes?: boolean,
   characterData?: boolean,
 }): void
