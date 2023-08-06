@@ -51,6 +51,9 @@ function checkSelectorExists<TElem extends Element = HTMLElement>(selector: stri
       console.error(`Couldn't call listener for selector '${selector}'`, err);
     }
   });
+
+  console.info("##-- opts", options, "\n##-- deleteIndices", deleteIndices, "\n##-- selectorMap", selectorMap.size, selectorMap);
+
   if(deleteIndices.length > 0) {
     const newOptsArray = options.filter((_, i) => !deleteIndices.includes(i));
     if(newOptsArray.length === 0)
@@ -78,4 +81,9 @@ export function initOnSelector(opts: InitOnSelectorOpts = {}) {
     // subtree: true, // this setting applies the options to the childList (which isn't necessary in this use case)
     childList: true,
   });
+}
+
+/** Returns all currently registered selectors, as a map of selector strings to their associated options */
+export function getSelectorMap() {
+  return selectorMap;
 }
