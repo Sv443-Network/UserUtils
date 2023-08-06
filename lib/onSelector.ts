@@ -26,7 +26,10 @@ export function onSelector<TElem extends Element = HTMLElement>(
   checkSelectorExists(selector, selectorMapItems);
 }
 
-/** Removes all listeners registered in `onSelector()` that have the given selector */
+/**
+ * Removes all listeners registered in `onSelector()` that have the given selector
+ * @returns Returns true when all listeners with the associated selector were found and removed, false otherwise
+ */
 export function removeOnSelector(selector: string) {
   return selectorMap.delete(selector);
 }
@@ -45,13 +48,18 @@ function checkSelectorExists<TElem extends Element = HTMLElement>(selector: stri
       }
     }
     catch(err) {
-      void err;
+      console.error(`Couldn't call listener for selector '${selector}'`, err);
     }
   });
   if(deleteIndices.length > 0) {
-    // once again laziness strikes
-    // @ts-ignore
-    selectorMap.set(selector, options.filter((_, i) => !deleteIndices.includes(i)));
+    const newOptsArray = options.filter((_, i) => !deleteIndices.includes(i));
+    if(newOptsArray.length === 0)
+      selectorMap.delete(selector);
+    else {
+      // once again laziness strikes
+      // @ts-ignore
+      selectorMap.set(selector, newOptsArray);
+    }
   }
 }
 
