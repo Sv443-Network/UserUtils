@@ -32,10 +32,10 @@ Contains builtin TypeScript declarations. Webpack compatible and supports ESM an
     - [debounce()](#debounce) - call a function only once, after a given amount of time
     - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
   - [Arrays:](#arrays)
-    - [randomItem()](#randomitem) - Returns a random item from an array
-    - [randomItemIndex()](#randomitemindex) - Returns a tuple of a random item and its index from an array
-    - [takeRandomItem()](#takerandomitem) - Returns a random item from an array and mutates it to remove the item
-    - [randomizeArray()](#randomizearray) - Returns a copy of the array with its items in a random order
+    - [randomItem()](#randomitem) - returns a random item from an array
+    - [randomItemIndex()](#randomitemindex) - returns a tuple of a random item and its index from an array
+    - [takeRandomItem()](#takerandomitem) - returns a random item from an array and mutates it to remove the item
+    - [randomizeArray()](#randomizearray) - returns a copy of the array with its items in a random order
 - [License](#license)
 
 <br><br>
