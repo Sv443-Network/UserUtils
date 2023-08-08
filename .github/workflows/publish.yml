@@ -13,6 +13,9 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
+    env:
+      PR_TITLE: "Create Release"
+      COMMIT_MSG: "chore: create new release"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -27,6 +30,8 @@ jobs:
         id: changesets
         with:
           publish: npm run publish-package
+          commit: ${{ env.COMMIT_MSG }}
+          title: ${{ env.PR_TITLE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
