@@ -1,8 +1,10 @@
 .changeset/
 .github/
 lib/
+package-lock.json
 .eslintrc.cjs
 .gitignore
 .npmignore
 tsconfig.json
 test.ts
+*.map
