@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.3.0
+
+### Minor Changes
+
+- 07ec443: add getSelectorMap() to return all currently registered selectors
+
 ## 0.2.0
 
 ### Minor Changes
