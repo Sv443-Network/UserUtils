@@ -1,28 +1,41 @@
+<div style="text-align: center;" align="center">
+
 ## UserUtils
 Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
-Contains builtin TypeScript declarations.
+Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.
 
+</div>
 <br>
 
 ## Table of Contents:
 - [Installation](#installation)
 - [Features](#features)
-  - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
-  - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
-  - [getSelectorMap()](#getselectormap) - returns all currently registered selectors, listeners and options
-  - [autoPlural()](#autoplural) - automatically pluralize a string
-  - [clamp()](#clamp) - clamp a number between a min and max value
-  - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
-  - [debounce()](#debounce) - call a function only once, after a given amount of time
-  - [getUnsafeWindow()](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-  - [insertAfter()](#insertafter) - insert an element as a sibling after another element
-  - [addParent()](#addparent) - add a parent element around another element
-  - [addGlobalStyle()](#addglobalstyle) - add a global style to the page
-  - [preloadImages()](#preloadimages) - preload images into the browser cache for faster loading later on
-  - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
-  - [openInNewTab()](#openinnewtab) - open a link in a new tab
-  - [interceptEvent()](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-  - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+  - [DOM:](#dom)
+    - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
+    - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
+    - [getSelectorMap()](#getselectormap) - returns all currently registered selectors, listeners and options
+    - [getUnsafeWindow()](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - [insertAfter()](#insertafter) - insert an element as a sibling after another element
+    - [addParent()](#addparent) - add a parent element around another element
+    - [addGlobalStyle()](#addglobalstyle) - add a global style to the page
+    - [preloadImages()](#preloadimages) - preload images into the browser cache for faster loading later on
+    - [openInNewTab()](#openinnewtab) - open a link in a new tab
+    - [interceptEvent()](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+    - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+  - [Math:](#math)
+    - [clamp()](#clamp) - clamp a number between a min and max value
+    - [mapRange()](#maprange) - map a number from one range to the same spot in another range
+    - [randRange()](#randrange) - generate a random number between a min and max boundary
+  - [Misc:](#misc)
+    - [autoPlural()](#autoplural) - automatically pluralize a string
+    - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
+    - [debounce()](#debounce) - call a function only once, after a given amount of time
+    - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
+  - [Arrays:](#arrays)
+    - [randomItem()](#randomitem) - Returns a random item from an array
+    - [randomItemIndex()](#randomitemindex) - Returns a tuple of a random item and its index from an array
+    - [takeRandomItem()](#takerandomitem) - Returns a random item from an array and mutates it to remove the item
+    - [randomizeArray()](#randomizearray) - Returns a copy of the array with its items in a random order
 - [License](#license)
 
 <br><br>
@@ -54,6 +67,8 @@ If you like using this library, please consider [supporting development](https:/
 <br><br>
 
 ## Features:
+
+## DOM:
 
 ### onSelector()
 Usage:  
@@ -181,86 +196,6 @@ const selectorMap = getSelectorMap();
 
 <br>
 
-### autoPlural()
-Usage: `autoPlural(str: string, num: number | Array | NodeList): string`  
-  
-Automatically pluralizes a string if the given number is not 1.  
-If an array or NodeList is passed, the length of it will be used.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-autoPlural("apple", 0); // "apples"
-autoPlural("apple", 1); // "apple"
-autoPlural("apple", 2); // "apples"
-
-autoPlural("apple", [1]);    // "apple"
-autoPlural("apple", [1, 2]); // "apples"
-
-const items = [1, 2, 3, 4, "foo", "bar"];
-console.log(`Found ${items.length} ${autoPlural("item", items)}`); // "Found 6 items"
-```
-
-</details>
-
-<br>
-
-### clamp()
-Usage: `clamp(num: number, min: number, max: number): number`  
-  
-Clamps a number between a min and max value.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-clamp(5, 0, 10);        // 5
-clamp(-1, 0, 10);       // 0
-clamp(7, 0, 10);        // 7
-clamp(Infinity, 0, 10); // 10
-```
-
-</details>
-
-<br>
-
-### pauseFor()
-Usage: `pauseFor(ms: number): Promise<void>`  
-  
-Pauses async execution for a given amount of time.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-async function run() {
-  console.log("Hello");
-  await pauseFor(3000); // waits for 3 seconds
-  console.log("World");
-}
-```
-
-</details>
-
-<br>
-
-### debounce()
-Usage: `debounce(func: Function, timeout?: number): Function`  
-  
-Debounces a function, meaning that it will only be called once after a given amount of time.  
-This is very useful for functions that are called repeatedly, like event listeners, to remove extraneous calls.  
-The timeout will default to 300ms if left undefined.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-window.addEventListener("resize", debounce((event) => {
-  console.log("Window was resized:", event);
-}, 500)); // 500ms timeout
-```
-
-</details>
-
-<br>
-
 ### getUnsafeWindow()
 Usage: `getUnsafeWindow(): Window`  
   
@@ -375,36 +310,6 @@ preloadImages([
 
 <br>
 
-### fetchAdvanced()
-Usage:  
-```ts
-fetchAdvanced(url: string, options?: {
-  timeout?: number,
-  // any other options from fetch() except for signal
-}): Promise<Response>
-```
-  
-A wrapper around the native `fetch()` function that adds options like a timeout property.  
-The timeout will default to 10 seconds if left undefined.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-fetchAdvanced("https://api.example.org/data", {
-  timeout: 5000,
-  // also accepts any other fetch options like headers:
-  headers: {
-    "Accept": "application/json",
-  },
-}).then(async (response) => {
-  console.log("Data:", await response.json());
-});
-```
-
-</details>
-
-<br>
-
 ### openInNewTab()
 Usage: `openInNewTab(url: string): void`  
   
@@ -463,6 +368,236 @@ interceptWindowEvent("beforeunload", () => {
 ```
 
 </details>
+
+<br><br>
+
+## Math:
+
+### clamp()
+Usage: `clamp(num: number, min: number, max: number): number`  
+  
+Clamps a number between a min and max value.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+clamp(5, 0, 10);        // 5
+clamp(-1, 0, 10);       // 0
+clamp(7, 0, 10);        // 7
+clamp(Infinity, 0, 10); // 10
+```
+
+</details>
+
+<br>
+
+### mapRange()
+Usage: `mapRange(value: number, range_1_min: number, range_1_max: number, range_2_min: number, range_2_max: number): number`  
+  
+Maps a number from one range to the spot it would be in another range.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+mapRange(5, 0, 10, 0, 100); // 50
+mapRange(5, 0, 10, 0, 50);  // 25
+// to calculate a percentage from arbitrary values, use 0 and 100 as the second range:
+mapRange(4, 0, 13, 0, 100); // 30.76923076923077
+```
+
+</details>
+
+<br>
+
+### randRange()
+Usages:  
+```ts
+randRange(min: number, max: number): number
+randRange(max: number): number
+```
+  
+Returns a random number between `min` and `max` (inclusive).  
+If only one argument is passed, it will be used as the `max` value and `min` will be set to 0.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+randRange(0, 10);  // 4
+randRange(10, 20); // 17
+randRange(10);     // 7
+```
+
+</details>
+
+<br><br>
+
+## Misc:
+
+### autoPlural()
+Usage: `autoPlural(str: string, num: number | Array | NodeList): string`  
+  
+Automatically pluralizes a string if the given number is not 1.  
+If an array or NodeList is passed, the length of it will be used.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+autoPlural("apple", 0); // "apples"
+autoPlural("apple", 1); // "apple"
+autoPlural("apple", 2); // "apples"
+
+autoPlural("apple", [1]);    // "apple"
+autoPlural("apple", [1, 2]); // "apples"
+
+const items = [1, 2, 3, 4, "foo", "bar"];
+console.log(`Found ${items.length} ${autoPlural("item", items)}`); // "Found 6 items"
+```
+
+</details>
+
+<br>
+
+### pauseFor()
+Usage: `pauseFor(ms: number): Promise<void>`  
+  
+Pauses async execution for a given amount of time.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+async function run() {
+  console.log("Hello");
+  await pauseFor(3000); // waits for 3 seconds
+  console.log("World");
+}
+```
+
+</details>
+
+<br>
+
+### debounce()
+Usage: `debounce(func: Function, timeout?: number): Function`  
+  
+Debounces a function, meaning that it will only be called once after a given amount of time.  
+This is very useful for functions that are called repeatedly, like event listeners, to remove extraneous calls.  
+The timeout will default to 300ms if left undefined.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+window.addEventListener("resize", debounce((event) => {
+  console.log("Window was resized:", event);
+}, 500)); // 500ms timeout
+```
+
+</details>
+
+<br>
+
+### fetchAdvanced()
+Usage:  
+```ts
+fetchAdvanced(url: string, options?: {
+  timeout?: number,
+  // any other options from fetch() except for signal
+}): Promise<Response>
+```
+  
+A wrapper around the native `fetch()` function that adds options like a timeout property.  
+The timeout will default to 10 seconds if left undefined.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+fetchAdvanced("https://api.example.org/data", {
+  timeout: 5000,
+  // also accepts any other fetch options like headers:
+  headers: {
+    "Accept": "application/json",
+  },
+}).then(async (response) => {
+  console.log("Data:", await response.json());
+});
+```
+
+</details>
+
+<br><br>
+
+## Arrays:
+
+### randomItem()
+Usage: `randomItem(array: Array): any`  
+  
+Returns a random item from an array.  
+Returns undefined if the array is empty.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+randomItem(["foo", "bar", "baz"]); // "bar"
+randomItem([ ]);                   // undefined
+```
+
+</details>
+
+<br>
+
+### randomItemIndex()
+Usage: `randomItemIndex(array: Array): [item: any, index: number]`  
+  
+Returns a tuple of a random item and its index from an array.  
+If the array is empty, it will return undefined for both values.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
+randomItemIndex([ ]);                   // [undefined, undefined]
+// using array destructuring:
+const [item, index] = randomItemIndex(["foo", "bar", "baz"]);
+// or if you only want the index:
+const [, index] = randomItemIndex(["foo", "bar", "baz"]);
+```
+
+</details>
+
+<br>
+
+### takeRandomItem()
+Usage: `takeRandomItem(array: Array): any`  
+  
+Returns a random item from an array and mutates the array by removing the item.  
+Returns undefined if the array is empty.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+const arr = ["foo", "bar", "baz"];
+takeRandomItem(arr); // "bar"
+console.log(arr);    // ["foo", "baz"]
+```
+
+</details>
+
+<br>
+
+### randomizeArray()
+Usage: `randomizeArray(array: Array): Array`  
+  
+Returns a copy of the array with its items in a random order.  
+If the array is empty, the originally passed array will be returned.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+randomizeArray([1, 2, 3, 4, 5, 6]); // [3, 1, 5, 2, 4, 6]
+```
+
+</details>
+
+<br>
 
 
 <br><br>
