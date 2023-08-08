@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.4.1
+
+### Patch Changes
+
+- 85ec87b: fix missing export for array functions
+
 ## 0.4.0
 
 ### Minor Changes
