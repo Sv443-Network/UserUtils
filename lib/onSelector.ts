@@ -52,8 +52,6 @@ function checkSelectorExists<TElem extends Element = HTMLElement>(selector: stri
     }
   });
 
-  console.info("##-- opts", options, "\n##-- deleteIndices", deleteIndices, "\n##-- selectorMap", selectorMap.size, selectorMap);
-
   if(deleteIndices.length > 0) {
     const newOptsArray = options.filter((_, i) => !deleteIndices.includes(i));
     if(newOptsArray.length === 0)

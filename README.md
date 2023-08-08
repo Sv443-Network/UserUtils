@@ -9,6 +9,7 @@ Contains builtin TypeScript declarations.
 - [Features](#features)
   - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
   - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
+  - [getSelectorMap()](#getselectormap) - returns all currently registered selectors, listeners and options
   - [autoPlural()](#autoplural) - automatically pluralize a string
   - [clamp()](#clamp) - clamp a number between a min and max value
   - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
@@ -134,6 +135,46 @@ document.addEventListener("DOMContentLoaded", () => {
     characterData: true,
   });
 });
+```
+
+</details>
+
+<br>
+
+### getSelectorMap()
+Usage: `getSelectorMap(): Map<string, OnSelectorOptions[]>`  
+  
+Returns a Map of all currently registered selectors and their options, including listener function.  
+Since multiple listeners can be registered for the same selector, the value of the Map is an array of `OnSelectorOptions` objects.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+document.addEventListener("DOMContentLoaded", initOnSelector);
+
+onSelector<HTMLDivElement>("div", {
+  listener: (elements) => void 0,
+  all: true,
+  continuous: true,
+});
+
+onSelector<HTMLDivElement>("div", {
+  listener: (elements) => void 0,
+});
+
+const selectorMap = getSelectorMap();
+// Map(1) {
+//   "div" => [
+//     {
+//       listener: (elements) => void 0,
+//       all: true,
+//       continuous: true,
+//     },
+//     {
+//       listener: (elements) => void 0,
+//     },
+//   ]
+// }
 ```
 
 </details>
