@@ -67,7 +67,7 @@ export function preloadImages(srcUrls: string[], rejects = false) {
  * Creates an invisible anchor with a `_blank` target and clicks it.  
  * Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
  *   
- * This function has to be run in relatively quick succession in response to a user interaction event, else the browser might reject it.
+ * This function has to be run in response to a user interaction event, else the browser might reject it.
  */
 export function openInNewTab(href: string) {
   const openElem = document.createElement("a");
@@ -117,4 +117,39 @@ export function interceptEvent<TEvtObj extends EventTarget>(eventObject: TEvtObj
  */
 export function interceptWindowEvent(eventName: keyof WindowEventMap, predicate: () => boolean) {  
   return interceptEvent(getUnsafeWindow(), eventName, predicate);
+}
+
+/**
+ * Amplifies the gain of the passed media element's audio by the specified multiplier.  
+ * This function supports any media element like `<audio>` or `<video>`  
+ *   
+ * This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
+ *   
+ * @returns Returns an object with the following properties:
+ * | Property | Description |
+ * | :-- | :-- |
+ * | `mediaElement` | The passed media element |
+ * | `amplify()` | A function to change the amplification level |
+ * | `getAmpLevel()` | A function to return the current amplification level |
+ * | `context` | The AudioContext instance |
+ * | `source` | The MediaElementSourceNode instance |
+ * | `gain` | The GainNode instance |
+ */
+export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, multiplier = 1.0) {
+  // @ts-ignore
+  const context = new (window.AudioContext || window.webkitAudioContext);
+  const result = {
+    mediaElement,
+    amplify: (multiplier: number) => { result.gain.gain.value = multiplier; },
+    getAmpLevel: () => result.gain.gain.value,
+    context: context,
+    source: context.createMediaElementSource(mediaElement),
+    gain: context.createGain(),
+  };
+
+  result.source.connect(result.gain);
+  result.gain.connect(context.destination);
+  result.amplify(multiplier);
+
+  return result;
 }
