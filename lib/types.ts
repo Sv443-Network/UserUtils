@@ -1,12 +1,5 @@
 //#SECTION selector exists
 
-export type InitOnSelectorOpts = {
-  /** Set to true if mutations to any element's attributes are to also trigger the onSelector check (warning: this might draw a lot of performance on larger sites) */
-  attributes?: boolean;
-  /** Set to true if mutations to any element's character data are to also trigger the onSelector check (warning: this might draw a lot of performance on larger sites) */
-  characterData?: boolean;
-}
-
 export type OnSelectorOpts<TElem extends Element = HTMLElement> = SelectorOptsOne<TElem> | SelectorOptsAll<TElem>;
 
 type SelectorOptsOne<TElem extends Element> = SelectorOptsBase & {

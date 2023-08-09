@@ -1,4 +1,4 @@
-import type { InitOnSelectorOpts, OnSelectorOpts } from "./types";
+import type { OnSelectorOpts } from "./types";
 
 const selectorMap = new Map<string, OnSelectorOpts[]>();
 
@@ -39,7 +39,7 @@ function checkSelectorExists<TElem extends Element = HTMLElement>(selector: stri
   options.forEach((option, i) => {
     try {
       const elements = option.all ? document.querySelectorAll<HTMLElement>(selector) : document.querySelector<HTMLElement>(selector);
-      if(elements) {
+      if((elements !== null && elements instanceof NodeList && elements.length > 0) || elements !== null) {
         // I don't feel like dealing with intersecting types, this should work just fine at runtime
         // @ts-ignore
         option.listener(elements);
@@ -66,18 +66,18 @@ function checkSelectorExists<TElem extends Element = HTMLElement>(selector: stri
 
 /**
  * Initializes a MutationObserver that checks for all registered selectors whenever an element is added to or removed from the `<body>`
- * @param opts For fine-tuning when the MutationObserver checks for the selectors
+ * @param options For fine-tuning what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
  */
-export function initOnSelector(opts: InitOnSelectorOpts = {}) {
+export function initOnSelector(options: MutationObserverInit = {}) {
   const observer = new MutationObserver(() => {
     for(const [selector, options] of selectorMap.entries())
       checkSelectorExists(selector, options);
   });
 
   observer.observe(document.body, {
-    ...opts,
-    // subtree: true, // this setting applies the options to the childList (which isn't necessary in this use case)
+    subtree: true,
     childList: true,
+    ...options,
   });
 }
 
