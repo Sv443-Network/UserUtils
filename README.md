@@ -2,14 +2,17 @@
 
 ## UserUtils
 Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
-Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.
+Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
+If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 </div>
 <br>
 
 ## Table of Contents:
-- [Installation](#installation)
-- [Features](#features)
+- [**Installation**](#installation)
+- [**Preamble**](#preamble)
+- [**License**](#license)
+- [**Features**](#features)
   - [DOM:](#dom)
     - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
     - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
@@ -22,8 +25,9 @@ Contains builtin TypeScript declarations. Webpack compatible and supports ESM an
     - [openInNewTab()](#openinnewtab) - open a link in a new tab
     - [interceptEvent()](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
     - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+    - [amplifyMedia()](#amplifymedia) - amplify an audio or video element's volume past the maximum of 100%
   - [Math:](#math)
-    - [clamp()](#clamp) - clamp a number between a min and max value
+    - [clamp()](#clamp) - constrain a number between a min and max value
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
     - [randRange()](#randrange) - generate a random number between a min and max boundary
   - [Misc:](#misc)
@@ -36,7 +40,6 @@ Contains builtin TypeScript declarations. Webpack compatible and supports ESM an
     - [randomItemIndex()](#randomitemindex) - returns a tuple of a random item and its index from an array
     - [takeRandomItem()](#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [randomizeArray()](#randomizearray) - returns a copy of the array with its items in a random order
-- [License](#license)
 
 <br><br>
 
@@ -60,13 +63,28 @@ Contains builtin TypeScript declarations. Webpack compatible and supports ESM an
   // @require https://greasyfork.org/scripts/TODO
   ```
 
-<br>
+<br><br>
 
-If you like using this library, please consider [supporting development](https://github.com/sponsors/Sv443)
+## Preamble:
+This library is written in TypeScript and contains builtin TypeScript declarations.  
+The usages and examples in this readme are written in TypeScript, but the library can also be used in plain JavaScript.  
+  
+Some functions require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
+Their documentation will contain a section marked by a warning emoji (⚠️) that will go into more detail.  
+  
+If the usage contains multiple definitions of the function, each line represents an overload and you can choose which one you want to use.
+
+<br><br>
+
+## License:
+This library is licensed under the MIT License.  
+See the [license file](./LICENSE.txt) for details.
 
 <br><br>
 
 ## Features:
+
+<br>
 
 ## DOM:
 
@@ -125,21 +143,21 @@ onSelector<HTMLInputElement>("input[value=\"5\"]", {
 ### initOnSelector()
 Usage:  
 ```ts
-initOnSelector(options?: {
-  attributes?: boolean,
-  characterData?: boolean,
-}): void
+initOnSelector(options?: MutationObserverInit): void
 ```
 
 Initializes the MutationObserver that is used by [`onSelector()`](#onselector) to check for the registered selectors whenever a DOM change occurs on the `<body>`  
 By default, this only checks if elements are added or removed (at any depth).  
-  
-Set `attributes` to `true` to also check for attribute changes on every single descendant of the `<body>` (defaults to false).  
-Set `characterData` to `true` to also check for character data changes on every single descendant of the `<body>` (defaults to false).  
-  
-⚠️ Using these extra options can have a performance impact on larger sites or sites with a constantly changing DOM.  
-  
+
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+The options object is passed directly to the MutationObserver.observe() method.  
+Note that `options.subtree` and `options.childList` will be set to true by default.  
+You may see all options [here](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options), but these are the important ones:  
+> Set `options.attributes` to `true` to also check for attribute changes on every single descendant of the `<body>` (defaults to false).  
+> Set `options.characterData` to `true` to also check for character data changes on every single descendant of the `<body>` (defaults to false).  
+>   
+> ⚠️ Using these extra options can have a performance impact on larger sites or sites with a constantly changing DOM.
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -315,7 +333,7 @@ Usage: `openInNewTab(url: string): void`
   
 Creates an invisible anchor with a `_blank` target and clicks it.  
 Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
-This function has to be run in relatively quick succession in response to a user interaction event, else the browser might reject it.  
+This function has to be run in response to a user interaction event, else the browser might reject it.  
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
@@ -368,6 +386,43 @@ interceptWindowEvent("beforeunload", () => {
 ```
 
 </details>
+
+<br>
+
+### amplifyMedia()
+Usage: `amplifyMedia(mediaElement: HTMLMediaElement, multiplier?: number): AmplifyMediaResult`  
+  
+Amplifies the gain of a media element (like `<audio>` or `<video>`) by a given multiplier (defaults to 1.0).  
+Make sure to limit the multiplier to a reasonable value ([clamp()](#clamp) is good for this), as it may cause clipping or bleeding eardrums.  
+  
+⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
+  
+Returns an object with the following properties:
+| Property | Description |
+| :-- | :-- |
+| `mediaElement` | The passed media element |
+| `amplify()` | A function to change the amplification level |
+| `getAmpLevel()` | A function to return the current amplification level |
+| `context` | The AudioContext instance |
+| `source` | The MediaElementSourceNode instance |
+| `gain` | The GainNode instance |
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+const audio = document.querySelector<HTMLAudioElement>("#my-audio");
+const { amplify, getAmpLevel } = amplifyMedia(audio);
+
+function setGain(value: number) {
+  amplify(clamp(value, 0, 5));
+  console.log("Gain set to", getAmpLevel());
+}
+
+setGain(2);    // set gain to 2x
+setGain(3.5);  // set gain to 3.5x
+
+getAmpLevel(); // 3.5
+```
 
 <br><br>
 
@@ -599,14 +654,7 @@ randomizeArray([1, 2, 3, 4, 5, 6]); // [3, 1, 5, 2, 4, 6]
 
 <br>
 
-
-<br><br>
-
-## License:
-This library is licensed under the MIT License.  
-See the [license file](./LICENSE.txt) for details.
-
-<br><br>
+<br><br><br><br>
 
 <div style="text-align: center;" align="center">
 
