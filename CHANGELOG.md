@@ -1,5 +1,18 @@
 # @sv443-network/userutils
 
+## 0.5.0
+
+### Minor Changes
+
+- 54e7905: Features:
+
+  - add function `amplifyMedia()` to boost the volume of a MediaElement past its default maximum
+  - allow all `MutationObserver.observe()` options to be passed to `initOnSelector()`
+
+  Fixes:
+
+  - fix `onSelector()` not triggering correctly
+
 ## 0.4.1
 
 ### Patch Changes
