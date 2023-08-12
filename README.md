@@ -393,6 +393,7 @@ interceptWindowEvent("beforeunload", () => {
 Usage: `amplifyMedia(mediaElement: HTMLMediaElement, multiplier?: number): AmplifyMediaResult`  
   
 Amplifies the gain of a media element (like `<audio>` or `<video>`) by a given multiplier (defaults to 1.0).  
+This is how you can increase the volume of a media element beyond the default maximum volume of 1.0 or 100%.  
 Make sure to limit the multiplier to a reasonable value ([clamp()](#clamp) is good for this), as it may cause clipping or bleeding eardrums.  
   
 ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
@@ -410,18 +411,24 @@ Returns an object with the following properties:
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-const audio = document.querySelector<HTMLAudioElement>("#my-audio");
-const { amplify, getAmpLevel } = amplifyMedia(audio);
+const audio = document.querySelector<HTMLAudioElement>("audio");
+const button = document.querySelector<HTMLButtonElement>("button");
 
-function setGain(value: number) {
-  amplify(clamp(value, 0, 5));
-  console.log("Gain set to", getAmpLevel());
-}
+// amplifyMedia needs to be called in response to a user interaction event:
+button.addEventListener("click", () => {
+  const { amplify, getAmpLevel } = amplifyMedia(audio);
 
-setGain(2);    // set gain to 2x
-setGain(3.5);  // set gain to 3.5x
+  const setGain = (value: number) => {
+    // constrain the value to between 0 and 5
+    amplify(clamp(value, 0, 5));
+    console.log("Gain set to", getAmpLevel());
+  }
 
-getAmpLevel(); // 3.5
+  setGain(2);    // set gain to 2x
+  setGain(3.5);  // set gain to 3.5x
+
+  console.log(getAmpLevel()); // 3.5
+});
 ```
 
 <br><br>
