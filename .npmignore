@@ -1,6 +1,7 @@
 .changeset/
 .github/
 lib/
+README.greasyfork.md
 package-lock.json
 .eslintrc.cjs
 .gitignore
