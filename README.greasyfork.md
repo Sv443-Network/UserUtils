@@ -15,16 +15,12 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
     npm i @sv443-network/userutils
     ```
 
-    <br>
-
     Then, import it in your script as usual:
     ```ts
     import { addGlobalStyle } from "@sv443-network/userutils";
     // or
     import * as userUtils from "@sv443-network/userutils";
     ```
-
-    <br>
 
     Shameless plug: I also have a [webpack-based template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly.
 
