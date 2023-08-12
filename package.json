@@ -40,9 +40,14 @@
     "tsup": "^7.2.0",
     "typescript": "^5.1.6"
   },
-  "browserslist": [
-    "last 1 version",
-    "> 1%",
-    "not dead"
+  "files": [
+    "/dist/index.js",
+    "/dist/index.mjs",
+    "/dist/index.d.ts",
+    "/dist/index.d.mts",
+    "/package.json",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE.txt"
   ]
 }
