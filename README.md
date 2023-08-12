@@ -66,6 +66,11 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
   Then, access the functions on the global variable `UserUtils`:
   ```ts
   UserUtils.addGlobalStyle("body { background-color: red; }");
+
+  // or using object destructuring:
+
+  const { clamp } = UserUtils;
+  console.log(clamp(1, 5, 10); // 5
   ```
 
 <br><br>
