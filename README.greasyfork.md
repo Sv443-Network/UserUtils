@@ -1,6 +1,8 @@
 ## UserUtils
 Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
 Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
+Licensed under the [MIT license.](https://github.com/Sv443-Network/UserUtils/blob/main/LICENSE.txt)  
+  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
