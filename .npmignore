@@ -1,11 +1,14 @@
 .changeset/
 .github/
+
+dist/index.global.js
 lib/
-README.greasyfork.md
 package-lock.json
 .eslintrc.cjs
-.gitignore
-.npmignore
 tsconfig.json
 test.ts
 *.map
+
+README.greasyfork.md
+.gitignore
+.npmignore

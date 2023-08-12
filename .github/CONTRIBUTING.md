@@ -15,15 +15,16 @@ Thanks to Matt Pocock for his video on how to set up a modern TypeScript library
 | :-- | :-- |
 | `npm run lint` | Run TSC and ESLint to lint the code |
 | `npm run build` | Build the project with tsup, outputting minified CJS and ESM bundles to `dist/` |
-| `npm run dev` | Watch for changes and build the project without minification |
+| `npm run build-iife` | Build the project with tsup, outputting a minified IIFE bundle to `dist/` (for publishing to greasyfork) |
+| `npm run dev` | Watch for changes and build the project without minification and with sourcemaps |
 
 <br>
 
 ### Testing locally:
-1. Run `npm link` in the project root of UserUtils to create a global symlink to the package
-2. Run `npm link @sv443-network/userutils` in the project root of the project you want to test the package in to bind to the symlink
-3. Run `npm run dev` in the project root of UserUtils to watch for changes and rebuild the package automatically
-4. Run your project and test the changes :)
+1. Use `npm link` in the root of UserUtils to create a global symlink to the package
+2. Use `npm link @sv443-network/userutils` in the root of the project you want to test the package in to bind to the symlink
+3. Run `npm run dev` in the root of UserUtils to watch for changes and rebuild the package automatically
+4. Start your project and test the changes :)
 
 <br>
 
