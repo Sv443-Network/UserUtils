@@ -436,6 +436,8 @@ button.addEventListener("click", () => {
 });
 ```
 
+</details>
+
 <br><br>
 
 ## Math:
