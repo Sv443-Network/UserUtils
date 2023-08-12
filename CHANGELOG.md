@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.5.2
+
+### Patch Changes
+
+- 18d4a10: make npm bundle smaller
+
 ## 0.5.1
 
 ### Patch Changes
