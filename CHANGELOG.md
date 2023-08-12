@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.5.1
+
+### Patch Changes
+
+- aa8efbd: fix documentation
+
 ## 0.5.0
 
 ### Minor Changes
