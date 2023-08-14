@@ -15,8 +15,7 @@
     "strict": true,
     "useDefineForClassFields": true,
     "noImplicitThis": false,
-    "noUncheckedIndexedAccess": true,
-    "noEmit": true
+    "noUncheckedIndexedAccess": true
   },
   "exclude": ["**/*.js", "dist/**"]
 }

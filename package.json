@@ -4,13 +4,14 @@
   "description": "Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more ",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/lib/index.d.ts",
   "scripts": {
-    "lint": "tsc && eslint .",
-    "build-common": "tsup lib/index.ts --format cjs,esm --dts --clean --treeshake",
-    "build-iife": "tsup lib/index.ts --format cjs,esm,iife --dts --clean --treeshake --minify",
-    "build": "npm run build-common -- --minify",
-    "dev": "npm run build-common -- --sourcemap --watch",
+    "lint": "tsc --noEmit && eslint .",
+    "build-types": "tsc --emitDeclarationOnly --declaration --outDir dist",
+    "build-common": "tsup lib/index.ts --format cjs,esm --clean --treeshake",
+    "build-iife": "tsup lib/index.ts --format cjs,esm,iife --clean --treeshake --minify",
+    "build": "npm run build-common -- --minify && npm run build-types",
+    "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types\"",
     "publish-package": "npm run build && changeset publish"
   },
   "repository": {
@@ -43,8 +44,7 @@
   "files": [
     "/dist/index.js",
     "/dist/index.mjs",
-    "/dist/index.d.ts",
-    "/dist/index.d.mts",
+    "/dist/lib/**.*",
     "/package.json",
     "/README.md",
     "/CHANGELOG.md",

@@ -1,7 +1,7 @@
 <div style="text-align: center;" align="center">
 
 ## UserUtils
-Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
+Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
 Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
