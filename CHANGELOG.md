@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 0.5.3
+
+### Patch Changes
+
+- f97dae6: change bundling process
+
 ## 0.5.2
 
 ### Patch Changes
