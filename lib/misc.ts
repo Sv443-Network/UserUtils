@@ -1,3 +1,4 @@
+/** Options for the `fetchAdvanced()` function */
 export type FetchAdvancedOpts = RequestInit & Partial<{
   /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
   timeout: number;

@@ -1,3 +1,4 @@
+/** Options for the `onSelector()` function */
 export type OnSelectorOpts<TElem extends Element = HTMLElement> = SelectorOptsOne<TElem> | SelectorOptsAll<TElem>;
 
 type SelectorOptsOne<TElem extends Element> = SelectorOptsBase & {
