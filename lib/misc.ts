@@ -1,4 +1,7 @@
-import type { FetchAdvancedOpts } from "./types";
+export type FetchAdvancedOpts = RequestInit & Partial<{
+  /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
+  timeout: number;
+}>;
 
 /**
  * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1
