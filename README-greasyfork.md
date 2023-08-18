@@ -3,6 +3,8 @@ Library with various utilities for userscripts - register listeners for when CSS
 Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
 Licensed under the [MIT license.](https://github.com/Sv443-Network/UserUtils/blob/main/LICENSE.txt)  
   
+You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
+  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
@@ -47,15 +49,16 @@ If you like using this library, please consider [supporting the development ❤�
     ```
     npm i @sv443-network/userutils
     ```
-
     Then, import it in your script as usual:
     ```ts
     import { addGlobalStyle } from "@sv443-network/userutils";
-    // or
-    import * as userUtils from "@sv443-network/userutils";
-    ```
 
-    Shameless plug: I also have a [webpack-based template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly.
+    // or just import everything (not recommended because this doesn't allow for treeshaking):
+
+    import * as UserUtils from "@sv443-network/userutils";
+    ```
+    Shameless plug: I made a [webpack-based template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.
+
 
 <br>
 
@@ -63,7 +66,6 @@ If you like using this library, please consider [supporting the development ❤�
     ```
     // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
     ```
-
     Then, access the functions on the global variable `UserUtils`:
     ```ts
     UserUtils.addGlobalStyle("body { background-color: red; }");
