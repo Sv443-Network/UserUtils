@@ -1,24 +1,32 @@
-/**
- * Describes an object or primitive value that can be serialized as JSON  
- * [Source](https://github.com/microsoft/TypeScript/issues/1897#issuecomment-338650717)
- */
-export type JSONCompatible = boolean | number | string | null | JSONArray | JSONMap;
-interface JSONMap { [key: string]: JSONCompatible; }
-interface JSONArray extends Array<JSONCompatible> {}
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
-type MigrationFunc = <TOldData extends JSONCompatible, TNewData extends JSONCompatible>(oldData: TOldData) => TNewData | Promise<TNewData>;
+type MigrationFunc = <TOldData, TNewData>(oldData: TOldData) => TNewData | Promise<TNewData>;
 /** Dictionary of format version numbers and the function that migrates from them to the next whole integer. */
 type MigrationsDict = Record<number, MigrationFunc>;
 
+export interface ConfigManagerOptions<TData> {
+  /** A unique ID for this configuration */
+  id: string;
+  /** The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()` */
+  defaultConfig: TData;
+  /** An incremental version of the data format. If the format of the data is changed, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number, but you may skip numbers if you need to for some reason. */
+  formatVersion: number;
+  /** A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. */
+  migrations?: MigrationsDict;
+  /** If set to true, the already stored data in persistent storage is loaded asynchronously as soon as this instance is created. Note that this might cause race conditions as it is uncertain when the internal data cache gets populated. */
+  autoLoad?: boolean;
+}
 
 /**
  * Manages a user configuration that is cached in memory and persistently saved across sessions.  
  * Supports migrating data from older versions of the configuration to newer ones and populating the cache with default data if no persistent data is found.  
  *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`
+ * 
+ * @template TData The type of the data that is saved in persistent storage - this is also the type of the default data and the type of the data associated with the formatVersion passed in the constructor
  */
-export class Config<TData extends JSONCompatible = JSONCompatible> {
+export class ConfigManager<TData = any> {
   public readonly id: string;
   public readonly formatVersion: number;
   public readonly defaultData: TData;
@@ -26,43 +34,45 @@ export class Config<TData extends JSONCompatible = JSONCompatible> {
   private cachedData: TData;
 
   /**
-   * Creates an instance of Config.
-   * @param id A unique ID for this configuration
-   * @param defaultData The default data to use if no data is saved yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`
-   * @param formatVersion An incremental version of the data format. If the format of the data is changed, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number, but you may skip numbers if you need to for some reason.
-   * @param migrations A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run.
+   * Creates an instance of ConfigManager.  
+   * Make sure to call `loadData()` after creating an instance if you didn't set `autoLoad` to true.
+   * @param options The options for this ConfigManager instance
    */
-  constructor(id: string, formatVersion: number, defaultData: TData, migrations?: MigrationsDict) {
-    this.id = id;
-    this.formatVersion = formatVersion;
-    this.defaultData = this.cachedData = defaultData;
-    this.migrations = migrations;
+  constructor(options: ConfigManagerOptions<TData>) {
+    this.id = options.id;
+    this.formatVersion = options.formatVersion;
+    this.defaultData = this.cachedData = options.defaultConfig;
+    this.migrations = options.migrations;
 
-    this.loadData();
+    if(options.autoLoad === true)
+      this.loadData();
   }
 
-  /** Loads the data saved in persistent storage into the in-memory cache and also returns it */
-  public async loadData(): Promise<TData | undefined> {
+  /** Loads the data saved in persistent storage into the in-memory cache and also returns it. Automatically populates persistent storage with default data if it doesn't contain data yet. */
+  public async loadData(): Promise<TData> {
     try {
       const gmData = await GM.getValue(this.id, this.defaultData);
-      const gmFmtVer = await GM.getValue(`_uufmtver-${this.id}`);
+      let gmFmtVer = Number(await GM.getValue(`_uufmtver-${this.id}`));
 
-      if(typeof gmData !== "string" || typeof gmFmtVer !== "number")
-        return undefined;
+      if(typeof gmData !== "string")
+        return await this.saveDefaultData();
+
+      if(isNaN(gmFmtVer))
+        await GM.setValue(`_uufmtver-${this.id}`, gmFmtVer = this.formatVersion);
 
       let parsed = JSON.parse(gmData);
 
-      if(this.formatVersion > gmFmtVer)
+      if(gmFmtVer < this.formatVersion)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
       return this.cachedData = typeof parsed === "object" ? parsed : undefined;
     }
     catch(err) {
-      return undefined;
+      return await this.saveDefaultData();
     }
   }
 
-  /** Returns the data from the in-memory cache. Use `loadData()` to get fresh data from persistent storage (usually not necessary). */
+  /** Returns the data from the in-memory cache. Use `loadData()` to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage). */
   public getData(): TData {
     return this.cachedData;
   }
@@ -70,21 +80,43 @@ export class Config<TData extends JSONCompatible = JSONCompatible> {
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
   public setData(data: TData) {
     this.cachedData = data;
-    return new Promise<void>(async (resolve) => {
+    return new Promise<TData>(async (resolve) => {
       await GM.setValue(this.id, JSON.stringify(data));
       await GM.setValue(`_uufmtver-${this.id}`, this.formatVersion);
-      resolve();
+      resolve(data);
     });
   }
 
-  /** Runs all necessary migration functions consecutively */
-  protected async runMigrations(oldData: JSONCompatible, oldFmtVer: number): Promise<TData> {
+  /** Saves the default configuration data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
+  public async saveDefaultData() {
+    this.cachedData = this.defaultData;
+    return new Promise<TData>(async (resolve) => {
+      await GM.setValue(this.id, JSON.stringify(this.defaultData));
+      await GM.setValue(`_uufmtver-${this.id}`, this.formatVersion);
+      resolve(this.defaultData);
+    });
+  }
+
+  /**
+   * Call this method to clear all persistently stored data associated with this ConfigManager instance.  
+   * The in-memory cache will be left untouched, so you may still access the data with `getData()`  
+   * Calling `loadData()` or `setData()` after this method was called will recreate persistent storage with the cached or default data.  
+   *   
+   * ⚠️ This requires the additional directive `@grant GM.deleteValue`
+   */
+  public async deleteConfig() {
+    await GM.deleteValue(this.id);
+    await GM.deleteValue(`_uufmtver-${this.id}`);
+  }
+
+  /** Runs all necessary migration functions consecutively - may be overwritten in a subclass */
+  protected async runMigrations(oldData: any, oldFmtVer: number): Promise<TData> {
     return new Promise(async (resolve) => {
       if(!this.migrations)
         return resolve(oldData as TData);
 
       // TODO: verify
-      let newData: JSONCompatible = oldData;
+      let newData = oldData;
       const sortedMigrations = Object.entries(this.migrations)
         .sort(([a], [b]) => Number(a) - Number(b));
 

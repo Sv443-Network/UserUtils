@@ -31,6 +31,7 @@ If you like using this library, please consider [supporting the development ❤�
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
     - [randRange()](#randrange) - generate a random number between a min and max boundary
   - [Misc:](#misc)
+    - [ConfigManager()](#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](#autoplural) - automatically pluralize a string
     - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](#debounce) - call a function only once, after a given amount of time
@@ -508,6 +509,103 @@ randRange(10);     // 7
 <br><br>
 
 ## Misc:
+
+### ConfigManager()
+Usage: `new ConfigManager<TData = any>(options: ConfigManagerOptions)`  
+  
+A class that manages a userscript's configuration that is persistently saved to and loaded from GM storage.  
+Also supports automatic migration of outdated data formats via provided migration functions.  
+  
+The options object has the following properties:
+| Property | Description |
+| :-- | :-- |
+| `id` | A unique ID for this configuration |
+| `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()` |
+| `formatVersion` | An incremental version of the data format. If the format of the data is changed, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number, but you may skip numbers if you need to for some reason. |
+| `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
+| `autoLoad?` | (Optional) If set to true, the already stored data in persistent storage is loaded asynchronously as soon as this instance is created. Note that this might cause race conditions as it is uncertain when the internal data cache gets populated. |
+  
+⚠️ The configuration is stored as a JSON string, so only JSON-compatible data can be used.  
+⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { ConfigManager } from "@sv443-network/userutils";
+
+interface MyConfig {
+  foo: string;
+  bar: number;
+}
+
+/** Default config data */
+const defaultConfig: MyConfig = {
+  foo: "hello",
+  bar: 42,
+};
+/** If the format of MyConfig changes, increment this number */
+const formatVersion = 2;
+/** Functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion! */
+const migrations = {
+  // migrate from format version 0 to 1
+  1: (oldData: any) => {
+    return {
+      foo: oldData.foo,
+      bar: oldData.bar,
+      baz: "world",
+    };
+  },
+  // asynchronously migrate from format version 1 to 2
+  2: async (oldData: any) => {
+    // arbitrary async operation required for the new format
+    const qux = JSON.parse(await (await fetch("https://api.example.org/some-data")).text());
+    return {
+      foo: oldData.foo,
+      bar: oldData.bar,
+      baz: oldData.baz,
+      qux,
+    };
+  },
+};
+
+const configMgr = new ConfigManager({
+  /** A unique ID for this configuration */
+  id: "my-userscript",
+  /** Default / fallback configuration data */
+  defaultConfig,
+  /** The current version of the script's config data format */
+  formatVersion,
+  /** Data format migration functions */
+  migrations,
+});
+
+/** Entrypoint of the userscript */
+async function init() {
+  // wait for the config to be loaded from persistent storage
+  // if no data is saved in persistent storage yet or getData() is called before loadData(), the value of options.defaultConfig will be returned
+  const configData = await configMgr.loadData();
+
+  console.log(configData.foo); // "hello"
+
+  // update the config
+  configData.foo = "world";
+  configData.bar = 123;
+
+  // save the updated config - synchronously to the cache and asynchronously to persistent storage
+  configMgr.saveData(configData).then(() => {
+    console.log("Config saved to persistent storage!");
+  });
+
+  // the internal cache is updated synchronously, so the updated data can be accessed before the Promise resolves:
+  console.log(config.getData().foo); // "world"
+}
+
+init();
+```
+
+</details>
+
+<br>
 
 ### autoPlural()
 Usage: `autoPlural(str: string, num: number | Array | NodeList): string`  

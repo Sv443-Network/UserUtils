@@ -32,6 +32,7 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
     - [mapRange()](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
     - [randRange()](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
 - Misc:
+    - [ConfigManager()](https://github.com/Sv443-Network/UserUtils#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
     - [pauseFor()](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once, after a given amount of time
