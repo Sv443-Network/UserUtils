@@ -17,8 +17,8 @@ export function autoPlural(word: string, num: number | unknown[] | NodeList) {
 
 /** Pauses async execution for the specified time in ms */
 export function pauseFor(time: number) {
-  return new Promise((res) => {
-    setTimeout(res, time);
+  return new Promise<void>((res) => {
+    setTimeout(() => res(), time);
   });
 }
 

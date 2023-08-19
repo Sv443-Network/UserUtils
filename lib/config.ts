@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
-type MigrationFunc = <TOldData, TNewData>(oldData: TOldData) => TNewData | Promise<TNewData>;
+type MigrationFunc = <TOldData = any>(oldData: TOldData) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates from them to the next whole integer. */
 type MigrationsDict = Record<number, MigrationFunc>;
 
@@ -24,14 +24,14 @@ export interface ConfigManagerOptions<TData> {
  *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`
  * 
- * @template TData The type of the data that is saved in persistent storage - this is also the type of the default data and the type of the data associated with the formatVersion passed in the constructor
+ * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultConfig`) - this should also be the type of the data format associated with the `options.formatVersion`
  */
 export class ConfigManager<TData = any> {
   public readonly id: string;
   public readonly formatVersion: number;
-  public readonly defaultData: TData;
-  public readonly migrations?: MigrationsDict;
-  private cachedData: TData;
+  public readonly defaultConfig: TData;
+  private cachedConfig: TData;
+  private migrations?: MigrationsDict;
 
   /**
    * Creates an instance of ConfigManager.  
@@ -41,7 +41,8 @@ export class ConfigManager<TData = any> {
   constructor(options: ConfigManagerOptions<TData>) {
     this.id = options.id;
     this.formatVersion = options.formatVersion;
-    this.defaultData = this.cachedData = options.defaultConfig;
+    this.defaultConfig = options.defaultConfig;
+    this.cachedConfig = options.defaultConfig;
     this.migrations = options.migrations;
 
     if(options.autoLoad === true)
@@ -51,7 +52,7 @@ export class ConfigManager<TData = any> {
   /** Loads the data saved in persistent storage into the in-memory cache and also returns it. Automatically populates persistent storage with default data if it doesn't contain data yet. */
   public async loadData(): Promise<TData> {
     try {
-      const gmData = await GM.getValue(this.id, this.defaultData);
+      const gmData = await GM.getValue(this.id, this.defaultConfig);
       let gmFmtVer = Number(await GM.getValue(`_uufmtver-${this.id}`));
 
       if(typeof gmData !== "string")
@@ -65,21 +66,21 @@ export class ConfigManager<TData = any> {
       if(gmFmtVer < this.formatVersion)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
-      return this.cachedData = typeof parsed === "object" ? parsed : undefined;
+      return this.cachedConfig = typeof parsed === "object" ? parsed : undefined;
     }
     catch(err) {
       return await this.saveDefaultData();
     }
   }
 
-  /** Returns the data from the in-memory cache. Use `loadData()` to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage). */
+  /** Returns a copy of the data from the in-memory cache. Use `loadData()` to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage). */
   public getData(): TData {
-    return this.cachedData;
+    return this.deepCopy(this.cachedConfig);
   }
 
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
   public setData(data: TData) {
-    this.cachedData = data;
+    this.cachedConfig = data;
     return new Promise<TData>(async (resolve) => {
       await GM.setValue(this.id, JSON.stringify(data));
       await GM.setValue(`_uufmtver-${this.id}`, this.formatVersion);
@@ -89,11 +90,11 @@ export class ConfigManager<TData = any> {
 
   /** Saves the default configuration data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
   public async saveDefaultData() {
-    this.cachedData = this.defaultData;
+    this.cachedConfig = this.defaultConfig;
     return new Promise<TData>(async (resolve) => {
-      await GM.setValue(this.id, JSON.stringify(this.defaultData));
+      await GM.setValue(this.id, JSON.stringify(this.defaultConfig));
       await GM.setValue(`_uufmtver-${this.id}`, this.formatVersion);
-      resolve(this.defaultData);
+      resolve(this.defaultConfig);
     });
   }
 
@@ -111,26 +112,30 @@ export class ConfigManager<TData = any> {
 
   /** Runs all necessary migration functions consecutively - may be overwritten in a subclass */
   protected async runMigrations(oldData: any, oldFmtVer: number): Promise<TData> {
-    return new Promise(async (resolve) => {
-      if(!this.migrations)
-        return resolve(oldData as TData);
+    console.info("#DEBUG#-- RUNNING MIGRATIONS", oldFmtVer, "->", this.formatVersion, "- oldData:", oldData);
 
-      // TODO: verify
-      let newData = oldData;
-      const sortedMigrations = Object.entries(this.migrations)
-        .sort(([a], [b]) => Number(a) - Number(b));
+    if(!this.migrations)
+      return oldData as TData;
 
-      for(const [fmtVer, migrationFunc] of sortedMigrations) {
-        const ver = Number(fmtVer);
-        if(oldFmtVer < this.formatVersion && oldFmtVer < ver) {
-          const migRes = migrationFunc(newData);
-          newData = migRes instanceof Promise ? await migRes : migRes;
-          oldFmtVer = ver;
-        }
+    // TODO: verify
+    let newData = oldData;
+    const sortedMigrations = Object.entries(this.migrations)
+      .sort(([a], [b]) => Number(a) - Number(b));
+
+    for(const [fmtVer, migrationFunc] of sortedMigrations) {
+      const ver = Number(fmtVer);
+      if(oldFmtVer < this.formatVersion && oldFmtVer < ver) {
+        const migRes = migrationFunc(newData);
+        newData = migRes instanceof Promise ? await migRes : migRes;
+        oldFmtVer = ver;
       }
+    }
 
-      await GM.setValue(`_uufmtver-${this.id}`, this.formatVersion);
-      resolve(newData as TData);
-    });
+    await GM.setValue(`_uufmtver-${this.id}`, this.formatVersion);
+    return newData as TData;
+  }
+
+  protected deepCopy<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
   }
 }
