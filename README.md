@@ -527,7 +527,7 @@ The options object has the following properties:
 | :-- | :-- |
 | `id` | A unique ID for this configuration |
 | `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
-| `formatVersion` | An incremental version of the data format. If the format of the data is changed, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number, but you may skip numbers if you need to for some reason. |
+| `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
 | `autoLoad?` | (Optional) If set to true, the already stored data in persistent storage is loaded asynchronously as soon as this instance is created. Note that this might cause race conditions as it is uncertain when the internal data cache gets populated. |
   
@@ -549,9 +549,9 @@ const defaultConfig: MyConfig = {
   foo: "hello",
   bar: 42,
 };
-/** If the format of MyConfig changes, increment this number */
+/** If any properties are added to, removed from or renamed in MyConfig, increment this number */
 const formatVersion = 2;
-/** Functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion! */
+/** Functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion and that no numbers are skipped! */
 const migrations = {
   // migrate from format version 0 to 1
   1: (oldData: any) => {
@@ -603,13 +603,15 @@ async function init() {
   });
 
   // the internal cache is updated synchronously, so the updated data can be accessed before the Promise resolves:
-  console.log(config.getData().foo); // "world"
+  console.log(configMgr.getData().foo); // "world"
 }
 
 init();
 ```
 
 </details>
+
+<!-- TODO: document methods -->
 
 <br>
 
