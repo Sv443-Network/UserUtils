@@ -453,15 +453,19 @@ button.addEventListener("click", () => {
 ### clamp()
 Usage: `clamp(num: number, min: number, max: number): number`  
   
-Clamps a number between a min and max value.  
+Clamps a number between a min and max boundary (inclusive).  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-clamp(5, 0, 10);        // 5
-clamp(-1, 0, 10);       // 0
-clamp(7, 0, 10);        // 7
-clamp(Infinity, 0, 10); // 10
+clamp(7, 0, 10);     // 7
+clamp(-1, 0, 10);    // 0
+clamp(5, -5, 0);     // 0
+clamp(99999, 0, 10); // 10
+
+// clamp without a min or max boundary:
+clamp(-99999, -Infinity, 0); // -99999
+clamp(99999, 0, Infinity);   // 99999
 ```
 
 </details>
@@ -478,7 +482,9 @@ Maps a number from one range to the spot it would be in another range.
 ```ts
 mapRange(5, 0, 10, 0, 100); // 50
 mapRange(5, 0, 10, 0, 50);  // 25
-// to calculate a percentage from arbitrary values, use 0 and 100 as the second range:
+
+// to calculate a percentage from arbitrary values, use 0 and 100 as the second range
+// for example, if 4 files of a total of 13 were downloaded:
 mapRange(4, 0, 13, 0, 100); // 30.76923076923077
 ```
 
