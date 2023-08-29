@@ -517,7 +517,7 @@ randRange(10);     // 7
 ## Misc:
 
 ### ConfigManager()
-Usage: `new ConfigManager<TData = any>(options: ConfigManagerOptions)`  
+Usage: `new ConfigManager(options: ConfigManagerOptions)`  
   
 A class that manages a userscript's configuration that is persistently saved to and loaded from GM storage.  
 Also supports automatic migration of outdated data formats via provided migration functions.  
@@ -526,7 +526,7 @@ The options object has the following properties:
 | Property | Description |
 | :-- | :-- |
 | `id` | A unique ID for this configuration |
-| `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()` |
+| `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number, but you may skip numbers if you need to for some reason. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
 | `autoLoad?` | (Optional) If set to true, the already stored data in persistent storage is loaded asynchronously as soon as this instance is created. Note that this might cause race conditions as it is uncertain when the internal data cache gets populated. |
