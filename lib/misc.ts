@@ -1,9 +1,3 @@
-/** Options for the `fetchAdvanced()` function */
-export type FetchAdvancedOpts = RequestInit & Partial<{
-  /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
-  timeout: number;
-}>;
-
 /**
  * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
@@ -23,7 +17,7 @@ export function pauseFor(time: number) {
 }
 
 /**
- * Calls the passed `func` after the specified `timeout` in ms.  
+ * Calls the passed `func` after the specified `timeout` in ms (defaults to 300).  
  * Any subsequent calls to this function will reset the timer and discard previous calls.
  */
 export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(func: TFunc, timeout = 300) { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -33,6 +27,12 @@ export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(
     timer = setTimeout(() => func.apply(this, args), timeout) as unknown as number;
   };
 }
+
+/** Options for the `fetchAdvanced()` function */
+export type FetchAdvancedOpts = RequestInit & Partial<{
+  /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
+  timeout: number;
+}>;
 
 /** Calls the fetch API with special options like a timeout */
 export async function fetchAdvanced(url: string, options: FetchAdvancedOpts = {}) {
