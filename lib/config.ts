@@ -80,7 +80,7 @@ export class ConfigManager<TData = any> {
 
       let parsed = JSON.parse(gmData);
 
-      if(gmFmtVer < this.formatVersion)
+      if(gmFmtVer < this.formatVersion && this.migrations)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
       return this.cachedConfig = typeof parsed === "object" ? parsed : undefined;
@@ -129,10 +129,10 @@ export class ConfigManager<TData = any> {
 
   /** Runs all necessary migration functions consecutively - may be overwritten in a subclass */
   protected async runMigrations(oldData: any, oldFmtVer: number): Promise<TData> {
-    console.info("#DEBUG - RUNNING MIGRATIONS", oldFmtVer, "->", this.formatVersion, "- oldData:", oldData);
-
     if(!this.migrations)
       return oldData as TData;
+
+    console.info("#DEBUG - RUNNING MIGRATIONS", oldFmtVer, "->", this.formatVersion, "- oldData:", oldData);
 
     // TODO: verify
     let newData = oldData;

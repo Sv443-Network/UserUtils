@@ -547,6 +547,8 @@ interface MyConfig {
 const defaultConfig: MyConfig = {
   foo: "hello",
   bar: 42,
+  baz: "xyz",
+  qux: "something",
 };
 /** If any properties are added to, removed from or renamed in MyConfig, increment this number */
 const formatVersion = 2;
@@ -587,7 +589,8 @@ const configMgr = new ConfigManager({
 /** Entrypoint of the userscript */
 async function init() {
   // wait for the config to be loaded from persistent storage
-  // if no data is saved in persistent storage yet or getData() is called before loadData(), the value of options.defaultConfig will be returned
+  // if no data was saved in persistent storage before or getData() is called before loadData(), the value of options.defaultConfig will be returned
+  // if the previously saved data needs to be migrated to a newer version, it will happen in this function call
   const configData = await configMgr.loadData();
 
   console.log(configData.foo); // "hello"
