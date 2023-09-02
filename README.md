@@ -541,6 +541,8 @@ import { ConfigManager } from "@sv443-network/userutils";
 interface MyConfig {
   foo: string;
   bar: number;
+  baz: string;
+  qux: string;
 }
 
 /** Default config data */
