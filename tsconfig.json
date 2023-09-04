@@ -5,17 +5,18 @@
     "target": "ES2016",
     "outDir": "dist/out",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "rootDir": ".",
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "rootDir": ".",
+    "noImplicitThis": false,
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "useDefineForClassFields": true,
-    "noImplicitThis": false,
-    "noUncheckedIndexedAccess": true
+    "useDefineForClassFields": true
   },
   "exclude": ["**/*.js", "dist/**"]
 }

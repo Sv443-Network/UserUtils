@@ -9,10 +9,12 @@
     "lint": "tsc --noEmit && eslint .",
     "build-types": "tsc --emitDeclarationOnly --declaration --outDir dist",
     "build-common": "tsup lib/index.ts --format cjs,esm --clean --treeshake",
-    "build-iife": "tsup lib/index.ts --format cjs,esm,iife --clean --treeshake --minify",
+    "build-global": "tsup lib/index.ts --format cjs,esm,iife --clean --treeshake --onSuccess \"npm run post-build-global\"",
     "build": "npm run build-common -- --minify && npm run build-types",
+    "post-build-global": "npm run node-ts -- ./tools/post-build-global.mts",
     "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types\"",
-    "publish-package": "npm run build && changeset publish"
+    "publish-package": "npm run build && changeset publish",
+    "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm"
   },
   "repository": {
     "type": "git",
@@ -30,13 +32,15 @@
   "bugs": {
     "url": "https://github.com/Sv443-Network/UserUtils/issues"
   },
-  "homepage": "https://github.com/Sv443-Network/UserUtils#readme",
+  "homepage": "https://github.com/Sv443-Network/UserUtils",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "@types/greasemonkey": "^4.0.4",
+    "@types/node": "^20.5.9",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "eslint": "^8.46.0",
+    "ts-node": "^10.9.1",
     "tslib": "^2.6.1",
     "tsup": "^7.2.0",
     "typescript": "^5.1.6"
