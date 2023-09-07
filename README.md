@@ -392,7 +392,7 @@ Usage:
 interceptEvent(
   eventObject: EventTarget,
   eventName: string,
-  predicate: () => boolean
+  predicate: (event: Event) => boolean
 ): void
 ```
   
@@ -404,7 +404,8 @@ Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not 
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
-interceptEvent(document.body, "click", () => {
+interceptEvent(document.body, "click", (event) => {
+  console.log("Intercepting click event:", event);
   return true; // prevent all click events on the body element
 });
 ```
@@ -418,7 +419,7 @@ Usage:
 ```ts
 interceptWindowEvent(
   eventName: string,
-  predicate: () => boolean
+  predicate: (event: Event) => boolean
 ): void
 ```
   
@@ -426,11 +427,12 @@ Intercepts all events dispatched on the `window` object and prevents the listene
 This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` (or falls back to regular `window`).  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
+⚠️ In order for all events to be interceptable, the directive `@grant unsafeWindow` should be set.  
   
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
-interceptWindowEvent("beforeunload", () => {
+interceptWindowEvent("beforeunload", (event) => {
   return true; // prevent the pesky "Are you sure you want to leave this page?" popup
 });
 ```
@@ -610,6 +612,7 @@ Writes the default configuration given in `options.defaultConfig` synchronously 
 Fully deletes the configuration from persistent storage.  
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
 If `loadData()` or `setData()` are called after this, the persistent storage will be populated again.  
+If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
 
 <br>
 
