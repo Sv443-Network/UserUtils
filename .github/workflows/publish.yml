@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  PR_TITLE: "Create Release"
+  COMMIT_MSG: "chore: create new release"
+
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
@@ -13,9 +17,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-    env:
-      PR_TITLE: "Create Release"
-      COMMIT_MSG: "chore: create new release"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -24,7 +25,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build package
-        run: npm run build
+        run: |
+          npm run build
+          npm run build-global
+      - name: Create dist folder artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
       - name: Create Release
         uses: changesets/action@v1
         id: changesets

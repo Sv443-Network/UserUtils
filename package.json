@@ -9,7 +9,7 @@
     "lint": "tsc --noEmit && eslint .",
     "build-types": "tsc --emitDeclarationOnly --declaration --outDir dist",
     "build-common": "tsup lib/index.ts --format cjs,esm --clean --treeshake",
-    "build-global": "tsup lib/index.ts --format cjs,esm,iife --clean --treeshake --onSuccess \"npm run post-build-global\"",
+    "build-global": "tsup lib/index.ts --format cjs,esm,iife --treeshake --onSuccess \"npm run post-build-global\"",
     "build": "npm run build-common -- --minify && npm run build-types",
     "post-build-global": "npm run node-ts -- ./tools/post-build-global.mts",
     "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types\"",
