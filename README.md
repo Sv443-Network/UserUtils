@@ -1,7 +1,7 @@
 <div style="text-align: center;" align="center">
 
 ## UserUtils
-Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, modify the DOM more easily and more.  
+Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, manage persistent user configurations, modify the DOM more easily and more.  
 Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
@@ -82,10 +82,12 @@ If you like using this library, please consider [supporting the development ❤�
 This library is written in TypeScript and contains builtin TypeScript declarations.  
 The usages and examples in this readme are written in TypeScript, but the library can also be used in plain JavaScript.  
   
-Some functions require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
+Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
 Their documentation will contain a section marked by a warning emoji (⚠️) that will go into more detail.  
   
-If the usage contains multiple definitions of the function, each line represents an overload and you can choose which one you want to use.
+Each feature has example code that can be expanded by clicking on the text "Example - click to view".  
+  
+If the usage section contains multiple definitions of the function, each occurrence represents an overload and you can choose which one you want to use.
 
 <br><br>
 
@@ -127,7 +129,7 @@ This initialization function has to be called after `DOMContentLoaded` is fired 
   
 Calling onSelector() before `DOMContentLoaded` is fired will not throw an error, but it also won't trigger listeners until the DOM is accessible.
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 document.addEventListener("DOMContentLoaded", initOnSelector);
@@ -158,7 +160,7 @@ Usage:
 ```ts
 initOnSelector(options?: MutationObserverInit): void
 ```
-
+  
 Initializes the MutationObserver that is used by [`onSelector()`](#onselector) to check for the registered selectors whenever a DOM change occurs on the `<body>`  
 By default, this only checks if elements are added or removed (at any depth).  
 
@@ -172,7 +174,7 @@ You may see all options [here](https://developer.mozilla.org/en-US/docs/Web/API/
 >   
 > ⚠️ Using these extra options can have a performance impact on larger sites or sites with a constantly changing DOM.
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 document.addEventListener("DOMContentLoaded", () => {
@@ -188,12 +190,15 @@ document.addEventListener("DOMContentLoaded", () => {
 <br>
 
 ### getSelectorMap()
-Usage: `getSelectorMap(): Map<string, OnSelectorOptions[]>`  
+Usage:  
+```ts
+getSelectorMap(): Map<string, OnSelectorOptions[]>
+```
   
 Returns a Map of all currently registered selectors and their options, including listener function.  
 Since multiple listeners can be registered for the same selector, the value of the Map is an array of `OnSelectorOptions` objects.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 document.addEventListener("DOMContentLoaded", initOnSelector);
@@ -228,12 +233,15 @@ const selectorMap = getSelectorMap();
 <br>
 
 ### getUnsafeWindow()
-Usage: `getUnsafeWindow(): Window`  
+Usage:  
+```ts
+getUnsafeWindow(): Window
+```
   
 Returns the unsafeWindow object or falls back to the regular window object if the `@grant unsafeWindow` is not given.  
 Userscripts are sandboxed and do not have access to the regular window object, so this function is useful for websites that reject some events that were dispatched by the userscript.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 // trick the site into thinking the mouse was moved:
@@ -252,14 +260,17 @@ document.body.dispatchEvent(mouseEvent);
 <br>
 
 ### insertAfter()
-Usage: `insertAfter(beforeElement: HTMLElement, afterElement: HTMLElement): HTMLElement`  
+Usage:  
+```ts
+insertAfter(beforeElement: HTMLElement, afterElement: HTMLElement): HTMLElement
+```
   
 Inserts the element passed as `afterElement` as a sibling after the passed `beforeElement`.  
 The passed `afterElement` will be returned.  
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 // insert a <div> as a sibling next to an element
@@ -274,14 +285,17 @@ insertAfter(beforeElement, afterElement);
 <br>
 
 ### addParent()
-Usage: `addParent(element: HTMLElement, newParent: HTMLElement): HTMLElement`  
+Usage:  
+```ts
+addParent(element: HTMLElement, newParent: HTMLElement): HTMLElement
+```
   
 Adds a parent element around the passed `element` and returns the new parent.  
 Previously registered event listeners are kept intact.  
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 // add an <a> around an element
@@ -296,12 +310,15 @@ addParent(element, newParent);
 <br>
 
 ### addGlobalStyle()
-Usage: `addGlobalStyle(css: string): void`  
+Usage:  
+```ts
+addGlobalStyle(css: string): void
+```
   
 Adds a global style to the page in form of a `<style>` element that's inserted into the `<head>`.  
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 document.addEventListener("DOMContentLoaded", () => {
@@ -318,13 +335,16 @@ document.addEventListener("DOMContentLoaded", () => {
 <br>
 
 ### preloadImages()
-Usage: `preloadImages(urls: string[], rejects?: boolean): Promise<void>`  
+Usage:  
+```ts
+preloadImages(urls: string[], rejects?: boolean): Promise<void>
+```
   
 Preloads images into browser cache by creating an invisible `<img>` element for each URL passed.  
 The images will be loaded in parallel and the returned Promise will only resolve once all images have been loaded.  
 The resulting PromiseSettledResult array will contain the image elements if resolved, or an ErrorEvent if rejected, but only if `rejects` is set to true.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 preloadImages([
@@ -342,7 +362,10 @@ preloadImages([
 <br>
 
 ### openInNewTab()
-Usage: `openInNewTab(url: string): void`  
+Usage:  
+```ts
+openInNewTab(url: string): void
+```
   
 Creates an invisible anchor with a `_blank` target and clicks it.  
 Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
@@ -350,7 +373,7 @@ This function has to be run in response to a user interaction event, else the br
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 document.querySelector("#my-button").addEventListener("click", () => {
@@ -363,14 +386,21 @@ document.querySelector("#my-button").addEventListener("click", () => {
 <br>
 
 ### interceptEvent()
-Usage: `interceptEvent(eventObject: EventTarget, eventName: string, predicate: () => boolean): void`  
+Usage:  
+```ts
+interceptEvent(
+  eventObject: EventTarget,
+  eventName: string,
+  predicate: () => boolean
+): void
+```
   
 Intercepts all events dispatched on the `eventObject` and prevents the listeners from being called as long as the predicate function returns a truthy value.  
 Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not already higher) to ensure the stack trace is preserved.  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 interceptEvent(document.body, "click", () => {
@@ -383,14 +413,20 @@ interceptEvent(document.body, "click", () => {
 <br>
 
 ### interceptWindowEvent()
-Usage: `interceptWindowEvent(eventName: string, predicate: () => boolean): void`  
+Usage:  
+```ts
+interceptWindowEvent(
+  eventName: string,
+  predicate: () => boolean
+): void
+```
   
 Intercepts all events dispatched on the `window` object and prevents the listeners from being called as long as the predicate function returns a truthy value.  
 This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` (or falls back to regular `window`).  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 interceptWindowEvent("beforeunload", () => {
@@ -403,7 +439,10 @@ interceptWindowEvent("beforeunload", () => {
 <br>
 
 ### amplifyMedia()
-Usage: `amplifyMedia(mediaElement: HTMLMediaElement, multiplier?: number): AmplifyMediaResult`  
+Usage:  
+```ts
+amplifyMedia(mediaElement: HTMLMediaElement, multiplier?: number): AmplifyMediaResult
+```
   
 Amplifies the gain of a media element (like `<audio>` or `<video>`) by a given multiplier (defaults to 1.0).  
 This is how you can increase the volume of a media element beyond the default maximum volume of 1.0 or 100%.  
@@ -411,7 +450,7 @@ Make sure to limit the multiplier to a reasonable value ([clamp()](#clamp) is go
   
 ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
   
-Returns an object with the following properties:
+The returned AmplifyMediaResult object has the following properties:
 | Property | Description |
 | :-- | :-- |
 | `mediaElement` | The passed media element |
@@ -421,7 +460,7 @@ Returns an object with the following properties:
 | `source` | The MediaElementSourceNode instance |
 | `gain` | The GainNode instance |
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 const audio = document.querySelector<HTMLAudioElement>("audio");
@@ -451,11 +490,14 @@ button.addEventListener("click", () => {
 ## Math:
 
 ### clamp()
-Usage: `clamp(num: number, min: number, max: number): number`  
+Usage:  
+```ts
+clamp(num: number, min: number, max: number): number
+```
   
 Clamps a number between a min and max boundary (inclusive).  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 clamp(7, 0, 10);     // 7
@@ -473,11 +515,20 @@ clamp(99999, 0, Infinity);   // 99999
 <br>
 
 ### mapRange()
-Usage: `mapRange(value: number, range_1_min: number, range_1_max: number, range_2_min: number, range_2_max: number): number`  
+Usage:  
+```ts
+mapRange(
+  value: number,
+  range_1_min: number,
+  range_1_max: number,
+  range_2_min: number,
+  range_2_max: number
+): number
+```
   
 Maps a number from one range to the spot it would be in another range.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 mapRange(5, 0, 10, 0, 100); // 50
@@ -502,7 +553,7 @@ randRange(max: number): number
 Returns a random number between `min` and `max` (inclusive).  
 If only one argument is passed, it will be used as the `max` value and `min` will be set to 0.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 randRange(0, 10);  // 4
@@ -517,10 +568,16 @@ randRange(10);     // 7
 ## Misc:
 
 ### ConfigManager()
-Usage: `new ConfigManager(options: ConfigManagerOptions)`  
+Usage:  
+```ts
+new ConfigManager(options: ConfigManagerOptions)
+```
   
 A class that manages a userscript's configuration that is persistently saved to and loaded from GM storage.  
 Also supports automatic migration of outdated data formats via provided migration functions.  
+  
+⚠️ The configuration is stored as a JSON string, so only JSON-compatible data can be used.  
+⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
   
 The options object has the following properties:
 | Property | Description |
@@ -529,11 +586,33 @@ The options object has the following properties:
 | `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
+
+<br>
+
+### Methods:
+`loadData(): Promise<TData>`  
+Asynchronously loads the configuration data from persistent storage and returns it.  
+If no data was saved in persistent storage before, the value of `options.defaultConfig` will be returned and written to persistent storage.  
+If the formatVersion of the saved data is lower than the current one and the `options.migrations` property is present, the data will be migrated to the latest format before the Promise resolves.  
   
-⚠️ The configuration is stored as a JSON string, so only JSON-compatible data can be used.  
-⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
+`getData(): TData`  
+Synchronously returns the current data that is stored in the internal cache.  
+If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultConfig` will be returned.  
   
-<details><summary><b>Example - click to view</b></summary>
+`setData(data: TData): Promise<void>`  
+Writes the given data synchronously to the internal cache and asynchronously to persistent storage.  
+  
+`saveDefaultData(): Promise<void>`  
+Writes the default configuration given in `options.defaultConfig` synchronously to the internal cache and asynchronously to persistent storage.  
+  
+`deleteConfig(): Promise<void>`  
+Fully deletes the configuration from persistent storage.  
+The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
+If `loadData()` or `setData()` are called after this, the persistent storage will be populated again.  
+
+<br>
+
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 import { ConfigManager } from "@sv443-network/userutils";
@@ -615,17 +694,18 @@ init();
 
 </details>
 
-<!-- TODO: document methods -->
-
-<br>
+<br><br>
 
 ### autoPlural()
-Usage: `autoPlural(str: string, num: number | Array | NodeList): string`  
+Usage:  
+```ts
+autoPlural(str: string, num: number | Array | NodeList): string
+```
   
 Automatically pluralizes a string if the given number is not 1.  
-If an array or NodeList is passed, the length of it will be used.  
+If an array or NodeList is passed, the amount of contained items will be used.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 autoPlural("apple", 0); // "apples"
@@ -644,11 +724,14 @@ console.log(`Found ${items.length} ${autoPlural("item", items)}`); // "Found 6 i
 <br>
 
 ### pauseFor()
-Usage: `pauseFor(ms: number): Promise<void>`  
+Usage:  
+```ts
+pauseFor(ms: number): Promise<void>
+```
   
 Pauses async execution for a given amount of time.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 async function run() {
@@ -663,13 +746,17 @@ async function run() {
 <br>
 
 ### debounce()
-Usage: `debounce(func: Function, timeout?: number): Function`  
+Usage:  
+```ts
+debounce(func: Function, timeout?: number): Function
+```
   
 Debounces a function, meaning that it will only be called once after a given amount of time.  
 This is very useful for functions that are called repeatedly, like event listeners, to remove extraneous calls.  
+All passed properties will be passed down to the debounced function.  
 The timeout will default to 300ms if left undefined.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 window.addEventListener("resize", debounce((event) => {
@@ -693,7 +780,7 @@ fetchAdvanced(url: string, options?: {
 A wrapper around the native `fetch()` function that adds options like a timeout property.  
 The timeout will default to 10 seconds if left undefined.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 fetchAdvanced("https://api.example.org/data", {
@@ -714,12 +801,15 @@ fetchAdvanced("https://api.example.org/data", {
 ## Arrays:
 
 ### randomItem()
-Usage: `randomItem(array: Array): any`  
+Usage:  
+```ts
+randomItem(array: Array): any
+```
   
 Returns a random item from an array.  
 Returns undefined if the array is empty.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 randomItem(["foo", "bar", "baz"]); // "bar"
@@ -731,12 +821,15 @@ randomItem([ ]);                   // undefined
 <br>
 
 ### randomItemIndex()
-Usage: `randomItemIndex(array: Array): [item: any, index: number]`  
+Usage:  
+```ts
+randomItemIndex(array: Array): [item: any, index: number]
+```
   
 Returns a tuple of a random item and its index from an array.  
 If the array is empty, it will return undefined for both values.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
@@ -752,12 +845,15 @@ const [, index] = randomItemIndex(["foo", "bar", "baz"]);
 <br>
 
 ### takeRandomItem()
-Usage: `takeRandomItem(array: Array): any`  
+Usage:  
+```ts
+takeRandomItem(array: Array): any
+```
   
 Returns a random item from an array and mutates the array by removing the item.  
 Returns undefined if the array is empty.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 const arr = ["foo", "bar", "baz"];
@@ -770,12 +866,15 @@ console.log(arr);    // ["foo", "baz"]
 <br>
 
 ### randomizeArray()
-Usage: `randomizeArray(array: Array): Array`  
+Usage:  
+```ts
+randomizeArray(array: Array): Array
+```
   
-Returns a copy of the array with its items in a random order.  
-If the array is empty, the originally passed array will be returned.  
+Returns a copy of an array with its items in a random order.  
+If the array is empty, the originally passed empty array will be returned without copying.  
   
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
 randomizeArray([1, 2, 3, 4, 5, 6]); // [3, 1, 5, 2, 4, 6]
