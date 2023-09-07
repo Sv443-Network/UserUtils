@@ -1,5 +1,16 @@
 # @sv443-network/userutils
 
+## 1.0.0
+
+### Major Changes
+
+- a500a98: Added ConfigManager to manage persistent user configurations including data versioning and migration
+
+### Patch Changes
+
+- 6d0a700: Event interceptor can now be toggled at runtime ([#16](https://github.com/Sv443-Network/UserUtils/issues/16))
+- d038b21: Global (IIFE) build now comes with a header
+
 ## 0.5.3
 
 ### Patch Changes
