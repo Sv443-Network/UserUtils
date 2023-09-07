@@ -90,7 +90,11 @@ export function openInNewTab(href: string) {
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
-export function interceptEvent<TEvtObj extends EventTarget>(eventObject: TEvtObj, eventName: Parameters<TEvtObj["addEventListener"]>[0], predicate: () => boolean) {  
+export function interceptEvent<TEvtObj extends EventTarget, TPredicateEvt extends Event>(
+  eventObject: TEvtObj,
+  eventName: Parameters<TEvtObj["addEventListener"]>[0],
+  predicate: (event: TPredicateEvt) => boolean,
+) {  
   // default is between 10 and 100 on conventional browsers so this should hopefully be more than enough
   // @ts-ignore
   if(typeof Error.stackTraceLimit === "number" && Error.stackTraceLimit < 1000) {
@@ -100,11 +104,15 @@ export function interceptEvent<TEvtObj extends EventTarget>(eventObject: TEvtObj
 
   (function(original: typeof eventObject.addEventListener) {
     // @ts-ignore
-    element.__proto__.addEventListener = function(...args: Parameters<typeof eventObject.addEventListener>) {
-      if(args[0] === eventName && predicate())
-        return;
-      else
-        return original.apply(this, args);
+    eventObject.__proto__.addEventListener = function(...args: Parameters<typeof eventObject.addEventListener>) {
+      const origListener = typeof args[1] === "function" ? args[1] : args[1]?.handleEvent ?? (() => void 0);
+      args[1] = function(...a) {
+        if(args[0] === eventName && predicate((Array.isArray(a) ? a[0] : a) as TPredicateEvt))
+          return;
+        else
+          return origListener.apply(this, a);
+      };
+      original.apply(this, args);
     };
     // @ts-ignore
   })(eventObject.__proto__.addEventListener);
@@ -115,7 +123,10 @@ export function interceptEvent<TEvtObj extends EventTarget>(eventObject: TEvtObj
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
-export function interceptWindowEvent(eventName: keyof WindowEventMap, predicate: () => boolean) {  
+export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
+  eventName: TEvtKey,
+  predicate: (event: WindowEventMap[TEvtKey]) => boolean,
+) {  
   return interceptEvent(getUnsafeWindow(), eventName, predicate);
 }
 
