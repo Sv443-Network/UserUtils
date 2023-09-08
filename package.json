@@ -48,7 +48,8 @@
   "files": [
     "/dist/index.js",
     "/dist/index.mjs",
-    "/dist/lib/**.*",
+    "/dist/index.global.js",
+    "/dist/lib/**.d.ts",
     "/package.json",
     "/README.md",
     "/CHANGELOG.md",
