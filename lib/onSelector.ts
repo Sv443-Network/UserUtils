@@ -1,21 +1,21 @@
 /** Options for the `onSelector()` function */
 export type OnSelectorOpts<TElem extends Element = HTMLElement> = SelectorOptsOne<TElem> | SelectorOptsAll<TElem>;
 
-type SelectorOptsOne<TElem extends Element> = SelectorOptsBase & {
+type SelectorOptsOne<TElem extends Element> = SelectorOptsCommon & {
   /** Whether to use `querySelectorAll()` instead - default is false */
   all?: false;
   /** Gets called whenever the selector was found in the DOM */
   listener: (element: TElem) => void;
 };
 
-type SelectorOptsAll<TElem extends Element> = SelectorOptsBase & {
+type SelectorOptsAll<TElem extends Element> = SelectorOptsCommon & {
   /** Whether to use `querySelectorAll()` instead - default is false */
   all: true;
   /** Gets called whenever the selector was found in the DOM */
   listener: (elements: NodeListOf<TElem>) => void;
 };
 
-type SelectorOptsBase = {
+type SelectorOptsCommon = {
   /** Whether to call the listener continuously instead of once - default is false */
   continuous?: boolean;
 };
@@ -58,7 +58,7 @@ function checkSelectorExists<TElem extends Element = HTMLElement>(selector: stri
   const deleteIndices: number[] = [];
   options.forEach((option, i) => {
     try {
-      const elements = option.all ? document.querySelectorAll<HTMLElement>(selector) : document.querySelector<HTMLElement>(selector);
+      const elements = option.all ? document.querySelectorAll<TElem>(selector) : document.querySelector<TElem>(selector);
       if((elements !== null && elements instanceof NodeList && elements.length > 0) || elements !== null) {
         // I don't feel like dealing with intersecting types, this should work just fine at runtime
         // @ts-ignore

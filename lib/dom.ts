@@ -15,7 +15,7 @@ export function getUnsafeWindow() {
  * Inserts `afterElement` as a sibling just after the provided `beforeElement`
  * @returns Returns the `afterElement`
  */
-export function insertAfter(beforeElement: HTMLElement, afterElement: HTMLElement) {
+export function insertAfter(beforeElement: Element, afterElement: Element) {
   beforeElement.parentNode?.insertBefore(afterElement, beforeElement.nextSibling);
   return afterElement;
 }
@@ -24,7 +24,7 @@ export function insertAfter(beforeElement: HTMLElement, afterElement: HTMLElemen
  * Adds a parent container around the provided element
  * @returns Returns the new parent element
  */
-export function addParent(element: HTMLElement, newParent: HTMLElement) {
+export function addParent(element: Element, newParent: Element) {
   const oldParent = element.parentNode;
 
   if(!oldParent)

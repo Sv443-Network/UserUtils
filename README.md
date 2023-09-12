@@ -124,6 +124,7 @@ If set to `false` (default), querySelector() will be used and only the first mat
 If `continuous` is set to `true`, the listener will not be deregistered after it was called once (defaults to false).  
   
 When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
+It will default to `HTMLElement` if left undefined.  
   
 ⚠️ In order to use this function, [`initOnSelector()`](#initonselector) has to be called as soon as possible.  
 This initialization function has to be called after `DOMContentLoaded` is fired (or immediately if `@run-at document-end` is set).  
@@ -263,7 +264,7 @@ document.body.dispatchEvent(mouseEvent);
 ### insertAfter()
 Usage:  
 ```ts
-insertAfter(beforeElement: HTMLElement, afterElement: HTMLElement): HTMLElement
+insertAfter(beforeElement: Element, afterElement: Element): Element
 ```
   
 Inserts the element passed as `afterElement` as a sibling after the passed `beforeElement`.  
@@ -288,7 +289,7 @@ insertAfter(beforeElement, afterElement);
 ### addParent()
 Usage:  
 ```ts
-addParent(element: HTMLElement, newParent: HTMLElement): HTMLElement
+addParent(element: Element, newParent: Element): Element
 ```
   
 Adds a parent element around the passed `element` and returns the new parent.  
