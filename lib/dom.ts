@@ -164,3 +164,12 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
 
   return result;
 }
+
+/** Checks if an element is scrollable in the horizontal and vertical directions */
+export function isScrollable(element: Element) {
+  const { overflowX, overflowY } = getComputedStyle(element);
+  return {
+    vertical: (overflowY === "scroll" || overflowY === "auto") && element.scrollHeight > element.clientHeight,
+    horizontal: (overflowX === "scroll" || overflowX === "auto") && element.scrollWidth > element.clientWidth,
+  };
+}
