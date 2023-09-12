@@ -1,5 +1,15 @@
 # @sv443-network/userutils
 
+## 1.1.0
+
+### Minor Changes
+
+- db5cded: Added `isScrollable()` to check whether an element has a horizontal or vertical scroll bar
+
+### Patch Changes
+
+- 9e26464: Replaced most occurrences of `HTMLElement` in the docs with `Element` for better compatibility
+
 ## 1.0.0
 
 ### Major Changes
