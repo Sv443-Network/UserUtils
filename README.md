@@ -27,6 +27,7 @@ If you like using this library, please consider [supporting the development ❤�
     - [interceptEvent()](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
     - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
     - [amplifyMedia()](#amplifymedia) - amplify an audio or video element's volume past the maximum of 100%
+    - [isScrollable()](#isscrollable) - check if an element has a horizontal or vertical scroll bar
   - [Math:](#math)
     - [clamp()](#clamp) - constrain a number between a min and max value
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
@@ -81,14 +82,13 @@ If you like using this library, please consider [supporting the development ❤�
 
 ## Preamble:
 This library is written in TypeScript and contains builtin TypeScript declarations.  
-The usages and examples in this readme are written in TypeScript, but the library can also be used in plain JavaScript.  
-  
-Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
-Their documentation will contain a section marked by a warning emoji (⚠️) that will go into more detail.  
   
 Each feature has example code that can be expanded by clicking on the text "Example - click to view".  
+The usages and examples are written in TypeScript, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS).  
+If the usage section contains multiple definitions of the function, each occurrence represents an overload and you can choose which one you want to use.  
   
-If the usage section contains multiple definitions of the function, each occurrence represents an overload and you can choose which one you want to use.
+Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
+Their documentation will contain a section marked by a warning emoji (⚠️) that will go into more detail.
 
 <br><br>
 
@@ -134,6 +134,8 @@ Calling onSelector() before `DOMContentLoaded` is fired will not throw an error,
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { initOnSelector, onSelector } from "@sv443-network/userutils";
+
 document.addEventListener("DOMContentLoaded", initOnSelector);
 
 // Continuously checks if `div` elements are added to the DOM, then returns all of them (even previously detected ones) in a NodeList
@@ -179,6 +181,8 @@ You may see all options [here](https://developer.mozilla.org/en-US/docs/Web/API/
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { initOnSelector } from "@sv443-network/userutils";
+
 document.addEventListener("DOMContentLoaded", () => {
   initOnSelector({
     attributes: true,
@@ -203,6 +207,8 @@ Since multiple listeners can be registered for the same selector, the value of t
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { initOnSelector, onSelector, getSelectorMap } from "@sv443-network/userutils";
+
 document.addEventListener("DOMContentLoaded", initOnSelector);
 
 onSelector<HTMLDivElement>("div", {
@@ -246,6 +252,8 @@ Userscripts are sandboxed and do not have access to the regular window object, s
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { getUnsafeWindow } from "@sv443-network/userutils";
+
 // trick the site into thinking the mouse was moved:
 const mouseEvent = new MouseEvent("mousemove", {
   view: getUnsafeWindow(),
@@ -254,6 +262,7 @@ const mouseEvent = new MouseEvent("mousemove", {
   movementX: 10,
   movementY: 0,
 });
+
 document.body.dispatchEvent(mouseEvent);
 ```
 
@@ -275,10 +284,13 @@ The passed `afterElement` will be returned.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { insertAfter } from "@sv443-network/userutils";
+
 // insert a <div> as a sibling next to an element
 const beforeElement = document.querySelector("#before");
 const afterElement = document.createElement("div");
 afterElement.innerText = "After";
+
 insertAfter(beforeElement, afterElement);
 ```
 
@@ -300,10 +312,13 @@ Previously registered event listeners are kept intact.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { addParent } from "@sv443-network/userutils";
+
 // add an <a> around an element
 const element = document.querySelector("#element");
 const newParent = document.createElement("a");
 newParent.href = "https://example.org/";
+
 addParent(element, newParent);
 ```
 
@@ -323,6 +338,8 @@ Adds a global style to the page in form of a `<style>` element that's inserted i
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { addGlobalStyle } from "@sv443-network/userutils";
+
 document.addEventListener("DOMContentLoaded", () => {
   addGlobalStyle(`
     body {
@@ -349,6 +366,8 @@ The resulting PromiseSettledResult array will contain the image elements if reso
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { preloadImages } from "@sv443-network/userutils";
+
 preloadImages([
   "https://example.org/image1.png",
   "https://example.org/image2.png",
@@ -378,6 +397,8 @@ This function has to be run in response to a user interaction event, else the br
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { openInNewTab } from "@sv443-network/userutils";
+
 document.querySelector("#my-button").addEventListener("click", () => {
   openInNewTab("https://example.org/");
 });
@@ -405,6 +426,8 @@ Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not 
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { interceptEvent } from "@sv443-network/userutils";
+
 interceptEvent(document.body, "click", (event) => {
   console.log("Intercepting click event:", event);
   return true; // prevent all click events on the body element
@@ -433,6 +456,8 @@ This is essentially the same as [`interceptEvent()`](#interceptevent), but autom
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { interceptWindowEvent } from "@sv443-network/userutils";
+
 interceptWindowEvent("beforeunload", (event) => {
   return true; // prevent the pesky "Are you sure you want to leave this page?" popup
 });
@@ -467,6 +492,8 @@ The returned AmplifyMediaResult object has the following properties:
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { amplifyMedia } from "@sv443-network/userutils";
+
 const audio = document.querySelector<HTMLAudioElement>("audio");
 const button = document.querySelector<HTMLButtonElement>("button");
 
@@ -489,6 +516,31 @@ button.addEventListener("click", () => {
 
 </details>
 
+<br>
+
+### isScrollable()
+Usage:  
+```ts
+isScrollable(element: Element): { horizontal: boolean, vertical: boolean }
+```
+  
+Checks if an element has a horizontal or vertical scroll bar.  
+This uses the computed style of the element, so it will also work if the element is hidden.  
+  
+<details><summary><h4>Example - click to view</h4></summary>
+
+```ts
+import { isScrollable } from "@sv443-network/userutils";
+
+const element = document.querySelector("#element");
+const { horizontal, vertical } = isScrollable(element);
+
+console.log("Element has a horizontal scroll bar:", horizontal);
+console.log("Element has a vertical scroll bar:", vertical);
+```
+
+</details>
+
 <br><br>
 
 ## Math:
@@ -504,6 +556,8 @@ Clamps a number between a min and max boundary (inclusive).
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { clamp } from "@sv443-network/userutils";
+
 clamp(7, 0, 10);     // 7
 clamp(-1, 0, 10);    // 0
 clamp(5, -5, 0);     // 0
@@ -535,6 +589,8 @@ Maps a number from one range to the spot it would be in another range.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { mapRange } from "@sv443-network/userutils";
+
 mapRange(5, 0, 10, 0, 100); // 50
 mapRange(5, 0, 10, 0, 50);  // 25
 
@@ -560,6 +616,8 @@ If only one argument is passed, it will be used as the `max` value and `min` wil
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { randRange } from "@sv443-network/userutils";
+
 randRange(0, 10);  // 4
 randRange(10, 20); // 17
 randRange(10);     // 7
@@ -713,6 +771,8 @@ If an array or NodeList is passed, the amount of contained items will be used.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { autoPlural } from "@sv443-network/userutils";
+
 autoPlural("apple", 0); // "apples"
 autoPlural("apple", 1); // "apple"
 autoPlural("apple", 2); // "apples"
@@ -739,6 +799,8 @@ Pauses async execution for a given amount of time.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { pauseFor } from "@sv443-network/userutils";
+
 async function run() {
   console.log("Hello");
   await pauseFor(3000); // waits for 3 seconds
@@ -764,6 +826,8 @@ The timeout will default to 300ms if left undefined.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { debounce } from "@sv443-network/userutils";
+
 window.addEventListener("resize", debounce((event) => {
   console.log("Window was resized:", event);
 }, 500)); // 500ms timeout
@@ -788,7 +852,9 @@ The timeout will default to 10 seconds if left undefined.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
-fetchAdvanced("https://api.example.org/data", {
+import { fetchAdvanced } from "@sv443-network/userutils";
+
+fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
   timeout: 5000,
   // also accepts any other fetch options like headers:
   headers: {
@@ -817,6 +883,8 @@ Returns undefined if the array is empty.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { randomItem } from "@sv443-network/userutils";
+
 randomItem(["foo", "bar", "baz"]); // "bar"
 randomItem([ ]);                   // undefined
 ```
@@ -837,12 +905,15 @@ If the array is empty, it will return undefined for both values.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { randomItemIndex } from "@sv443-network/userutils";
+
 randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
 randomItemIndex([ ]);                   // [undefined, undefined]
+
 // using array destructuring:
-const [item, index] = randomItemIndex(["foo", "bar", "baz"]);
+const [item, index] = randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
 // or if you only want the index:
-const [, index] = randomItemIndex(["foo", "bar", "baz"]);
+const [, index] = randomItemIndex(["foo", "bar", "baz"]); // 1
 ```
 
 </details>
@@ -861,6 +932,8 @@ Returns undefined if the array is empty.
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
+import { takeRandomItem } from "@sv443-network/userutils";
+
 const arr = ["foo", "bar", "baz"];
 takeRandomItem(arr); // "bar"
 console.log(arr);    // ["foo", "baz"]
@@ -882,7 +955,14 @@ If the array is empty, the originally passed empty array will be returned withou
 <details><summary><h4>Example - click to view</h4></summary>
 
 ```ts
-randomizeArray([1, 2, 3, 4, 5, 6]); // [3, 1, 5, 2, 4, 6]
+import { randomizeArray } from "@sv443-network/userutils";
+
+const foo = [1, 2, 3, 4, 5, 6];
+
+console.log(randomizeArray(foo)); // [3, 1, 5, 2, 4, 6]
+console.log(randomizeArray(foo)); // [4, 5, 2, 1, 6, 3]
+
+console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 ```
 
 </details>
