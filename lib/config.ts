@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
-type MigrationFunc = <TOldData = any>(oldData: TOldData) => any | Promise<any>;
+type MigrationFunc = (oldData: any) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
 type MigrationsDict = Record<number, MigrationFunc>;
 
