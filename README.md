@@ -637,8 +637,9 @@ new ConfigManager(options: ConfigManagerOptions)
   
 A class that manages a userscript's configuration that is persistently saved to and loaded from GM storage.  
 Also supports automatic migration of outdated data formats via provided migration functions.  
+You may create as many instances as you like as long as they have different IDs.  
   
-⚠️ The configuration is stored as a JSON string, so only JSON-compatible data can be used.  
+⚠️ The configuration is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save.  
 ⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
   
 The options object has the following properties:
@@ -670,8 +671,8 @@ Writes the default configuration given in `options.defaultConfig` synchronously 
 `deleteConfig(): Promise<void>`  
 Fully deletes the configuration from persistent storage.  
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
-If `loadData()` or `setData()` are called after this, the persistent storage will be populated again.  
-If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
+If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultConfig` again.  
+⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
 
 <br>
 
@@ -699,7 +700,7 @@ const formatVersion = 2;
 /** Functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion and that no numbers are skipped! */
 const migrations = {
   // migrate from format version 0 to 1
-  1: (oldData: any) => {
+  1: (oldData: Record<string, unknown>) => {
     return {
       foo: oldData.foo,
       bar: oldData.bar,
@@ -707,7 +708,7 @@ const migrations = {
     };
   },
   // asynchronously migrate from format version 1 to 2
-  2: async (oldData: any) => {
+  2: async (oldData: Record<string, unknown>) => {
     // arbitrary async operation required for the new format
     const qux = JSON.parse(await (await fetch("https://api.example.org/some-data")).text());
     return {
@@ -719,7 +720,7 @@ const migrations = {
   },
 };
 
-const configMgr = new ConfigManager({
+const manager = new ConfigManager({
   /** A unique ID for this configuration - choose wisely as changing it is not supported yet! */
   id: "my-userscript",
   /** Default / fallback configuration data */
@@ -735,7 +736,7 @@ async function init() {
   // wait for the config to be loaded from persistent storage
   // if no data was saved in persistent storage before or getData() is called before loadData(), the value of options.defaultConfig will be returned
   // if the previously saved data needs to be migrated to a newer version, it will happen in this function call
-  const configData = await configMgr.loadData();
+  const configData = await manager.loadData();
 
   console.log(configData.foo); // "hello"
 
@@ -744,12 +745,12 @@ async function init() {
   configData.bar = 123;
 
   // save the updated config - synchronously to the cache and asynchronously to persistent storage
-  configMgr.saveData(configData).then(() => {
+  manager.saveData(configData).then(() => {
     console.log("Config saved to persistent storage!");
   });
 
   // the internal cache is updated synchronously, so the updated data can be accessed before the Promise resolves:
-  console.log(configMgr.getData().foo); // "world"
+  console.log(manager.getData().foo); // "world"
 }
 
 init();
