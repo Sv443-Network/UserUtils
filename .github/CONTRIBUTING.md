@@ -14,9 +14,9 @@ Thanks to Matt Pocock for his video on how to set up a modern TypeScript library
 | Command | Description |
 | :-- | :-- |
 | `npm run lint` | Run TSC and ESLint to lint the code |
-| `npm run build` | Build the project with tsup, outputting minified CJS and ESM bundles to `dist/` |
-| `npm run build-global` | Build the project with tsup, outputting a minified bundle that exports as a global, including a userscript header to `dist/` (for publishing to greasyfork) |
-| `npm run dev` | Watch for changes and build the project without minification and with sourcemaps |
+| `npm run build` | Build the project with tsup, outputting CJS and ESM bundles as well as TypeScript declarations to `dist/` |
+| `npm run build-global` | Build the project with tsup, outputting a bundle that exports as a global, including a userscript header to `dist/` (for publishing to greasyfork) |
+| `npm run dev` | Watch for changes and build the project with sourcemaps |
 
 <br>
 
