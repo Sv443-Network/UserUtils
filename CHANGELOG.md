@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 1.1.1
+
+### Patch Changes
+
+- 4799a9f: Fix TS error in ConfigManager migration functions
+
 ## 1.1.0
 
 ### Minor Changes
