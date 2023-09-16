@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 1.1.2
+
+### Patch Changes
+
+- 049aeb0: Export ConfigMigrationsDict for easier use with TypeScript
+
 ## 1.1.1
 
 ### Patch Changes
