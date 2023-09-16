@@ -3,7 +3,7 @@
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
 type MigrationFunc = (oldData: any) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
-type MigrationsDict = Record<number, MigrationFunc>;
+export type ConfigMigrationsDict = Record<number, MigrationFunc>;
 
 /** Options for the ConfigManager instance */
 export interface ConfigManagerOptions<TData> {
@@ -18,7 +18,7 @@ export interface ConfigManagerOptions<TData> {
   defaultConfig: TData;
   /**
    * An incremental, whole integer version number of the current format of config data.  
-   * If the format of the data is changed, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively.  
+   * If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively.  
    *   
    * ⚠️ Never decrement this number and optimally don't skip any numbers either!
    */
@@ -30,7 +30,7 @@ export interface ConfigManagerOptions<TData> {
    * The functions will be run in order from the oldest to the newest version.  
    * If the current format version is not in the dictionary, no migrations will be run.
    */
-  migrations?: MigrationsDict;
+  migrations?: ConfigMigrationsDict;
 }
 
 /**
@@ -47,7 +47,7 @@ export class ConfigManager<TData = any> {
   public readonly formatVersion: number;
   public readonly defaultConfig: TData;
   private cachedConfig: TData;
-  private migrations?: MigrationsDict;
+  private migrations?: ConfigMigrationsDict;
 
   /**
    * Creates an instance of ConfigManager to manage a user configuration that is cached in memory and persistently saved across sessions.  
@@ -107,7 +107,7 @@ export class ConfigManager<TData = any> {
   public setData(data: TData) {
     this.cachedConfig = data;
     return new Promise<void>(async (resolve) => {
-      await Promise.allSettled([
+      await Promise.all([
         GM.setValue(`_uucfg-${this.id}`, JSON.stringify(data)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
       ]);
@@ -119,7 +119,7 @@ export class ConfigManager<TData = any> {
   public async saveDefaultData() {
     this.cachedConfig = this.defaultConfig;
     return new Promise<void>(async (resolve) => {
-      await Promise.allSettled([
+      await Promise.all([
         GM.setValue(`_uucfg-${this.id}`, JSON.stringify(this.defaultConfig)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
       ]);
@@ -135,7 +135,7 @@ export class ConfigManager<TData = any> {
    * ⚠️ This requires the additional directive `@grant GM.deleteValue`
    */
   public async deleteConfig() {
-    await Promise.allSettled([
+    await Promise.all([
       GM.deleteValue(`_uucfg-${this.id}`),
       GM.deleteValue(`_uucfgver-${this.id}`),
     ]);
@@ -166,7 +166,7 @@ export class ConfigManager<TData = any> {
       }
     }
 
-    await Promise.allSettled([
+    await Promise.all([
       GM.setValue(`_uucfg-${this.id}`, JSON.stringify(newData)),
       GM.setValue(`_uucfgver-${this.id}`, lastFmtVer),
     ]);
