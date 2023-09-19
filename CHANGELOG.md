@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 1.1.3
+
+### Patch Changes
+
+- ad17374: Add support for OpenUserJS
+
 ## 1.1.2
 
 ### Patch Changes
