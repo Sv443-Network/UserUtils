@@ -15,16 +15,26 @@ async function run() {
 
   const libHeader = `\
 // ==UserScript==
-// @name         UserUtils
-// @description  ${packageJson.description}
 // @namespace    ${packageJson.homepage}
-// @version      ${packageJson.version}
-// @license      ${packageJson.license}
+// @exclude      *
 // @author       ${packageJson.author.name}
-// @copyright    ${packageJson.author.name} (${packageJson.author.url})
 // @supportURL   ${packageJson.bugs.url}
 // @homepageURL  ${packageJson.homepage}#readme
+// @supportURL   ${packageJson.homepage}/issues
+
+// ==UserLibrary==
+// @name         UserUtils
+// @description  ${packageJson.description}
+// @version      ${packageJson.version}
+// @license      ${packageJson.license}
+// @copyright    ${packageJson.author.name} (${packageJson.author.url})
+
 // ==/UserScript==
+// ==/UserLibrary==
+
+// ==OpenUserJS==
+// @author       Sv443
+// ==/OpenUserJS==
 `;
 
   const initialScript = await readFile(iifeScriptPath, "utf8");
