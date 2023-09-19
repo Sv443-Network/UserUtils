@@ -64,9 +64,12 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 <br>
 
-- If you are not using a bundler, you can include the latest release from GreasyFork by adding this directive to the userscript header:
+- If you are not using a bundler, you can include the latest release from GreasyFork by adding one of these directives to the userscript header, depending on your preferred CDN:
     ```
     // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
+    ```
+    ```
+    // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
     ```
     Then, access the functions on the global variable `UserUtils`:
     ```ts
