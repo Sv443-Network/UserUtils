@@ -139,7 +139,7 @@ This initialization function has to be called after `DOMContentLoaded` is fired 
   
 Calling onSelector() before `DOMContentLoaded` is fired will not throw an error, but it also won't trigger listeners until the DOM is accessible.
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { initOnSelector, onSelector } from "@sv443-network/userutils";
@@ -186,7 +186,7 @@ You may see all options [here](https://developer.mozilla.org/en-US/docs/Web/API/
 >   
 > ⚠️ Using these extra options can have a performance impact on larger sites or sites with a constantly changing DOM.
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { initOnSelector } from "@sv443-network/userutils";
@@ -212,7 +212,7 @@ getSelectorMap(): Map<string, OnSelectorOptions[]>
 Returns a Map of all currently registered selectors and their options, including listener function.  
 Since multiple listeners can be registered for the same selector, the value of the Map is an array of `OnSelectorOptions` objects.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { initOnSelector, onSelector, getSelectorMap } from "@sv443-network/userutils";
@@ -257,7 +257,7 @@ getUnsafeWindow(): Window
 Returns the unsafeWindow object or falls back to the regular window object if the `@grant unsafeWindow` is not given.  
 Userscripts are sandboxed and do not have access to the regular window object, so this function is useful for websites that reject some events that were dispatched by the userscript.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { getUnsafeWindow } from "@sv443-network/userutils";
@@ -289,7 +289,7 @@ The passed `afterElement` will be returned.
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { insertAfter } from "@sv443-network/userutils";
@@ -317,7 +317,7 @@ Previously registered event listeners are kept intact.
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { addParent } from "@sv443-network/userutils";
@@ -343,7 +343,7 @@ addGlobalStyle(css: string): void
 Adds a global style to the page in form of a `<style>` element that's inserted into the `<head>`.  
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { addGlobalStyle } from "@sv443-network/userutils";
@@ -371,7 +371,7 @@ Preloads images into browser cache by creating an invisible `<img>` element for 
 The images will be loaded in parallel and the returned Promise will only resolve once all images have been loaded.  
 The resulting PromiseSettledResult array will contain the image elements if resolved, or an ErrorEvent if rejected, but only if `rejects` is set to true.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { preloadImages } from "@sv443-network/userutils";
@@ -402,7 +402,7 @@ This function has to be run in response to a user interaction event, else the br
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { openInNewTab } from "@sv443-network/userutils";
@@ -431,7 +431,7 @@ Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not 
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { interceptEvent } from "@sv443-network/userutils";
@@ -461,7 +461,7 @@ This is essentially the same as [`interceptEvent()`](#interceptevent), but autom
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
 ⚠️ In order for all events to be interceptable, the directive `@grant unsafeWindow` should be set.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { interceptWindowEvent } from "@sv443-network/userutils";
@@ -497,7 +497,7 @@ The returned AmplifyMediaResult object has the following properties:
 | `source` | The MediaElementSourceNode instance |
 | `gain` | The GainNode instance |
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { amplifyMedia } from "@sv443-network/userutils";
@@ -535,7 +535,7 @@ isScrollable(element: Element): { horizontal: boolean, vertical: boolean }
 Checks if an element has a horizontal or vertical scroll bar.  
 This uses the computed style of the element, so it will also work if the element is hidden.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { isScrollable } from "@sv443-network/userutils";
@@ -561,7 +561,7 @@ clamp(num: number, min: number, max: number): number
   
 Clamps a number between a min and max boundary (inclusive).  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { clamp } from "@sv443-network/userutils";
@@ -594,7 +594,7 @@ mapRange(
   
 Maps a number from one range to the spot it would be in another range.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { mapRange } from "@sv443-network/userutils";
@@ -621,7 +621,7 @@ randRange(max: number): number
 Returns a random number between `min` and `max` (inclusive).  
 If only one argument is passed, it will be used as the `max` value and `min` will be set to 0.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { randRange } from "@sv443-network/userutils";
@@ -684,7 +684,7 @@ If `loadData()` or `setData()` are called after this, the persistent storage wil
 
 <br>
 
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { ConfigManager } from "@sv443-network/userutils";
@@ -777,7 +777,7 @@ autoPlural(str: string, num: number | Array | NodeList): string
 Automatically pluralizes a string if the given number is not 1.  
 If an array or NodeList is passed, the amount of contained items will be used.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { autoPlural } from "@sv443-network/userutils";
@@ -805,7 +805,7 @@ pauseFor(ms: number): Promise<void>
   
 Pauses async execution for a given amount of time.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { pauseFor } from "@sv443-network/userutils";
@@ -832,7 +832,7 @@ This is very useful for functions that are called repeatedly, like event listene
 All passed properties will be passed down to the debounced function.  
 The timeout will default to 300ms if left undefined.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { debounce } from "@sv443-network/userutils";
@@ -858,7 +858,7 @@ fetchAdvanced(url: string, options?: {
 A wrapper around the native `fetch()` function that adds options like a timeout property.  
 The timeout will default to 10 seconds if left undefined.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { fetchAdvanced } from "@sv443-network/userutils";
@@ -889,7 +889,7 @@ randomItem(array: Array): any
 Returns a random item from an array.  
 Returns undefined if the array is empty.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { randomItem } from "@sv443-network/userutils";
@@ -911,7 +911,7 @@ randomItemIndex(array: Array): [item: any, index: number]
 Returns a tuple of a random item and its index from an array.  
 If the array is empty, it will return undefined for both values.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { randomItemIndex } from "@sv443-network/userutils";
@@ -938,7 +938,7 @@ takeRandomItem(array: Array): any
 Returns a random item from an array and mutates the array by removing the item.  
 Returns undefined if the array is empty.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { takeRandomItem } from "@sv443-network/userutils";
@@ -961,7 +961,7 @@ randomizeArray(array: Array): Array
 Returns a copy of an array with its items in a random order.  
 If the array is empty, the originally passed empty array will be returned without copying.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { randomizeArray } from "@sv443-network/userutils";
@@ -992,12 +992,13 @@ tr(key: string, ...values: Stringifiable[]): string
   
 The function returns the translation of the passed key in the language added by [`tr.addLanguage()`](#traddlanguage) and set by [`tr.setLanguage()`](#trsetlanguage)  
 Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `values` rest parameter.  
+The items of the `values` rest parameter will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the translation.
   
 If the key is not found or no language has been added or set before calling this function, it will return the key itself.  
 If the key is found and the translation contains placeholders but no values are passed, it will return the translation as-is, including unmodified placeholders.  
 If the key is found, the translation doesn't contain placeholders but values are still passed, they will be ignored and the translation will be returned as-is.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
@@ -1043,7 +1044,7 @@ If `tr.addLanguage()` is called multiple times with the same language, the previ
 The translation values may contain placeholders in the format `%n`, where `n` is the number of the value starting at 1.  
 These can be used to inject values into the translation when calling `tr()`  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
@@ -1064,7 +1065,7 @@ tr.addLanguage("en", {
 });
 
 
-// can work for multiple locales too:
+// can be used for different locales too:
 
 tr.addLanguage("en-US", {
   "fries": "french fries",
@@ -1074,7 +1075,7 @@ tr.addLanguage("en-GB", {
 });
 
 
-// apply default values for different locales to reduce redundancy:
+// apply default values for different locales to reduce redundancy in shared translation values:
 
 const translation_de = {
   "greeting": "Guten Tag!",
@@ -1096,22 +1097,32 @@ tr.addLanguage("de-AT", {
 // example for custom pluralization:
 
 tr.addLanguage("en", {
-  "items_added-1": "Added 1 item to your cart",
-  "items_added-n": "Added %1 items to your cart",
+  "items_added-0": "Added %1 items to your cart",
+  "items_added-1": "Added %1 item to your cart",
+  "items_added-n": "Added all %1 items to your cart",
 });
 
-/** Returns the custom pluralization identifier */
+/** Returns the custom pluralization identifier for the given number of items (or size of Array/NodeList) */
 function pl(num: number | unknown[] | NodeList) {
   if(Array.isArray(num))
     num = num.length;
-  return num === 1 ? "1" : "n";
+
+  if(num === 0)
+    return "0";
+  else if(num === 1)
+    return "1";
+  else
+    return "n";
 };
 
-const items = ["foo"];
+const items = [];
+tr(`items_added-${pl(items)}`, items.length); // "Added 0 items to your cart"
+
+items.push("foo");
 tr(`items_added-${pl(items)}`, items.length); // "Added 1 item to your cart"
 
 items.push("bar");
-tr(`items_added-${pl(items)}`, items.length); // "Added 2 items to your cart"
+tr(`items_added-${pl(items)}`, items.length); // "Added all 2 items to your cart"
 ```
 
 </details>
@@ -1151,7 +1162,7 @@ This type describes any value that either is a string itself or can be converted
 To be considered stringifiable, the object needs to have a `toString()` method that returns a string (all primitive types have this method).  
 This method allows not just explicit conversion by calling it, but also implicit conversion by passing it into the `String()` constructor or by interpolating it in a template string.  
   
-<details><summary><h4>Example - click to view</h4></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import type { Stringifiable } from "@sv443-network/userutils";
