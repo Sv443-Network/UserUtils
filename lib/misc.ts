@@ -52,3 +52,16 @@ export async function fetchAdvanced(url: string, options: FetchAdvancedOpts = {}
   clearTimeout(id);
   return res;
 }
+
+/**
+ * Inserts the passed values into a string at the respective placeholders.  
+ * The placeholder format is `%n`, where `n` is the 1-indexed argument number.
+ * @param str The string to insert the values into
+ * @param values The values to insert, in order, starting at `%1`
+ */
+export function insertValues(str: string, ...values: Stringifiable[]) {
+  return str.replace(/%\d/gm, (match) => {
+    const argIndex = Number(match.substring(1)) - 1;
+    return (values[argIndex] ?? match)?.toString();
+  });
+}
