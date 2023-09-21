@@ -2,7 +2,7 @@ import { Stringifiable, insertValues } from "./misc";
 
 /** Trans rights! 🏳️‍⚧️ */
 const trans: Record<string, Record<string, string>> = {};
-let currentLanguage: string;
+let curLang: string;
 
 /**
  * Returns the translated text for the specified key in the current language set by `setLanguage()`  
@@ -13,9 +13,9 @@ let currentLanguage: string;
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
 function tr(key: string, ...args: Stringifiable[]) {
-  if(!currentLanguage)
+  if(!curLang)
     return key;
-  const trText = trans[currentLanguage]?.[key];
+  const trText = trans[curLang]?.[key];
   if(!trText)
     return key;
 
@@ -30,7 +30,11 @@ tr.addLanguage = (language: string, translations: Record<string, string>) => {
 };
 
 tr.setLanguage = (language: string) => {
-  currentLanguage = language;
+  curLang = language;
+};
+
+tr.getLanguage = () => {
+  return curLang;
 };
 
 export { tr };
