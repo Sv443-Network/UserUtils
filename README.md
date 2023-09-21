@@ -1104,7 +1104,7 @@ tr.addLanguage("en", {
 
 /** Returns the custom pluralization identifier for the given number of items (or size of Array/NodeList) */
 function pl(num: number | unknown[] | NodeList) {
-  if(Array.isArray(num))
+  if(typeof num !== "number")
     num = num.length;
 
   if(num === 0)
