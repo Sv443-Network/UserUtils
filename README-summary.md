@@ -38,11 +38,19 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
     - [pauseFor()](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once, after a given amount of time
     - [fetchAdvanced()](https://github.com/Sv443-Network/UserUtils#fetchadvanced) - wrapper around the fetch API with a timeout option
+    - [insertValues()](https://github.com/Sv443-Network/UserUtils#insertvalues) - insert values into a string at specified placeholders
 - Arrays:
     - [randomItem()](https://github.com/Sv443-Network/UserUtils#randomitem) - returns a random item from an array
     - [randomItemIndex()](https://github.com/Sv443-Network/UserUtils#randomitemindex) - returns a tuple of a random item and its index from an array
     - [takeRandomItem()](https://github.com/Sv443-Network/UserUtils#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [randomizeArray()](https://github.com/Sv443-Network/UserUtils#randomizearray) - returns a copy of the array with its items in a random order
+- Translation:
+    - [tr()](https://github.com/Sv443-Network/UserUtils#tr) - simple translation of a string to another language
+    - [tr.addLanguage()](https://github.com/Sv443-Network/UserUtils#traddlanguage) - add a language and its translations
+    - [tr.setLanguage()](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language
+    - [tr.getLanguage()](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
+- Utility types for TypeScript
+    - [Stringifiable](https://github.com/Sv443-Network/UserUtils#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
 
 <br><br>
 

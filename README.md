@@ -14,7 +14,7 @@ If you like using this library, please consider [supporting the development ❤�
 - [**Preamble**](#preamble)
 - [**License**](#license)
 - [**Features**](#features)
-  - [DOM:](#dom)
+  - [**DOM:**](#dom)
     - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
     - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
     - [getSelectorMap()](#getselectormap) - returns all currently registered selectors, listeners and options
@@ -28,21 +28,29 @@ If you like using this library, please consider [supporting the development ❤�
     - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
     - [amplifyMedia()](#amplifymedia) - amplify an audio or video element's volume past the maximum of 100%
     - [isScrollable()](#isscrollable) - check if an element has a horizontal or vertical scroll bar
-  - [Math:](#math)
+  - [**Math:**](#math)
     - [clamp()](#clamp) - constrain a number between a min and max value
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
     - [randRange()](#randrange) - generate a random number between a min and max boundary
-  - [Misc:](#misc)
+  - [**Misc:**](#misc)
     - [ConfigManager()](#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](#autoplural) - automatically pluralize a string
     - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](#debounce) - call a function only once, after a given amount of time
     - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
-  - [Arrays:](#arrays)
+    - [insertValues()](#insertvalues) - insert values into a string at specified placeholders
+  - [**Arrays:**](#arrays)
     - [randomItem()](#randomitem) - returns a random item from an array
     - [randomItemIndex()](#randomitemindex) - returns a tuple of a random item and its index from an array
     - [takeRandomItem()](#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [randomizeArray()](#randomizearray) - returns a copy of the array with its items in a random order
+  - [**Translation:**](#translation)
+    - [tr()](#tr) - simple translation of a string to another language
+    - [tr.addLanguage()](#traddlanguage) - add a language and its translations
+    - [tr.setLanguage()](#trsetlanguage) - set the currently active language for translations
+    - [tr.getLanguage()](#trgetlanguage) - returns the currently active language
+  - [**Utility types for TypeScript:**](#utility-types)
+    - [Stringifiable](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
 
 <br><br>
 
@@ -968,7 +976,208 @@ console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 
 </details>
 
+<br><br>
+
+## Translation:
+This is a very lightweight translation function that can be used to translate simple strings.  
+Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addLanguage()`](#traddlanguage) for an example on how this might be done.
+
 <br>
+
+### tr()
+Usage:  
+```ts
+tr(key: string, ...values: Stringifiable[]): string
+```
+  
+The function returns the translation of the passed key in the language added by [`tr.addLanguage()`](#traddlanguage) and set by [`tr.setLanguage()`](#trsetlanguage)  
+Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `values` rest parameter.  
+  
+If the key is not found or no language has been added or set before calling this function, it will return the key itself.  
+If the key is found and the translation contains placeholders but no values are passed, it will return the translation as-is, including unmodified placeholders.  
+If the key is found, the translation doesn't contain placeholders but values are still passed, they will be ignored and the translation will be returned as-is.  
+  
+<details><summary><h4>Example - click to view</h4></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addLanguage("en", {
+  "welcome": "Welcome",
+  "welcome_name": "Welcome, %1",
+});
+tr.addLanguage("de", {
+  "welcome": "Willkommen",
+  "welcome_name": "Willkommen, %1",
+});
+
+// this has to be called at least once before calling tr()
+tr.setLanguage("en");
+
+console.log(tr("welcome"));              // "Welcome"
+console.log(tr("welcome_name", "John")); // "Welcome, John"
+console.log(tr("non_existent_key"));     // "non_existent_key"
+
+// language can be changed at any time, synchronously
+tr.setLanguage("de");
+
+console.log(tr("welcome"));              // "Willkommen"
+console.log(tr("welcome_name", "John")); // "Willkommen, John"
+```
+
+</details>
+
+<br>
+
+### tr.addLanguage()
+Usage:  
+```ts
+tr.addLanguage(language: string, translations: Record<string, string>): void
+```
+
+Adds a language and its associated translations to the translation function.  
+The passed language can be any unique identifier, though I recommend sticking to the [ISO 639-1 standard.](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)  
+The passed translations should be an object where the key is the translation key used in `tr()` and the value is the translation itself.  
+If `tr.addLanguage()` is called multiple times with the same language, the previous translations of that language will be overwritten.  
+  
+The translation values may contain placeholders in the format `%n`, where `n` is the number of the value starting at 1.  
+These can be used to inject values into the translation when calling `tr()`  
+  
+<details><summary><h4>Example - click to view</h4></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+// add a language with associated translations:
+
+tr.addLanguage("de", {
+  "color": "Farbe",
+});
+
+
+// with placeholders:
+
+tr.addLanguage("en", {
+  "welcome_generic": "Welcome!",
+  "welcome_name": "Welcome, %1!",
+  "welcome_extended": "Welcome, %1!\nYour last login was on %2\nYou have %3 unread messages",
+});
+
+
+// can work for multiple locales too:
+
+tr.addLanguage("en-US", {
+  "fries": "french fries",
+});
+tr.addLanguage("en-GB", {
+  "fries": "chips",
+});
+
+
+// apply default values for different locales to reduce redundancy:
+
+const translation_de = {
+  "greeting": "Guten Tag!",
+  "foo": "Foo",
+};
+tr.addLanguage("de-DE", translation_de);
+tr.addLanguage("de-CH", {
+  ...translation_de,
+  // overwrite the "greeting" but keep other keys as they are
+  "greeting": "Grüezi!",
+});
+tr.addLanguage("de-AT", {
+  ...translation_de,
+  // overwrite "greeting" again but keep other keys as they are
+  "greeting": "Grüß Gott!",
+});
+
+
+// example for custom pluralization:
+
+tr.addLanguage("en", {
+  "items_added-1": "Added 1 item to your cart",
+  "items_added-n": "Added %1 items to your cart",
+});
+
+/** Returns the custom pluralization identifier */
+function pl(num: number | unknown[] | NodeList) {
+  if(Array.isArray(num))
+    num = num.length;
+  return num === 1 ? "1" : "n";
+};
+
+const items = ["foo"];
+tr(`items_added-${pl(items)}`, items.length); // "Added 1 item to your cart"
+
+items.push("bar");
+tr(`items_added-${pl(items)}`, items.length); // "Added 2 items to your cart"
+```
+
+</details>
+
+<br>
+
+### tr.setLanguage()
+Usage:  
+```ts
+tr.setLanguage(language: string): void
+```
+
+Synchronously sets the language that will be used for translations.  
+No validation is done on the passed language, so make sure it is correct and it has been added with `tr.addLanguage()` before calling `tr()`  
+  
+For an example, see [`tr()`](#tr)
+
+<br>
+
+### tr.getLanguage()
+Usage:  
+```ts
+tr.getLanguage(): string | undefined
+```
+
+Returns the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+If no language has been set yet, it will return undefined.
+
+<br><br>
+
+## Utility types:
+UserUtils also offers some utility types that can be used in TypeScript projects.  
+They don't alter the runtime behavior of the code, but they can be used to make the code more readable and to prevent errors.
+
+### Stringifiable
+This type describes any value that either is a string itself or can be converted to a string.  
+To be considered stringifiable, the object needs to have a `toString()` method that returns a string (all primitive types have this method).  
+This method allows not just explicit conversion by calling it, but also implicit conversion by passing it into the `String()` constructor or by interpolating it in a template string.  
+  
+<details><summary><h4>Example - click to view</h4></summary>
+
+```ts
+import type { Stringifiable } from "@sv443-network/userutils";
+
+function logSomething(value: Stringifiable) {
+  console.log(`Log: ${value}`); // implicit conversion using `value.toString()`
+}
+
+const fooObject = {
+  toString: () => "hello world",
+};
+
+const barObject = {
+  baz: "",
+};
+
+logSomething("foo");     // "Log: foo"
+logSomething(42);        // "Log: 42"
+logSomething(true);      // "Log: true"
+logSomething({});        // "Log: [object Object]"
+logSomething(Symbol(1)); // "Log: Symbol(1)"
+logSomething(fooObject); // "Log: hello world"
+logSomething(barObject); // type error
+```
+
+</details>
 
 <br><br><br><br>
 
