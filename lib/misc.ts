@@ -1,9 +1,12 @@
+/** Represents any value that is either a string itself or can be converted to one (implicitly or explicitly) because it has a toString() method */
+export type Stringifiable = string | { toString(): string };
+
 /**
  * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
  * @param num If this is an array or NodeList, the amount of items is used
  */
-export function autoPlural(word: string, num: number | unknown[] | NodeList) {
+export function autoPlural(word: Stringifiable, num: number | unknown[] | NodeList) {
   if(Array.isArray(num) || num instanceof NodeList)
     num = num.length;
   return `${word}${num === 1 ? "" : "s"}`;
