@@ -1,5 +1,13 @@
 # @sv443-network/userutils
 
+## 1.2.0
+
+### Minor Changes
+
+- 84b37f1: Added utility type Stringifiable to describe a string or any value that can be converted to one
+- 142c5e2: Added function insertValues() to insert values into a string with placeholders
+- 16ce257: Added lightweight translation system
+
 ## 1.1.3
 
 ### Patch Changes
