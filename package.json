@@ -9,10 +9,10 @@
     "lint": "tsc --noEmit && eslint .",
     "build-types": "tsc --emitDeclarationOnly --declaration --outDir dist",
     "build-common": "tsup lib/index.ts --format cjs,esm --clean --treeshake",
-    "build-global": "tsup lib/index.ts --format cjs,esm,iife --treeshake --onSuccess \"npm run post-build-global\"",
+    "build-global": "tsup lib/index.ts --format cjs,esm,iife --treeshake --onSuccess \"npm run post-build-global && echo Finished building.\"",
     "build": "npm run build-common -- && npm run build-types",
     "post-build-global": "npm run node-ts -- ./tools/post-build-global.mts",
-    "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types\"",
+    "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types && echo Finished building.\"",
     "publish-package": "changeset publish",
     "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm"
   },

@@ -132,38 +132,85 @@ export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
 
 /**
  * Amplifies the gain of the passed media element's audio by the specified multiplier.  
- * This function supports any media element like `<audio>` or `<video>`  
+ * Also applies a limiter to prevent clipping and distortion.  
+ * This function supports any MediaElement instance like `<audio>` or `<video>`  
  *   
- * This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
+ * This is the audio processing workflow:  
+ * `MediaElement (source)` => `DynamicsCompressorNode (limiter)` => `GainNode` => `AudioDestinationNode (output)`  
  *   
+ * ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
+ * ⚠️ Make sure to call the returned function `enable()` after calling this function to actually enable the amplification.  
+ *   
+ * @param mediaElement The media element to amplify (e.g. `<audio>` or `<video>`)
+ * @param initialMultiplier The initial gain multiplier to apply (floating point number, default is `1.0`)
  * @returns Returns an object with the following properties:
  * | Property | Description |
  * | :-- | :-- |
- * | `mediaElement` | The passed media element |
- * | `amplify()` | A function to change the amplification level |
- * | `getAmpLevel()` | A function to return the current amplification level |
+ * | `setGain()` | Used to change the gain multiplier |
+ * | `getGain()` | Returns the current gain multiplier |
+ * | `enable()` | Call to enable the amplification for the first time or if it was disabled before |
+ * | `disable()` | Call to disable amplification |
+ * | `setLimiterOptions()` | Used for changing the [options of the DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options) - the default is `{ threshold: -2, knee: 40, ratio: 12, attack: 0.003, release: 0.25 }` |
  * | `context` | The AudioContext instance |
  * | `source` | The MediaElementSourceNode instance |
- * | `gain` | The GainNode instance |
+ * | `gainNode` | The GainNode instance |
+ * | `limiterNode` | The DynamicsCompressorNode instance used for limiting clipping and distortion |
  */
-export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, multiplier = 1.0) {
+export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, initialMultiplier = 1.0) {
   // @ts-ignore
   const context = new (window.AudioContext || window.webkitAudioContext);
-  const result = {
-    mediaElement,
-    amplify: (multiplier: number) => { result.gain.gain.value = multiplier; },
-    getAmpLevel: () => result.gain.gain.value,
+  const props = {
+    /** Sets the gain multiplier */
+    setGain(multiplier: number) {
+      props.gainNode.gain.setValueAtTime(multiplier, props.context.currentTime);
+    },
+    /** Returns the current gain multiplier */
+    getGain() {
+      return props.gainNode.gain.value;
+    },
+    /** Enable the amplification for the first time or if it was disabled before */
+    enable() {
+      props.source.connect(props.limiterNode);
+      props.limiterNode.connect(props.gainNode);
+      props.gainNode.connect(props.context.destination);
+    },
+    /** Disable the amplification */
+    disable() {
+      props.source.disconnect(props.limiterNode);
+      props.limiterNode.disconnect(props.gainNode);
+      props.gainNode.disconnect(props.context.destination);
+
+      props.source.connect(props.context.destination);
+    },
+    /**
+     * Set the options of the [limiter / DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options)  
+     * The default is `{ threshold: -2, knee: 40, ratio: 12, attack: 0.003, release: 0.25 }`
+     */
+    setLimiterOptions(options: Partial<Record<"threshold" | "knee" | "ratio" | "attack" | "release", number>>) {
+      for(const [key, val] of Object.entries(options))
+        props.limiterNode[key as keyof typeof options]
+          .setValueAtTime(val, props.context.currentTime);
+    },
     context: context,
     source: context.createMediaElementSource(mediaElement),
-    gain: context.createGain(),
+    gainNode: context.createGain(),
+    limiterNode: context.createDynamicsCompressor(),
   };
 
-  result.source.connect(result.gain);
-  result.gain.connect(context.destination);
-  result.amplify(multiplier);
+  props.setLimiterOptions({
+    threshold: -2,
+    knee: 40,
+    ratio: 12,
+    attack: 0.003,
+    release: 0.25,
+  });
+  props.setGain(initialMultiplier);
 
-  return result;
+  return props;
 }
+
+/** An object which contains the results of `amplifyMedia()` */
+export type AmplifyMediaResult = ReturnType<typeof amplifyMedia>;
 
 /** Checks if an element is scrollable in the horizontal and vertical directions */
 export function isScrollable(element: Element) {
