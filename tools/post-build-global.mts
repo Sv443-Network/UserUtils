@@ -41,7 +41,7 @@ async function run() {
   let finalScript = `\
 ${libHeader}
 var UserUtils = ${initialScript}`;
-  finalScript = finalScript.replace(/^\s*'use strict';\s*\r?\n{1,2}/gm, "");
+  finalScript = finalScript.replace(/^\s*'use strict';\s*(\r?\n){1,2}/gm, "");
 
   await writeFile(iifeScriptPath, finalScript, "utf8");
   console.log(`Global script at path '${iifeScriptPath}' has been updated`);
