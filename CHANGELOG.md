@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 2.0.1
+
+### Patch Changes
+
+- 63af1a7: Change default limiter options to be more balanced
+
 ## 2.0.0
 
 ### Major Changes
