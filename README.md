@@ -490,7 +490,7 @@ This is the processing workflow applied to the media element:
   
 A limiter (compression) is applied to the audio to prevent clipping.  
 Its properties can be changed by calling the returned function `setLimiterOptions()`  
-The default props are `{ threshold: -2, knee: 40, ratio: 12, attack: 0.003, release: 0.25 }`  
+The limiter options set by default are `{ threshold: -12, knee: 30, ratio: 12, attack: 0.003, release: 0.25 }`  
   
 ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
 ⚠️ Make sure to call the returned function `enable()` after calling this function to actually enable the amplification.  
@@ -502,7 +502,7 @@ The returned object of the type `AmplifyMediaResult` has the following propertie
 | `getGain()` | Returns the current gain multiplier |
 | `enable()` | Call to enable the amplification for the first time or if it was disabled before |
 | `disable()` | Call to disable amplification |
-| `setLimiterOptions()` | Used for changing the [options of the DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options) - the default is `{ threshold: -2, knee: 40, ratio: 12, attack: 0.003, release: 0.25 }` |
+| `setLimiterOptions()` | Used for changing the [options of the DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options) - the default is `{ threshold: -12, knee: 30, ratio: 12, attack: 0.003, release: 0.25 }` |
 | `context` | The AudioContext instance |
 | `source` | The MediaElementSourceNode instance |
 | `gainNode` | The GainNode instance used for actually boosting the gain |

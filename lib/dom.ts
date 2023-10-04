@@ -184,7 +184,7 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
     },
     /**
      * Set the options of the [limiter / DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options)  
-     * The default is `{ threshold: -2, knee: 40, ratio: 12, attack: 0.003, release: 0.25 }`
+     * The default is `{ threshold: -12, knee: 30, ratio: 12, attack: 0.003, release: 0.25 }`
      */
     setLimiterOptions(options: Partial<Record<"threshold" | "knee" | "ratio" | "attack" | "release", number>>) {
       for(const [key, val] of Object.entries(options))
@@ -198,8 +198,8 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
   };
 
   props.setLimiterOptions({
-    threshold: -2,
-    knee: 40,
+    threshold: -12,
+    knee: 30,
     ratio: 12,
     attack: 0.003,
     release: 0.25,
