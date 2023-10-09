@@ -636,10 +636,10 @@ Usage:
 ```ts
 mapRange(
   value: number,
-  range_1_min: number,
-  range_1_max: number,
-  range_2_min: number,
-  range_2_max: number
+  range1min: number,
+  range1max: number,
+  range2min: number,
+  range2max: number
 ): number
 ```
   

@@ -12,8 +12,8 @@ export function getUnsafeWindow() {
 }
 
 /**
- * Inserts `afterElement` as a sibling just after the provided `beforeElement`
- * @returns Returns the `afterElement`
+ * Inserts {@linkcode afterElement} as a sibling just after the provided {@linkcode beforeElement}
+ * @returns Returns the {@linkcode afterElement}
  */
 export function insertAfter(beforeElement: Element, afterElement: Element) {
   beforeElement.parentNode?.insertBefore(afterElement, beforeElement.nextSibling);
@@ -86,15 +86,15 @@ export function openInNewTab(href: string) {
 }
 
 /**
- * Intercepts the specified event on the passed object and prevents it from being called if the called `predicate` function returns a truthy value.  
+ * Intercepts the specified event on the passed object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
 export function interceptEvent<TEvtObj extends EventTarget, TPredicateEvt extends Event>(
   eventObject: TEvtObj,
   eventName: Parameters<TEvtObj["addEventListener"]>[0],
-  predicate: (event: TPredicateEvt) => boolean,
-) {  
+  predicate: (event: TPredicateEvt) => boolean = () => true,
+) {
   // default is between 10 and 100 on conventional browsers so this should hopefully be more than enough
   // @ts-ignore
   if(typeof Error.stackTraceLimit === "number" && Error.stackTraceLimit < 1000) {
@@ -119,13 +119,13 @@ export function interceptEvent<TEvtObj extends EventTarget, TPredicateEvt extend
 }
 
 /**
- * Intercepts the specified event on the window object and prevents it from being called if the called `predicate` function returns a truthy value.  
+ * Intercepts the specified event on the window object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
 export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
   eventName: TEvtKey,
-  predicate: (event: WindowEventMap[TEvtKey]) => boolean,
+  predicate: (event: WindowEventMap[TEvtKey]) => boolean = () => true,
 ) {  
   return interceptEvent(getUnsafeWindow(), eventName, predicate);
 }
@@ -146,7 +146,7 @@ export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
  * @returns Returns an object with the following properties:
  * | Property | Description |
  * | :-- | :-- |
- * | `setGain()` | Used to change the gain multiplier |
+ * | `setGain()` | Used to change the gain multiplier from the default set by {@linkcode initialMultiplier} |
  * | `getGain()` | Returns the current gain multiplier |
  * | `enable()` | Call to enable the amplification for the first time or if it was disabled before |
  * | `disable()` | Call to disable amplification |
@@ -209,7 +209,7 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
   return props;
 }
 
-/** An object which contains the results of `amplifyMedia()` */
+/** An object which contains the results of {@linkcode amplifyMedia()} */
 export type AmplifyMediaResult = ReturnType<typeof amplifyMedia>;
 
 /** Checks if an element is scrollable in the horizontal and vertical directions */

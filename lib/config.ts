@@ -38,7 +38,7 @@ export interface ConfigManagerOptions<TData> {
  * Supports migrating data from older versions of the configuration to newer ones and populating the cache with default data if no persistent data is found.  
  *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
- * ⚠️ Make sure to call `loadData()` at least once after creating an instance, or the returned data will be the same as `options.defaultConfig`
+ * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultConfig`
  * 
  * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultConfig`) - this should also be the type of the data format associated with the current `options.formatVersion`
  */
@@ -54,7 +54,7 @@ export class ConfigManager<TData = any> {
    * Supports migrating data from older versions of the configuration to newer ones and populating the cache with default data if no persistent data is found.  
    *   
    * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
-   * ⚠️ Make sure to call `loadData()` at least once after creating an instance, or the returned data will be the same as `options.defaultConfig`
+   * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultConfig`
    * 
    * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultConfig`) - this should also be the type of the data format associated with the current `options.formatVersion`
    * @param options The options for this ConfigManager instance
@@ -98,7 +98,10 @@ export class ConfigManager<TData = any> {
     }
   }
 
-  /** Returns a copy of the data from the in-memory cache. Use `loadData()` to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage). */
+  /**
+   * Returns a copy of the data from the in-memory cache.  
+   * Use {@linkcode loadData()} to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage).
+   */
   public getData(): TData {
     return this.deepCopy(this.cachedConfig);
   }
@@ -129,8 +132,8 @@ export class ConfigManager<TData = any> {
 
   /**
    * Call this method to clear all persistently stored data associated with this ConfigManager instance.  
-   * The in-memory cache will be left untouched, so you may still access the data with `getData()`.  
-   * Calling `loadData()` or `setData()` after this method was called will recreate persistent storage with the cached or default data.  
+   * The in-memory cache will be left untouched, so you may still access the data with {@linkcode getData()}  
+   * Calling {@linkcode loadData()} or {@linkcode setData()} after this method was called will recreate persistent storage with the cached or default data.  
    *   
    * ⚠️ This requires the additional directive `@grant GM.deleteValue`
    */

@@ -2,7 +2,7 @@
 export type Stringifiable = string | { toString(): string };
 
 /**
- * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1
+ * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
  * @param num If this is an array or NodeList, the amount of items is used
  */
@@ -20,7 +20,7 @@ export function pauseFor(time: number) {
 }
 
 /**
- * Calls the passed `func` after the specified `timeout` in ms (defaults to 300).  
+ * Calls the passed {@linkcode func} after the specified {@linkcode timeout} in ms (defaults to 300).  
  * Any subsequent calls to this function will reset the timer and discard previous calls.
  */
 export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(func: TFunc, timeout = 300) { // eslint-disable-line @typescript-eslint/no-explicit-any

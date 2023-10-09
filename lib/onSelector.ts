@@ -1,4 +1,4 @@
-/** Options for the `onSelector()` function */
+/** Options for the {@linkcode onSelector()} function */
 export type OnSelectorOpts<TElem extends Element = HTMLElement> = SelectorOptsOne<TElem> | SelectorOptsAll<TElem>;
 
 type SelectorOptsOne<TElem extends Element> = SelectorOptsCommon & {
@@ -23,12 +23,12 @@ type SelectorOptsCommon = {
 const selectorMap = new Map<string, OnSelectorOpts[]>();
 
 /**
- * Calls the `listener` as soon as the `selector` exists in the DOM.  
+ * Calls the {@linkcode listener} as soon as the {@linkcode selector} exists in the DOM.  
  * Listeners are deleted when they are called once, unless `options.continuous` is set.  
  * Multiple listeners with the same selector may be registered.
  * @param selector The selector to listen for
  * @param options Used for switching to `querySelectorAll()` and for calling the listener continuously
- * @template TElem The type of element that the listener will return as its argument (defaults to the generic HTMLElement)
+ * @template TElem The type of element that the listener will return as its argument (defaults to the generic type HTMLElement)
  */
 export function onSelector<TElem extends Element = HTMLElement>(
   selector: string,
@@ -47,7 +47,7 @@ export function onSelector<TElem extends Element = HTMLElement>(
 }
 
 /**
- * Removes all listeners registered in `onSelector()` that have the given selector
+ * Removes all listeners registered in {@linkcode onSelector()} that have the given selector
  * @returns Returns true when all listeners with the associated selector were found and removed, false otherwise
  */
 export function removeOnSelector(selector: string) {
