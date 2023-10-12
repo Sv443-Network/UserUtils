@@ -2,4 +2,4 @@
 "@sv443-network/userutils": patch
 ---
 
-Add @linkcode references to the JSDoc in-IDE documentation
+Add `@linkcode` references to the JSDoc in-IDE documentation
