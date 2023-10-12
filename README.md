@@ -112,6 +112,7 @@ See the [license file](./LICENSE.txt) for details.
 
 ## DOM:
 
+<!-- TODO: write docs for SelectorObserver class -->
 ### onSelector()
 Usage:  
 ```ts
