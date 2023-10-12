@@ -15,9 +15,7 @@ If you like using this library, please consider [supporting the development ❤�
 - [**License**](#license)
 - [**Features**](#features)
   - [**DOM:**](#dom)
-    - [onSelector()](#onselector) - call a listener once a selector is found in the DOM
-    - [initOnSelector()](#initonselector) - needs to be called once to be able to use `onSelector()`
-    - [getSelectorMap()](#getselectormap) - returns all currently registered selectors, listeners and options
+    - [SelectorObserver](#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [getUnsafeWindow()](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
     - [insertAfter()](#insertafter) - insert an element as a sibling after another element
     - [addParent()](#addparent) - add a parent element around another element
@@ -33,7 +31,7 @@ If you like using this library, please consider [supporting the development ❤�
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
     - [randRange()](#randrange) - generate a random number between a min and max boundary
   - [**Misc:**](#misc)
-    - [ConfigManager()](#configmanager) - class that manages persistent userscript configurations, including data migration
+    - [ConfigManager](#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](#autoplural) - automatically pluralize a string
     - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](#debounce) - call a function only once, after a given amount of time
@@ -112,140 +110,54 @@ See the [license file](./LICENSE.txt) for details.
 
 ## DOM:
 
-<!-- TODO: write docs for SelectorObserver class -->
-### onSelector()
+### SelectorObserver
 Usage:  
 ```ts
-onSelector<TElement = HTMLElement>(selector: string, options: {
-  listener: (elements: TElement | NodeListOf<TElement>) => void,
-  all?: boolean,
-  continuous?: boolean,
-}): void
-```
-  
-Registers a listener to be called whenever the element(s) behind a selector is/are found in the DOM.  
-If the selector already exists, the listener will be called immediately.  
-  
-If `all` is set to `true`, querySelectorAll() will be used instead and the listener will return a NodeList of matching elements.  
-This will also include elements that were already found in a previous listener call.  
-If set to `false` (default), querySelector() will be used and only the first matching element will be returned.  
-  
-If `continuous` is set to `true`, the listener will not be deregistered after it was called once (defaults to false).  
-  
-When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
-It will default to `HTMLElement` if left undefined.  
-  
-⚠️ In order to use this function, [`initOnSelector()`](#initonselector) has to be called as soon as possible.  
-This initialization function has to be called after `DOMContentLoaded` is fired (or immediately if `@run-at document-end` is set).  
-  
-Calling onSelector() before `DOMContentLoaded` is fired will not throw an error, but it also won't trigger listeners until the DOM is accessible.
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { initOnSelector, onSelector } from "@sv443-network/userutils";
-
-document.addEventListener("DOMContentLoaded", initOnSelector);
-
-// Continuously checks if `div` elements are added to the DOM, then returns all of them (even previously detected ones) in a NodeList
-onSelector<HTMLDivElement>("div", {
-  listener: (elements) => {
-    console.log("Elements found:", elements); // type = NodeListOf<HTMLDivElement>
-  },
-  all: true,
-  continuous: true,
-});
-
-// Checks if an input element with a value attribute of "5" is added to the DOM, then returns it and deregisters the listener
-onSelector<HTMLInputElement>("input[value=\"5\"]", {
-  listener: (element) => {
-    console.log("Element found:", element); // type = HTMLInputElement
-  },
-});
+new SelectorObserver(baseElement: Element, options?: MutationObserverInit)
 ```
 
-</details>
+A class that manages listeners that are called when selectors are found in the DOM.  
+<!-- TODO: -->
 
 <br>
 
-### initOnSelector()
-Usage:  
-```ts
-initOnSelector(options?: MutationObserverInit): void
-```
+### Methods:
+`addListener(selector: string, options: SelectorListenerOptions): void`  
+Adds a listener for the given selector.  
+<!-- TODO: -->
   
-Initializes the MutationObserver that is used by [`onSelector()`](#onselector) to check for the registered selectors whenever a DOM change occurs on the `<body>`  
-By default, this only checks if elements are added or removed (at any depth).  
-
-⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+`disable(): void`  
+<!-- TODO: -->
   
-The options object is passed directly to the MutationObserver.observe() method.  
-Note that `options.subtree` and `options.childList` will be set to true by default.  
-You may see all options [here](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options), but these are the important ones:  
-> Set `options.attributes` to `true` to also check for attribute changes on every single descendant of the `<body>` (defaults to false).  
-> Set `options.characterData` to `true` to also check for character data changes on every single descendant of the `<body>` (defaults to false).  
->   
-> ⚠️ Using these extra options can have a performance impact on larger sites or sites with a constantly changing DOM.
+`enable(): void`  
+<!-- TODO: -->
   
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { initOnSelector } from "@sv443-network/userutils";
-
-document.addEventListener("DOMContentLoaded", () => {
-  initOnSelector({
-    attributes: true,
-    characterData: true,
-  });
-});
-```
-
-</details>
+`clearListeners(): void`  
+<!-- TODO: -->
+  
+`removeAllListeners(selector: string): boolean`  
+<!-- TODO: -->
+  
+`removeListener(selector: string, options: SelectorListenerOptions): boolean`  
+<!-- TODO: -->
+  
+`getAllListeners(): Map<string, SelectorListenerOptions[]>`  
+<!-- TODO: -->
+  
+`getListeners(selector: string): SelectorListenerOptions[] | undefined`  
+<!-- TODO: -->
+  
 
 <br>
 
-### getSelectorMap()
-Usage:  
-```ts
-getSelectorMap(): Map<string, OnSelectorOptions[]>
-```
-  
-Returns a Map of all currently registered selectors and their options, including listener function.  
-Since multiple listeners can be registered for the same selector, the value of the Map is an array of `OnSelectorOptions` objects.  
-  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { initOnSelector, onSelector, getSelectorMap } from "@sv443-network/userutils";
-
-document.addEventListener("DOMContentLoaded", initOnSelector);
-
-onSelector<HTMLDivElement>("div", {
-  listener: (elements) => void 0,
-  all: true,
-  continuous: true,
-});
-
-onSelector<HTMLDivElement>("div", {
-  listener: (elements) => void 0,
-});
-
-const selectorMap = getSelectorMap();
-// Map(1) {
-//   "div" => [
-//     {
-//       listener: (elements) => void 0,
-//       all: true,
-//       continuous: true,
-//     },
-//     {
-//       listener: (elements) => void 0,
-//     },
-//   ]
-// }
+import { SelectorObserver } from "@sv443-network/userutils";
 ```
 
 </details>
+
 
 <br>
 
@@ -689,7 +601,7 @@ randRange(10);     // 7
 
 ## Misc:
 
-### ConfigManager()
+### ConfigManager
 Usage:  
 ```ts
 new ConfigManager(options: ConfigManagerOptions)

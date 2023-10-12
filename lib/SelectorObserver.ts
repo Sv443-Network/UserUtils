@@ -1,5 +1,5 @@
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
-export type OnSelectorOptions<TElem extends Element = HTMLElement> = SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>;
+export type SelectorListenerOptions<TElem extends Element = HTMLElement> = SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>;
 
 type SelectorOptionsOne<TElem extends Element> = SelectorOptionsCommon & {
   /** Whether to use `querySelectorAll()` instead - default is false */
@@ -28,7 +28,7 @@ export class SelectorObserver {
   private baseElement: Element;
   private observer: MutationObserver;
   private observerOptions: MutationObserverInit;
-  private listenerMap = new Map<string, OnSelectorOptions[]>();
+  private listenerMap = new Map<string, SelectorListenerOptions[]>();
 
   /**
    * Creates a new SelectorObserver that will observe the children of the given base element for changes (only creation and deletion of elements by default)
@@ -91,14 +91,14 @@ export class SelectorObserver {
    * @param [options.continuous] Whether to call the listener continuously instead of just once - default is false
    * @param [options.debounce] Whether to debounce the listener to reduce calls to `querySelector` or `querySelectorAll` - set undefined or <=0 to disable (default)
    */
-  public addListener<TElem extends Element = HTMLElement>(selector: string, options: OnSelectorOptions<TElem>) {
+  public addListener<TElem extends Element = HTMLElement>(selector: string, options: SelectorListenerOptions<TElem>) {
     options = { all: false, continuous: false, debounce: 0, ...options };
     if(options.debounce && options.debounce > 0)
       options.listener = this.debounce(options.listener as ((arg: NodeListOf<Element> | Element) => void), options.debounce);
     if(this.listenerMap.has(selector))
-      this.listenerMap.get(selector)!.push(options as OnSelectorOptions<Element>);
+      this.listenerMap.get(selector)!.push(options as SelectorListenerOptions<Element>);
     else
-      this.listenerMap.set(selector, [options as OnSelectorOptions<Element>]);
+      this.listenerMap.set(selector, [options as SelectorListenerOptions<Element>]);
   }
 
   /** Disables the observation of the child elements */
@@ -138,7 +138,7 @@ export class SelectorObserver {
    * Removes a single listener for the given {@linkcode selector} and {@linkcode options} that has been registered with {@linkcode addListener()}
    * @returns Returns true when the listener was found and removed, false otherwise
    */
-  public removeListener(selector: string, options: OnSelectorOptions) {
+  public removeListener(selector: string, options: SelectorListenerOptions) {
     const listeners = this.listenerMap.get(selector);
     if(!listeners)
       return false;
