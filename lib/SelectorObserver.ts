@@ -32,13 +32,17 @@ export class SelectorObserver {
 
   /**
    * Creates a new SelectorObserver that will observe the children of the given base element for changes (only creation and deletion of elements by default)
-   * @param options fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
+   * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
    */
   constructor(baseElement: Element, observerOptions?: MutationObserverInit) {
     this.baseElement = baseElement;
 
     this.observer = new MutationObserver(this.checkSelectors);
-    this.observerOptions = observerOptions ?? {};
+    this.observerOptions = {
+      childList: true,
+      subtree: true,
+      ...observerOptions,
+    };
 
     this.enable();
   }
@@ -99,6 +103,8 @@ export class SelectorObserver {
       this.listenerMap.get(selector)!.push(options as SelectorListenerOptions<Element>);
     else
       this.listenerMap.set(selector, [options as SelectorListenerOptions<Element>]);
+
+    this.checkSelectors();
   }
 
   /** Disables the observation of the child elements */
@@ -114,11 +120,12 @@ export class SelectorObserver {
     if(this.enabled)
       return;
     this.enabled = true;
-    this.observer.observe(this.baseElement, {
-      childList: true,
-      subtree: true,
-      ...this.observerOptions,
-    });
+    this.observer.observe(this.baseElement, this.observerOptions);
+  }
+
+  /** Returns whether the observation of the child elements is currently enabled */
+  public isEnabled() {
+    return this.enabled;
   }
 
   /** Removes all listeners that have been registered with {@linkcode addListener()} */

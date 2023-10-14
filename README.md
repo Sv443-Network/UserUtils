@@ -122,38 +122,203 @@ A class that manages listeners that are called when selectors are found in the D
 <br>
 
 ### Methods:
-`addListener(selector: string, options: SelectorListenerOptions): void`  
-Adds a listener for the given selector.  
-<!-- TODO: -->
+`addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
+Adds a listener (specified in `options.listener`) for the given selector that will be called once the selector exists in the DOM. It will be passed the element(s) that match the selector as the only argument.  
+The listener will be called immediately if the selector already exists in the DOM.  
   
+If `options.all` is set to true, querySelectorAll() will be used instead and the listener will be passed a `NodeList` of matching elements.  
+This will also include elements that were already found in a previous listener call.  
+If set to false (default), querySelector() will be used and only the first matching element will be returned.  
+  
+If `options.continuous` is set to true, the listener will not be deregistered after it was called once (defaults to false).  
+  
+If `options.debounce` is set to a number above 0, the listener will be debounced by that amount of milliseconds (defaults to 0).  
+E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of the listener will be executed.  
+  
+When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
+It will default to HTMLElement if left undefined.  
+  
+<br>
+
 `disable(): void`  
-<!-- TODO: -->
+Disables the observation of the child elements.  
+If selectors are currently being checked, the current selector will be finished before disabling.  
   
+<br>
+
 `enable(): void`  
-<!-- TODO: -->
+Enables the observation of the child elements if it was disabled before.  
   
+<br>
+
+`isEnabled(): boolean`  
+Returns whether the observation of the child elements is currently enabled.  
+  
+<br>
+
 `clearListeners(): void`  
-<!-- TODO: -->
+Removes all listeners for all selectors.  
   
+<br>
+
 `removeAllListeners(selector: string): boolean`  
-<!-- TODO: -->
+Removes all listeners for the given selector.  
   
+<br>
+
 `removeListener(selector: string, options: SelectorListenerOptions): boolean`  
-<!-- TODO: -->
+Removes a specific listener for the given selector and options.  
   
+<br>
+
 `getAllListeners(): Map<string, SelectorListenerOptions[]>`  
-<!-- TODO: -->
+Returns a Map of all selectors and their listeners.  
   
+<br>
+
 `getListeners(selector: string): SelectorListenerOptions[] | undefined`  
-<!-- TODO: -->
-  
+Returns all listeners for the given selector or undefined if there are none.  
 
 <br>
 
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><b>Examples - click to view</b></summary>
+
+#### Basic usage:
 
 ```ts
 import { SelectorObserver } from "@sv443-network/userutils";
+
+document.addEventListener("DOMContentLoaded", () => {
+  // adding a single-shot listener:
+
+  const fooObserver = new SelectorObserver(document.body);
+
+  fooObserver.addListener("#my-element", {
+    listener: (element) => {
+      console.log("Element found:", element);
+    },
+  });
+
+
+  // adding custom observer options:
+
+  const barObserver = new SelectorObserver(document.body, {
+    // only check if the following attributes change:
+    attributeFilter: ["class", "style", "data-whatever"],
+  });
+
+  observer.addListener("#my-element", {
+    listener: (element) => {
+      console.log("Element attributes changed:", element);
+    },
+  });
+
+
+  // using custom listener options:
+
+  const bazObserver = new SelectorObserver(document.body);
+
+  // for TypeScript, specify that input elements are returned by the listener:
+  bazObserver.addListener<HTMLInputElement>("input", {
+    all: true,        // use querySelectorAll() instead of querySelector()
+    continuous: true, // don't remove the listener after it was called once
+    debounce: 200,    // debounce the listener by 200ms
+    listener: (elements) => {
+      console.log("Input elements found:", elements);
+    },
+  });
+
+
+  // use a different element as the base:
+
+  const myElement = document.querySelector("#my-element");
+  if(myElement) {
+    const quxObserver = new SelectorObserver(myElement);
+
+    quxObserver.addListener("#my-child-element", {
+      listener: (element) => {
+        console.log("Child element found:", element);
+      },
+    });
+  }
+});
+```
+
+<br>
+
+#### Get and remove listeners:
+
+```ts
+import { SelectorObserver } from "@sv443-network/userutils";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const observer = new SelectorObserver(document.body);
+
+  observer.addListener("#my-element-foo", {
+    continuous: true,
+    listener: (element) => {
+      console.log("Element found:", element);
+    },
+  });
+
+  observer.addListener("#my-element-bar", {
+    listener: (element) => {
+      console.log("Element found again:", element);
+    },
+  });
+
+
+  // get all listeners:
+
+  console.log(observer.getAllListeners());
+  // Map(2) {
+  //   '#my-element-foo' => [ { listener: [Function: listener] } ],
+  //   '#my-element-bar' => [ { listener: [Function: listener] } ]
+  // }
+
+
+  // get listeners for a specific selector:
+
+  console.log(observer.getListeners("#my-element-foo"));
+  // [ { listener: [Function: listener], continuous: true } ]
+
+
+  // remove all listeners for a specific selector:
+
+  observer.removeAllListeners("#my-element-foo");
+  console.log(observer.getAllListeners());
+  // Map(1) {
+  //   '#my-element-bar' => [ { listener: [Function: listener] } ]
+  // }
+});
+```
+
+<br>
+
+#### Chaining:
+
+```ts
+import { SelectorObserver } from "@sv443-network/userutils";
+
+document.addEventListener("DOMContentLoaded", () => {
+  // initialize generic observer that in turn initializes "sub-observers":
+  const fooObserver = new SelectorObserver(document.body);
+
+  fooObserver.addListener("#my-element", {
+    listener: (element) => {
+      // only initialize the observer once it is actually needed (when #my-element exists):
+      const barObserver = new SelectorObserver(element);
+
+      barObserver.addListener(".my-child-element", {
+        all: true,
+        continuous: true,
+        listener: (elements) => {
+          console.log("Child elements found:", elements);
+        },
+      });
+    },
+  });
+});
 ```
 
 </details>
