@@ -15,7 +15,8 @@
     "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types && echo Finished building.\"",
     "publish-package": "changeset publish",
     "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm",
-    "test": "npm run node-ts -- ./test/server.mts"
+    "test-serve": "npm run node-ts -- ./test/server.mts",
+    "test-dev": "cd test/TestScript && npm run dev"
   },
   "repository": {
     "type": "git",
