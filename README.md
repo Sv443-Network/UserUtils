@@ -73,7 +73,11 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
   ```
   // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
   ```
-
+  ```
+  // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
+  ```
+  (in order for your userscript not to break on a major library update, use the versioned URL at the top of the [GreasyFork page](https://greasyfork.org/scripts/472956-userutils))  
+    
   Then, access the functions on the global variable `UserUtils`:
   ```ts
   UserUtils.addGlobalStyle("body { background-color: red; }");
