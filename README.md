@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bazObserver.addListener<HTMLInputElement>("input", {
     all: true,        // use querySelectorAll() instead of querySelector()
     continuous: true, // don't remove the listener after it was called once
-    debounce: 200,    // debounce the listener by 200ms
+    debounce: 50,     // debounce the listener by 50ms
     listener: (elements) => {
       console.log("Input elements found:", elements);
     },

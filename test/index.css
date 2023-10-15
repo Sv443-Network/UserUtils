@@ -1,0 +1,14 @@
+body {
+  font-family: sans-serif;
+}
+
+.selector-observer-subcont {
+  background-color: rgba(0, 0, 255, 0.33);
+  padding: 8px;
+}
+
+.selector-observer-item {
+  font-family: "Cascadia Code", "Courier New", monospace;
+  background-color: #57ed96;
+  color: black;
+}

@@ -14,7 +14,8 @@
     "post-build-global": "npm run node-ts -- ./tools/post-build-global.mts",
     "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types && echo Finished building.\"",
     "publish-package": "changeset publish",
-    "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm"
+    "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm",
+    "test": "npm run node-ts -- ./test/server.mts"
   },
   "repository": {
     "type": "git",
@@ -35,11 +36,13 @@
   "homepage": "https://github.com/Sv443-Network/UserUtils",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
+    "@types/express": "^4.17.19",
     "@types/greasemonkey": "^4.0.4",
     "@types/node": "^20.5.9",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "eslint": "^8.46.0",
+    "express": "^4.18.2",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.1",
     "tsup": "^7.2.0",
