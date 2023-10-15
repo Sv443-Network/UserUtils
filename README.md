@@ -116,12 +116,21 @@ Usage:
 new SelectorObserver(baseElement: Element, options?: MutationObserverInit)
 ```
 
-A class that manages listeners that are called when selectors are found in the DOM.  
-<!-- TODO: -->
+A class that manages listeners that are called when elements at given selectors are found in the DOM.  
+This is useful for userscripts that need to wait for elements to be added to the DOM at an indeterminate point in time before they can be interacted with.  
+  
+The constructor takes a `baseElement`, which is a parent of the elements you want to observe.  
+If you want to observe the entire document, you can pass `document.body`.  
+
+The `options` parameter is optional and will be passed to the MutationObserver that is used internally.  
+The default options are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
+For example, if you want to trigger the listeners when certain attributes change, pass `{ attributes: true, attributeFilter: ["class", "data-my-attribute"] }`  
+  
+⚠️ The instances of this class need to be created after the `baseElement` is available in the DOM (at the earliest when using `@run-at document-end` or after `DOMContentLoaded` has fired).
 
 <br>
 
-### Methods:
+#### Methods:
 `addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
 Adds a listener (specified in `options.listener`) for the given selector that will be called once the selector exists in the DOM. It will be passed the element(s) that match the selector as the only argument.  
 The listener will be called immediately if the selector already exists in the DOM.  
@@ -789,7 +798,7 @@ The options object has the following properties:
 
 <br>
 
-### Methods:
+#### Methods:
 `loadData(): Promise<TData>`  
 Asynchronously loads the configuration data from persistent storage and returns it.  
 If no data was saved in persistent storage before, the value of `options.defaultConfig` will be returned and written to persistent storage.  
@@ -1314,7 +1323,8 @@ logSomething(true);      // "Log: true"
 logSomething({});        // "Log: [object Object]"
 logSomething(Symbol(1)); // "Log: Symbol(1)"
 logSomething(fooObject); // "Log: hello world"
-logSomething(barObject); // type error
+
+logSomething(barObject); // Type Error
 ```
 
 </details>
