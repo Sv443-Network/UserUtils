@@ -6,6 +6,10 @@ Zero-dependency library with various utilities for userscripts - register listen
 Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
+<br>
+
+View documentation of previous major releases: [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
+
 </div>
 <br>
 
