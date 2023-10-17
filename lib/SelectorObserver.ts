@@ -74,6 +74,8 @@ export class SelectorObserver {
               this.listenerMap.get(selector)!.splice(this.listenerMap.get(selector)!.indexOf(options), 1);
           }
         }
+        if(this.listenerMap.get(selector)?.length === 0)
+          this.listenerMap.delete(selector);
       }
     }
   }
