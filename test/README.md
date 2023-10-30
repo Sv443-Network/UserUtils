@@ -7,3 +7,5 @@
 6. Install deps with `npm i`
 7. Link with `npm link @sv443-network/userutils`
 8. Watch and recompile test userscript with `npm run dev` (or `npm run test-dev` when in the main project root)
+
+To quickly run everything in parallel, use these commands in the root UserUtils project: `npm test` and `npm run dev`

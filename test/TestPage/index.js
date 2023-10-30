@@ -1,10 +1,10 @@
-function load() {
+function onLoad() {
   document
     .querySelector("#selector-observer-btn")
     .addEventListener("click", selectorObserver);
 }
 
-document.addEventListener("DOMContentLoaded", load);
+document.addEventListener("DOMContentLoaded", onLoad);
 
 //#SECTION SelectorObserver
 
@@ -53,6 +53,7 @@ async function addElements(contNum, container) {
 
 //#SECTION utils
 
+/** @param {number} ms */
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
