@@ -1,9 +1,10 @@
 <div style="text-align: center;" align="center">
 
+<!-- #MARKER Description -->
 ## UserUtils
 Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, manage persistent user configurations, modify the DOM more easily and more.  
   
-Contains builtin TypeScript declarations. Webpack compatible and supports ESM and CJS.  
+Contains builtin TypeScript declarations. Fully web compatible and supports ESM, CJS and global imports.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
@@ -13,6 +14,7 @@ View documentation of previous major releases: [2.0.1](https://github.com/Sv443-
 </div>
 <br>
 
+<!-- #MARKER Table of Contents -->
 ## Table of Contents:
 - [**Installation**](#installation)
 - [**Preamble**](#preamble)
@@ -34,6 +36,7 @@ View documentation of previous major releases: [2.0.1](https://github.com/Sv443-
     - [clamp()](#clamp) - constrain a number between a min and max value
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
     - [randRange()](#randrange) - generate a random number between a min and max boundary
+    - [randomId()](#randomid) - generate a random ID of a given length and radix
   - [**Misc:**](#misc)
     - [ConfigManager](#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](#autoplural) - automatically pluralize a string
@@ -56,6 +59,7 @@ View documentation of previous major releases: [2.0.1](https://github.com/Sv443-
 
 <br><br>
 
+<!-- #MARKER Installation -->
 ## Installation:
 - If you are using a bundler like webpack, you can install this package using npm:
   ```
@@ -94,6 +98,7 @@ View documentation of previous major releases: [2.0.1](https://github.com/Sv443-
 
 <br><br>
 
+<!-- #MARKER Preamble -->
 ## Preamble:
 This library is written in TypeScript and contains builtin TypeScript declarations.  
   
@@ -106,16 +111,19 @@ Their documentation will contain a section marked by a warning emoji (⚠️) th
 
 <br><br>
 
+<!-- #MARKER License -->
 ## License:
 This library is licensed under the MIT License.  
 See the [license file](./LICENSE.txt) for details.
 
 <br><br>
 
+<!-- #MARKER Features -->
 ## Features:
 
 <br>
 
+<!-- #SECTION DOM -->
 ## DOM:
 
 ### SelectorObserver
@@ -697,6 +705,7 @@ console.log("Element has a vertical scroll bar:", vertical);
 
 <br><br>
 
+<!-- #SECTION Math -->
 ## Math:
 
 ### clamp()
@@ -779,8 +788,33 @@ randRange(10);     // 7
 
 </details>
 
+<br>
+
+### randomId()
+Usage:  
+```ts
+randomId(length?: number, radix?: number): string
+```
+  
+Generates a random ID of a given length and [radix.](https://en.wikipedia.org/wiki/Radix)  
+The default length is 16 and the default radix is 16 (hexadecimal).  
+You may change the radix to get digits from different numerical systems.  
+Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal, 36 for alphanumeric.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { randomId } from "@sv443-network/userutils";
+
+randomId();       // "a3f4b2c1e5d6" (length 16, radix 16)
+randomId(8);      // "f86cd354"     (length 8, radix 16)
+randomId(8, 2);   // "10100011"     (length 8, radix 2)
+randomId(10, 10); // "8103428506"   (length 10, radix 10)
+```
+
 <br><br>
 
+<!-- #SECTION Misc -->
 ## Misc:
 
 ### ConfigManager
@@ -1024,6 +1058,7 @@ fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
 
 <br><br>
 
+<!-- #SECTION Arrays -->
 ## Arrays:
 
 ### randomItem()
@@ -1124,6 +1159,7 @@ console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 
 <br><br>
 
+<!-- #SECTION Translation -->
 ## Translation:
 This is a very lightweight translation function that can be used to translate simple strings.  
 Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addLanguage()`](#traddlanguage) for an example on how this might be done.
@@ -1299,6 +1335,7 @@ If no language has been set yet, it will return undefined.
 
 <br><br>
 
+<!-- #SECTION Utility types -->
 ## Utility types:
 UserUtils also offers some utility types that can be used in TypeScript projects.  
 They don't alter the runtime behavior of the code, but they can be used to make the code more readable and to prevent errors.
@@ -1339,6 +1376,7 @@ logSomething(barObject); // Type Error
 
 <br><br><br><br>
 
+<!-- #MARKER Footer -->
 <div style="text-align: center;" align="center">
 
 Made with ❤️ by [Sv443](https://github.com/Sv443)  

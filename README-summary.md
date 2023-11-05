@@ -32,6 +32,7 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
     - [clamp()](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
     - [mapRange()](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
     - [randRange()](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
+    - [randomId()](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
 - Misc:
     - [ConfigManager()](https://github.com/Sv443-Network/UserUtils#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
