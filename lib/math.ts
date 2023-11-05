@@ -46,13 +46,16 @@ export function randRange(...args: number[]): number {
 }
 
 /**
- * Generates a random hexadecimal ID with the specified length  
+ * Generates a random ID with the specified length and radix (16 characters and hexadecimal by default)  
  * Uses [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for better cryptographic randomness  
  * @param length The length of the ID to generate (defaults to 16)
+ * @param radix The [radix](https://en.wikipedia.org/wiki/Radix) of each digit (defaults to 16 which is hexadecimal. Use 2 for binary, 10 for decimal, 36 for alphanumeric, etc.)
  */
-export function randomId(length = 16) {
-  const arr = new Uint8Array(Math.ceil(Math.max(length, 2) / 2));
+export function randomId(length = 16, radix = 16) {
+  const arr = new Uint8Array(length);
   crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, "0"))
-    .join("").substring(0, length);
+  return Array.from(
+    arr,
+    (v) => mapRange(v, 0, 255, 0, radix).toString(radix).substring(0, 1),
+  ).join("");
 }
