@@ -52,6 +52,7 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
     - [tr.getLanguage()](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
 - Utility types for TypeScript
     - [Stringifiable](https://github.com/Sv443-Network/UserUtils#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
+    - [NonEmptyArray](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
 
 <br><br>
 

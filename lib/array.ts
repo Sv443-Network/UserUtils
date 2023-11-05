@@ -1,5 +1,8 @@
 import { randRange } from "./math";
 
+/** Describes an array with at least one item */
+export type NonEmptyArray<T = unknown> = [T, ...T[]];
+
 /** Returns a random item from the passed array */
 export function randomItem<T = unknown>(array: T[]) {
   return randomItemIndex<T>(array)[0];

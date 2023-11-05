@@ -56,6 +56,7 @@ View the documentation of previous major releases: [2.0.1](https://github.com/Sv
     - [tr.getLanguage()](#trgetlanguage) - returns the currently active language
   - [**Utility types for TypeScript:**](#utility-types)
     - [Stringifiable](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
+    - [NonEmptyArray](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
 
 <br><br>
 
@@ -1376,6 +1377,32 @@ logSomething(Symbol(1)); // "Log: Symbol(1)"
 logSomething(fooObject); // "Log: hello world"
 
 logSomething(barObject); // Type Error
+```
+
+</details>
+
+<br>
+
+## NonEmptyArray
+This type describes an array that has at least one item.  
+Use the generic parameter to specify the type of the items in the array.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import type { NonEmptyArray } from "@sv443-network/userutils";
+
+function logFirstItem(array: NonEmptyArray<string>) {
+  console.log(parseInt(array[0]));
+}
+
+function somethingElse(array: NonEmptyArray) {
+  // array is typed as NonEmptyArray<unknown> when not passing a
+  // generic parameter, so this throws a TS error:
+  console.log(parseInt(array[0])); // Argument of type 'unknown' is not assignable to parameter of type 'string'
+}
+
+logFirstItem(["04abc", "69"]); // 4
 ```
 
 </details>
