@@ -44,3 +44,15 @@ export function randRange(...args: number[]): number {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+/**
+ * Generates a random hexadecimal ID with the specified length  
+ * Uses [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for better cryptographic randomness  
+ * @param length The length of the ID to generate (defaults to 16)
+ */
+export function randomId(length = 16) {
+  const arr = new Uint8Array(Math.ceil(Math.max(length, 2) / 2));
+  crypto.getRandomValues(arr);
+  return Array.from(arr, (v) => v.toString(16).padStart(2, "0"))
+    .join("").substring(0, length);
+}
