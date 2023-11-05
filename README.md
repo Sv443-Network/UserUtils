@@ -9,7 +9,7 @@ If you like using this library, please consider [supporting the development ❤�
 
 <br>
 
-View documentation of previous major releases: [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
+View the documentation of previous major releases: [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
 
 </div>
 <br>
@@ -17,7 +17,7 @@ View documentation of previous major releases: [2.0.1](https://github.com/Sv443-
 <!-- #MARKER Table of Contents -->
 ## Table of Contents:
 - [**Installation**](#installation)
-- [**Preamble**](#preamble)
+- [**Preamble** (info about the documentation)](#preamble)
 - [**License**](#license)
 - [**Features**](#features)
   - [**DOM:**](#dom)
@@ -103,8 +103,8 @@ View documentation of previous major releases: [2.0.1](https://github.com/Sv443-
 This library is written in TypeScript and contains builtin TypeScript declarations.  
   
 Each feature has example code that can be expanded by clicking on the text "Example - click to view".  
-The usages and examples are written in TypeScript, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS).  
-If the usage section contains multiple definitions of the function, each occurrence represents an overload and you can choose which one you want to use.  
+The usages and examples are written in TypeScript and use ESM import syntax, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS or the global declaration).  
+If the usage section contains multiple usages of the function, each occurrence represents an overload and you can choose which one you want to use.  
   
 Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
 Their documentation will contain a section marked by a warning emoji (⚠️) that will go into more detail.
@@ -796,10 +796,10 @@ Usage:
 randomId(length?: number, radix?: number): string
 ```
   
-Generates a random ID of a given length and [radix.](https://en.wikipedia.org/wiki/Radix)  
+Generates a cryptographically strong random ID of a given length and [radix (base).](https://en.wikipedia.org/wiki/Radix)  
 The default length is 16 and the default radix is 16 (hexadecimal).  
 You may change the radix to get digits from different numerical systems.  
-Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal, 36 for alphanumeric.  
+Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alphanumeric.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -807,10 +807,13 @@ Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal, 36 for alphan
 import { randomId } from "@sv443-network/userutils";
 
 randomId();       // "a3f4b2c1e5d6" (length 16, radix 16)
-randomId(8);      // "f86cd354"     (length 8, radix 16)
-randomId(8, 2);   // "10100011"     (length 8, radix 2)
-randomId(10, 10); // "8103428506"   (length 10, radix 10)
+randomId(8);      // "f86cd354"     (length 8,  radix 16)
+randomId(8, 2);   // "10100011"     (length 8,  radix 2)
+randomId(10, 10); // "0183428506"   (length 10, radix 10)
+randomId(8, 36);  // "z46jfpa3"     (length 8,  radix 36)
 ```
+
+</details>
 
 <br><br>
 
