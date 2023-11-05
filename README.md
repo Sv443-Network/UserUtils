@@ -486,6 +486,9 @@ preloadImages([
 ], true)
   .then((results) => {
     console.log("Images preloaded. Results:", results);
+  })
+  .catch((results) => {
+    console.error("Couldn't preload all images. Results:", results);
   });
 ```
 
