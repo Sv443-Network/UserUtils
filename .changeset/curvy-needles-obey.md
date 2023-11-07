@@ -7,6 +7,7 @@ Instead of just one post-amplifier GainNode and a DynamicsCompressorNode, there 
   
 **Migration info:**
 - The methods `setGain()` and `getGain()` have been exchanged for `setPreampGain()`, `getPreampGain()`, `setPostampGain()` and `getPostampGain()`
+- The parameter `initialMultiplier` has been exchanged for `initialPreampGain` and `initialPostampGain` to support the new system and reduce confusion (they are not multipliers strictly speaking)
 - A boolean property `enabled` has been added to check if the amplification is enabled or not
 - The property `gainNode` has been exchanged for `preampNode` and `postampNode`
 - The property `source` has been renamed to `sourceNode` to fit the naming of the other properties
