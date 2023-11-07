@@ -157,9 +157,47 @@ export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
  * | `limiterNode` | The DynamicsCompressorNode instance used for limiting clipping and distortion |
  */
 export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, initialMultiplier = 1.0) {
+  /*
+  // Globals:
+
+  bands = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000]
+
+
+  // Audio Processing Nodes:
+
+  <HTMLMediaElement (source)>
+
+  // connect to:
+
+  <GainNode (preamp)>
+    attr gain = ?
+
+  // connect to:
+
+  // only for panning L/R I think
+  // <StereoPannerNode (balance)>
+  //   attr pan
+
+  // connect to:
+
+  [foreach band of bands] <BiquadFilterNode (filter)>
+    attr frequency = band
+    attr gain = ?
+    attr type = (index === 0 ? "lowshelf" : "highshelf) || "peaking"   // "peaking" is unreachable??
+
+  // connect all but the first filter to the first filter, then first filter to destination:
+
+  <AudioContext.destination>
+
+  */
+
   // @ts-ignore
-  const context = new (window.AudioContext || window.webkitAudioContext);
+  const context = new (window.AudioContext || window.webkitAudioContext)();
   const props = {
+    context,
+    source: context.createMediaElementSource(mediaElement),
+    gainNode: context.createGain(),
+    limiterNode: context.createDynamicsCompressor(),
     /** Sets the gain multiplier */
     setGain(multiplier: number) {
       props.gainNode.gain.setValueAtTime(multiplier, props.context.currentTime);
@@ -191,23 +229,46 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
         props.limiterNode[key as keyof typeof options]
           .setValueAtTime(val, props.context.currentTime);
     },
-    context: context,
-    source: context.createMediaElementSource(mediaElement),
-    gainNode: context.createGain(),
-    limiterNode: context.createDynamicsCompressor(),
   };
 
-  props.setLimiterOptions({
+  // TODO: better limiter options
+  // - https://www.reddit.com/r/edmproduction/comments/ssi4sx/explain_limitingclippingcompression_like_im_8/hx5kukj/
+  // - https://blog.landr.com/how-to-use-a-compressor/
+  // - https://youtu.be/72rtkuk9Gb0?t=120
+
+  props.setLimiterOptions(limiterPresets.default);
+  props.setGain(initialMultiplier);
+
+  return props;
+}
+
+/** Presets for the `setLimiterOptions()` function returned by {@linkcode amplifyMedia()} */
+export const limiterPresets = {
+  /** The default limiter options */
+  default: {
+    threshold: -16,
+    knee: 15,
+    ratio: 5,
+    attack: 0.004,
+    release: 0.01,
+  },
+  /** A limiter preset for a more aggressive compression */
+  aggressive: {
     threshold: -12,
     knee: 30,
     ratio: 12,
     attack: 0.003,
     release: 0.25,
-  });
-  props.setGain(initialMultiplier);
-
-  return props;
-}
+  },
+  /** A limiter preset for a more subtle compression */
+  subtle: {
+    threshold: -24,
+    knee: 5,
+    ratio: 2,
+    attack: 0.005,
+    release: 0.05,
+  },
+};
 
 /** An object which contains the results of {@linkcode amplifyMedia()} */
 export type AmplifyMediaResult = ReturnType<typeof amplifyMedia>;
