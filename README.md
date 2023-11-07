@@ -585,36 +585,48 @@ interceptWindowEvent("beforeunload", (event) => {
 ### amplifyMedia()
 Usage:  
 ```ts
-amplifyMedia(mediaElement: HTMLMediaElement, initialMultiplier?: number): AmplifyMediaResult
+amplifyMedia(mediaElement: HTMLMediaElement, initialPreampGain?: number, initialPostampGain?: number): AmplifyMediaResult
 ```
   
-Amplifies the gain of a media element (like `<audio>` or `<video>`) by a given multiplier (defaults to 1.0).  
-This is how you can increase the volume of a media element beyond the default maximum volume of 1.0 or 100%.  
-Make sure to limit the multiplier to a reasonable value ([clamp()](#clamp) is good for this), as it may cause bleeding eardrums.  
+Amplifies the gain of a media element (like `<audio>` or `<video>`) by the given values.  
+This is how you can increase the volume of a media element beyond the default maximum volume of 100%.  
+Make sure to limit the multiplier to a reasonable value ([clamp()](#clamp) is good for this), as it may otherwise cause bleeding eardrums.  
+  
+The default values are `0.02` for the pre-amplifier and `1.0` for the post-amplifier.  
+The values may be changed at any point by calling the `setPreampGain()` and `setPostampGain()` methods of the returned object.  
+The value of the pre-amplifier influences the scaling of the post-amplifier, so you will have to spend some time finding the right values for your use case.  
+  
+To activate the amplification for the first time, call the `enable()` method of the returned object.  
   
 This is the processing workflow applied to the media element:  
-`MediaElement (source)` => `DynamicsCompressorNode (limiter)` => `GainNode` => `AudioDestination (output)`  
-  
-A limiter (compression) is applied to the audio to prevent clipping.  
-Its properties can be changed by calling the returned function `setLimiterOptions()`  
-The limiter options set by default are `{ threshold: -12, knee: 30, ratio: 12, attack: 0.003, release: 0.25 }`  
+`MediaElement (source)` => `GainNode (pre-amplifier)` => 10x `BiquadFilterNode` => `GainNode (post-amplifier)` => `destination`  
   
 ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
 ⚠️ Make sure to call the returned function `enable()` after calling this function to actually enable the amplification.  
   
-The returned object of the type `AmplifyMediaResult` has the following properties:
+The returned object of the type `AmplifyMediaResult` has the following properties:  
+**Important properties:**
 | Property | Description |
 | :-- | :-- |
-| `setGain()` | Used to change the gain multiplier |
-| `getGain()` | Returns the current gain multiplier |
-| `enable()` | Call to enable the amplification for the first time or if it was disabled before |
+| `setPreampGain()` | Used to change the pre-amplifier gain value from the default set by {@linkcode initialPreampGain} (0.02) |
+| `getPreampGain()` | Returns the current pre-amplifier gain value |
+| `setPostampGain()` | Used to change the post-amplifier gain value from the default set by {@linkcode initialPostampGain} (1.0) |
+| `getPostampGain()` | Returns the current post-amplifier gain value |
+| `enable()` | Call to enable the amplification for the first time or re-enable it if it was disabled before |
 | `disable()` | Call to disable amplification |
-| `setLimiterOptions()` | Used for changing the [options of the DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options) - the default is `{ threshold: -12, knee: 30, ratio: 12, attack: 0.003, release: 0.25 }` |
-| `context` | The AudioContext instance |
-| `source` | The MediaElementSourceNode instance |
-| `gainNode` | The GainNode instance used for actually boosting the gain |
-| `limiterNode` | The DynamicsCompressorNode instance used for limiting clipping and distortion |
+| `enabled` | Whether the amplification is currently enabled |
   
+**Other properties:**
+| Property | Description |
+| :-- | :-- |
+| `context` | The AudioContext instance |
+| `sourceNode` | A MediaElementSourceNode instance created from the passed {@linkcode mediaElement} |
+| `preampNode` | The pre-amplifier GainNode instance |
+| `postampNode` | The post-amplifier GainNode instance |
+| `filterNodes` | An array of BiquadFilterNode instances used for normalizing the audio volume |
+  
+<br>
+
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
@@ -625,12 +637,16 @@ const audioElement = document.querySelector<HTMLAudioElement>("audio");
 
 let ampResult: AmplifyMediaResult | undefined;
 
-function setGain(newValue: number) {
+// I found this value to be a good starting point
+// and a good match if the postamp value is between 1 and 3
+const preampValue = 0.15;
+
+function updateGainValue(postampValue: number) {
   if(!ampResult)
     return;
   // constrain the value to between 0 and 3 for safety
-  ampResult.setGain(clamp(newValue, 0, 3));
-  console.log("Gain set to", ampResult.getGain());
+  ampResult.setPostampGain(clamp(postampValue, 0, 3));
+  console.log("Gain set to", ampResult.getPostampGain());
 }
 
 
@@ -641,15 +657,17 @@ amplifyButton.addEventListener("click", () => {
   // only needs to be initialized once, afterwards the returned object
   // can be used to change settings and enable/disable the amplification
   if(!ampResult) {
-    // initialize amplification and set gain to 2x
-    ampResult = amplifyMedia(audioElement, 2);
+    // initialize amplification and set it to ~2x
+    ampResult = amplifyMedia(audioElement, preampValue, 2);
+  }
+  if(!ampResult.enabled) {
     // enable the amplification
     ampResult.enable();
   }
 
-  setGain(2.5);  // set gain to 2.5x
+  updateGainValue(2.5); // set postamp gain to ~2.5x
 
-  console.log(ampResult.getGain()); // 2.5
+  console.log(ampResult.getPostampGain()); // 2.5
 });
 
 
@@ -659,23 +677,6 @@ disableButton.addEventListener("click", () => {
   if(ampResult) {
     // disable the amplification
     ampResult.disable();
-  }
-});
-
-
-const limiterButton = document.querySelector<HTMLButtonElement>("button#limiter");
-
-limiterButton.addEventListener("click", () => {
-  if(ampResult) {
-    // change the limiter options to a more aggressive setting
-    // see https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options
-    ampResult.setLimiterOptions({
-      threshold: -10,
-      knee: 20,
-      ratio: 20,
-      attack: 0.001,
-      release: 0.1,
-    });
   }
 });
 ```

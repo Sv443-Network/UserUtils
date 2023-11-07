@@ -1,3 +1,5 @@
+import type { NonEmptyArray } from "./array";
+
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
@@ -130,148 +132,113 @@ export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
   return interceptEvent(getUnsafeWindow(), eventName, predicate);
 }
 
+/** An object which contains the results of {@linkcode amplifyMedia()} */
+export type AmplifyMediaResult = ReturnType<typeof amplifyMedia>;
+
+const amplifyBands = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000];
+
 /**
- * Amplifies the gain of the passed media element's audio by the specified multiplier.  
- * Also applies a limiter to prevent clipping and distortion.  
+ * Amplifies the gain of the passed media element's audio by the specified values.  
+ * Also applies biquad filters to prevent clipping and distortion.  
  * This function supports any MediaElement instance like `<audio>` or `<video>`  
  *   
  * This is the audio processing workflow:  
- * `MediaElement (source)` => `DynamicsCompressorNode (limiter)` => `GainNode` => `AudioDestinationNode (output)`  
+ * `MediaElement (source)` => `GainNode (pre-amplifier)` => 10x `BiquadFilterNode` => `GainNode (post-amplifier)` => `destination`  
  *   
  * ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
  * ⚠️ Make sure to call the returned function `enable()` after calling this function to actually enable the amplification.  
  *   
  * @param mediaElement The media element to amplify (e.g. `<audio>` or `<video>`)
- * @param initialMultiplier The initial gain multiplier to apply (floating point number, default is `1.0`)
- * @returns Returns an object with the following properties:
+ * @param initialPreampGain The initial gain to apply to the pre-amplifier GainNode (floating point number, default is `0.02`)
+ * @param initialPostampGain The initial gain to apply to the post-amplifier GainNode (floating point number, default is `1.0`)
+ * @returns Returns an object with the following properties:  
+ * **Important properties:**
  * | Property | Description |
  * | :-- | :-- |
- * | `setGain()` | Used to change the gain multiplier from the default set by {@linkcode initialMultiplier} |
- * | `getGain()` | Returns the current gain multiplier |
- * | `enable()` | Call to enable the amplification for the first time or if it was disabled before |
+ * | `setPreampGain()` | Used to change the pre-amplifier gain value from the default set by {@linkcode initialPreampGain} (0.02) |
+ * | `getPreampGain()` | Returns the current pre-amplifier gain value |
+ * | `setPostampGain()` | Used to change the post-amplifier gain value from the default set by {@linkcode initialPostampGain} (1.0) |
+ * | `getPostampGain()` | Returns the current post-amplifier gain value |
+ * | `enable()` | Call to enable the amplification for the first time or re-enable it if it was disabled before |
  * | `disable()` | Call to disable amplification |
- * | `setLimiterOptions()` | Used for changing the [options of the DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options) - the default is `{ threshold: -2, knee: 40, ratio: 12, attack: 0.003, release: 0.25 }` |
+ * | `enabled` | Whether the amplification is currently enabled |
+ * 
+ * **Other properties:**
+ * | Property | Description |
+ * | :-- | :-- |
  * | `context` | The AudioContext instance |
- * | `source` | The MediaElementSourceNode instance |
- * | `gainNode` | The GainNode instance |
- * | `limiterNode` | The DynamicsCompressorNode instance used for limiting clipping and distortion |
+ * | `sourceNode` | A MediaElementSourceNode instance created from the passed {@linkcode mediaElement} |
+ * | `preampNode` | The pre-amplifier GainNode instance |
+ * | `postampNode` | The post-amplifier GainNode instance |
+ * | `filterNodes` | An array of BiquadFilterNode instances used for normalizing the audio volume |
  */
-export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, initialMultiplier = 1.0) {
-  /*
-  // Globals:
-
-  bands = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000]
-
-
-  // Audio Processing Nodes:
-
-  <HTMLMediaElement (source)>
-
-  // connect to:
-
-  <GainNode (preamp)>
-    attr gain = ?
-
-  // connect to:
-
-  // only for panning L/R I think
-  // <StereoPannerNode (balance)>
-  //   attr pan
-
-  // connect to:
-
-  [foreach band of bands] <BiquadFilterNode (filter)>
-    attr frequency = band
-    attr gain = ?
-    attr type = (index === 0 ? "lowshelf" : "highshelf) || "peaking"   // "peaking" is unreachable??
-
-  // connect all but the first filter to the first filter, then first filter to destination:
-
-  <AudioContext.destination>
-
-  */
-
+export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, initialPreampGain = 0.02, initialPostampGain = 1.0) {
   // @ts-ignore
   const context = new (window.AudioContext || window.webkitAudioContext)();
   const props = {
     context,
-    source: context.createMediaElementSource(mediaElement),
-    gainNode: context.createGain(),
-    limiterNode: context.createDynamicsCompressor(),
-    /** Sets the gain multiplier */
-    setGain(multiplier: number) {
-      props.gainNode.gain.setValueAtTime(multiplier, props.context.currentTime);
+    sourceNode: context.createMediaElementSource(mediaElement),
+    preampNode: context.createGain(),
+    postampNode: context.createGain(),
+    filterNodes: amplifyBands.map((band, i) => {
+      const node = context.createBiquadFilter();
+      node.type = (i === 0 ? "lowshelf" : "highshelf");
+      node.frequency.setValueAtTime(band, context.currentTime);
+      return node;
+    }) as NonEmptyArray<BiquadFilterNode>,
+    /** Sets the gain of the pre-amplifier GainNode */
+    setPreampGain(gain: number) {
+      props.preampNode.gain.setValueAtTime(gain, context.currentTime);
     },
-    /** Returns the current gain multiplier */
-    getGain() {
-      return props.gainNode.gain.value;
+    /** Returns the current gain of the pre-amplifier GainNode */
+    getPreampGain() {
+      return props.preampNode.gain.value;
     },
+    /** Sets the gain of the post-amplifier GainNode */
+    setPostampGain(multiplier: number) {
+      props.postampNode.gain.setValueAtTime(multiplier, context.currentTime);
+    },
+    /** Returns the current gain of the post-amplifier GainNode */
+    getPostampGain() {
+      return props.postampNode.gain.value;
+    },
+    /** Whether the amplification is currently enabled */
+    enabled: false,
     /** Enable the amplification for the first time or if it was disabled before */
     enable() {
-      props.source.connect(props.limiterNode);
-      props.limiterNode.connect(props.gainNode);
-      props.gainNode.connect(props.context.destination);
+      if(props.enabled)
+        return;
+      props.enabled = true;
+      props.sourceNode.connect(props.preampNode);
+      props.filterNodes.slice(1).forEach(filterNode => {
+        props.preampNode.connect(filterNode);
+        filterNode.connect(props.filterNodes[0]);
+      });
+      props.filterNodes[0].connect(props.postampNode);
+      props.postampNode.connect(props.context.destination);
     },
     /** Disable the amplification */
     disable() {
-      props.source.disconnect(props.limiterNode);
-      props.limiterNode.disconnect(props.gainNode);
-      props.gainNode.disconnect(props.context.destination);
+      if(!props.enabled)
+        return;
+      props.enabled = false;
+      props.sourceNode.disconnect(props.preampNode);
+      props.filterNodes.slice(1).forEach(filterNode => {
+        props.preampNode.disconnect(filterNode);
+        filterNode.disconnect(props.filterNodes[0]);
+      });
+      props.filterNodes[0].disconnect(props.postampNode);
+      props.postampNode.disconnect(props.context.destination);
 
-      props.source.connect(props.context.destination);
-    },
-    /**
-     * Set the options of the [limiter / DynamicsCompressorNode](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode/DynamicsCompressorNode#options)  
-     * The default is `{ threshold: -12, knee: 30, ratio: 12, attack: 0.003, release: 0.25 }`
-     */
-    setLimiterOptions(options: Partial<Record<"threshold" | "knee" | "ratio" | "attack" | "release", number>>) {
-      for(const [key, val] of Object.entries(options))
-        props.limiterNode[key as keyof typeof options]
-          .setValueAtTime(val, props.context.currentTime);
+      props.sourceNode.connect(props.context.destination);
     },
   };
 
-  // TODO: better limiter options
-  // - https://www.reddit.com/r/edmproduction/comments/ssi4sx/explain_limitingclippingcompression_like_im_8/hx5kukj/
-  // - https://blog.landr.com/how-to-use-a-compressor/
-  // - https://youtu.be/72rtkuk9Gb0?t=120
-
-  props.setLimiterOptions(limiterPresets.default);
-  props.setGain(initialMultiplier);
+  props.setPreampGain(initialPreampGain);
+  props.setPostampGain(initialPostampGain);
 
   return props;
 }
-
-/** Presets for the `setLimiterOptions()` function returned by {@linkcode amplifyMedia()} */
-export const limiterPresets = {
-  /** The default limiter options */
-  default: {
-    threshold: -16,
-    knee: 15,
-    ratio: 5,
-    attack: 0.004,
-    release: 0.01,
-  },
-  /** A limiter preset for a more aggressive compression */
-  aggressive: {
-    threshold: -12,
-    knee: 30,
-    ratio: 12,
-    attack: 0.003,
-    release: 0.25,
-  },
-  /** A limiter preset for a more subtle compression */
-  subtle: {
-    threshold: -24,
-    knee: 5,
-    ratio: 2,
-    attack: 0.005,
-    release: 0.05,
-  },
-};
-
-/** An object which contains the results of {@linkcode amplifyMedia()} */
-export type AmplifyMediaResult = ReturnType<typeof amplifyMedia>;
 
 /** Checks if an element is scrollable in the horizontal and vertical directions */
 export function isScrollable(element: Element) {
