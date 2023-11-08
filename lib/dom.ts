@@ -1,5 +1,3 @@
-import type { NonEmptyArray } from "./array";
-
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
@@ -135,72 +133,50 @@ export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
 /** An object which contains the results of {@linkcode amplifyMedia()} */
 export type AmplifyMediaResult = ReturnType<typeof amplifyMedia>;
 
-const amplifyBands = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000];
-
 /**
- * Amplifies the gain of the passed media element's audio by the specified values.  
- * Also applies biquad filters to prevent clipping and distortion.  
+ * Amplifies the gain of the passed media element's audio by the specified value.  
  * This function supports any MediaElement instance like `<audio>` or `<video>`  
  *   
  * This is the audio processing workflow:  
- * `MediaElement (source)` => `GainNode (pre-amplifier)` => 10x `BiquadFilterNode` => `GainNode (post-amplifier)` => `destination`  
+ * `MediaElement (source)` => `GainNode (amplification)` => `destination`  
  *   
  * ⚠️ This function has to be run in response to a user interaction event, else the browser will reject it because of the strict autoplay policy.  
  * ⚠️ Make sure to call the returned function `enable()` after calling this function to actually enable the amplification.  
+ * ⚠️ You should implement a safety limit by using the [`clamp()`](https://github.com/Sv443-Network/UserUtils#clamp) function to prevent any accidental bleeding eardrums.  
  *   
  * @param mediaElement The media element to amplify (e.g. `<audio>` or `<video>`)
- * @param initialPreampGain The initial gain to apply to the pre-amplifier GainNode (floating point number, default is `0.02`)
- * @param initialPostampGain The initial gain to apply to the post-amplifier GainNode (floating point number, default is `1.0`)
+ * @param initialGain The initial gain to apply to the GainNode responsible for volume amplification (floating point number, default is `1.0`)
  * @returns Returns an object with the following properties:  
  * **Important properties:**
  * | Property | Description |
  * | :-- | :-- |
- * | `setPreampGain()` | Used to change the pre-amplifier gain value from the default set by {@linkcode initialPreampGain} (0.02) |
- * | `getPreampGain()` | Returns the current pre-amplifier gain value |
- * | `setPostampGain()` | Used to change the post-amplifier gain value from the default set by {@linkcode initialPostampGain} (1.0) |
- * | `getPostampGain()` | Returns the current post-amplifier gain value |
  * | `enable()` | Call to enable the amplification for the first time or re-enable it if it was disabled before |
  * | `disable()` | Call to disable amplification |
  * | `enabled` | Whether the amplification is currently enabled |
+ * | `setGain()` | Used to change the gain value from the default given by the parameter {@linkcode initialGain} |
+ * | `getGain()` | Returns the current gain value |
  * 
  * **Other properties:**
  * | Property | Description |
  * | :-- | :-- |
  * | `context` | The AudioContext instance |
  * | `sourceNode` | A MediaElementSourceNode instance created from the passed {@linkcode mediaElement} |
- * | `preampNode` | The pre-amplifier GainNode instance |
- * | `postampNode` | The post-amplifier GainNode instance |
- * | `filterNodes` | An array of BiquadFilterNode instances used for normalizing the audio volume |
+ * | `gainNode` | The GainNode instance used for volume amplification |
  */
-export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, initialPreampGain = 0.02, initialPostampGain = 1.0) {
+export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem, initialGain = 1.0) {
   // @ts-ignore
   const context = new (window.AudioContext || window.webkitAudioContext)();
   const props = {
     context,
     sourceNode: context.createMediaElementSource(mediaElement),
-    preampNode: context.createGain(),
-    postampNode: context.createGain(),
-    filterNodes: amplifyBands.map((band, i) => {
-      const node = context.createBiquadFilter();
-      node.type = (i === 0 ? "lowshelf" : "highshelf");
-      node.frequency.setValueAtTime(band, context.currentTime);
-      return node;
-    }) as NonEmptyArray<BiquadFilterNode>,
-    /** Sets the gain of the pre-amplifier GainNode */
-    setPreampGain(gain: number) {
-      props.preampNode.gain.setValueAtTime(gain, context.currentTime);
+    gainNode: context.createGain(),
+    /** Sets the gain of the amplifying GainNode */
+    setGain(gain: number) {
+      props.gainNode.gain.setValueAtTime(gain, context.currentTime);
     },
-    /** Returns the current gain of the pre-amplifier GainNode */
-    getPreampGain() {
-      return props.preampNode.gain.value;
-    },
-    /** Sets the gain of the post-amplifier GainNode */
-    setPostampGain(multiplier: number) {
-      props.postampNode.gain.setValueAtTime(multiplier, context.currentTime);
-    },
-    /** Returns the current gain of the post-amplifier GainNode */
-    getPostampGain() {
-      return props.postampNode.gain.value;
+    /** Returns the current gain of the amplifying GainNode */
+    getGain() {
+      return props.gainNode.gain.value;
     },
     /** Whether the amplification is currently enabled */
     enabled: false,
@@ -209,33 +185,23 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
       if(props.enabled)
         return;
       props.enabled = true;
-      props.sourceNode.connect(props.preampNode);
-      props.filterNodes.slice(1).forEach(filterNode => {
-        props.preampNode.connect(filterNode);
-        filterNode.connect(props.filterNodes[0]);
-      });
-      props.filterNodes[0].connect(props.postampNode);
-      props.postampNode.connect(props.context.destination);
+
+      props.sourceNode.connect(props.gainNode);
+      props.gainNode.connect(props.context.destination);
     },
     /** Disable the amplification */
     disable() {
       if(!props.enabled)
         return;
       props.enabled = false;
-      props.sourceNode.disconnect(props.preampNode);
-      props.filterNodes.slice(1).forEach(filterNode => {
-        props.preampNode.disconnect(filterNode);
-        filterNode.disconnect(props.filterNodes[0]);
-      });
-      props.filterNodes[0].disconnect(props.postampNode);
-      props.postampNode.disconnect(props.context.destination);
+      props.sourceNode.disconnect(props.gainNode);
+      props.gainNode.disconnect(props.context.destination);
 
       props.sourceNode.connect(props.context.destination);
     },
   };
 
-  props.setPreampGain(initialPreampGain);
-  props.setPostampGain(initialPostampGain);
+  props.setGain(initialGain);
 
   return props;
 }
