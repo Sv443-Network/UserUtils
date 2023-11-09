@@ -811,11 +811,11 @@ Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alp
 ```ts
 import { randomId } from "@sv443-network/userutils";
 
-randomId();       // "a3f4b2c1e5d6" (length 16, radix 16)
-randomId(8);      // "f86cd354"     (length 8,  radix 16)
-randomId(8, 2);   // "10100011"     (length 8,  radix 2)
-randomId(10, 10); // "0183428506"   (length 10, radix 10)
-randomId(8, 36);  // "z46jfpa3"     (length 8,  radix 36)
+randomId();       // "1bda419a73629d4f" (length 16, radix 16)
+randomId(10);     // "f86cd354a4"       (length 10, radix 16)
+randomId(10, 2);  // "1010001101"       (length 10, radix 2)
+randomId(10, 10); // "0183428506"       (length 10, radix 10)
+randomId(10, 36); // "z46jfpa37r"       (length 10, radix 36)
 ```
 
 </details>
