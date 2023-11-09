@@ -172,7 +172,7 @@ export function amplifyMedia<TElem extends HTMLMediaElement>(mediaElement: TElem
     gainNode: context.createGain(),
     /** Sets the gain of the amplifying GainNode */
     setGain(gain: number) {
-      props.gainNode.gain.setValueAtTime(gain, context.currentTime);
+      props.gainNode.gain.value = gain;
     },
     /** Returns the current gain of the amplifying GainNode */
     getGain() {
