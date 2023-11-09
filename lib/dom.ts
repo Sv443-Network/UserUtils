@@ -87,6 +87,7 @@ export function openInNewTab(href: string) {
 
 /**
  * Intercepts the specified event on the passed object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
+ * If no predicate is specified, all events will be discarded.  
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */
@@ -120,6 +121,7 @@ export function interceptEvent<TEvtObj extends EventTarget, TPredicateEvt extend
 
 /**
  * Intercepts the specified event on the window object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
+ * If no predicate is specified, all events will be discarded.  
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set the `Error.stackTraceLimit` to 1000 to ensure the stack trace is preserved.
  */

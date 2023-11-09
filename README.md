@@ -529,11 +529,12 @@ Usage:
 interceptEvent(
   eventObject: EventTarget,
   eventName: string,
-  predicate: (event: Event) => boolean
+  predicate?: (event: Event) => boolean
 ): void
 ```
   
 Intercepts all events dispatched on the `eventObject` and prevents the listeners from being called as long as the predicate function returns a truthy value.  
+If no predicate is specified, all events will be discarded.  
 Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not already higher) to ensure the stack trace is preserved.  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
@@ -544,8 +545,12 @@ Calling this function will set the `Error.stackTraceLimit` to 1000 (if it's not 
 import { interceptEvent } from "@sv443-network/userutils";
 
 interceptEvent(document.body, "click", (event) => {
-  console.log("Intercepting click event:", event);
-  return true; // prevent all click events on the body element
+  // prevent all click events on <a> elements within the entire <body>
+  if(event.target instanceof HTMLAnchorElement) {
+    console.log("Intercepting click event:", event);
+    return true;
+  }
+  return false; // allow all other click events through
 });
 ```
 
@@ -558,11 +563,12 @@ Usage:
 ```ts
 interceptWindowEvent(
   eventName: string,
-  predicate: (event: Event) => boolean
+  predicate?: (event: Event) => boolean
 ): void
 ```
   
 Intercepts all events dispatched on the `window` object and prevents the listeners from being called as long as the predicate function returns a truthy value.  
+If no predicate is specified, all events will be discarded.  
 This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` (or falls back to regular `window`).  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
@@ -573,9 +579,9 @@ This is essentially the same as [`interceptEvent()`](#interceptevent), but autom
 ```ts
 import { interceptWindowEvent } from "@sv443-network/userutils";
 
-interceptWindowEvent("beforeunload", (event) => {
-  return true; // prevent the pesky "Are you sure you want to leave this page?" popup
-});
+// prevent the pesky "Are you sure you want to leave this page?" popup
+// as no predicate is specified, all events will be discarded by default
+interceptWindowEvent("beforeunload");
 ```
 
 </details>
