@@ -585,16 +585,15 @@ interceptWindowEvent("beforeunload", (event) => {
 ### amplifyMedia()
 Usage:  
 ```ts
-amplifyMedia(mediaElement: HTMLMediaElement, initialPreampGain?: number, initialPostampGain?: number): AmplifyMediaResult
+amplifyMedia(mediaElement: HTMLMediaElement, initialGain?: number): AmplifyMediaResult
 ```
   
-Amplifies the gain of a media element (like `<audio>` or `<video>`) by the given values.  
+Amplifies the gain of a media element (like `<audio>` or `<video>`) by the given gain value.  
 This is how you can increase the volume of a media element beyond the default maximum volume of 100%.  
-Make sure to limit the multiplier to a reasonable value ([clamp()](#clamp) is good for this), as it may otherwise cause bleeding eardrums.  
+Make sure to limit the value to a reasonable value ([clamp()](#clamp) is good for this), as it may otherwise cause bleeding eardrums.  
   
-The default values are `0.02` for the pre-amplifier and `1.0` for the post-amplifier.  
-The values may be changed at any point by calling the `setPreampGain()` and `setPostampGain()` methods of the returned object.  
-The value of the pre-amplifier influences the scaling of the post-amplifier, so you will have to spend some time finding the right values for your use case.  
+The default gain value passed to the GainNode is `1.0`  
+It may be read and changed at any point by calling the `getGain()` and `setGain()` methods of the returned object.  
   
 To activate the amplification for the first time, call the `enable()` method of the returned object.  
   
@@ -608,22 +607,18 @@ The returned object of the type `AmplifyMediaResult` has the following propertie
 **Important properties:**
 | Property | Description |
 | :-- | :-- |
-| `setPreampGain()` | Used to change the pre-amplifier gain value from the default set by {@linkcode initialPreampGain} (0.02) |
-| `getPreampGain()` | Returns the current pre-amplifier gain value |
-| `setPostampGain()` | Used to change the post-amplifier gain value from the default set by {@linkcode initialPostampGain} (1.0) |
-| `getPostampGain()` | Returns the current post-amplifier gain value |
 | `enable()` | Call to enable the amplification for the first time or re-enable it if it was disabled before |
 | `disable()` | Call to disable amplification |
 | `enabled` | Whether the amplification is currently enabled |
-  
+| `setGain()` | Used to change the gain value from the default given by the parameter `initialGain` |
+| `getGain()` | Returns the current gain value |
+
 **Other properties:**
 | Property | Description |
 | :-- | :-- |
-| `context` | The AudioContext instance |
-| `sourceNode` | A MediaElementSourceNode instance created from the passed {@linkcode mediaElement} |
-| `preampNode` | The pre-amplifier GainNode instance |
-| `postampNode` | The post-amplifier GainNode instance |
-| `filterNodes` | An array of BiquadFilterNode instances used for normalizing the audio volume |
+| `context` | The AudioContext instance used as the audio destination and context within the nodes are created |
+| `sourceNode` | A MediaElementSourceNode instance created from the passed `mediaElement` |
+| `gainNode` | The GainNode instance used for volume amplification |
   
 <br>
 
@@ -637,16 +632,13 @@ const audioElement = document.querySelector<HTMLAudioElement>("audio");
 
 let ampResult: AmplifyMediaResult | undefined;
 
-// I found this value to be a good starting point
-// and a good match if the postamp value is between 1 and 3
-const preampValue = 0.15;
-
-function updateGainValue(postampValue: number) {
+function updateGainValue(gainValue: number) {
   if(!ampResult)
     return;
   // constrain the value to between 0 and 3 for safety
-  ampResult.setPostampGain(clamp(postampValue, 0, 3));
-  console.log("Gain set to", ampResult.getPostampGain());
+  ampResult.setGain(clamp(gainValue, 0, 3));
+
+  console.log("Gain set to", ampResult.getGain());
 }
 
 
@@ -658,16 +650,16 @@ amplifyButton.addEventListener("click", () => {
   // can be used to change settings and enable/disable the amplification
   if(!ampResult) {
     // initialize amplification and set it to ~2x
-    ampResult = amplifyMedia(audioElement, preampValue, 2);
+    ampResult = amplifyMedia(audioElement, 2.0);
   }
   if(!ampResult.enabled) {
     // enable the amplification
     ampResult.enable();
   }
 
-  updateGainValue(2.5); // set postamp gain to ~2.5x
+  updateGainValue(3.5); // try to set gain to ~3.5x
 
-  console.log(ampResult.getPostampGain()); // 2.5
+  console.log(ampResult.getGain()); // 3.0 (because of the clamp())
 });
 
 
