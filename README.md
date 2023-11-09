@@ -588,7 +588,7 @@ Usage:
 amplifyMedia(mediaElement: HTMLMediaElement, initialGain?: number): AmplifyMediaResult
 ```
   
-Amplifies the gain of a media element (like `<audio>` or `<video>`) by the given gain value.  
+Amplifies the volume of a media element (like `<audio>` or `<video>`) by the given gain value.  
 This is how you can increase the volume of a media element beyond the default maximum volume of 100%.  
 Make sure to limit the value to a reasonable value ([clamp()](#clamp) is good for this), as it may otherwise cause bleeding eardrums.  
   
