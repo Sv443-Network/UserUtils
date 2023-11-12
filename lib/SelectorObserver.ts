@@ -22,26 +22,35 @@ type SelectorOptionsCommon = {
   debounce?: number;
 };
 
+export type SelectorObserverOptions = MutationObserverInit & {
+  /** If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set */
+  defaultDebounce?: number;
+};
+
 /** Observes the children of the given element for changes */
 export class SelectorObserver {
-  private enabled = true;
+  private enabled = false;
   private baseElement: Element;
   private observer: MutationObserver;
-  private observerOptions: MutationObserverInit;
-  private listenerMap = new Map<string, SelectorListenerOptions[]>();
+  private observerOptions: SelectorObserverOptions;
+  private listenerMap: Map<string, SelectorListenerOptions[]>;
+  private readonly dbgId = Math.floor(Math.random() * 1000000);
 
   /**
    * Creates a new SelectorObserver that will observe the children of the given base element for changes (only creation and deletion of elements by default)
    * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
+   * TODO: support passing a selector for the base element to be able to queue listeners before the element is available
    */
-  constructor(baseElement: Element, observerOptions?: MutationObserverInit) {
+  constructor(baseElement: Element, options: SelectorObserverOptions = {}) {
     this.baseElement = baseElement;
 
-    this.observer = new MutationObserver(this.checkSelectors);
+    this.listenerMap = new Map<string, SelectorListenerOptions[]>();
+    // if the arrow func isn't there, `this` will be undefined in the callback
+    this.observer = new MutationObserver(() => this.checkSelectors());
     this.observerOptions = {
       childList: true,
       subtree: true,
-      ...observerOptions,
+      ...options,
     };
 
     this.enable();
@@ -59,19 +68,18 @@ export class SelectorObserver {
       const oneElement = one ? this.baseElement.querySelector<HTMLElement>(selector) : null;
 
       for(const options of listeners) {
-        if(!this.enabled)
-          return;
         if(options.all) {
           if(allElements && allElements.length > 0) {
             options.listener(allElements);
             if(!options.continuous)
-              this.listenerMap.get(selector)!.splice(this.listenerMap.get(selector)!.indexOf(options), 1);
+              this.removeListener(selector, options);
           }
-        } else {
+        }
+        else {
           if(oneElement) {
             options.listener(oneElement);
             if(!options.continuous)
-              this.listenerMap.get(selector)!.splice(this.listenerMap.get(selector)!.indexOf(options), 1);
+              this.removeListener(selector, options);
           }
         }
         if(this.listenerMap.get(selector)?.length === 0)
@@ -99,8 +107,12 @@ export class SelectorObserver {
    */
   public addListener<TElem extends Element = HTMLElement>(selector: string, options: SelectorListenerOptions<TElem>) {
     options = { all: false, continuous: false, debounce: 0, ...options };
-    if(options.debounce && options.debounce > 0)
-      options.listener = this.debounce(options.listener as ((arg: NodeListOf<Element> | Element) => void), options.debounce);
+    if((options.debounce && options.debounce > 0) || (this.observerOptions.defaultDebounce && this.observerOptions.defaultDebounce > 0)) {
+      options.listener = this.debounce(
+        options.listener as ((arg: NodeListOf<Element> | Element) => void),
+        (options.debounce || this.observerOptions.defaultDebounce)!,
+      );
+    }
     if(this.listenerMap.has(selector))
       this.listenerMap.get(selector)!.push(options as SelectorListenerOptions<Element>);
     else
@@ -152,7 +164,7 @@ export class SelectorObserver {
     if(!listeners)
       return false;
     const index = listeners.indexOf(options);
-    if(index !== -1) {
+    if(index > -1) {
       listeners.splice(index, 1);
       return true;
     }

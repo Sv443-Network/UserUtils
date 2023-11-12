@@ -130,7 +130,7 @@ See the [license file](./LICENSE.txt) for details.
 ### SelectorObserver
 Usage:  
 ```ts
-new SelectorObserver(baseElement: Element, options?: MutationObserverInit)
+new SelectorObserver(baseElement: Element, options?: SelectorObserverOptions)
 ```
 
 A class that manages listeners that are called when elements at given selectors are found in the DOM.  
@@ -142,6 +142,8 @@ If you want to observe the entire document, you can pass `document.body`.
 The `options` parameter is optional and will be passed to the MutationObserver that is used internally.  
 The default options are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
 For example, if you want to trigger the listeners when certain attributes change, pass `{ attributes: true, attributeFilter: ["class", "data-my-attribute"] }`  
+Additionally, there are the following extra options:
+- `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
   
 ⚠️ The instances of this class need to be created after the `baseElement` is available in the DOM (at the earliest when using `@run-at document-end` or after `DOMContentLoaded` has fired).
 
@@ -151,18 +153,26 @@ For example, if you want to trigger the listeners when certain attributes change
 `addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
 Adds a listener (specified in `options.listener`) for the given selector that will be called once the selector exists in the DOM. It will be passed the element(s) that match the selector as the only argument.  
 The listener will be called immediately if the selector already exists in the DOM.  
+
+> `options.listener` is the only required property of the `options` object.  
+> It is a function that will be called once the selector exists in the DOM.  
+> It will be passed the found element or NodeList of elements, depending on if `options.all` is set to true or false.
   
-If `options.all` is set to true, querySelectorAll() will be used instead and the listener will be passed a `NodeList` of matching elements.  
-This will also include elements that were already found in a previous listener call.  
-If set to false (default), querySelector() will be used and only the first matching element will be returned.  
+> If `options.all` is set to true, querySelectorAll() will be used instead and the listener will be passed a `NodeList` of matching elements.  
+> This will also include elements that were already found in a previous listener call.  
+> If set to false (default), querySelector() will be used and only the first matching element will be returned.
   
-If `options.continuous` is set to true, the listener will not be deregistered after it was called once (defaults to false).  
+> If `options.continuous` is set to true, the listener will not be deregistered after it was called once (defaults to false).  
+>   
+> ⚠️ You should keep usage of this option to a minimum, as it will cause the listener to be called every time the selector is *checked for and found* and this can stack up quite quickly.  
+> ⚠️ You should try to only use this option on SelectorObserver instances that are scoped really low in the DOM tree to prevent as many selector checks as possible from being triggered.  
+> ⚠️ I also recommend always setting a debounce time (see constructor or below) if you use this option.
   
-If `options.debounce` is set to a number above 0, the listener will be debounced by that amount of milliseconds (defaults to 0).  
-E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of the listener will be executed.  
+> If `options.debounce` is set to a number above 0, the listener will be debounced by that amount of milliseconds (defaults to 0).  
+> E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of the listener will be executed.
   
-When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
-It will default to HTMLElement if left undefined.  
+> When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
+> It will default to HTMLElement if left undefined.
   
 <br>
 
@@ -231,11 +241,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const barObserver = new SelectorObserver(document.body, {
     // only check if the following attributes change:
     attributeFilter: ["class", "style", "data-whatever"],
+    // debounce all listeners by 100ms unless specified otherwise:
+    defaultDebounce: 100,
   });
 
   observer.addListener("#my-element", {
     listener: (element) => {
-      console.log("Element attributes changed:", element);
+      console.log("Element's attributes changed:", element);
+    },
+  });
+
+  observer.addListener("#my-other-element", {
+    // set the debounce higher than provided by the defaultDebounce property:
+    debounce: 250,
+    listener: (element) => {
+      console.log("Other element's attributes changed:", element);
     },
   });
 
@@ -250,6 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
     continuous: true, // don't remove the listener after it was called once
     debounce: 50,     // debounce the listener by 50ms
     listener: (elements) => {
+      // type of `elements` is NodeListOf<HTMLInputElement>
       console.log("Input elements found:", elements);
     },
   });
