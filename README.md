@@ -131,13 +131,15 @@ See the [license file](./LICENSE.txt) for details.
 Usage:  
 ```ts
 new SelectorObserver(baseElement: Element, options?: SelectorObserverOptions)
+new SelectorObserver(baseElementSelector: string, options?: SelectorObserverOptions)
 ```
 
 A class that manages listeners that are called when elements at given selectors are found in the DOM.  
 This is useful for userscripts that need to wait for elements to be added to the DOM at an indeterminate point in time before they can be interacted with.  
   
 The constructor takes a `baseElement`, which is a parent of the elements you want to observe.  
-If you want to observe the entire document, you can pass `document.body`.  
+If a selector string is passed instead, it will be used to find the element.  
+If you want to observe the entire document, you can pass `document.body`  
 
 The `options` parameter is optional and will be passed to the MutationObserver that is used internally.  
 The default options are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
@@ -145,7 +147,7 @@ For example, if you want to trigger the listeners when certain attributes change
 Additionally, there are the following extra options:
 - `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
   
-⚠️ The instances of this class need to be created after the `baseElement` is available in the DOM (at the earliest when using `@run-at document-end` or after `DOMContentLoaded` has fired).
+⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.
 
 <br>
 
@@ -176,14 +178,16 @@ The listener will be called immediately if the selector already exists in the DO
   
 <br>
 
-`disable(): void`  
-Disables the observation of the child elements.  
-If selectors are currently being checked, the current selector will be finished before disabling.  
+`enable(immediatelyCheckSelectors?: boolean): boolean`  
+Enables the observation of the child elements for the first time or if it was disabled before.  
+`immediatelyCheckSelectors` is set to true by default, which means all previously registered selectors will be checked. Set to false to only check them on the first detected mutation.  
+Returns true if the observation was enabled, false if it was already enabled or the passed `baseElementSelector` couldn't be found.  
   
 <br>
 
-`enable(): void`  
-Enables the observation of the child elements if it was disabled before.  
+`disable(): void`  
+Disables the observation of the child elements.  
+If selectors are currently being checked, the current selector will be finished before disabling.  
   
 <br>
 
@@ -224,16 +228,18 @@ Returns all listeners for the given selector or undefined if there are none.
 ```ts
 import { SelectorObserver } from "@sv443-network/userutils";
 
+// adding a single-shot listener before the element exists:
+const fooObserver = new SelectorObserver("body");
+
+fooObserver.addListener("#my-element", {
+  listener: (element) => {
+    console.log("Element found:", element);
+  },
+});
+
 document.addEventListener("DOMContentLoaded", () => {
-  // adding a single-shot listener:
-
-  const fooObserver = new SelectorObserver(document.body);
-
-  fooObserver.addListener("#my-element", {
-    listener: (element) => {
-      console.log("Element found:", element);
-    },
-  });
+  // starting observation after the <body> element is available:
+  fooObserver.enable();
 
 
   // adding custom observer options:
@@ -245,19 +251,21 @@ document.addEventListener("DOMContentLoaded", () => {
     defaultDebounce: 100,
   });
 
-  observer.addListener("#my-element", {
+  barObserver.addListener("#my-element", {
     listener: (element) => {
       console.log("Element's attributes changed:", element);
     },
   });
 
-  observer.addListener("#my-other-element", {
+  barObserver.addListener("#my-other-element", {
     // set the debounce higher than provided by the defaultDebounce property:
     debounce: 250,
     listener: (element) => {
       console.log("Other element's attributes changed:", element);
     },
   });
+
+  barObserver.enable();
 
 
   // using custom listener options:
@@ -275,6 +283,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   });
 
+  bazObserver.enable();
+
 
   // use a different element as the base:
 
@@ -287,6 +297,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Child element found:", element);
       },
     });
+
+    quxObserver.enable();
   }
 });
 ```
@@ -313,6 +325,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Element found again:", element);
     },
   });
+
+  observer.enable();
 
 
   // get all listeners:
@@ -346,25 +360,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
 ```ts
 import { SelectorObserver } from "@sv443-network/userutils";
+import type { SelectorObserverOptions } from "@sv443-network/userutils";
+
+// apply a default debounce to all SelectorObserver instances:
+const defaultOptions: SelectorObserverOptions = {
+  defaultDebounce: 100,
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   // initialize generic observer that in turn initializes "sub-observers":
-  const fooObserver = new SelectorObserver(document.body);
+  const fooObserver = new SelectorObserver(document.body, {
+    ...defaultOptions,
+    // define any other specific options here
+  });
 
-  fooObserver.addListener("#my-element", {
+  const myElementSelector = "#my-element";
+
+  // this relatively expensive listener (as it is in the full <body> scope) will only fire once:
+  fooObserver.addListener(myElementSelector, {
     listener: (element) => {
-      // only initialize the observer once it is actually needed (when #my-element exists):
-      const barObserver = new SelectorObserver(element);
-
-      barObserver.addListener(".my-child-element", {
-        all: true,
-        continuous: true,
-        listener: (elements) => {
-          console.log("Child elements found:", elements);
-        },
-      });
+      // only enable barObserver once its baseElement exists:
+      barObserver.enable();
     },
   });
+
+  // barObserver is created at the same time as fooObserver, but only enabled once #my-element exists
+  const barObserver = new SelectorObserver(element, {
+    ...defaultOptions,
+    // define any other specific options here
+  });
+
+  // this selector will be checked for immediately after `enable()` is called
+  // and on each subsequent mutation because `continuous` is set to true.
+  // however it is much less expensive as it is scoped to a lower element which will receive less DOM updates
+  barObserver.addListener(".my-child-element", {
+    all: true,
+    continuous: true,
+    listener: (elements) => {
+      console.log("Child elements found:", elements);
+    },
+  });
+
+  // immediately enable fooObserver as the <body> is available as soon as "DOMContentLoaded" fires:
+  fooObserver.enable();
 });
 ```
 

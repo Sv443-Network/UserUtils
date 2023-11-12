@@ -30,61 +30,73 @@ export type SelectorObserverOptions = MutationObserverInit & {
 /** Observes the children of the given element for changes */
 export class SelectorObserver {
   private enabled = false;
-  private baseElement: Element;
+  private baseElement: Element | string;
   private observer: MutationObserver;
   private observerOptions: SelectorObserverOptions;
   private listenerMap: Map<string, SelectorListenerOptions[]>;
-  private readonly dbgId = Math.floor(Math.random() * 1000000);
 
   /**
-   * Creates a new SelectorObserver that will observe the children of the given base element for changes (only creation and deletion of elements by default)
+   * Creates a new SelectorObserver that will observe the children of the given base element selector for changes (only creation and deletion of elements by default)
+   * @param baseElementSelector The selector of the element to observe
    * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
-   * TODO: support passing a selector for the base element to be able to queue listeners before the element is available
    */
-  constructor(baseElement: Element, options: SelectorObserverOptions = {}) {
+  constructor(baseElementSelector: string, options: SelectorObserverOptions)
+  /**
+   * Creates a new SelectorObserver that will observe the children of the given base element for changes (only creation and deletion of elements by default)
+   * @param baseElement The element to observe
+   * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
+   */
+  constructor(baseElement: Element, options: SelectorObserverOptions)
+  constructor(baseElement: Element | string, options: SelectorObserverOptions = {}) {
     this.baseElement = baseElement;
 
     this.listenerMap = new Map<string, SelectorListenerOptions[]>();
     // if the arrow func isn't there, `this` will be undefined in the callback
-    this.observer = new MutationObserver(() => this.checkSelectors());
+    this.observer = new MutationObserver(() => this.checkAllSelectors());
     this.observerOptions = {
       childList: true,
       subtree: true,
       ...options,
     };
-
-    this.enable();
   }
 
-  private checkSelectors() {
-    for(const [selector, listeners] of this.listenerMap.entries()) {
-      if(!this.enabled)
-        return;
+  private checkAllSelectors() {
+    for(const [selector, listeners] of this.listenerMap.entries())
+      this.checkSelector(selector, listeners);
+  }
 
-      const all = listeners.some(listener => listener.all);
-      const one = listeners.some(listener => !listener.all);
+  private checkSelector(selector: string, listeners: SelectorListenerOptions[]) {
+    if(!this.enabled)
+      return;
 
-      const allElements = all ? this.baseElement.querySelectorAll<HTMLElement>(selector) : null;
-      const oneElement = one ? this.baseElement.querySelector<HTMLElement>(selector) : null;
+    const baseElement = typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement;
 
-      for(const options of listeners) {
-        if(options.all) {
-          if(allElements && allElements.length > 0) {
-            options.listener(allElements);
-            if(!options.continuous)
-              this.removeListener(selector, options);
-          }
+    if(!baseElement)
+      return;
+
+    const all = listeners.some(listener => listener.all);
+    const one = listeners.some(listener => !listener.all);
+
+    const allElements = all ? baseElement.querySelectorAll<HTMLElement>(selector) : null;
+    const oneElement = one ? baseElement.querySelector<HTMLElement>(selector) : null;
+
+    for(const options of listeners) {
+      if(options.all) {
+        if(allElements && allElements.length > 0) {
+          options.listener(allElements);
+          if(!options.continuous)
+            this.removeListener(selector, options);
         }
-        else {
-          if(oneElement) {
-            options.listener(oneElement);
-            if(!options.continuous)
-              this.removeListener(selector, options);
-          }
-        }
-        if(this.listenerMap.get(selector)?.length === 0)
-          this.listenerMap.delete(selector);
       }
+      else {
+        if(oneElement) {
+          options.listener(oneElement);
+          if(!options.continuous)
+            this.removeListener(selector, options);
+        }
+      }
+      if(this.listenerMap.get(selector)?.length === 0)
+        this.listenerMap.delete(selector);
     }
   }
 
@@ -118,7 +130,7 @@ export class SelectorObserver {
     else
       this.listenerMap.set(selector, [options as SelectorListenerOptions<Element>]);
 
-    this.checkSelectors();
+    this.checkSelector(selector, [options as SelectorListenerOptions<Element>]);
   }
 
   /** Disables the observation of the child elements */
@@ -129,12 +141,20 @@ export class SelectorObserver {
     this.observer.disconnect();
   }
 
-  /** Reenables the observation of the child elements */
-  public enable() {
-    if(this.enabled)
-      return;
+  /**
+   * Enables or reenables the observation of the child elements.
+   * @param immediatelyCheckSelectors Whether to immediately check if all previously registered selectors exist (default is true)
+   * @returns Returns true when the observation was enabled, false otherwise (e.g. when the base element wasn't found)
+   */
+  public enable(immediatelyCheckSelectors = true) {
+    const baseElement = typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement;
+    if(this.enabled || !baseElement)
+      return false;
     this.enabled = true;
-    this.observer.observe(this.baseElement, this.observerOptions);
+    this.observer.observe(baseElement, this.observerOptions);
+    if(immediatelyCheckSelectors)
+      this.checkAllSelectors();
+    return true;
   }
 
   /** Returns whether the observation of the child elements is currently enabled */
