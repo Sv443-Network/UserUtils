@@ -7,6 +7,7 @@
 - separate instances can be disabled and reenabled individually on demand
 - separate instances can have different MutationObserver options set to further reduce performance impact
 - the separation into instances allows for a new "chaining" paradigm where selector listeners are only added and checked for once they are actually needed (see examples in the documentation)
+- when using chaining, separate instances can be created and have listeners added to them before their base element is available in the DOM tree
 - every listener can have a set debounce time, so that it doesn't get called too often (works the same as the [`debounce()` function](https://github.com/Sv443-Network/UserUtils/blob/main/README.md#debounce), but is disabled by default)
 - there are now multiple methods to get and delete specific listeners
   
