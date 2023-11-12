@@ -1,5 +1,39 @@
 # @sv443-network/userutils
 
+## 3.0.0
+
+### Major Changes
+
+- 1859022: `onSelector()` has been turned into the `SelectorObserver` class to reduce the performance impact on larger sites:
+
+  - its instances can be scoped to any element lower in the DOM tree, unlike before where it was always observing the entire body with all its children
+  - separate instances can be disabled and reenabled individually on demand
+  - separate instances can have different MutationObserver options set to further reduce performance impact
+  - the separation into instances allows for a new "chaining" paradigm where selector listeners are only added and checked for once they are actually needed (see examples in the documentation)
+  - when using chaining, separate instances can be created and have listeners added to them before their base element is available in the DOM tree
+  - every listener can have a set debounce time, so that it doesn't get called too often (works the same as the [`debounce()` function](https://github.com/Sv443-Network/UserUtils/blob/main/README.md#debounce), but is disabled by default)
+  - there are now multiple methods to get and delete specific listeners
+
+  The `SelectorObserver.addListener()` method is backwards compatible with the old `onSelector()` function, so you can just add the class instance in front (for full backwards compat use `document.body` for the `baseElement` parameter of the constructor), then change the old function's name and it should work as before.
+  For more info and examples, please view the [SelectorObserver documentation](https://github.com/Sv443-Network/UserUtils/blob/main/README.md#selectorobserver)
+
+### Minor Changes
+
+- 0db73b5: Removed the limiter (DynamicsCompressorNode) from `amplifyMedia()` for clear and undistorted audio.
+
+  **Notable changes:**
+
+  - The property `source` has been renamed to `sourceNode` to fit the naming of the `gainNode` property
+  - A boolean property `enabled` has been added to check if the amplification is enabled or not
+  - The parameter `initialMultiplier` has been renamed to `initialGain` to reduce confusion (it is not a multiplier strictly speaking)
+
+- 736784f: Added function `randomId()` to randomly generate cryptographically strong hexadecimal IDs
+- 563e515: Added utility type `NonEmptyArray` for typing an array with at least 1 item
+
+### Patch Changes
+
+- a123da6: Added `@linkcode` references to the JSDoc in-IDE documentation
+
 ## 2.0.1
 
 ### Patch Changes
