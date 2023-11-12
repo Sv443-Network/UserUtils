@@ -15,9 +15,7 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 ## Features:
 - DOM:
-    - [onSelector()](https://github.com/Sv443-Network/UserUtils#onselector) - call a listener once a selector is found in the DOM
-    - [initOnSelector()](https://github.com/Sv443-Network/UserUtils#initonselector) - needs to be called once to be able to use `onSelector()`
-    - [getSelectorMap()](https://github.com/Sv443-Network/UserUtils#getselectormap) - returns all currently registered selectors, listeners and options
+    - [SelectorObserver](https://github.com/Sv443-Network/UserUtils#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [getUnsafeWindow()](https://github.com/Sv443-Network/UserUtils#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
     - [insertAfter()](https://github.com/Sv443-Network/UserUtils#insertafter) - insert an element as a sibling after another element
     - [addParent()](https://github.com/Sv443-Network/UserUtils#addparent) - add a parent element around another element
