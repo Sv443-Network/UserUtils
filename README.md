@@ -56,7 +56,9 @@ View the documentation of previous major releases: [2.0.1](https://github.com/Sv
     - [tr.getLanguage()](#trgetlanguage) - returns the currently active language
   - [**Utility types for TypeScript:**](#utility-types)
     - [Stringifiable](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
-    - [NonEmptyArray](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
+    - [NonEmptyArray](#nonemptyarray) - any array that should have at least one item
+    - [NonEmptyString](#nonemptystring) - any string that should have at least one character
+    - [LooseUnion](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
 
 <br><br>
 
@@ -1442,6 +1444,11 @@ logSomething(barObject); // Type Error
 <br>
 
 ## NonEmptyArray
+Usage:
+```ts
+NonEmptyArray<TItem = unknown>
+```
+  
 This type describes an array that has at least one item.  
 Use the generic parameter to specify the type of the items in the array.  
   
@@ -1461,6 +1468,59 @@ function somethingElse(array: NonEmptyArray) {
 }
 
 logFirstItem(["04abc", "69"]); // 4
+```
+
+</details>
+
+<br>
+
+## NonEmptyString
+Usage:
+```ts
+NonEmptyString<TString extends string>
+```
+  
+This type describes a string that has at least one character.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import type { NonEmptyString } from "@sv443-network/userutils";
+
+function convertToNumber<T extends string>(str: NonEmptyString<T>) {
+  console.log(parseInt(str));
+}
+
+convertToNumber("04abc"); // "4"
+convertToNumber("");      // type error: Argument of type 'string' is not assignable to parameter of type 'never'
+```
+
+</details>
+
+<br>
+
+## LooseUnion
+Usage:
+```ts
+LooseUnion<TUnion extends string | number | object>
+```
+  
+A type that offers autocomplete in the IDE for the passed union but also allows any value of the same type to be passed.  
+Supports unions of strings, numbers and objects.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+function foo(bar: LooseUnion<"a" | "b" | "c">) {
+  console.log(bar);
+}
+
+// when typing the following, autocomplete suggests "a", "b" and "c"
+// foo("
+
+foo("a"); // included in autocomplete, no type error
+foo("");  // *not* included in autocomplete, still no type error
+foo(1);   // type error: Argument of type '1' is not assignable to parameter of type 'LooseUnion<"a" | "b" | "c">'
 ```
 
 </details>

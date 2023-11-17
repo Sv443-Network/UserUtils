@@ -1,18 +1,18 @@
 import { randRange } from "./math";
 
 /** Describes an array with at least one item */
-export type NonEmptyArray<T = unknown> = [T, ...T[]];
+export type NonEmptyArray<TArray = unknown> = [TArray, ...TArray[]];
 
 /** Returns a random item from the passed array */
-export function randomItem<T = unknown>(array: T[]) {
-  return randomItemIndex<T>(array)[0];
+export function randomItem<TItem = unknown>(array: TItem[]) {
+  return randomItemIndex<TItem>(array)[0];
 }
 
 /**
  * Returns a tuple of a random item and its index from the passed array  
  * Returns `[undefined, undefined]` if the passed array is empty
  */
-export function randomItemIndex<T = unknown>(array: T[]): [item?: T, index?: number] {
+export function randomItemIndex<TItem = unknown>(array: TItem[]): [item?: TItem, index?: number] {
   if(array.length === 0)
     return [undefined, undefined];
 
@@ -22,18 +22,18 @@ export function randomItemIndex<T = unknown>(array: T[]): [item?: T, index?: num
 }
 
 /** Returns a random item from the passed array and mutates the array to remove the item */
-export function takeRandomItem<T = unknown>(arr: T[]) {
-  const [itm, idx] = randomItemIndex<T>(arr);
+export function takeRandomItem<TItem = unknown>(arr: TItem[]) {
+  const [itm, idx] = randomItemIndex<TItem>(arr);
 
   if(idx === undefined)
     return undefined;
 
   arr.splice(idx, 1);
-  return itm as T;
+  return itm as TItem;
 }
 
 /** Returns a copy of the array with its items in a random order */
-export function randomizeArray<T = unknown>(array: T[]) {
+export function randomizeArray<TItem = unknown>(array: TItem[]) {
   const retArray = [...array]; // so array and retArray don't point to the same memory address
 
   if(array.length === 0)

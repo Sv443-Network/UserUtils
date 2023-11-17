@@ -2,6 +2,30 @@
 export type Stringifiable = string | { toString(): string };
 
 /**
+ * A type that offers autocomplete for the passed union but also allows any arbitrary value of the same type to be passed.  
+ * Supports unions of strings, numbers and objects.
+ */
+export type LooseUnion<TUnion extends string | number | object> =
+  (TUnion) | (
+    TUnion extends string
+      ? (string & {})
+      : (
+        TUnion extends object
+          ? (object & {})
+          : (number & {})
+      )
+  );
+
+/**
+ * A type that allows all strings except for empty ones
+ * @example
+ * function foo<T extends string>(bar: NonEmptyString<T>) {
+ *   console.log(bar);
+ * }
+ */
+export type NonEmptyString<TString extends string> = TString extends "" ? never : TString;
+
+/**
  * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
  * @param num If this is an array or NodeList, the amount of items is used
