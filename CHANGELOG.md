@@ -1,5 +1,20 @@
 # @sv443-network/userutils
 
+## 4.0.0
+
+### Major Changes
+
+- dae5450: Removed `amplifyMedia` function due to massive inconsistencies in sound quality
+
+### Minor Changes
+
+- 168c2aa: Added functions `compress` and `decompress` to compress and decompress strings using gzip or deflate
+- 49bc85e: Added utility types `NonEmptyString` and `LooseUnion`
+
+### Patch Changes
+
+- 2ae665d: fixed wrong TS type for SelectorObserver options in constructor
+
 ## 3.0.0
 
 ### Major Changes
