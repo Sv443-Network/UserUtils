@@ -24,7 +24,6 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
     - [openInNewTab()](https://github.com/Sv443-Network/UserUtils#openinnewtab) - open a link in a new tab
     - [interceptEvent()](https://github.com/Sv443-Network/UserUtils#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
     - [interceptWindowEvent()](https://github.com/Sv443-Network/UserUtils#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-    - [amplifyMedia()](https://github.com/Sv443-Network/UserUtils#amplifymedia) - amplify an audio or video element's volume past the maximum of 100%
     - [isScrollable()](https://github.com/Sv443-Network/UserUtils#isscrollable) - check if an element has a horizontal or vertical scroll bar
 - Math:
     - [clamp()](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
