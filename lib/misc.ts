@@ -10,9 +10,14 @@ export type LooseUnion<TUnion extends string | number | object> =
     TUnion extends string
       ? (string & {})
       : (
-        TUnion extends object
-          ? (object & {})
-          : (number & {})
+        TUnion extends number
+          ? (number & {})
+          : (
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            TUnion extends Record<keyof any, unknown>
+            ? (object & {})
+            : never
+          )
       )
   );
 
