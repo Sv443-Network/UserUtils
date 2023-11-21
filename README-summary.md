@@ -43,6 +43,8 @@ Or view the documentation of previous major releases: [3.0.0](https://github.com
     - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once, after a given amount of time
     - [fetchAdvanced()](https://github.com/Sv443-Network/UserUtils#fetchadvanced) - wrapper around the fetch API with a timeout option
     - [insertValues()](https://github.com/Sv443-Network/UserUtils#insertvalues) - insert values into a string at specified placeholders
+    - [compress()](https://github.com/Sv443-Network/UserUtils#compress) - compress a string with Gzip or Deflate
+    - [decompress()](https://github.com/Sv443-Network/UserUtils#decompress) - decompress a previously compressed string
 - Arrays:
     - [randomItem()](https://github.com/Sv443-Network/UserUtils#randomitem) - returns a random item from an array
     - [randomItemIndex()](https://github.com/Sv443-Network/UserUtils#randomitemindex) - returns a tuple of a random item and its index from an array

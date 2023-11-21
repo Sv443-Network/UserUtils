@@ -45,6 +45,8 @@ View the documentation of previous major releases: [3.0.0](https://github.com/Sv
     - [debounce()](#debounce) - call a function only once, after a given amount of time
     - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
     - [insertValues()](#insertvalues) - insert values into a string at specified placeholders
+    - [compress()](#compress) - compress a string with Gzip or Deflate
+    - [decompress()](#decompress) - decompress a previously compressed string
   - [**Arrays:**](#arrays)
     - [randomItem()](#randomitem) - returns a random item from an array
     - [randomItemIndex()](#randomitemindex) - returns a tuple of a random item and its index from an array
@@ -1025,6 +1027,106 @@ fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
 }).then(async (response) => {
   console.log("Data:", await response.json());
 });
+```
+
+</details>
+
+<br>
+
+### insertValues()
+Usage:  
+```ts
+insertValues(input: string, ...values: Stringifiable[]): string
+```
+  
+Inserts values into a string in the format `%n`, where `n` is the number of the value, starting at 1.  
+The values will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the input string.  
+If not enough values are passed, the remaining placeholders will be left untouched.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { insertValues } from "@sv443-network/userutils";
+
+insertValues("Hello, %1!", "World");                        // "Hello, World!"
+insertValues("Hello, %1! My name is %2.", "World", "John"); // "Hello, World! My name is John."
+insertValues("Testing %1", { toString: () => "foo" });      // "Testing foo"
+
+// using an array for the values and not passing enough arguments:
+const values = ["foo", "bar", "baz"];
+insertValues("Testing %1, %2, %3 and %4", ...values); // "Testing foo, bar and baz and %4"
+```
+
+</details>
+
+<br>
+
+### compress()
+Usage:  
+```ts
+compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "base64"): Promise<string>
+compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
+```
+  
+Compresses a string or ArrayBuffer using the specified compression format. Most browsers should support at least `gzip` and `deflate`  
+The `outputType` dictates which format the output will be in. It will default to `base64` if left undefined.  
+  
+⚠️ You need to provide the `@grant unsafeWindow` directive if you are using the `base64` output type or you will get a TypeError.  
+⚠️ Not all browsers might support compression. Please check [on this page](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream#browser_compatibility) for compatibility and supported compression formats.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { compress } from "@sv443-network/userutils";
+
+// using gzip:
+
+const fooGz = await compress("Hello, World!", "gzip");
+const barGz = await compress("Hello, World!".repeat(20), "gzip");
+
+// not as efficient with short strings but can save quite a lot of space with larger strings:
+console.log(fooGz); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVEEANDDSuwNAAAA"
+console.log(barGz); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVH0GJkcAKOPcmYEAQAA"
+
+// depending on the type of data you might want to use a different compression format like deflate:
+
+const fooDeflate = await compress("Hello, World!", "deflate");
+const barDeflate = await compress("Hello, World!".repeat(20), "deflate");
+
+// again, it's not as efficient initially but gets better with longer inputs:
+console.log(fooDeflate); // "eJzzSM3JyddRCM8vyklRBAAfngRq"
+console.log(barDeflate); // "eJzzSM3JyddRCM8vyklR9BiZHAAIEVg1"
+```
+
+</details>
+
+<br>
+
+### decompress()
+Usage:  
+```ts
+decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
+decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
+```
+  
+Decompresses a string or ArrayBuffer that has been previously [compressed](#compress) using the specified compression format. Most browsers should support at least `gzip` and `deflate`  
+The `outputType` dictates which format the output will be in. It will default to `string` if left undefined.  
+  
+⚠️ You need to provide the `@grant unsafeWindow` directive if you are using the `string` output type or you will get a TypeError.  
+⚠️ Not all browsers might support decompression. Please check [on this page](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream#browser_compatibility) for compatibility and supported compression formats.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { compress, decompress } from "@sv443-network/userutils";
+
+const compressed = await compress("Hello, World!".repeat(20), "gzip");
+
+console.log(compressed); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVH0GJkcAKOPcmYEAQAA"
+
+const decompressed = await decompress(compressed, "gzip");
+
+console.log(decompressed); // "Hello, World!"
 ```
 
 </details>
