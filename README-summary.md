@@ -9,11 +9,17 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 <br>
 
-### Full documentation [on GitHub](https://github.com/Sv443-Network/UserUtils#readme)
+### > Full documentation [on GitHub](https://github.com/Sv443-Network/UserUtils#readme) <
+
+<sub>
+
+Or view the documentation of previous major releases: [3.0.0](https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md), [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
+
+</sub>
 
 <br>
 
-## Features:
+## Feature Summary:
 - DOM:
     - [SelectorObserver](https://github.com/Sv443-Network/UserUtils#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [getUnsafeWindow()](https://github.com/Sv443-Network/UserUtils#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
