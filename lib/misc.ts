@@ -1,3 +1,5 @@
+import { getUnsafeWindow } from "./dom";
+
 /** Represents any value that is either a string itself or can be converted to one (implicitly or explicitly) because it has a toString() method */
 export type Stringifiable = string | { toString(): string };
 
@@ -85,12 +87,55 @@ export async function fetchAdvanced(url: string, options: FetchAdvancedOpts = {}
 /**
  * Inserts the passed values into a string at the respective placeholders.  
  * The placeholder format is `%n`, where `n` is the 1-indexed argument number.
- * @param str The string to insert the values into
+ * @param input The string to insert the values into
  * @param values The values to insert, in order, starting at `%1`
  */
-export function insertValues(str: string, ...values: Stringifiable[]) {
-  return str.replace(/%\d/gm, (match) => {
+export function insertValues(input: string, ...values: Stringifiable[]) {
+  return input.replace(/%\d/gm, (match) => {
     const argIndex = Number(match.substring(1)) - 1;
     return (values[argIndex] ?? match)?.toString();
   });
+}
+
+/** Compresses a string or an ArrayBuffer using the provided {@linkcode compressionFormat} and returns it as a base64 string */
+export async function compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "base64"): Promise<string>
+/** Compresses a string or an ArrayBuffer using the provided {@linkcode compressionFormat} and returns it as an ArrayBuffer */
+export async function compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
+/** Compresses a string or an ArrayBuffer using the provided {@linkcode compressionFormat} and returns it as a base64 string or ArrayBuffer, depending on what {@linkcode outputType} is set to */
+export async function compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "base64" | "arrayBuffer" = "base64"): Promise<ArrayBuffer | string> {
+  const byteArray = typeof input === "string" ? new TextEncoder().encode(input) : input;
+  const comp = new CompressionStream(compressionFormat);
+  const writer = comp.writable.getWriter();
+  writer.write(byteArray);
+  writer.close();
+  const buf = await (new Response(comp.readable).arrayBuffer());
+  return outputType === "arrayBuffer" ? buf : ab2str(buf);
+}
+
+/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to a string */
+export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
+/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to an ArrayBuffer */
+export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
+/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to a string or ArrayBuffer, depending on what {@linkcode outputType} is set to */
+export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "string" | "arrayBuffer" = "string"): Promise<ArrayBuffer | string> {
+  const byteArray = typeof input === "string" ? str2ab(input) : input;
+  const decomp = new DecompressionStream(compressionFormat);
+  const writer = decomp.writable.getWriter();
+  writer.write(byteArray);
+  writer.close();
+  const buf = await (new Response(decomp.readable).arrayBuffer());
+  return outputType === "arrayBuffer" ? buf : new TextDecoder().decode(buf);
+}
+
+/** Converts an ArrayBuffer to a base64-encoded string */
+function ab2str(buf: ArrayBuffer) {
+  return getUnsafeWindow().btoa(
+    new Uint8Array(buf)
+      .reduce((data, byte) => data + String.fromCharCode(byte), "")
+  );
+}
+
+/** Converts a base64-encoded string to an ArrayBuffer representation of its bytes */
+function str2ab(str: string) {
+  return Uint8Array.from(getUnsafeWindow().atob(str), c => c.charCodeAt(0));
 }
