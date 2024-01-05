@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 4.1.0
+
+### Minor Changes
+
+- 885323d: Added function `observeElementProp` to allow observing element property changes
+
 ## 4.0.0
 
 ### Major Changes
