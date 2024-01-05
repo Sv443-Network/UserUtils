@@ -33,7 +33,7 @@ View the documentation of previous major releases: [3.0.0](https://github.com/Sv
     - [interceptEvent()](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
     - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
     - [isScrollable()](#isscrollable) - check if an element has a horizontal or vertical scroll bar
-    - [observeElementProperty()](#observeelementproperty) - observe changes to an element's property that can't be observed with MutationObserver
+    - [observeElementProp()](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
   - [**Math:**](#math)
     - [clamp()](#clamp) - constrain a number between a min and max value
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
@@ -678,26 +678,26 @@ console.log("Element has a vertical scroll bar:", vertical);
 
 <br>
 
-### observeElementProperty()
+### observeElementProp()
 Usage:  
 ```ts
-observeElementProperty(
+observeElementProp(
   element: Element,
   property: string,
   callback: (oldValue: any, newValue: any) => void
 ): void
 ```
   
-Observes changes to an element's property.  
-While regular attributes can be observed using a MutationObserver, this is not always possible for properties that are changed through setter functions and assignment.  
+This function observes changes to the given property of a given element.  
+While regular HTML attributes can be observed using a MutationObserver, this is not always possible for properties that are assigned on the JS object.  
 This function shims the setter of the provided property and calls the callback function whenever it is changed through any means.  
   
-When using TypeScript, the types for `element`, `property` and the arguments for `callback` will be automatically inferred.
+When using TypeScript, the types for `element`, `property` and the arguments for `callback` will be automatically inferred.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { observeElementProperty } from "@sv443-network/userutils";
+import { observeElementProp } from "@sv443-network/userutils";
 
 const myInput = document.querySelector("input#my-input");
 
@@ -721,7 +721,7 @@ observer.observe(myInput, {
 });
 
 
-observeElementProperty(myInput, "value", (oldValue, newValue) => {
+observeElementProp(myInput, "value", (oldValue, newValue) => {
   // will be called every time the value changes:
   console.log("Value changed from", oldValue, "to", newValue);
 });

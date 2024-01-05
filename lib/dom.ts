@@ -150,13 +150,13 @@ export function isScrollable(element: Element) {
  * @param property The name of the property to observe
  * @param callback Callback to execute when the value is changed
  */
-export function observeElementProperty<
+export function observeElementProp<
   TElem extends Element = HTMLElement,
-  TProp extends keyof TElem = keyof TElem,
+  TPropKey extends keyof TElem = keyof TElem,
 >(
   element: TElem,
-  property: TProp,
-  callback: (oldVal: TElem[TProp], newVal: TElem[TProp]) => void
+  property: TPropKey,
+  callback: (oldVal: TElem[TPropKey], newVal: TElem[TPropKey]) => void
 ) {
   const elementPrototype = Object.getPrototypeOf(element);
   // eslint-disable-next-line no-prototype-builtins
