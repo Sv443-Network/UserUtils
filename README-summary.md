@@ -31,6 +31,7 @@ Or view the documentation of previous major releases: [3.0.0](https://github.com
     - [interceptEvent()](https://github.com/Sv443-Network/UserUtils#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
     - [interceptWindowEvent()](https://github.com/Sv443-Network/UserUtils#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
     - [isScrollable()](https://github.com/Sv443-Network/UserUtils#isscrollable) - check if an element has a horizontal or vertical scroll bar
+    - [observeElementProperty()](https://github.com/Sv443-Network/UserUtils#observeelementproperty) - observe changes to an element's property that can't be observed with MutationObserver
 - Math:
     - [clamp()](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
     - [mapRange()](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
