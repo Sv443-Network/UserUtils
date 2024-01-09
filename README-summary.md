@@ -38,7 +38,7 @@ Or view the documentation of previous major releases: [3.0.0](https://github.com
     - [randRange()](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
     - [randomId()](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
 - Misc:
-    - [ConfigManager()](https://github.com/Sv443-Network/UserUtils#configmanager) - class that manages persistent userscript configurations, including data migration
+    - [ConfigManager](https://github.com/Sv443-Network/UserUtils#configmanager) - class that manages persistent userscript configurations, including data migration
     - [autoPlural()](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
     - [pauseFor()](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once, after a given amount of time
