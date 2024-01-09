@@ -100,7 +100,7 @@ View the documentation of previous major releases: [3.0.0](https://github.com/Sv
   // or using object destructuring:
 
   const { clamp } = UserUtils;
-  console.log(clamp(1, 5, 10); // 5
+  console.log(clamp(1, 5, 10)); // 5
   ```
 
 <br><br>
