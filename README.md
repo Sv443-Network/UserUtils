@@ -84,7 +84,7 @@ View the documentation of previous major releases: [3.0.0](https://github.com/Sv
 
 <br>
 
-- If you are not using a bundler, you can include the latest release from GreasyFork by adding this directive to the userscript header:
+- If you are not using a bundler, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
   ```
   // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
   ```
