@@ -48,6 +48,7 @@ export function randRange(...args: number[]): number {
 /**
  * Generates a random ID with the specified length and radix (16 characters and hexadecimal by default)  
  * Uses [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for better cryptographic randomness  
+ * ⚠️ Not suitable for generating encryption keys! Use [`crypto.subtle.generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that.
  * @param length The length of the ID to generate (defaults to 16)
  * @param radix The [radix](https://en.wikipedia.org/wiki/Radix) of each digit (defaults to 16 which is hexadecimal. Use 2 for binary, 10 for decimal, 36 for alphanumeric, etc.)
  */

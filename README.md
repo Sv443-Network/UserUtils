@@ -824,6 +824,9 @@ randomId(length?: number, radix?: number): string
 ```
   
 Generates a cryptographically strong random ID of a given length and [radix (base).](https://en.wikipedia.org/wiki/Radix)  
+Uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for generating the random numbers.  
+⚠️ This is not intended for generating encryption keys, only for generating IDs with a decent amount of entropy!  
+  
 The default length is 16 and the default radix is 16 (hexadecimal).  
 You may change the radix to get digits from different numerical systems.  
 Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alphanumeric.  
@@ -1273,7 +1276,7 @@ randomizeArray(array: Array): Array
 ```
   
 Returns a copy of an array with its items in a random order.  
-If the array is empty, the originally passed empty array will be returned without copying.  
+If the array is empty, a new, empty array will be returned.  
   
 <details><summary><b>Example - click to view</b></summary>
 
