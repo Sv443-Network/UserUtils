@@ -63,21 +63,30 @@ export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(
 }
 
 /** Options for the `fetchAdvanced()` function */
-export type FetchAdvancedOpts = RequestInit & Partial<{
-  /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
-  timeout: number;
-}>;
+export type FetchAdvancedOpts = Omit<
+  RequestInit & Partial<{
+    /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
+    timeout: number;
+  }>,
+  "signal"
+>;
 
 /** Calls the fetch API with special options like a timeout */
-export async function fetchAdvanced(url: string, options: FetchAdvancedOpts = {}) {
+export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdvancedOpts = {}) {
   const { timeout = 10000 } = options;
 
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
+  let signalOpts: Partial<RequestInit> = {},
+    id: NodeJS.Timeout | undefined = undefined;
 
-  const res = await fetch(url, {
+  if(timeout >= 0) {
+    const controller = new AbortController();
+    id = setTimeout(() => controller.abort(), timeout);
+    signalOpts = { signal: controller.signal };
+  }
+
+  const res = await fetch(input, {
     ...options,
-    signal: controller.signal,
+    ...signalOpts,
   });
 
   clearTimeout(id);

@@ -1059,14 +1059,15 @@ window.addEventListener("resize", debounce((event) => {
 ### fetchAdvanced()
 Usage:  
 ```ts
-fetchAdvanced(url: string, options?: {
+fetchAdvanced(input: string | Request | URL, options?: {
   timeout?: number,
   // any other options from fetch() except for signal
 }): Promise<Response>
 ```
   
-A wrapper around the native `fetch()` function that adds options like a timeout property.  
-The timeout will default to 10 seconds if left undefined.  
+A drop-in replacement for the native `fetch()` function that adds options like a timeout property.  
+The timeout will default to 10 seconds if left undefined. Set it to a negative number to disable the timeout.  
+Note that the `signal` option will be overwritten if passed.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1077,10 +1078,12 @@ fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
   timeout: 5000,
   // also accepts any other fetch options like headers:
   headers: {
-    "Accept": "application/json",
+    "Accept": "text/plain",
   },
 }).then(async (response) => {
-  console.log("Data:", await response.json());
+  console.log("Fetch data:", await response.text());
+}).catch((err) => {
+  console.error("Fetch error:", err);
 });
 ```
 
