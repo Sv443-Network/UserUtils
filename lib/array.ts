@@ -37,7 +37,7 @@ export function randomizeArray<TItem = unknown>(array: TItem[]) {
   const retArray = [...array]; // so array and retArray don't point to the same memory address
 
   if(array.length === 0)
-    return array;
+    return retArray;
 
   // shamelessly stolen from https://javascript.info/task/shuffle
   for(let i = retArray.length - 1; i > 0; i--) {
