@@ -148,9 +148,12 @@ If a selector string is passed instead, it will be used to find the element.
 If you want to observe the entire document, you can pass `document.body`  
 
 The `options` parameter is optional and will be passed to the MutationObserver that is used internally.  
-The default options are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
-For example, if you want to trigger the listeners when certain attributes change, pass `{ attributes: true, attributeFilter: ["class", "data-my-attribute"] }`  
+The MutationObserver options present by default are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
+For example, if you want to trigger the listeners when certain attributes change, pass `{ attributeFilter: ["class", "data-my-attribute"] }`  
+  
 Additionally, there are the following extra options:
+- `disableOnNoListeners` - whether to disable the SelectorObserver when there are no listeners left (defaults to false)
+- `enableOnAddListener` - whether to enable the SelectorObserver when a new listener is added (defaults to true)
 - `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
   
 ⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.
