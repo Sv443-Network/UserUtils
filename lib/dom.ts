@@ -40,11 +40,13 @@ export function addParent(element: Element, newParent: Element) {
  * Adds global CSS style in the form of a `<style>` element in the document's `<head>`  
  * This needs to be run after the `DOMContentLoaded` event has fired on the document object (or instantly if `@run-at document-end` is used).
  * @param style CSS string
+ * @returns Returns the created style element
  */
 export function addGlobalStyle(style: string) {
   const styleElem = document.createElement("style");
   styleElem.innerHTML = style;
   document.head.appendChild(styleElem);
+  return styleElem;
 }
 
 /**

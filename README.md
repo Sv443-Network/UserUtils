@@ -506,10 +506,11 @@ addParent(element, newParent);
 ### addGlobalStyle()
 Usage:  
 ```ts
-addGlobalStyle(css: string): void
+addGlobalStyle(css: string): HTMLStyleElement
 ```
   
 Adds a global style to the page in form of a `<style>` element that's inserted into the `<head>`.  
+Returns the style element that was just created.  
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
 <details><summary><b>Example - click to view</b></summary>
