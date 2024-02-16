@@ -31,6 +31,8 @@ export type SelectorObserverOptions = {
   enableOnAddListener?: boolean;
 };
 
+export type SelectorObserverConstructorOptions = MutationObserverInit & SelectorObserverOptions;
+
 /** Observes the children of the given element for changes */
 export class SelectorObserver {
   private enabled = false;
@@ -45,14 +47,14 @@ export class SelectorObserver {
    * @param baseElementSelector The selector of the element to observe
    * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
    */
-  constructor(baseElementSelector: string, options?: SelectorObserverOptions & MutationObserverInit)
+  constructor(baseElementSelector: string, options?: SelectorObserverConstructorOptions)
   /**
    * Creates a new SelectorObserver that will observe the children of the given base element for changes (only creation and deletion of elements by default)
    * @param baseElement The element to observe
    * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
    */
-  constructor(baseElement: Element, options?: SelectorObserverOptions)
-  constructor(baseElement: Element | string, options: SelectorObserverOptions = {}) {
+  constructor(baseElement: Element, options?: SelectorObserverConstructorOptions)
+  constructor(baseElement: Element | string, options: SelectorObserverConstructorOptions = {}) {
     this.baseElement = baseElement;
 
     this.listenerMap = new Map<string, SelectorListenerOptions[]>();
