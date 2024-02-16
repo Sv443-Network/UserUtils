@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 4.2.1
+
+### Patch Changes
+
+- 0462e35: Fixed TS types for overload of SelectorObserver constructor
+
 ## 4.2.0
 
 ### Minor Changes
