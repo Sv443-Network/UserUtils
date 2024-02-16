@@ -1,5 +1,17 @@
 # @sv443-network/userutils
 
+## 4.2.0
+
+### Minor Changes
+
+- 47639f0: Added SelectorObserver options `disableOnNoListeners` and `enableOnAddListener`
+- 4a58caa: `addGlobalStyle` now returns the created style element
+- 5038967: `fetchAdvanced` is now a drop-in replacement and timeout can now optionally be disabled
+
+### Patch Changes
+
+- 17a6ad5: `randomizeArray` now returns a copy if an empty array is passed as well
+
 ## 4.1.0
 
 ### Minor Changes
