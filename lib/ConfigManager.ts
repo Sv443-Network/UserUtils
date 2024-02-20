@@ -35,16 +35,18 @@ export type ConfigManagerOptions<TData> = {
 & ({
   /**
    * Function to use to encode the data prior to saving it in persistent storage.  
-   * The input data is a serialized JSON object.  
+   * If this is specified, make sure to declare {@linkcode decodeData()} as well.  
    *   
    * You can make use of UserUtils' [`compress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#compress) function here to make the data use up less space at the cost of a little bit of performance.
+   * @param data The input data as a serialized object (JSON string)
    */
   encodeData: (data: string) => string | Promise<string>,
   /**
    * Function to use to decode the data after reading it from persistent storage.  
-   * The result should be a valid JSON object.  
+   * If this is specified, make sure to declare {@linkcode encodeData()} as well.  
    *   
    * You can make use of UserUtils' [`decompress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#decompress) function here to make the data use up less space at the cost of a little bit of performance.
+   * @returns The resulting data as a valid serialized object (JSON string)
    */
   decodeData: (data: string) => string | Promise<string>,
 } | {
