@@ -118,6 +118,7 @@ export class ConfigManager<TData = any> {
       return this.cachedConfig = parsed;
     }
     catch(err) {
+      console.warn("Error while loading config data, resetting it to the default value.", err);
       await this.saveDefaultData();
       return this.defaultConfig;
     }
@@ -189,7 +190,10 @@ export class ConfigManager<TData = any> {
           lastFmtVer = oldFmtVer = ver;
         }
         catch(err) {
-          console.error(`Error while running migration function for format version ${fmtVer}:`, err);
+          console.error(`Error while running migration function for format version '${fmtVer}' - resetting to the default value.`, err);
+
+          await this.saveDefaultData();
+          return this.getData();
         }
       }
     }
