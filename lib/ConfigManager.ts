@@ -24,6 +24,20 @@ export interface ConfigManagerOptions<TData> {
    */
   formatVersion: number;
   /**
+   * Function to use to encode the data prior to saving it in persistent storage.  
+   * The input data is a serialized JSON object.  
+   *   
+   * You can make use of UserUtils' [`compress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#compress) function here to make the data use up less space at the cost of a little bit of performance.
+   */
+  encodeData?: (data: string) => string | Promise<string>,
+  /**
+   * Function to use to decode the data after reading it from persistent storage.  
+   * The result should be a valid JSON object.  
+   *   
+   * You can make use of UserUtils' [`decompress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#decompress) function here to make the data use up less space at the cost of a little bit of performance.
+   */
+  decodeData?: (data: string) => string | Promise<string>,
+  /**
    * A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones.  
    * The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value.  
    * The values should be functions that take the data in the old format and return the data in the new format.  
@@ -48,6 +62,8 @@ export class ConfigManager<TData = any> {
   public readonly defaultConfig: TData;
   private cachedConfig: TData;
   private migrations?: ConfigMigrationsDict;
+  private encodeData: ConfigManagerOptions<TData>["encodeData"];
+  private decodeData: ConfigManagerOptions<TData>["decodeData"];
 
   /**
    * Creates an instance of ConfigManager to manage a user configuration that is cached in memory and persistently saved across sessions.  
@@ -65,6 +81,8 @@ export class ConfigManager<TData = any> {
     this.defaultConfig = options.defaultConfig;
     this.cachedConfig = options.defaultConfig;
     this.migrations = options.migrations;
+    this.encodeData = options.encodeData;
+    this.decodeData = options.decodeData;
   }
 
   /**
@@ -85,12 +103,12 @@ export class ConfigManager<TData = any> {
       if(isNaN(gmFmtVer))
         await GM.setValue(`_uucfgver-${this.id}`, gmFmtVer = this.formatVersion);
 
-      let parsed = JSON.parse(gmData);
+      let parsed = await this.deserializeData(gmData);
 
       if(gmFmtVer < this.formatVersion && this.migrations)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
-      return this.cachedConfig = typeof parsed === "object" ? parsed : undefined;
+      return this.cachedConfig = parsed;
     }
     catch(err) {
       await this.saveDefaultData();
@@ -111,7 +129,7 @@ export class ConfigManager<TData = any> {
     this.cachedConfig = data;
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, JSON.stringify(data)),
+        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(data)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
       ]);
       resolve();
@@ -123,7 +141,7 @@ export class ConfigManager<TData = any> {
     this.cachedConfig = this.defaultConfig;
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, JSON.stringify(this.defaultConfig)),
+        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultConfig)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
       ]);
       resolve();
@@ -170,11 +188,32 @@ export class ConfigManager<TData = any> {
     }
 
     await Promise.all([
-      GM.setValue(`_uucfg-${this.id}`, JSON.stringify(newData)),
+      GM.setValue(`_uucfg-${this.id}`, await this.serializeData(newData)),
       GM.setValue(`_uucfgver-${this.id}`, lastFmtVer),
     ]);
 
     return newData as TData;
+  }
+
+  /** Serializes the data using the optional this.encodeData() and returns it as a string */
+  private async serializeData(data: TData) {
+    const stringData = JSON.stringify(data);
+    if(!this.encodeData)
+      return stringData;
+
+    const encRes = this.encodeData(stringData);
+    if(encRes instanceof Promise)
+      return await encRes;
+    return encRes;
+  }
+
+  /** Deserializes the data using the optional this.decodeData() and returns it as a JSON object */
+  private async deserializeData(data: string) {
+    let decRes = this.decodeData ? this.decodeData(data) : undefined;
+    if(decRes instanceof Promise)
+      decRes = await decRes;
+
+    return JSON.parse(decRes ?? data) as TData;
   }
 
   /** Copies a JSON-compatible object and loses its internal references */
