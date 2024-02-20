@@ -1,6 +1,6 @@
 import { getUnsafeWindow } from "./dom";
 
-/** Represents any value that is either a string itself or can be converted to one (implicitly or explicitly) because it has a toString() method */
+/** Represents any value that is either a string itself or can be converted to one (implicitly and explicitly) because it has a toString() method */
 export type Stringifiable = string | { toString(): string };
 
 /**

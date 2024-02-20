@@ -107,10 +107,12 @@ export class ConfigManager<TData = any> {
         return this.defaultConfig;
       }
 
+      const isEncoded = await GM.getValue(`_uucfgenc-${this.id}`, false);
+
       if(isNaN(gmFmtVer))
         await GM.setValue(`_uucfgver-${this.id}`, gmFmtVer = this.formatVersion);
 
-      let parsed = await this.deserializeData(gmData);
+      let parsed = await this.deserializeData(gmData, isEncoded);
 
       if(gmFmtVer < this.formatVersion && this.migrations)
         parsed = await this.runMigrations(parsed, gmFmtVer);
@@ -135,10 +137,12 @@ export class ConfigManager<TData = any> {
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
   public setData(data: TData) {
     this.cachedConfig = data;
+    const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(data)),
+        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(data, useEncoding)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
+        GM.setValue(`_uucfgenc-${this.id}`, useEncoding),
       ]);
       resolve();
     });
@@ -147,10 +151,12 @@ export class ConfigManager<TData = any> {
   /** Saves the default configuration data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
   public async saveDefaultData() {
     this.cachedConfig = this.defaultConfig;
+    const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultConfig)),
+        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultConfig, useEncoding)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
+        GM.setValue(`_uucfgenc-${this.id}`, useEncoding),
       ]);
       resolve();
     });
@@ -167,6 +173,7 @@ export class ConfigManager<TData = any> {
     await Promise.all([
       GM.deleteValue(`_uucfg-${this.id}`),
       GM.deleteValue(`_uucfgver-${this.id}`),
+      GM.deleteValue(`_uucfgenc-${this.id}`),
     ]);
   }
 
@@ -201,15 +208,16 @@ export class ConfigManager<TData = any> {
     await Promise.all([
       GM.setValue(`_uucfg-${this.id}`, await this.serializeData(newData)),
       GM.setValue(`_uucfgver-${this.id}`, lastFmtVer),
+      GM.setValue(`_uucfgenc-${this.id}`, Boolean(this.encodeData && this.decodeData)),
     ]);
 
     return newData as TData;
   }
 
   /** Serializes the data using the optional this.encodeData() and returns it as a string */
-  private async serializeData(data: TData) {
+  private async serializeData(data: TData, useEncoding = true) {
     const stringData = JSON.stringify(data);
-    if(!this.encodeData)
+    if(!this.encodeData || !this.decodeData || !useEncoding)
       return stringData;
 
     const encRes = this.encodeData(stringData);
@@ -219,8 +227,8 @@ export class ConfigManager<TData = any> {
   }
 
   /** Deserializes the data using the optional this.decodeData() and returns it as a JSON object */
-  private async deserializeData(data: string) {
-    let decRes = this.decodeData ? this.decodeData(data) : undefined;
+  private async deserializeData(data: string, useEncoding = true) {
+    let decRes = this.decodeData && this.encodeData && useEncoding ? this.decodeData(data) : undefined;
     if(decRes instanceof Promise)
       decRes = await decRes;
 
