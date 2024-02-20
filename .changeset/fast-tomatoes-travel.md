@@ -2,4 +2,4 @@
 "@sv443-network/userutils": major
 ---
 
-`decompress()` now uses the same values for the outputType parameter as `compress()`
+`compress()` now uses the same value "string" (unlike previously "base64") for the outputType parameter like `decompress()`
