@@ -873,6 +873,8 @@ The options object has the following properties:
 | `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
+| `encodeData?` | (Optional, but required when decodeData is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
+| `decodeData?` | (Optional, but required when encodeData is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
 
 <br>
 
@@ -903,7 +905,7 @@ If `loadData()` or `setData()` are called after this, the persistent storage wil
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { ConfigManager } from "@sv443-network/userutils";
+import { ConfigManager, compress, decompress } from "@sv443-network/userutils";
 
 interface MyConfig {
   foo: string;
@@ -953,6 +955,15 @@ const manager = new ConfigManager({
   formatVersion,
   /** Data format migration functions */
   migrations,
+
+  // Compression example:
+  // Adding this will save space at the cost of a little bit of performance while initially loading and saving the data
+  // Only both of these properties or none of them should be set
+  // Everything else will be handled by the ConfigManager instance
+  /** Encode data using the "deflate-raw" algorithm and digests it as a base64 string */
+  encodeData: (data) => compress(data, "deflate-raw", "base64"),
+  /** Decode the "deflate-raw" encoded data as a base64 string */
+  decodeData: (data) => decompress(data, "deflate-raw", "base64"),
 });
 
 /** Entrypoint of the userscript */
