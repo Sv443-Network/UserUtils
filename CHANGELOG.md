@@ -1,5 +1,15 @@
 # @sv443-network/userutils
 
+## 5.0.0
+
+### Major Changes
+
+- c980ff3: `compress()` now uses the same value "string" (unlike previously "base64") for the outputType parameter like `decompress()`
+
+### Minor Changes
+
+- ca1b596: Added `encodeData()` and `decodeData()` to the ConfigManager options to allow for easy data compression
+
 ## 4.2.1
 
 ### Patch Changes
