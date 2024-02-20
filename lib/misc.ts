@@ -121,12 +121,12 @@ export async function compress(input: string | ArrayBuffer, compressionFormat: C
   return outputType === "arrayBuffer" ? buf : ab2str(buf);
 }
 
-/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to a string */
-export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
+/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to a base64 string */
+export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "base64"): Promise<string>
 /** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to an ArrayBuffer */
 export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
-/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to a string or ArrayBuffer, depending on what {@linkcode outputType} is set to */
-export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "string" | "arrayBuffer" = "string"): Promise<ArrayBuffer | string> {
+/** Decompresses a previously compressed base64 string or ArrayBuffer, with the format passed by {@linkcode compressionFormat}, converted to a base64 string or ArrayBuffer, depending on what {@linkcode outputType} is set to */
+export async function decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "base64" | "arrayBuffer" = "base64"): Promise<ArrayBuffer | string> {
   const byteArray = typeof input === "string" ? str2ab(input) : input;
   const decomp = new DecompressionStream(compressionFormat);
   const writer = decomp.writable.getWriter();
