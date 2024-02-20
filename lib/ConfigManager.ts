@@ -6,7 +6,7 @@ type MigrationFunc = (oldData: any) => any | Promise<any>;
 export type ConfigMigrationsDict = Record<number, MigrationFunc>;
 
 /** Options for the ConfigManager instance */
-export interface ConfigManagerOptions<TData> {
+export type ConfigManagerOptions<TData> = {
   /** A unique internal ID for this configuration - choose wisely as changing it is not supported yet. */
   id: string;
   /**
@@ -24,20 +24,6 @@ export interface ConfigManagerOptions<TData> {
    */
   formatVersion: number;
   /**
-   * Function to use to encode the data prior to saving it in persistent storage.  
-   * The input data is a serialized JSON object.  
-   *   
-   * You can make use of UserUtils' [`compress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#compress) function here to make the data use up less space at the cost of a little bit of performance.
-   */
-  encodeData?: (data: string) => string | Promise<string>,
-  /**
-   * Function to use to decode the data after reading it from persistent storage.  
-   * The result should be a valid JSON object.  
-   *   
-   * You can make use of UserUtils' [`decompress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#decompress) function here to make the data use up less space at the cost of a little bit of performance.
-   */
-  decodeData?: (data: string) => string | Promise<string>,
-  /**
    * A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones.  
    * The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value.  
    * The values should be functions that take the data in the old format and return the data in the new format.  
@@ -46,6 +32,25 @@ export interface ConfigManagerOptions<TData> {
    */
   migrations?: ConfigMigrationsDict;
 }
+& ({
+  /**
+   * Function to use to encode the data prior to saving it in persistent storage.  
+   * The input data is a serialized JSON object.  
+   *   
+   * You can make use of UserUtils' [`compress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#compress) function here to make the data use up less space at the cost of a little bit of performance.
+   */
+  encodeData: (data: string) => string | Promise<string>,
+  /**
+   * Function to use to decode the data after reading it from persistent storage.  
+   * The result should be a valid JSON object.  
+   *   
+   * You can make use of UserUtils' [`decompress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#decompress) function here to make the data use up less space at the cost of a little bit of performance.
+   */
+  decodeData: (data: string) => string | Promise<string>,
+} | {
+  encodeData?: never,
+  decodeData?: never,
+});
 
 /**
  * Manages a user configuration that is cached in memory and persistently saved across sessions.  
