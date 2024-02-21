@@ -10,7 +10,7 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 <br>
 <sub>
 
-View the documentation of previous major releases: [3.0.0](https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md), [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
+View the documentation of previous major releases: [4.2.1](https://github.com/Sv443-Network/UserUtils/blob/v4.2.1/README.md), [3.0.0](https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md), [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
 
 </sub>
 </div>
