@@ -67,7 +67,7 @@ export class ConfigManager<TData = any> {
   public readonly id: string;
   public readonly formatVersion: number;
   public readonly defaultConfig: TData;
-  private cachedConfig: TData;
+  private cachedData: TData;
   private migrations?: ConfigMigrationsDict;
   private encodeData: ConfigManagerOptions<TData>["encodeData"];
   private decodeData: ConfigManagerOptions<TData>["decodeData"];
@@ -86,7 +86,7 @@ export class ConfigManager<TData = any> {
     this.id = options.id;
     this.formatVersion = options.formatVersion;
     this.defaultConfig = options.defaultConfig;
-    this.cachedConfig = options.defaultConfig;
+    this.cachedData = options.defaultConfig;
     this.migrations = options.migrations;
     this.encodeData = options.encodeData;
     this.decodeData = options.decodeData;
@@ -104,7 +104,7 @@ export class ConfigManager<TData = any> {
 
       if(typeof gmData !== "string") {
         await this.saveDefaultData();
-        return this.defaultConfig;
+        return { ...this.defaultConfig };
       }
 
       const isEncoded = await GM.getValue(`_uucfgenc-${this.id}`, false);
@@ -117,7 +117,7 @@ export class ConfigManager<TData = any> {
       if(gmFmtVer < this.formatVersion && this.migrations)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
-      return this.cachedConfig = parsed;
+      return { ...(this.cachedData = parsed) };
     }
     catch(err) {
       console.warn("Error while loading config data, resetting it to the default value.", err);
@@ -131,12 +131,12 @@ export class ConfigManager<TData = any> {
    * Use {@linkcode loadData()} to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage).
    */
   public getData(): TData {
-    return this.deepCopy(this.cachedConfig);
+    return this.deepCopy(this.cachedData);
   }
 
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
   public setData(data: TData) {
-    this.cachedConfig = data;
+    this.cachedData = data;
     const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
       await Promise.all([
@@ -150,7 +150,7 @@ export class ConfigManager<TData = any> {
 
   /** Saves the default configuration data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
   public async saveDefaultData() {
-    this.cachedConfig = this.defaultConfig;
+    this.cachedData = this.defaultConfig;
     const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
       await Promise.all([
