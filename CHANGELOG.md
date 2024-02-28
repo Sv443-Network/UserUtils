@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 5.0.1
+
+### Patch Changes
+
+- 2b885c3: `ConfigManager.loadData()` now returns a copy of the data
+
 ## 5.0.0
 
 ### Major Changes
