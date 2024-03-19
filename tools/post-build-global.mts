@@ -1,33 +1,33 @@
 import { access, constants as fsconstants, readFile, writeFile } from "fs/promises";
 import { resolve } from "path";
-import packageJson from "../package.json" assert { type: "json" };
+import pkg from "../package.json" assert { type: "json" };
 
 const { exit } = process;
 
-const iifeScriptPath = resolve("dist/index.global.js");
+/** Path to the global / IIFE bundle built by tsup */
+const iifeBundlePath = resolve("dist/index.global.js");
 
 async function run() {
-  if(!await exists(iifeScriptPath)) {
-    console.error(`No global script found at path '${iifeScriptPath}'`);
+  if(!await exists(iifeBundlePath)) {
+    console.error(`No global script found at path '${iifeBundlePath}'`);
     setImmediate(() => exit(1));
     return;
   }
 
   const libHeader = `\
 // ==UserScript==
-// @namespace    ${packageJson.homepage}
+// @namespace    ${pkg.homepage}
 // @exclude      *
-// @author       ${packageJson.author.name}
-// @supportURL   ${packageJson.bugs.url}
-// @homepageURL  ${packageJson.homepage}#readme
-// @supportURL   ${packageJson.homepage}/issues
+// @author       ${pkg.author.name}
+// @supportURL   ${pkg.bugs.url}
+// @homepageURL  ${pkg.homepage}
 
 // ==UserLibrary==
-// @name         UserUtils
-// @description  ${packageJson.description}
-// @version      ${packageJson.version}
-// @license      ${packageJson.license}
-// @copyright    ${packageJson.author.name} (${packageJson.author.url})
+// @name         ${pkg.libName}
+// @description  ${pkg.description}
+// @version      ${pkg.version}
+// @license      ${pkg.license}
+// @copyright    ${pkg.author.name} (${pkg.author.url})
 
 // ==/UserScript==
 // ==/UserLibrary==
@@ -37,14 +37,13 @@ async function run() {
 // ==/OpenUserJS==
 `;
 
-  const initialScript = await readFile(iifeScriptPath, "utf8");
-  let finalScript = `\
-${libHeader}
-var UserUtils = ${initialScript}`;
-  finalScript = finalScript.replace(/^\s*'use strict';\s*(\r?\n){1,2}/gm, "");
+  const initialScript = await readFile(iifeBundlePath, "utf8");
 
-  await writeFile(iifeScriptPath, finalScript, "utf8");
-  console.log(`Global script at path '${iifeScriptPath}' has been updated`);
+  const finalScript = `${libHeader}\nvar UserUtils = ${initialScript}`
+    .replace(/^\s*'use strict';\s*(\r?\n){1,2}/gm, "");
+
+  await writeFile(iifeBundlePath, finalScript, "utf8");
+  console.log(`Global script at path '${iifeBundlePath}' has been updated`);
 
   setImmediate(() => exit(0));
 }
