@@ -5,26 +5,26 @@ type MigrationFunc = (oldData: any) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
 export type ConfigMigrationsDict = Record<number, MigrationFunc>;
 
-/** Options for the ConfigManager instance */
-export type ConfigManagerOptions<TData> = {
-  /** A unique internal ID for this configuration - choose wisely as changing it is not supported yet. */
+/** Options for the DataStore instance */
+export type DataStoreOptions<TData> = {
+  /** A unique internal ID for this data store - choose wisely as changing it is not supported yet. */
   id: string;
   /**
-   * The default config data object to use if no data is saved in persistent storage yet.  
+   * The default data object to use if no data is saved in persistent storage yet.  
    * Until the data is loaded from persistent storage with `loadData()`, this will be the data returned by `getData()`  
    *   
    * ⚠️ This has to be an object that can be serialized to JSON, so no functions or circular references are allowed, they will cause unexpected behavior.  
    */
-  defaultConfig: TData;
+  defaultData: TData;
   /**
-   * An incremental, whole integer version number of the current format of config data.  
+   * An incremental, whole integer version number of the current format of data.  
    * If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively.  
    *   
    * ⚠️ Never decrement this number and optimally don't skip any numbers either!
    */
   formatVersion: number;
   /**
-   * A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones.  
+   * A dictionary of functions that can be used to migrate data from older versions to newer ones.  
    * The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value.  
    * The values should be functions that take the data in the old format and return the data in the new format.  
    * The functions will be run in order from the oldest to the newest version.  
@@ -55,38 +55,38 @@ export type ConfigManagerOptions<TData> = {
 });
 
 /**
- * Manages a user configuration that is cached in memory and persistently saved across sessions.  
+ * Manages a sync & async persistent JSON database that is cached in memory and persistently saved across sessions.  
  * Supports migrating data from older versions of the configuration to newer ones and populating the cache with default data if no persistent data is found.  
  *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
- * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultConfig`
+ * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
  * 
- * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultConfig`) - this should also be the type of the data format associated with the current `options.formatVersion`
+ * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `defaultData`) - this should also be the type of the data format associated with the current `formatVersion`
  */
-export class ConfigManager<TData = any> {
+export class DataStore<TData = any> {
   public readonly id: string;
   public readonly formatVersion: number;
-  public readonly defaultConfig: TData;
+  public readonly defaultData: TData;
   private cachedData: TData;
   private migrations?: ConfigMigrationsDict;
-  private encodeData: ConfigManagerOptions<TData>["encodeData"];
-  private decodeData: ConfigManagerOptions<TData>["decodeData"];
+  private encodeData: DataStoreOptions<TData>["encodeData"];
+  private decodeData: DataStoreOptions<TData>["decodeData"];
 
   /**
-   * Creates an instance of ConfigManager to manage a user configuration that is cached in memory and persistently saved across sessions.  
-   * Supports migrating data from older versions of the configuration to newer ones and populating the cache with default data if no persistent data is found.  
+   * Creates an instance of DataStore to manage a sync & async database that is cached in memory and persistently saved across sessions.  
+   * Supports migrating data from older versions to newer ones and populating the cache with default data if no persistent data is found.  
    *   
    * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
-   * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultConfig`
+   * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
    * 
-   * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultConfig`) - this should also be the type of the data format associated with the current `options.formatVersion`
-   * @param options The options for this ConfigManager instance
+   * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultData`) - this should also be the type of the data format associated with the current `options.formatVersion`
+   * @param options The options for this DataStore instance
   */
-  constructor(options: ConfigManagerOptions<TData>) {
+  constructor(options: DataStoreOptions<TData>) {
     this.id = options.id;
     this.formatVersion = options.formatVersion;
-    this.defaultConfig = options.defaultConfig;
-    this.cachedData = options.defaultConfig;
+    this.defaultData = options.defaultData;
+    this.cachedData = options.defaultData;
     this.migrations = options.migrations;
     this.encodeData = options.encodeData;
     this.decodeData = options.decodeData;
@@ -99,12 +99,12 @@ export class ConfigManager<TData = any> {
    */
   public async loadData(): Promise<TData> {
     try {
-      const gmData = await GM.getValue(`_uucfg-${this.id}`, this.defaultConfig);
+      const gmData = await GM.getValue(`_uucfg-${this.id}`, this.defaultData);
       let gmFmtVer = Number(await GM.getValue(`_uucfgver-${this.id}`));
 
       if(typeof gmData !== "string") {
         await this.saveDefaultData();
-        return { ...this.defaultConfig };
+        return { ...this.defaultData };
       }
 
       const isEncoded = await GM.getValue(`_uucfgenc-${this.id}`, false);
@@ -120,9 +120,9 @@ export class ConfigManager<TData = any> {
       return { ...(this.cachedData = parsed) };
     }
     catch(err) {
-      console.warn("Error while loading config data, resetting it to the default value.", err);
+      console.warn("Error while parsing JSON data, resetting it to the default value.", err);
       await this.saveDefaultData();
-      return this.defaultConfig;
+      return this.defaultData;
     }
   }
 
@@ -150,11 +150,11 @@ export class ConfigManager<TData = any> {
 
   /** Saves the default configuration data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
   public async saveDefaultData() {
-    this.cachedData = this.defaultConfig;
+    this.cachedData = this.defaultData;
     const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultConfig, useEncoding)),
+        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultData, useEncoding)),
         GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
         GM.setValue(`_uucfgenc-${this.id}`, useEncoding),
       ]);
@@ -163,13 +163,13 @@ export class ConfigManager<TData = any> {
   }
 
   /**
-   * Call this method to clear all persistently stored data associated with this ConfigManager instance.  
+   * Call this method to clear all persistently stored data associated with this DataStore instance.  
    * The in-memory cache will be left untouched, so you may still access the data with {@linkcode getData()}  
    * Calling {@linkcode loadData()} or {@linkcode setData()} after this method was called will recreate persistent storage with the cached or default data.  
    *   
    * ⚠️ This requires the additional directive `@grant GM.deleteValue`
    */
-  public async deleteConfig() {
+  public async deleteData() {
     await Promise.all([
       GM.deleteValue(`_uucfg-${this.id}`),
       GM.deleteValue(`_uucfgver-${this.id}`),
