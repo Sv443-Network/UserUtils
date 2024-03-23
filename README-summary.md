@@ -19,6 +19,7 @@ Or view the documentation of previous major releases: [3.0.0](https://github.com
 
 <br>
 
+<!-- https://github.com/Sv443-Network/UserUtils  < #foo    -->
 ## Feature Summary:
 - DOM:
     - [SelectorObserver](https://github.com/Sv443-Network/UserUtils#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
@@ -32,13 +33,14 @@ Or view the documentation of previous major releases: [3.0.0](https://github.com
     - [interceptWindowEvent()](https://github.com/Sv443-Network/UserUtils#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
     - [isScrollable()](https://github.com/Sv443-Network/UserUtils#isscrollable) - check if an element has a horizontal or vertical scroll bar
     - [observeElementProp()](https://github.com/Sv443-Network/UserUtils#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - [getSiblingsFrame()](https://github.com/Sv443-Network/UserUtils#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
 - Math:
     - [clamp()](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
     - [mapRange()](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
     - [randRange()](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
     - [randomId()](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
 - Misc:
-    - [ConfigManager](https://github.com/Sv443-Network/UserUtils#configmanager) - class that manages persistent userscript configurations, including data migration
+    - [DataStore](https://github.com/Sv443-Network/UserUtils#DataStore) - class that manages a sync & async persistent JSON database, including data migration
     - [autoPlural()](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
     - [pauseFor()](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once, after a given amount of time

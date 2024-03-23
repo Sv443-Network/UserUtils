@@ -34,13 +34,14 @@ View the documentation of previous major releases: [4.2.1](https://github.com/Sv
     - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
     - [isScrollable()](#isscrollable) - check if an element has a horizontal or vertical scroll bar
     - [observeElementProp()](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - [getSiblingsFrame()](#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
   - [**Math:**](#math)
     - [clamp()](#clamp) - constrain a number between a min and max value
     - [mapRange()](#maprange) - map a number from one range to the same spot in another range
     - [randRange()](#randrange) - generate a random number between a min and max boundary
     - [randomId()](#randomid) - generate a random ID of a given length and radix
   - [**Misc:**](#misc)
-    - [ConfigManager](#configmanager) - class that manages persistent userscript configurations, including data migration
+    - [DataStore](#datastore) - class that manages a sync & async persistent JSON database, including data migration
     - [autoPlural()](#autoplural) - automatically pluralize a string
     - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](#debounce) - call a function only once, after a given amount of time
@@ -733,6 +734,129 @@ observeElementProp(myInput, "value", (oldValue, newValue) => {
 
 </details>
 
+<br>
+
+### getSiblingsFrame()
+Usage:  
+```ts
+getSiblingsFrame<
+  TSiblingType extends Element = HTMLElement
+>(
+  refElement: Element,
+  siblingAmount: number,
+  refElementAlignment: "center-top" | "center-bottom" | "top" | "bottom" = "center-top",
+  includeRef = true
+): TSiblingType[]
+```
+Returns a "frame" of the closest siblings of the reference element, based on the passed amount of siblings and element alignment.  
+The returned type is an array of `HTMLElement` by default but can be changed by specifying the `TSiblingType` generic in TypeScript.  
+  
+These are the parameters:
+- The `refElement` parameter is the reference element to return the relative closest siblings from.
+- The `siblingAmount` parameter is the amount of siblings to return in total (including or excluding the `refElement` based on the `includeRef` parameter).
+- The `refElementAlignment` parameter can be set to `center-top` (default), `center-bottom`, `top`, or `bottom`, which will determine where the relative location of the provided `refElement` is in the returned array.  
+  `center-top` (default) will try to keep the `refElement` in the center of the returned array, but can shift around by one element. In those cases it will prefer the top spot.  
+  Same goes for `center-bottom` in reverse.  
+  `top` will keep the `refElement` at the top of the returned array, and `bottom` will keep it at the bottom.
+- If `includeRef` is set to `true` (default), the provided `refElement` will be included in the returned array at its corresponding position.
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { getSiblingsFrame } from "@sv443-network/userutils";
+
+const refElement = document.querySelector("#ref");
+// ^ structure of the elements:
+// <div id="parent">
+//     <div>1</div>
+//     <div>2</div>
+//     <div id="ref">3</div>
+//     <div>4</div>
+//     <div>5</div>
+//     <div>6</div>
+// </div>
+
+// ref element aligned to the top of the frame's center positions and included in the result:
+const siblingsFoo = getSiblingsFrame(refElement, 4, "center-top", true);
+// <div>1</div>
+// <div>2</div>        ◄──┐
+// <div id="ref">3</div>  │ returned         <(ref is here because refElementAlignment = "center-top")
+// <div>4</div>           │ frame
+// <div>5</div>        ◄──┘
+// <div>6</div>
+
+// ref element aligned to the bottom of the frame's center positions and included in the result:
+const siblingsBar = getSiblingsFrame(refElement, 4, "center-bottom", true);
+// <div>1</div>        ◄──┐
+// <div>2</div>           │ returned
+// <div id="ref">3</div>  │ frame            <(ref is here because refElementAlignment = "center-bottom")
+// <div>4</div>        ◄──┘
+// <div>5</div>
+// <div>6</div>
+
+// ref element aligned to the bottom of the frame's center positions, but excluded from the result:
+const siblingsBaz = getSiblingsFrame(refElement, 3, "center-bottom", false);
+// <div>1</div>        ◄──┐
+// <div>2</div>        ◄──┘ returned...
+// <div id="ref">3</div>                     <(skipped because includeRef = false)
+// <div>4</div>        ◄─── ...frame
+// <div>5</div>
+// <div>6</div>
+
+// ref element aligned to the top of the frame, but excluded from the result:
+const siblingsQux = getSiblingsFrame(refElement, 3, "top", false);
+// <div>1</div>
+// <div>2</div>
+// <div id="ref">3</div>                     <(skipped because includeRef = false)
+// <div>4</div>        ◄──┐ returned
+// <div>5</div>           │ frame
+// <div>6</div>        ◄──┘
+
+// ref element aligned to the top of the frame, but this time included in the result:
+const siblingsQuux = getSiblingsFrame(refElement, 3, "top", true);
+// <div>1</div>
+// <div>2</div>
+// <div id="ref">3</div>  ◄──┐ returned      <(not skipped because includeRef = true)
+// <div>4</div>              │ frame
+// <div>5</div>           ◄──┘
+// <div>6</div>
+```
+
+More useful examples:
+
+```ts
+const refElement = document.querySelector("#ref");
+// ^ structure of the elements:
+// <div id="parent">
+//     <div>1</div>
+//     <div>2</div>
+//     <div id="ref">3</div>
+//     <div>4</div>
+//     <div>5</div>
+//     <div>6</div>
+// </div>
+
+// get all elements above and include the reference element:
+const allAbove = getSiblingsFrame(refElement, Infinity, "top", true);
+// <div>1</div>          ◄──┐ returned
+// <div>2</div>             │ frame
+// <div id="ref">3</div> ◄──┘
+// <div>4</div>
+// <div>5</div>
+// <div>6</div>
+
+// get all elements below and exclude the reference element:
+const allBelowExcl = getSiblingsFrame(refElement, Infinity, "bottom", false);
+// <div>1</div>
+// <div>2</div>
+// <div id="ref">3</div>
+// <div>4</div>          ◄──┐ returned
+// <div>5</div>             │ frame
+// <div>6</div>          ◄──┘
+```
+
+</details>
+
 <br><br>
 
 <!-- #SECTION Math -->
@@ -853,26 +977,26 @@ randomId(10, 36); // "z46jfpa37r"       (length 10, radix 36)
 <!-- #SECTION Misc -->
 ## Misc:
 
-### ConfigManager
+### DataStore
 Usage:  
 ```ts
-new ConfigManager(options: ConfigManagerOptions)
+new DataStore(options: DataStoreOptions)
 ```
   
-A class that manages a userscript's configuration that is persistently saved to and loaded from GM storage.  
+A class that manages a sync & async JSON database that is persistently saved to and loaded from GM storage.  
 Also supports automatic migration of outdated data formats via provided migration functions.  
 You may create as many instances as you like as long as they have different IDs.  
   
-⚠️ The configuration is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save.  
+⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save.  
 ⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
   
 The options object has the following properties:
 | Property | Description |
 | :-- | :-- |
-| `id` | A unique internal identification string for this configuration. If two ConfigManagers share the same ID, they will overwrite each other's data. Choose wisely because if it is changed, the previously saved data will not be able to be loaded anymore. |
-| `defaultConfig` | The default config data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
+| `id` | A unique internal identification string for this instance. If two DataStores share the same ID, they will overwrite each other's data. Choose wisely because if it is changed, the previously saved data will not be able to be loaded anymore. |
+| `defaultData` | The default data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
-| `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the configuration to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
+| `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
 | `encodeData?` | (Optional, but required when decodeData is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
 | `decodeData?` | (Optional, but required when encodeData is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
 
@@ -880,24 +1004,24 @@ The options object has the following properties:
 
 #### Methods:
 `loadData(): Promise<TData>`  
-Asynchronously loads the configuration data from persistent storage and returns it.  
-If no data was saved in persistent storage before, the value of `options.defaultConfig` will be returned and written to persistent storage.  
+Asynchronously loads the data from persistent storage and returns it.  
+If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and written to persistent storage.  
 If the formatVersion of the saved data is lower than the current one and the `options.migrations` property is present, the data will be migrated to the latest format before the Promise resolves.  
   
 `getData(): TData`  
 Synchronously returns the current data that is stored in the internal cache.  
-If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultConfig` will be returned.  
+If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultData` will be returned.  
   
 `setData(data: TData): Promise<void>`  
 Writes the given data synchronously to the internal cache and asynchronously to persistent storage.  
   
 `saveDefaultData(): Promise<void>`  
-Writes the default configuration given in `options.defaultConfig` synchronously to the internal cache and asynchronously to persistent storage.  
+Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.  
   
-`deleteConfig(): Promise<void>`  
-Fully deletes the configuration from persistent storage.  
+`deleteData(): Promise<void>`  
+Fully deletes the data from persistent storage.  
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
-If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultConfig` again.  
+If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
 ⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
 
 <br>
@@ -905,8 +1029,9 @@ If `loadData()` or `setData()` are called after this, the persistent storage wil
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { ConfigManager, compress, decompress } from "@sv443-network/userutils";
+import { DataStore, compress, decompress } from "@sv443-network/userutils";
 
+/** Example: Userscript configuration data */
 interface MyConfig {
   foo: string;
   bar: number;
@@ -914,8 +1039,8 @@ interface MyConfig {
   qux: string;
 }
 
-/** Default config data */
-const defaultConfig: MyConfig = {
+/** Default data */
+const defaultData: MyConfig = {
   foo: "hello",
   bar: 42,
   baz: "xyz",
@@ -946,12 +1071,12 @@ const migrations = {
   },
 };
 
-const manager = new ConfigManager({
-  /** A unique ID for this configuration - choose wisely as changing it is not supported yet! */
-  id: "my-userscript",
-  /** Default / fallback configuration data */
-  defaultConfig,
-  /** The current version of the script's config data format */
+const manager = new DataStore({
+  /** A unique ID for this instance - choose wisely as changing it is not supported yet! */
+  id: "my-userscript-config",
+  /** Default / fallback data */
+  defaultData,
+  /** The current version of the data format */
   formatVersion,
   /** Data format migration functions */
   migrations,
@@ -959,29 +1084,30 @@ const manager = new ConfigManager({
   // Compression example:
   // Adding this will save space at the cost of a little bit of performance while initially loading and saving the data
   // Only both of these properties or none of them should be set
-  // Everything else will be handled by the ConfigManager instance
-  /** Encode data using the "deflate-raw" algorithm and digests it as a base64 string */
+  // Everything else will be handled by the DataStore instance
+
+  /** Encodes data using the "deflate-raw" algorithm and digests it as a base64 string */
   encodeData: (data) => compress(data, "deflate-raw", "base64"),
-  /** Decode the "deflate-raw" encoded data as a base64 string */
+  /** Decodes the "deflate-raw" encoded data as a base64 string */
   decodeData: (data) => decompress(data, "deflate-raw", "base64"),
 });
 
 /** Entrypoint of the userscript */
 async function init() {
-  // wait for the config to be loaded from persistent storage
-  // if no data was saved in persistent storage before or getData() is called before loadData(), the value of options.defaultConfig will be returned
+  // wait for the data to be loaded from persistent storage
+  // if no data was saved in persistent storage before or getData() is called before loadData(), the value of options.defaultData will be returned
   // if the previously saved data needs to be migrated to a newer version, it will happen in this function call
   const configData = await manager.loadData();
 
   console.log(configData.foo); // "hello"
 
-  // update the config
+  // update the data
   configData.foo = "world";
   configData.bar = 123;
 
-  // save the updated config - synchronously to the cache and asynchronously to persistent storage
+  // save the updated data - synchronously to the cache and asynchronously to persistent storage
   manager.saveData(configData).then(() => {
-    console.log("Config saved to persistent storage!");
+    console.log("Data saved to persistent storage!");
   });
 
   // the internal cache is updated synchronously, so the updated data can be accessed before the Promise resolves:

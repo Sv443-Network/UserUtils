@@ -184,3 +184,52 @@ export function observeElementProp<
     });
   }
 }
+
+/**
+ * Returns a "frame" of the closest siblings of the {@linkcode refElement}, based on the passed amount of siblings and {@linkcode refElementAlignment}
+ * @param refElement The reference element to return the relative closest siblings from
+ * @param siblingAmount The amount of siblings to return
+ * @param refElementAlignment Can be set to `center-top` (default), `center-bottom`, `top`, or `bottom`, which will determine where the relative location of the provided {@linkcode refElement} is in the returned array
+ * @param includeRef If set to `true` (default), the provided {@linkcode refElement} will be included in the returned array at the corresponding position
+ * @template TSiblingType The type of the sibling elements that are returned
+ * @returns An array of sibling elements
+ */
+export function getSiblingsFrame<
+  TSiblingType extends Element = HTMLElement,
+>(
+  refElement: Element,
+  siblingAmount: number,
+  refElementAlignment: "center-top" | "center-bottom" | "top" | "bottom" = "center-top",
+  includeRef = true,
+): TSiblingType[] {
+  const siblings = [...refElement.parentNode?.childNodes ?? []] as TSiblingType[];
+  const elemSiblIdx = siblings.indexOf(refElement as TSiblingType);
+
+  if(elemSiblIdx === -1)
+    throw new Error("Element doesn't have a parent node");
+
+  if(refElementAlignment === "top")
+    return [...siblings.slice(elemSiblIdx + Number(!includeRef), elemSiblIdx + siblingAmount + Number(!includeRef))];
+  else if(refElementAlignment.startsWith("center-")) {
+    // if the amount of siblings is even, one of the two center ones will be decided by the value of `refElementAlignment`
+    const halfAmount = (refElementAlignment === "center-bottom" ? Math.ceil : Math.floor)(siblingAmount / 2);
+    const startIdx = Math.max(0, elemSiblIdx - halfAmount);
+    // if the amount of siblings is even, the top offset of 1 will be applied whenever `includeRef` is set to true
+    const topOffset = Number(refElementAlignment === "center-top" && siblingAmount % 2 === 0 && includeRef);
+    // if the amount of siblings is odd, the bottom offset of 1 will be applied whenever `includeRef` is set to true
+    const btmOffset = Number(refElementAlignment === "center-bottom" && siblingAmount % 2 !== 0 && includeRef);
+    const startIdxWithOffset = startIdx + topOffset + btmOffset;
+
+    // filter out the reference element if `includeRef` is set to false,
+    // then slice the array to the desired framing including the offsets
+    return [
+      ...siblings
+        .filter((_, idx) => includeRef || idx !== elemSiblIdx)
+        .slice(startIdxWithOffset, startIdxWithOffset + siblingAmount)
+    ];
+  }
+  else if(refElementAlignment === "bottom")
+    return [...siblings.slice(elemSiblIdx - siblingAmount + Number(includeRef), elemSiblIdx + Number(includeRef))];
+
+  return [] as TSiblingType[];
+}
