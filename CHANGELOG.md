@@ -1,5 +1,22 @@
 # @sv443-network/userutils
 
+## 6.0.0
+
+### Major Changes
+
+- e921593: Renamed `ConfigManager` to `DataStore` to make its implied purpose as a generic JSON database more clear.
+  - the constructor property `defaultConfig` is now called `defaultData`
+  - `deleteConfig()` is now called `deleteData()`
+  - the internal GM storage keys will still have the prefix `_uucfg` for backwards compatibility
+
+### Minor Changes
+
+- da679c6: Added function `getSiblingsFrame()` that returns a frame of an element's siblings, with a given alignment and size
+
+### Patch Changes
+
+- 0c716a6: Lowered the `Error.stackTraceLimit` by a multiple of 10 to preserve memory
+
 ## 5.0.1
 
 ### Patch Changes
