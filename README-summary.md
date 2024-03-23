@@ -9,13 +9,18 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 <br>
 
-### > Full documentation [on GitHub](https://github.com/Sv443-Network/UserUtils#readme) <
+## &gt; [Full documentation on GitHub](https://github.com/Sv443-Network/UserUtils#readme) &lt;
 
-<sub>
+<br>
 
-Or view the documentation of previous major releases: [3.0.0](https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md), [2.0.1](https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md), [1.2.0](https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md), [0.5.3](https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md)
+<sup>
+View the documentation of previous major releases:
+</sup>
+<sup>
 
-</sub>
+<a href="https://github.com/Sv443-Network/UserUtils/blob/v5.0.1/README.md" rel="noopener noreferrer">5.0.1</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v4.2.1/README.md" rel="noopener noreferrer">4.2.1</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md" rel="noopener noreferrer">3.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md" rel="noopener noreferrer">2.0.1</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md" rel="noopener noreferrer">1.2.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md" rel="noopener noreferrer">0.5.3</a>
+
+</sup>
 
 <br>
 
