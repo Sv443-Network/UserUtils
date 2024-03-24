@@ -48,9 +48,10 @@ async function run() {
   setImmediate(() => exit(0));
 }
 
-async function exists(path: string) {
+/** Checks if a path exists / is readable and writable (by default) */
+async function exists(path: string, mode = fsconstants.R_OK | fsconstants.W_OK) {
   try {
-    await access(path, fsconstants.R_OK | fsconstants.W_OK);
+    await access(path, mode);
     return true;
   }
   catch(err) {
