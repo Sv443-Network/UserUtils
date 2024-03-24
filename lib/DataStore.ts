@@ -3,7 +3,7 @@
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
 type MigrationFunc = (oldData: any) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
-export type ConfigMigrationsDict = Record<number, MigrationFunc>;
+export type DataMigrationsDict = Record<number, MigrationFunc>;
 
 /** Options for the DataStore instance */
 export type DataStoreOptions<TData> = {
@@ -30,7 +30,7 @@ export type DataStoreOptions<TData> = {
    * The functions will be run in order from the oldest to the newest version.  
    * If the current format version is not in the dictionary, no migrations will be run.
    */
-  migrations?: ConfigMigrationsDict;
+  migrations?: DataMigrationsDict;
 }
 & ({
   /**
@@ -56,7 +56,7 @@ export type DataStoreOptions<TData> = {
 
 /**
  * Manages a sync & async persistent JSON database that is cached in memory and persistently saved across sessions.  
- * Supports migrating data from older versions of the configuration to newer ones and populating the cache with default data if no persistent data is found.  
+ * Supports migrating data from older format versions to newer ones and populating the cache with default data if no persistent data is found.  
  *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
  * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
@@ -68,7 +68,7 @@ export class DataStore<TData = any> {
   public readonly formatVersion: number;
   public readonly defaultData: TData;
   private cachedData: TData;
-  private migrations?: ConfigMigrationsDict;
+  private migrations?: DataMigrationsDict;
   private encodeData: DataStoreOptions<TData>["encodeData"];
   private decodeData: DataStoreOptions<TData>["decodeData"];
 
@@ -79,7 +79,7 @@ export class DataStore<TData = any> {
    * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
    * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
    * 
-   * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `config.defaultData`) - this should also be the type of the data format associated with the current `options.formatVersion`
+   * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `options.defaultData`) - this should also be the type of the data format associated with the current `options.formatVersion`
    * @param options The options for this DataStore instance
   */
   constructor(options: DataStoreOptions<TData>) {
@@ -148,7 +148,7 @@ export class DataStore<TData = any> {
     });
   }
 
-  /** Saves the default configuration data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
+  /** Saves the default data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
   public async saveDefaultData() {
     this.cachedData = this.defaultData;
     const useEncoding = Boolean(this.encodeData && this.decodeData);
