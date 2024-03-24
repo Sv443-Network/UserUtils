@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 6.0.1
+
+### Patch Changes
+
+- 08248c1: Fixed terminology in JSDoc comments of the `DataStore` class
+
 ## 6.0.0
 
 ### Major Changes
