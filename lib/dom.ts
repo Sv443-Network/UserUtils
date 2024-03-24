@@ -191,19 +191,19 @@ export function observeElementProp<
  * @param siblingAmount The amount of siblings to return
  * @param refElementAlignment Can be set to `center-top` (default), `center-bottom`, `top`, or `bottom`, which will determine where the relative location of the provided {@linkcode refElement} is in the returned array
  * @param includeRef If set to `true` (default), the provided {@linkcode refElement} will be included in the returned array at the corresponding position
- * @template TSiblingType The type of the sibling elements that are returned
+ * @template TSibling The type of the sibling elements that are returned
  * @returns An array of sibling elements
  */
 export function getSiblingsFrame<
-  TSiblingType extends Element = HTMLElement,
+  TSibling extends Element = HTMLElement,
 >(
   refElement: Element,
   siblingAmount: number,
   refElementAlignment: "center-top" | "center-bottom" | "top" | "bottom" = "center-top",
   includeRef = true,
-): TSiblingType[] {
-  const siblings = [...refElement.parentNode?.childNodes ?? []] as TSiblingType[];
-  const elemSiblIdx = siblings.indexOf(refElement as TSiblingType);
+): TSibling[] {
+  const siblings = [...refElement.parentNode?.childNodes ?? []] as TSibling[];
+  const elemSiblIdx = siblings.indexOf(refElement as TSibling);
 
   if(elemSiblIdx === -1)
     throw new Error("Element doesn't have a parent node");
@@ -231,5 +231,5 @@ export function getSiblingsFrame<
   else if(refElementAlignment === "bottom")
     return [...siblings.slice(elemSiblIdx - siblingAmount + Number(includeRef), elemSiblIdx + Number(includeRef))];
 
-  return [] as TSiblingType[];
+  return [] as TSibling[];
 }
