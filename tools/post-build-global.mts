@@ -1,5 +1,5 @@
-import { access, constants as fsconstants, readFile, writeFile } from "fs/promises";
-import { resolve } from "path";
+import { access, constants as fsconstants, readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import pkg from "../package.json" assert { type: "json" };
 
 const { exit } = process;
@@ -37,13 +37,13 @@ async function run() {
 // ==/OpenUserJS==
 `;
 
-  const initialScript = await readFile(iifeBundlePath, "utf8");
+  const initialBundle = await readFile(iifeBundlePath, "utf8");
 
-  const finalScript = `${libHeader}\nvar UserUtils = ${initialScript}`
+  const finalBundle = `${libHeader}\nvar UserUtils = ${initialBundle}`
     .replace(/^\s*'use strict';\s*(\r?\n){1,2}/gm, "");
 
-  await writeFile(iifeBundlePath, finalScript, "utf8");
-  console.log(`Global script at path '${iifeBundlePath}' has been updated`);
+  await writeFile(iifeBundlePath, finalBundle, "utf8");
+  console.log(`\x1b[32mGlobal bundle at path \x1b[0m'${iifeBundlePath}'\x1b[32m has been updated\x1b[0m`);
 
   setImmediate(() => exit(0));
 }
