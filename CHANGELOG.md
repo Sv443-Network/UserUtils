@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 6.2.0
+
+### Minor Changes
+
+- 0173235: Add property to change the debounce edge in `SelectorObserver` instances
+
 ## 6.1.0
 
 ### Minor Changes
