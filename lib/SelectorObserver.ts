@@ -1,3 +1,5 @@
+import { debounce } from "./misc";
+
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
 export type SelectorListenerOptions<TElem extends Element = HTMLElement> = SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>;
 
@@ -20,11 +22,18 @@ type SelectorOptionsCommon = {
   continuous?: boolean;
   /** Whether to debounce the listener to reduce calls to `querySelector` or `querySelectorAll` - set undefined or <=0 to disable (default) */
   debounce?: number;
+  /** Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default) */
+  debounceEdge?: "rising" | "falling";
 };
 
 export type SelectorObserverOptions = {
   /** If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set */
   defaultDebounce?: number;
+  /**
+   * If set, applies this debounce edge to all listeners that don't have their own set.  
+   * Edge = Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default)
+   */
+  defaultDebounceEdge?: "rising" | "falling";
   /** Whether to disable the observer when no listeners are present - default is true */
   disableOnNoListeners?: boolean;
   /** Whether to ensure the observer is enabled when a new listener is added - default is true */
@@ -63,6 +72,7 @@ export class SelectorObserver {
 
     const {
       defaultDebounce,
+      defaultDebounceEdge,
       disableOnNoListeners,
       enableOnAddListener,
       ...observerOptions
@@ -76,6 +86,7 @@ export class SelectorObserver {
 
     this.customOptions = {
       defaultDebounce: defaultDebounce ?? 0,
+      defaultDebounceEdge: defaultDebounceEdge ?? "rising",
       disableOnNoListeners: disableOnNoListeners ?? false,
       enableOnAddListener: enableOnAddListener ?? true,
     };
@@ -123,12 +134,8 @@ export class SelectorObserver {
     }
   }
 
-  private debounce<TArgs>(func: (...args: TArgs[]) => void, time: number): (...args: TArgs[]) => void {
-    let timeout: number;
-    return function(...args: TArgs[]) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), time) as unknown as number;
-    };
+  private debounce<TArgs>(func: (...args: TArgs[]) => void, time: number, edge: "falling" | "rising" = "falling"): (...args: TArgs[]) => void {
+    return debounce(func, time, edge);
   }
 
   /**
@@ -146,6 +153,7 @@ export class SelectorObserver {
       options.listener = this.debounce(
         options.listener as ((arg: NodeListOf<Element> | Element) => void),
         (options.debounce || this.customOptions.defaultDebounce)!,
+        (options.debounceEdge || this.customOptions.defaultDebounceEdge),
       );
     }
     if(this.listenerMap.has(selector))
