@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 6.1.0
+
+### Minor Changes
+
+- a11ed77: Added parameter to switch `debounce()` to trigger on the rising edge, instead of just the falling edge [(see docs)](https://github.com/Sv443-Network/UserUtils#debounce)
+
 ## 6.0.1
 
 ### Patch Changes
