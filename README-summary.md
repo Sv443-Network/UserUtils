@@ -46,7 +46,7 @@ or view the documentation of previous major releases:
     - [DataStore](https://github.com/Sv443-Network/UserUtils#DataStore) - class that manages a sync & async persistent JSON database, including data migration
     - [autoPlural()](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
     - [pauseFor()](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
-    - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once, after a given amount of time
+    - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once in a series of calls, after or before a given timeout
     - [fetchAdvanced()](https://github.com/Sv443-Network/UserUtils#fetchadvanced) - wrapper around the fetch API with a timeout option
     - [insertValues()](https://github.com/Sv443-Network/UserUtils#insertvalues) - insert values into a string at specified placeholders
     - [compress()](https://github.com/Sv443-Network/UserUtils#compress) - compress a string with Gzip or Deflate

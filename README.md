@@ -47,7 +47,7 @@ View the documentation of previous major releases:
     - [DataStore](#datastore) - class that manages a sync & async persistent JSON database, including data migration
     - [autoPlural()](#autoplural) - automatically pluralize a string
     - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
-    - [debounce()](#debounce) - call a function only once, after a given amount of time
+    - [debounce()](#debounce) - call a function only once in a series of calls, after or before a given timeout
     - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
     - [insertValues()](#insertvalues) - insert values into a string at specified placeholders
     - [compress()](#compress) - compress a string with Gzip or Deflate
@@ -1180,22 +1180,43 @@ async function run() {
 ### debounce()
 Usage:  
 ```ts
-debounce(func: Function, timeout?: number): Function
+debounce(func: Function, timeout?: number, edge?: "falling" | "rising"): Function
 ```
   
-Debounces a function, meaning that it will only be called once after a given amount of time.  
-This is very useful for functions that are called repeatedly, like event listeners, to remove extraneous calls.  
-All passed properties will be passed down to the debounced function.  
-The timeout will default to 300ms if left undefined.  
+Returns a debounced wrapper function, meaning that the given `func` will only be called once after or before a given amount of time.  
+This is very useful for functions that are called repeatedly, like event listeners, to remove a substantial amount of unnecessary calls.  
+All parameters passed to the returned function will be passed along to the input `func`  
+  
+The `timeout` will default to 300ms if left undefined.  
+  
+The `edge` ("falling" by default) determines if the function should be called after the timeout has passed or before it.  
+In simpler terms, this results in "falling" edge functions being called once at the very end of a sequence of calls, and "rising" edge functions being called once at the beginning and possibly multiple times following that, but at the very least they're spaced apart by what's passed in `timeout`.  
+  
+This diagram can hopefully help bring the difference across:  
+<details><summary><b>Click to view the diagram</b></summary>
+
+![debounce function edge diagram](./.github/assets/debounce.png)
+
+</details>
+
+<br>
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { debounce } from "@sv443-network/userutils";
 
+// uses "falling" edge by default:
 window.addEventListener("resize", debounce((event) => {
   console.log("Window was resized:", event);
 }, 500)); // 500ms timeout
+
+// using "rising" edge:
+const myFunc = debounce((event) => {
+  console.log("Body was scrolled:", event);
+}, 100, "rising"); // 100ms timeout
+
+document.body.addEventListener("scroll", myFunc);
 ```
 
 </details>

@@ -53,12 +53,24 @@ export function pauseFor(time: number) {
 /**
  * Calls the passed {@linkcode func} after the specified {@linkcode timeout} in ms (defaults to 300).  
  * Any subsequent calls to this function will reset the timer and discard all previous calls.
+ * @param func The function to call after the timeout
+ * @param timeout The time in ms to wait before calling the function
+ * @param edge Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default)
  */
-export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(func: TFunc, timeout = 300) { // eslint-disable-line @typescript-eslint/no-explicit-any
-  let timer: number | undefined;
+export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(func: TFunc, timeout = 300, edge: "rising" | "falling" = "falling") { // eslint-disable-line @typescript-eslint/no-explicit-any
+  let timer: NodeJS.Timeout | undefined;
+
   return function(...args: TArgs[]) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), timeout) as unknown as number;
+    if(edge === "rising") {
+      if(!timer) {
+        func.apply(this, args);
+        timer = setTimeout(() => timer = undefined, timeout);
+      }
+    }
+    else {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), timeout);
+    }
   };
 }
 
