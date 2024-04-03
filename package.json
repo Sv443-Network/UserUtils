@@ -2,7 +2,7 @@
   "name": "@sv443-network/userutils",
   "libName": "UserUtils",
   "version": "6.2.0",
-  "description": "Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, manage persistent user configurations, modify the DOM more easily and more",
+  "description": "Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/lib/index.d.ts",

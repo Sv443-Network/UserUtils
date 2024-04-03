@@ -2,7 +2,7 @@
 
 <!-- #MARKER Description -->
 ## UserUtils
-Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, manage persistent user configurations, modify the DOM more easily and more.  
+Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
   
 Contains builtin TypeScript declarations. Fully web compatible and supports ESM and CJS imports and global declaration.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)

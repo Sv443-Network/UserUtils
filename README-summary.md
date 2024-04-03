@@ -1,5 +1,5 @@
 ## UserUtils
-Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, manage persistent user configurations, modify the DOM more easily and more.  
+Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
 Contains builtin TypeScript declarations. Fully web compatible and supports ESM and CJS imports and global declaration.  
 Licensed under the [MIT license.](https://github.com/Sv443-Network/UserUtils/blob/main/LICENSE.txt)  
   
