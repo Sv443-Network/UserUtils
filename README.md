@@ -159,6 +159,7 @@ Additionally, there are the following extra options:
 - `disableOnNoListeners` - whether to disable the SelectorObserver when there are no listeners left (defaults to false)
 - `enableOnAddListener` - whether to enable the SelectorObserver when a new listener is added (defaults to true)
 - `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
+- `defaultDebounceEdge` - can be set to "falling" (default) or "rising", to call the function at (rising) on the very first call and subsequent times after the given debounce time or (falling) the very last call after the debounce time passed with no new calls - [see `debounce()` for more info and a diagram](#debounce)
   
 ⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.
 
@@ -177,16 +178,19 @@ The listener will be called immediately if the selector already exists in the DO
 > This will also include elements that were already found in a previous listener call.  
 > If set to false (default), querySelector() will be used and only the first matching element will be returned.
   
-> If `options.continuous` is set to true, the listener will not be deregistered after it was called once (defaults to false).  
+> If `options.continuous` is set to true, this listener will not be deregistered after it was called once (defaults to false).  
 >   
-> ⚠️ You should keep usage of this option to a minimum, as it will cause the listener to be called every time the selector is *checked for and found* and this can stack up quite quickly.  
+> ⚠️ You should keep usage of this option to a minimum, as it will cause this listener to be called every time the selector is *checked for and found* and this can stack up quite quickly.  
 > ⚠️ You should try to only use this option on SelectorObserver instances that are scoped really low in the DOM tree to prevent as many selector checks as possible from being triggered.  
 > ⚠️ I also recommend always setting a debounce time (see constructor or below) if you use this option.
   
-> If `options.debounce` is set to a number above 0, the listener will be debounced by that amount of milliseconds (defaults to 0).  
-> E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of the listener will be executed.
+> If `options.debounce` is set to a number above 0, this listener will be debounced by that amount of milliseconds (defaults to 0).  
+> E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of this listener will be executed.
+
+> `options.debounceEdge` is set to "falling" by default, which means the debounce timer will start after the last call of this listener.  
+> If set to "rising", the debounce timer will start after the first call of this listener.
   
-> When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that the listener will return.  
+> When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that this listener will return.  
 > It will default to HTMLElement if left undefined.
   
 <br>
@@ -262,6 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
     attributeFilter: ["class", "style", "data-whatever"],
     // debounce all listeners by 100ms unless specified otherwise:
     defaultDebounce: 100,
+    // "rising" means listeners are called immediately and use the debounce as a timeout between subsequent calls - see the debounce() function for a better explanation
+    defaultDebounceEdge: "rising",
+    // other settings from the MutationObserver API can be set here too - see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options
   });
 
   barObserver.addListener("#my-element", {
@@ -273,6 +280,8 @@ document.addEventListener("DOMContentLoaded", () => {
   barObserver.addListener("#my-other-element", {
     // set the debounce higher than provided by the defaultDebounce property:
     debounce: 250,
+    // adjust the debounceEdge back to the default "falling" for this specific listener:
+    debounceEdge: "falling",
     listener: (element) => {
       console.log("Other element's attributes changed:", element);
     },
