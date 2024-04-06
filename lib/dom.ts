@@ -66,25 +66,30 @@ export function preloadImages(srcUrls: string[], rejects = false) {
 }
 
 /**
- * Creates an invisible anchor with a `_blank` target and clicks it.  
- * Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
- *   
- * This function has to be run in response to a user interaction event, else the browser might reject it.
+ * Tries to use `GM.openInTab` to open the given URL in a new tab, otherwise if the grant is not given, creates an invisible anchor element and clicks it.  
+ * For the fallback to work, this function needs to be run in response to a user interaction event, else the browser might reject it.
+ * @param href The URL to open in a new tab
+ * @param background If set to `true`, the tab will be opened in the background - set to `undefined` (default) to use the browser's default behavior
  */
-export function openInNewTab(href: string) {
-  const openElem = document.createElement("a");
-  Object.assign(openElem, {
-    className: "userutils-open-in-new-tab",
-    target: "_blank",
-    rel: "noopener noreferrer",
-    href,
-  });
-  openElem.style.display = "none";
+export function openInNewTab(href: string, background?: boolean) {
+  try {
+    GM.openInTab(href, background);
+  }
+  catch(e) {
+    const openElem = document.createElement("a");
+    Object.assign(openElem, {
+      className: "userutils-open-in-new-tab",
+      target: "_blank",
+      rel: "noopener noreferrer",
+      href,
+    });
+    openElem.style.display = "none";
 
-  document.body.appendChild(openElem);
-  openElem.click();
-  // timeout just to be safe
-  setTimeout(openElem.remove, 50);
+    document.body.appendChild(openElem);
+    openElem.click();
+    // timeout just to be safe
+    setTimeout(openElem.remove, 50);
+  }
 }
 
 /**

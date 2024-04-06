@@ -582,14 +582,14 @@ preloadImages([
 ### openInNewTab()
 Usage:  
 ```ts
-openInNewTab(url: string): void
+openInNewTab(url: string, background?: boolean): void
 ```
   
-Creates an invisible anchor with a `_blank` target and clicks it.  
-Contrary to `window.open()`, this has a lesser chance to get blocked by the browser's popup blocker and doesn't open the URL as a new window.  
-This function has to be run in response to a user interaction event, else the browser might reject it.  
+Tries to use `GM.openInTab` to open the given URL in a new tab, or as a fallback if the grant is not given, creates an invisible anchor element and clicks it.  
+If `background` is set to true, the tab will be opened in the background. Leave `undefined` to use the browser's default behavior.  
   
-⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+⚠️ Needs the `@grant GM.openInTab` directive, otherwise only the fallback behavior will be used and the warning below is extra important:  
+⚠️ For the fallback to work, this function needs to be run in response to a user interaction event, else the browser might reject it.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -597,7 +597,8 @@ This function has to be run in response to a user interaction event, else the br
 import { openInNewTab } from "@sv443-network/userutils";
 
 document.querySelector("#my-button").addEventListener("click", () => {
-  openInNewTab("https://example.org/");
+  // open in background:
+  openInNewTab("https://example.org/", true);
 });
 ```
 
