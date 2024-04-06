@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 6.3.0
+
+### Minor Changes
+
+- fa09004: Made `openInNewTab()` use `GM.openInTab` by default and fall back to the old behavior.
+  Also added `background` param to specify if the tab should get focus when opened.
+
 ## 6.2.0
 
 ### Minor Changes
