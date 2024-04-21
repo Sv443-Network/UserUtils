@@ -1675,7 +1675,6 @@ const barObject = {
 logSomething("foo");     // "Log: foo"
 logSomething(42);        // "Log: 42"
 logSomething(true);      // "Log: true"
-logSomething({});        // "Log: [object Object]"
 logSomething(Symbol(1)); // "Log: Symbol(1)"
 logSomething(fooObject); // "Log: hello world"
 
