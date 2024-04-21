@@ -440,7 +440,7 @@ getUnsafeWindow(): Window
 ```
   
 Returns the unsafeWindow object or falls back to the regular window object if the `@grant unsafeWindow` is not given.  
-Userscripts are sandboxed and do not have access to the regular window object, so this function is useful for websites that reject some events that were dispatched by the userscript.  
+Userscripts are sandboxed and do not have access to the regular window object, so this function is useful for websites that reject some events that were dispatched by the userscript, or userscripts that need to interact with other userscripts, and more.  
   
 <details><summary><b>Example - click to view</b></summary>
 
