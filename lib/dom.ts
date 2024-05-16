@@ -12,15 +12,6 @@ export function getUnsafeWindow() {
 }
 
 /**
- * Inserts {@linkcode afterElement} as a sibling just after the provided {@linkcode beforeElement}
- * @returns Returns the {@linkcode afterElement}
- */
-export function insertAfter(beforeElement: Element, afterElement: Element) {
-  beforeElement.parentNode?.insertBefore(afterElement, beforeElement.nextSibling);
-  return afterElement;
-}
-
-/**
  * Adds a parent container around the provided element
  * @returns Returns the new parent element
  */

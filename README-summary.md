@@ -27,7 +27,6 @@ or view the documentation of previous major releases:
 - DOM:
     - [SelectorObserver](https://github.com/Sv443-Network/UserUtils#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [getUnsafeWindow()](https://github.com/Sv443-Network/UserUtils#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - [insertAfter()](https://github.com/Sv443-Network/UserUtils#insertafter) - insert an element as a sibling after another element
     - [addParent()](https://github.com/Sv443-Network/UserUtils#addparent) - add a parent element around another element
     - [addGlobalStyle()](https://github.com/Sv443-Network/UserUtils#addglobalstyle) - add a global style to the page
     - [preloadImages()](https://github.com/Sv443-Network/UserUtils#preloadimages) - preload images into the browser cache for faster loading later on

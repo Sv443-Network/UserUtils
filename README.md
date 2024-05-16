@@ -28,7 +28,6 @@ View the documentation of previous major releases:
   - [**DOM:**](#dom)
     - [SelectorObserver](#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [getUnsafeWindow()](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - [insertAfter()](#insertafter) - insert an element as a sibling after another element
     - [addParent()](#addparent) - add a parent element around another element
     - [addGlobalStyle()](#addglobalstyle) - add a global style to the page
     - [preloadImages()](#preloadimages) - preload images into the browser cache for faster loading later on
@@ -457,34 +456,6 @@ const mouseEvent = new MouseEvent("mousemove", {
 });
 
 document.body.dispatchEvent(mouseEvent);
-```
-
-</details>
-
-<br>
-
-### insertAfter()
-Usage:  
-```ts
-insertAfter(beforeElement: Element, afterElement: Element): Element
-```
-  
-Inserts the element passed as `afterElement` as a sibling after the passed `beforeElement`.  
-The passed `afterElement` will be returned.  
-  
-⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { insertAfter } from "@sv443-network/userutils";
-
-// insert a <div> as a sibling next to an element
-const beforeElement = document.querySelector("#before");
-const afterElement = document.createElement("div");
-afterElement.innerText = "After";
-
-insertAfter(beforeElement, afterElement);
 ```
 
 </details>
