@@ -5,3 +5,4 @@ export * from "./math";
 export * from "./misc";
 export * from "./SelectorObserver";
 export * from "./translation";
+export * from "./types";
