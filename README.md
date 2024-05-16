@@ -1652,8 +1652,9 @@ They don't alter the runtime behavior of the code, but they can be used to make 
 
 ### Stringifiable
 This type describes any value that either is a string itself or can be converted to a string.  
-To be considered stringifiable, the object needs to have a `toString()` method that returns a string (all primitive types have this method).  
-This method allows not just explicit conversion by calling it, but also implicit conversion by passing it into the `String()` constructor or by interpolating it in a template string.  
+To be considered stringifiable, the object needs to have a `toString()` method that returns a string.  
+Most primitives have this method, but something like undefined or null does not (they can only be used in the `String()` constructor or string interpolation).  
+Having this method allows not just explicit conversion by calling it, but also implicit conversion by passing it into the `String()` constructor or by interpolating it in a template string.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1661,7 +1662,7 @@ This method allows not just explicit conversion by calling it, but also implicit
 import type { Stringifiable } from "@sv443-network/userutils";
 
 function logSomething(value: Stringifiable) {
-  console.log(`Log: ${value}`); // implicit conversion using `value.toString()`
+  console.log(`Log: ${value}`); // implicit conversion to a string
 }
 
 const fooObject = {
@@ -1678,7 +1679,7 @@ logSomething(true);      // "Log: true"
 logSomething(Symbol(1)); // "Log: Symbol(1)"
 logSomething(fooObject); // "Log: hello world"
 
-logSomething(barObject); // Type Error
+logSomething(barObject); // Type error
 ```
 
 </details>
