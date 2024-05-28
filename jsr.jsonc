@@ -1,0 +1,5 @@
+{
+  "name": "@sv443-network/userutils",
+  "version": "6.3.0",
+  "exports": "./lib/index.ts"
+}
