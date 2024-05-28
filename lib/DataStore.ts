@@ -117,7 +117,7 @@ export class DataStore<TData = any> {
       if(gmFmtVer < this.formatVersion && this.migrations)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
-      return { ...(this.cachedData = parsed) };
+      return this.cachedData = { ...parsed };
     }
     catch(err) {
       console.warn("Error while parsing JSON data, resetting it to the default value.", err);
