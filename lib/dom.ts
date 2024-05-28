@@ -1,7 +1,7 @@
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
-export function getUnsafeWindow() {
+export function getUnsafeWindow(): Window {
   try {
     // throws ReferenceError if the "@grant unsafeWindow" isn't present
     return unsafeWindow;
@@ -15,7 +15,7 @@ export function getUnsafeWindow() {
  * Adds a parent container around the provided element
  * @returns Returns the new parent element
  */
-export function addParent(element: Element, newParent: Element) {
+export function addParent<TElem extends Element, TParentElem extends Element>(element: TElem, newParent: TParentElem): TParentElem {
   const oldParent = element.parentNode;
 
   if(!oldParent)
@@ -33,7 +33,7 @@ export function addParent(element: Element, newParent: Element) {
  * @param style CSS string
  * @returns Returns the created style element
  */
-export function addGlobalStyle(style: string) {
+export function addGlobalStyle(style: string): HTMLStyleElement {
   const styleElem = document.createElement("style");
   styleElem.innerHTML = style;
   document.head.appendChild(styleElem);
@@ -45,8 +45,8 @@ export function addGlobalStyle(style: string) {
  * @param rejects If set to `true`, the returned PromiseSettledResults will contain rejections for any of the images that failed to load
  * @returns Returns an array of `PromiseSettledResult` - each resolved result will contain the loaded image element, while each rejected result will contain an `ErrorEvent`
  */
-export function preloadImages(srcUrls: string[], rejects = false) {
-  const promises = srcUrls.map(src => new Promise((res, rej) => {
+export function preloadImages(srcUrls: string[], rejects = false): Promise<PromiseSettledResult<HTMLImageElement>[]> {
+  const promises = srcUrls.map(src => new Promise<HTMLImageElement>((res, rej) => {
     const image = new Image();
     image.src = src;
     image.addEventListener("load", () => res(image));
@@ -89,11 +89,14 @@ export function openInNewTab(href: string, background?: boolean) {
  * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
  * Calling this function will set `Error.stackTraceLimit = 100` (if not already higher) to ensure the stack trace is preserved.
  */
-export function interceptEvent<TEvtObj extends EventTarget, TPredicateEvt extends Event>(
+export function interceptEvent<
+  TEvtObj extends EventTarget,
+  TPredicateEvt extends Event
+> (
   eventObject: TEvtObj,
   eventName: Parameters<TEvtObj["addEventListener"]>[0],
   predicate: (event: TPredicateEvt) => boolean = () => true,
-) {
+): void {
   // default is 25 on FF so this should hopefully be more than enough
   // @ts-ignore
   Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100);
@@ -125,12 +128,12 @@ export function interceptEvent<TEvtObj extends EventTarget, TPredicateEvt extend
 export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
   eventName: TEvtKey,
   predicate: (event: WindowEventMap[TEvtKey]) => boolean = () => true,
-) {  
+): void {  
   return interceptEvent(getUnsafeWindow(), eventName, predicate);
 }
 
 /** Checks if an element is scrollable in the horizontal and vertical directions */
-export function isScrollable(element: Element) {
+export function isScrollable(element: Element): Record<"vertical" | "horizontal", boolean> {
   const { overflowX, overflowY } = getComputedStyle(element);
   return {
     vertical: (overflowY === "scroll" || overflowY === "auto") && element.scrollHeight > element.clientHeight,
@@ -150,11 +153,11 @@ export function isScrollable(element: Element) {
 export function observeElementProp<
   TElem extends Element = HTMLElement,
   TPropKey extends keyof TElem = keyof TElem,
->(
+> (
   element: TElem,
   property: TPropKey,
   callback: (oldVal: TElem[TPropKey], newVal: TElem[TPropKey]) => void
-) {
+): void {
   const elementPrototype = Object.getPrototypeOf(element);
   // eslint-disable-next-line no-prototype-builtins
   if(elementPrototype.hasOwnProperty(property)) {
@@ -192,7 +195,7 @@ export function observeElementProp<
  */
 export function getSiblingsFrame<
   TSibling extends Element = HTMLElement,
->(
+> (
   refElement: Element,
   siblingAmount: number,
   refElementAlignment: "center-top" | "center-bottom" | "top" | "bottom" = "center-top",

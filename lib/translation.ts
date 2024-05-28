@@ -13,7 +13,7 @@ let curLang: string;
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-function tr(key: string, ...args: Stringifiable[]) {
+function tr(key: string, ...args: Stringifiable[]): string {
   if(!curLang)
     return key;
   const trText = trans[curLang]?.[key];
@@ -26,15 +26,15 @@ function tr(key: string, ...args: Stringifiable[]) {
   return trText;
 }
 
-tr.addLanguage = (language: string, translations: Record<string, string>) => {
+tr.addLanguage = (language: string, translations: Record<string, string>): void => {
   trans[language] = translations;
 };
 
-tr.setLanguage = (language: string) => {
+tr.setLanguage = (language: string): void => {
   curLang = language;
 };
 
-tr.getLanguage = () => {
+tr.getLanguage = (): string => {
   return curLang;
 };
 

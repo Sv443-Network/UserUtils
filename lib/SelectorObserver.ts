@@ -92,12 +92,12 @@ export class SelectorObserver {
     };
   }
 
-  private checkAllSelectors() {
+  private checkAllSelectors(): void {
     for(const [selector, listeners] of this.listenerMap.entries())
       this.checkSelector(selector, listeners);
   }
 
-  private checkSelector(selector: string, listeners: SelectorListenerOptions[]) {
+  private checkSelector(selector: string, listeners: SelectorListenerOptions[]): void {
     if(!this.enabled)
       return;
 
@@ -147,7 +147,7 @@ export class SelectorObserver {
    * @param [options.continuous] Whether to call the listener continuously instead of just once - default is false
    * @param [options.debounce] Whether to debounce the listener to reduce calls to `querySelector` or `querySelectorAll` - set undefined or <=0 to disable (default)
    */
-  public addListener<TElem extends Element = HTMLElement>(selector: string, options: SelectorListenerOptions<TElem>) {
+  public addListener<TElem extends Element = HTMLElement>(selector: string, options: SelectorListenerOptions<TElem>): void {
     options = { all: false, continuous: false, debounce: 0, ...options };
     if((options.debounce && options.debounce > 0) || (this.customOptions.defaultDebounce && this.customOptions.defaultDebounce > 0)) {
       options.listener = this.debounce(
@@ -168,7 +168,7 @@ export class SelectorObserver {
   }
 
   /** Disables the observation of the child elements */
-  public disable() {
+  public disable(): void {
     if(!this.enabled)
       return;
     this.enabled = false;
@@ -180,7 +180,7 @@ export class SelectorObserver {
    * @param immediatelyCheckSelectors Whether to immediately check if all previously registered selectors exist (default is true)
    * @returns Returns true when the observation was enabled, false otherwise (e.g. when the base element wasn't found)
    */
-  public enable(immediatelyCheckSelectors = true) {
+  public enable(immediatelyCheckSelectors = true): boolean {
     const baseElement = typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement;
     if(this.enabled || !baseElement)
       return false;
@@ -192,12 +192,12 @@ export class SelectorObserver {
   }
 
   /** Returns whether the observation of the child elements is currently enabled */
-  public isEnabled() {
+  public isEnabled(): boolean {
     return this.enabled;
   }
 
   /** Removes all listeners that have been registered with {@linkcode addListener()} */
-  public clearListeners() {
+  public clearListeners(): void {
     this.listenerMap.clear();
   }
 
@@ -205,7 +205,7 @@ export class SelectorObserver {
    * Removes all listeners for the given {@linkcode selector} that have been registered with {@linkcode addListener()}
    * @returns Returns true when all listeners for the associated selector were found and removed, false otherwise
    */
-  public removeAllListeners(selector: string) {
+  public removeAllListeners(selector: string): boolean {
     return this.listenerMap.delete(selector);
   }
 
@@ -213,7 +213,7 @@ export class SelectorObserver {
    * Removes a single listener for the given {@linkcode selector} and {@linkcode options} that has been registered with {@linkcode addListener()}
    * @returns Returns true when the listener was found and removed, false otherwise
    */
-  public removeListener(selector: string, options: SelectorListenerOptions) {
+  public removeListener(selector: string, options: SelectorListenerOptions): boolean {
     const listeners = this.listenerMap.get(selector);
     if(!listeners)
       return false;
@@ -226,12 +226,12 @@ export class SelectorObserver {
   }
 
   /** Returns all listeners that have been registered with {@linkcode addListener()} */
-  public getAllListeners() {
+  public getAllListeners(): Map<string, SelectorListenerOptions<HTMLElement>[]> {
     return this.listenerMap;
   }
 
   /** Returns all listeners for the given {@linkcode selector} that have been registered with {@linkcode addListener()} */
-  public getListeners(selector: string) {
+  public getListeners(selector: string): SelectorListenerOptions<HTMLElement>[] | undefined {
     return this.listenerMap.get(selector);
   }
 }

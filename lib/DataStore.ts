@@ -135,7 +135,7 @@ export class DataStore<TData = any> {
   }
 
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
-  public setData(data: TData) {
+  public setData(data: TData): Promise<void> {
     this.cachedData = data;
     const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
@@ -149,7 +149,7 @@ export class DataStore<TData = any> {
   }
 
   /** Saves the default data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
-  public async saveDefaultData() {
+  public async saveDefaultData(): Promise<void> {
     this.cachedData = this.defaultData;
     const useEncoding = Boolean(this.encodeData && this.decodeData);
     return new Promise<void>(async (resolve) => {
@@ -169,7 +169,7 @@ export class DataStore<TData = any> {
    *   
    * ⚠️ This requires the additional directive `@grant GM.deleteValue`
    */
-  public async deleteData() {
+  public async deleteData(): Promise<void> {
     await Promise.all([
       GM.deleteValue(`_uucfg-${this.id}`),
       GM.deleteValue(`_uucfgver-${this.id}`),
@@ -215,7 +215,7 @@ export class DataStore<TData = any> {
   }
 
   /** Serializes the data using the optional this.encodeData() and returns it as a string */
-  private async serializeData(data: TData, useEncoding = true) {
+  private async serializeData(data: TData, useEncoding = true): Promise<string> {
     const stringData = JSON.stringify(data);
     if(!this.encodeData || !this.decodeData || !useEncoding)
       return stringData;
@@ -227,7 +227,7 @@ export class DataStore<TData = any> {
   }
 
   /** Deserializes the data using the optional this.decodeData() and returns it as a JSON object */
-  private async deserializeData(data: string, useEncoding = true) {
+  private async deserializeData(data: string, useEncoding = true): Promise<TData> {
     let decRes = this.decodeData && this.encodeData && useEncoding ? this.decodeData(data) : undefined;
     if(decRes instanceof Promise)
       decRes = await decRes;

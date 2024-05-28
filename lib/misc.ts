@@ -6,14 +6,14 @@ import type { Stringifiable } from "./types";
  * @param word A word in singular form, to auto-convert to plural
  * @param num If this is an array or NodeList, the amount of items is used
  */
-export function autoPlural(word: Stringifiable, num: number | unknown[] | NodeList) {
+export function autoPlural(word: Stringifiable, num: number | unknown[] | NodeList): string {
   if(Array.isArray(num) || num instanceof NodeList)
     num = num.length;
   return `${word}${num === 1 ? "" : "s"}`;
 }
 
 /** Pauses async execution for the specified time in ms */
-export function pauseFor(time: number) {
+export function pauseFor(time: number): Promise<void> {
   return new Promise<void>((res) => {
     setTimeout(() => res(), time);
   });
@@ -26,7 +26,14 @@ export function pauseFor(time: number) {
  * @param timeout The time in ms to wait before calling the function
  * @param edge Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default)
  */
-export function debounce<TFunc extends (...args: TArgs[]) => void, TArgs = any>(func: TFunc, timeout = 300, edge: "rising" | "falling" = "falling") { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function debounce<
+  TFunc extends (...args: TArgs[]) => void, // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TArgs = any,
+> (
+  func: TFunc,
+  timeout = 300,
+  edge: "rising" | "falling" = "falling"
+): (...args: TArgs[]) => void {
   let timer: NodeJS.Timeout | undefined;
 
   return function(...args: TArgs[]) {
@@ -53,7 +60,7 @@ export type FetchAdvancedOpts = Omit<
 >;
 
 /** Calls the fetch API with special options like a timeout */
-export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdvancedOpts = {}) {
+export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdvancedOpts = {}): Promise<Response> {
   const { timeout = 10000 } = options;
 
   let signalOpts: Partial<RequestInit> = {},
@@ -80,7 +87,7 @@ export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdva
  * @param input The string to insert the values into
  * @param values The values to insert, in order, starting at `%1`
  */
-export function insertValues(input: string, ...values: Stringifiable[]) {
+export function insertValues(input: string, ...values: Stringifiable[]): string {
   return input.replace(/%\d/gm, (match) => {
     const argIndex = Number(match.substring(1)) - 1;
     return (values[argIndex] ?? match)?.toString();

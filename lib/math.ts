@@ -1,5 +1,5 @@
 /** Ensures the passed {@linkcode value} always stays between {@linkcode min} and {@linkcode max} */
-export function clamp(value: number, min: number, max: number) {
+export function clamp(value: number, min: number, max: number): number {
   return Math.max(Math.min(value, max), min);
 }
 
@@ -7,7 +7,7 @@ export function clamp(value: number, min: number, max: number) {
  * Transforms the value parameter from the numerical range `range1min─range1max` to the numerical range `range2min─range2max`  
  * For example, you can map the value 2 in the range of 0-5 to the range of 0-10 and you'd get a 4 as a result.
  */
-export function mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number) {
+export function mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number {
   if(Number(range1min) === 0.0 && Number(range2min) === 0.0)
     return value * (range2max / range1max);
 
@@ -52,7 +52,7 @@ export function randRange(...args: number[]): number {
  * @param length The length of the ID to generate (defaults to 16)
  * @param radix The [radix](https://en.wikipedia.org/wiki/Radix) of each digit (defaults to 16 which is hexadecimal. Use 2 for binary, 10 for decimal, 36 for alphanumeric, etc.)
  */
-export function randomId(length = 16, radix = 16) {
+export function randomId(length = 16, radix = 16): string {
   const arr = new Uint8Array(length);
   crypto.getRandomValues(arr);
   return Array.from(

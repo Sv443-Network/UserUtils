@@ -4,7 +4,7 @@ import { randRange } from "./math";
 export type NonEmptyArray<TArray = unknown> = [TArray, ...TArray[]];
 
 /** Returns a random item from the passed array */
-export function randomItem<TItem = unknown>(array: TItem[]) {
+export function randomItem<TItem = unknown>(array: TItem[]): TItem | undefined {
   return randomItemIndex<TItem>(array)[0];
 }
 
@@ -22,7 +22,7 @@ export function randomItemIndex<TItem = unknown>(array: TItem[]): [item?: TItem,
 }
 
 /** Returns a random item from the passed array and mutates the array to remove the item */
-export function takeRandomItem<TItem = unknown>(arr: TItem[]) {
+export function takeRandomItem<TItem = unknown>(arr: TItem[]): TItem | undefined {
   const [itm, idx] = randomItemIndex<TItem>(arr);
 
   if(idx === undefined)
@@ -33,7 +33,7 @@ export function takeRandomItem<TItem = unknown>(arr: TItem[]) {
 }
 
 /** Returns a copy of the array with its items in a random order */
-export function randomizeArray<TItem = unknown>(array: TItem[]) {
+export function randomizeArray<TItem = unknown>(array: TItem[]): TItem[] {
   const retArray = [...array]; // so array and retArray don't point to the same memory address
 
   if(array.length === 0)
