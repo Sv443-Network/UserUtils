@@ -521,7 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ### preloadImages()
 Usage:  
 ```ts
-preloadImages(urls: string[], rejects?: boolean): Promise<void>
+preloadImages(urls: string[], rejects?: boolean): Promise<Array<PromiseSettledResult<HTMLImageElement>>>
 ```
   
 Preloads images into browser cache by creating an invisible `<img>` element for each URL passed.  
