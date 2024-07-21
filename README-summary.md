@@ -16,7 +16,6 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 <span style="font-size: 0.8em;">
 
 or view the documentation of previous major releases:  
-
 <a href="https://github.com/Sv443-Network/UserUtils/blob/v5.0.1/README.md" rel="noopener noreferrer">5.0.1</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v4.2.1/README.md" rel="noopener noreferrer">4.2.1</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md" rel="noopener noreferrer">3.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md" rel="noopener noreferrer">2.0.1</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md" rel="noopener noreferrer">1.2.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md" rel="noopener noreferrer">0.5.3</a>
 </span>
 
@@ -24,7 +23,7 @@ or view the documentation of previous major releases:
 
 <!-- https://github.com/Sv443-Network/UserUtils  < #foo    -->
 ## Feature Summary:
-- DOM:
+- **DOM:**
     - [SelectorObserver](https://github.com/Sv443-Network/UserUtils#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [getUnsafeWindow()](https://github.com/Sv443-Network/UserUtils#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
     - [addParent()](https://github.com/Sv443-Network/UserUtils#addparent) - add a parent element around another element
@@ -36,13 +35,13 @@ or view the documentation of previous major releases:
     - [isScrollable()](https://github.com/Sv443-Network/UserUtils#isscrollable) - check if an element has a horizontal or vertical scroll bar
     - [observeElementProp()](https://github.com/Sv443-Network/UserUtils#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
     - [getSiblingsFrame()](https://github.com/Sv443-Network/UserUtils#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
-- Math:
+- **Math:**
     - [clamp()](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
     - [mapRange()](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
     - [randRange()](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
     - [randomId()](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
-- Misc:
-    - [DataStore](https://github.com/Sv443-Network/UserUtils#DataStore) - class that manages a sync & async persistent JSON database, including data migration
+- **Misc:**
+    - [DataStore](https://github.com/Sv443-Network/UserUtils#datastore) - class that manages a sync & async persistent JSON database, including data migration
     - [autoPlural()](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
     - [pauseFor()](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
     - [debounce()](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once in a series of calls, after or before a given timeout
@@ -50,19 +49,21 @@ or view the documentation of previous major releases:
     - [insertValues()](https://github.com/Sv443-Network/UserUtils#insertvalues) - insert values into a string at specified placeholders
     - [compress()](https://github.com/Sv443-Network/UserUtils#compress) - compress a string with Gzip or Deflate
     - [decompress()](https://github.com/Sv443-Network/UserUtils#decompress) - decompress a previously compressed string
-- Arrays:
+- **Arrays:**
     - [randomItem()](https://github.com/Sv443-Network/UserUtils#randomitem) - returns a random item from an array
     - [randomItemIndex()](https://github.com/Sv443-Network/UserUtils#randomitemindex) - returns a tuple of a random item and its index from an array
     - [takeRandomItem()](https://github.com/Sv443-Network/UserUtils#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [randomizeArray()](https://github.com/Sv443-Network/UserUtils#randomizearray) - returns a copy of the array with its items in a random order
-- Translation:
+- **Translation:**
     - [tr()](https://github.com/Sv443-Network/UserUtils#tr) - simple translation of a string to another language
     - [tr.addLanguage()](https://github.com/Sv443-Network/UserUtils#traddlanguage) - add a language and its translations
-    - [tr.setLanguage()](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language
+    - [tr.setLanguage()](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language for translations
     - [tr.getLanguage()](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
-- Utility types for TypeScript
+- **Utility types for TypeScript:**
     - [Stringifiable](https://github.com/Sv443-Network/UserUtils#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
     - [NonEmptyArray](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
+    - [NonEmptyString](https://github.com/Sv443-Network/UserUtils#nonemptystring) - any string that should have at least one character
+    - [LooseUnion](https://github.com/Sv443-Network/UserUtils#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
 
 <br><br>
 
@@ -75,7 +76,7 @@ or view the documentation of previous major releases:
     ```ts
     import { addGlobalStyle } from "@sv443-network/userutils";
 
-    // or just import everything (not recommended because this doesn't allow for treeshaking):
+    // or just import everything (not recommended because of worse treeshaking support):
 
     import * as UserUtils from "@sv443-network/userutils";
     ```

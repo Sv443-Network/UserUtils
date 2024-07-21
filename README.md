@@ -79,7 +79,7 @@ View the documentation of previous major releases:
   ```ts
   import { addGlobalStyle } from "@sv443-network/userutils";
 
-  // or just import everything (not recommended because this doesn't allow for treeshaking):
+  // or just import everything (not recommended because of worse treeshaking support):
 
   import * as UserUtils from "@sv443-network/userutils";
   ```
