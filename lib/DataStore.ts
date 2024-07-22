@@ -55,22 +55,22 @@ export type DataStoreOptions<TData> = {
 });
 
 /**
- * Manages a sync & async persistent JSON database that is cached in memory and persistently saved across sessions.  
+ * Manages a hybrid synchronous & asynchronous persistent JSON database that is cached in memory and persistently saved across sessions using [GM storage.](https://wiki.greasespot.net/GM.setValue)  
  * Supports migrating data from older format versions to newer ones and populating the cache with default data if no persistent data is found.  
  *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
  * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
  * 
- * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `defaultData`) - this should also be the type of the data format associated with the current `formatVersion`
+ * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided) - **This has to be a JSON-compatible object!** (no undefined, circular references, etc.)
  */
-export class DataStore<TData = any> {
+export class DataStore<TData extends object = object> {
   public readonly id: string;
   public readonly formatVersion: number;
   public readonly defaultData: TData;
+  public readonly encodeData: DataStoreOptions<TData>["encodeData"];
+  public readonly decodeData: DataStoreOptions<TData>["decodeData"];
   private cachedData: TData;
   private migrations?: DataMigrationsDict;
-  private encodeData: DataStoreOptions<TData>["encodeData"];
-  private decodeData: DataStoreOptions<TData>["decodeData"];
 
   /**
    * Creates an instance of DataStore to manage a sync & async database that is cached in memory and persistently saved across sessions.  
@@ -81,7 +81,7 @@ export class DataStore<TData = any> {
    * 
    * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `options.defaultData`) - this should also be the type of the data format associated with the current `options.formatVersion`
    * @param options The options for this DataStore instance
-  */
+   */
   constructor(options: DataStoreOptions<TData>) {
     this.id = options.id;
     this.formatVersion = options.formatVersion;
@@ -100,7 +100,7 @@ export class DataStore<TData = any> {
   public async loadData(): Promise<TData> {
     try {
       const gmData = await GM.getValue(`_uucfg-${this.id}`, this.defaultData);
-      let gmFmtVer = Number(await GM.getValue(`_uucfgver-${this.id}`));
+      let gmFmtVer = Number(await GM.getValue(`_uucfgver-${this.id}`, NaN));
 
       if(typeof gmData !== "string") {
         await this.saveDefaultData();
@@ -109,15 +109,22 @@ export class DataStore<TData = any> {
 
       const isEncoded = await GM.getValue(`_uucfgenc-${this.id}`, false);
 
-      if(isNaN(gmFmtVer))
+      let saveData = false;
+      if(isNaN(gmFmtVer)) {
         await GM.setValue(`_uucfgver-${this.id}`, gmFmtVer = this.formatVersion);
+        saveData = true;
+      }
 
       let parsed = await this.deserializeData(gmData, isEncoded);
 
       if(gmFmtVer < this.formatVersion && this.migrations)
         parsed = await this.runMigrations(parsed, gmFmtVer);
 
-      return this.cachedData = { ...parsed };
+      if(saveData)
+        await this.setData(parsed);
+
+      this.cachedData = { ...parsed };
+      return this.cachedData;
     }
     catch(err) {
       console.warn("Error while parsing JSON data, resetting it to the default value.", err);
@@ -137,7 +144,7 @@ export class DataStore<TData = any> {
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
   public setData(data: TData): Promise<void> {
     this.cachedData = data;
-    const useEncoding = Boolean(this.encodeData && this.decodeData);
+    const useEncoding = this.encodingEnabled();
     return new Promise<void>(async (resolve) => {
       await Promise.all([
         GM.setValue(`_uucfg-${this.id}`, await this.serializeData(data, useEncoding)),
@@ -151,7 +158,7 @@ export class DataStore<TData = any> {
   /** Saves the default data passed in the constructor synchronously to the in-memory cache and asynchronously to persistent storage */
   public async saveDefaultData(): Promise<void> {
     this.cachedData = this.defaultData;
-    const useEncoding = Boolean(this.encodeData && this.decodeData);
+    const useEncoding = this.encodingEnabled();
     return new Promise<void>(async (resolve) => {
       await Promise.all([
         GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultData, useEncoding)),
@@ -177,8 +184,14 @@ export class DataStore<TData = any> {
     ]);
   }
 
-  /** Runs all necessary migration functions consecutively - may be overwritten in a subclass */
-  protected async runMigrations(oldData: any, oldFmtVer: number): Promise<TData> {
+  /**
+   * Runs all necessary migration functions consecutively and saves the result to the in-memory cache and persistent storage and also returns it.  
+   * This method is automatically called by {@linkcode loadData()} if the data format has changed since the last time the data was saved.  
+   * Though calling this method manually is not necessary, it can be useful if you want to run migrations for special occasions like a user importing potentially outdated data that has been previously exported.  
+   *   
+   * If one of the migrations fails, the data will be reset to the default value if `resetOnError` is set to `true` (default). Otherwise, an error will be thrown and no data will be saved.
+   */
+  public async runMigrations(oldData: any, oldFmtVer: number, resetOnError = true): Promise<TData> {
     if(!this.migrations)
       return oldData as TData;
 
@@ -197,6 +210,9 @@ export class DataStore<TData = any> {
           lastFmtVer = oldFmtVer = ver;
         }
         catch(err) {
+          if(!resetOnError)
+            throw new Error(`Error while running migration function for format version '${fmtVer}'`);
+
           console.error(`Error while running migration function for format version '${fmtVer}' - resetting to the default value.`, err);
 
           await this.saveDefaultData();
@@ -208,10 +224,15 @@ export class DataStore<TData = any> {
     await Promise.all([
       GM.setValue(`_uucfg-${this.id}`, await this.serializeData(newData)),
       GM.setValue(`_uucfgver-${this.id}`, lastFmtVer),
-      GM.setValue(`_uucfgenc-${this.id}`, Boolean(this.encodeData && this.decodeData)),
+      GM.setValue(`_uucfgenc-${this.id}`, this.encodingEnabled()),
     ]);
 
-    return newData as TData;
+    return this.cachedData = { ...newData as TData };
+  }
+
+  /** Returns whether encoding and decoding are enabled for this DataStore instance */
+  public encodingEnabled(): this is Required<Pick<DataStoreOptions<TData>, "encodeData" | "decodeData">> {
+    return Boolean(this.encodeData && this.decodeData);
   }
 
   /** Serializes the data using the optional this.encodeData() and returns it as a string */
@@ -228,7 +249,7 @@ export class DataStore<TData = any> {
 
   /** Deserializes the data using the optional this.decodeData() and returns it as a JSON object */
   private async deserializeData(data: string, useEncoding = true): Promise<TData> {
-    let decRes = this.decodeData && this.encodeData && useEncoding ? this.decodeData(data) : undefined;
+    let decRes = this.encodingEnabled() && useEncoding ? this.decodeData(data) : undefined;
     if(decRes instanceof Promise)
       decRes = await decRes;
 

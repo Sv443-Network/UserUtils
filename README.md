@@ -1007,6 +1007,14 @@ Fully deletes the data from persistent storage.
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
 If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
 ⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
+  
+`runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
+Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
+If `resetOnError` is set to `false`, the migration will be aborted if an error is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.  
+  
+`encodingEnabled(): boolean`  
+Returns `true` if both `options.encodeData` and `options.decodeData` are set, else `false`.  
+Uses TypeScript's type guard notation for easier use in conditional statements.
 
 <br>
 
