@@ -1,4 +1,4 @@
-import { randRange } from "./math";
+import { randRange } from "./math.js";
 
 /** Describes an array with at least one item */
 export type NonEmptyArray<TArray = unknown> = [TArray, ...TArray[]];

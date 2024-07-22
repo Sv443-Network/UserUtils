@@ -1,5 +1,5 @@
-import { getUnsafeWindow } from "./dom";
-import type { Stringifiable } from "./types";
+import { getUnsafeWindow } from "./dom.js";
+import type { Stringifiable } from "./types.js";
 
 /**
  * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1

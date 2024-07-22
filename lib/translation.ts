@@ -1,5 +1,5 @@
-import { insertValues } from "./misc";
-import type { Stringifiable } from "./types";
+import { insertValues } from "./misc.js";
+import type { Stringifiable } from "./types.js";
 
 /** Trans rights! 🏳️‍⚧️ */
 const trans: Record<string, Record<string, string>> = {};

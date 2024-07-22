@@ -1,4 +1,4 @@
-import { getUnsafeWindow, type DataStore } from ".";
+import { getUnsafeWindow, type DataStore } from "./index.js";
 
 export type DataStoreSerializerOptions = {
   /** Whether to add a checksum to the exported data */

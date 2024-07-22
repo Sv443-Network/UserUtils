@@ -1,4 +1,4 @@
-import { debounce } from "./misc";
+import { debounce } from "./misc.js";
 
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
 export type SelectorListenerOptions<TElem extends Element = HTMLElement> = SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>;
