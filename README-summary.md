@@ -39,7 +39,6 @@ or view the documentation of previous major releases:
     - [`clamp()`](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
     - [`mapRange()`](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
     - [`randRange()`](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
-    - [`randomId()`](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
 - **Misc:**
     - [`DataStore`](https://github.com/Sv443-Network/UserUtils#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
@@ -51,6 +50,7 @@ or view the documentation of previous major releases:
     - [`compress()`](https://github.com/Sv443-Network/UserUtils#compress) - compress a string with Gzip or Deflate
     - [`decompress()`](https://github.com/Sv443-Network/UserUtils#decompress) - decompress a previously compressed string
     - [`computeHash()`](https://github.com/Sv443-Network/UserUtils#computehash) - compute the hash / checksum of a string or ArrayBuffer
+    - [`randomId()`](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
 - **Arrays:**
     - [`randomItem()`](https://github.com/Sv443-Network/UserUtils#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](https://github.com/Sv443-Network/UserUtils#randomitemindex) - returns a tuple of a random item and its index from an array

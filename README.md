@@ -41,7 +41,6 @@ View the documentation of previous major releases:
     - [`clamp()`](#clamp) - constrain a number between a min and max value
     - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
     - [`randRange()`](#randrange) - generate a random number between a min and max boundary
-    - [`randomId()`](#randomid) - generate a random ID of a given length and radix
   - [**Misc:**](#misc)
     - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
@@ -53,6 +52,7 @@ View the documentation of previous major releases:
     - [`compress()`](#compress) - compress a string with Gzip or Deflate
     - [`decompress()`](#decompress) - decompress a previously compressed string
     - [`computeHash()`](#computehash) - compute the hash / checksum of a string or ArrayBuffer
+    - [`randomId()`](#randomid) - generate a random ID of a given length and radix
   - [**Arrays:**](#arrays)
     - [`randomItem()`](#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
@@ -928,36 +928,6 @@ randRange(10);     // 7
 
 </details>
 
-<br>
-
-### randomId()
-Usage:  
-```ts
-randomId(length?: number, radix?: number): string
-```
-  
-Generates a cryptographically strong random ID of a given length and [radix (base).](https://en.wikipedia.org/wiki/Radix)  
-Uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for generating the random numbers.  
-⚠️ This is not intended for generating encryption keys, only for generating IDs with a decent amount of entropy!  
-  
-The default length is 16 and the default radix is 16 (hexadecimal).  
-You may change the radix to get digits from different numerical systems.  
-Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alphanumeric.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { randomId } from "@sv443-network/userutils";
-
-randomId();       // "1bda419a73629d4f" (length 16, radix 16)
-randomId(10);     // "f86cd354a4"       (length 10, radix 16)
-randomId(10, 2);  // "1010001101"       (length 10, radix 2)
-randomId(10, 10); // "0183428506"       (length 10, radix 10)
-randomId(10, 36); // "z46jfpa37r"       (length 10, radix 36)
-```
-
-</details>
-
 <br><br>
 
 <!-- #SECTION Misc -->
@@ -1524,6 +1494,39 @@ async function run() {
 
 run();
 ```
+</details>
+
+<br>
+
+### randomId()
+Usage:  
+```ts
+randomId(length?: number, radix?: number, enhancedEntropy?: boolean): string
+```
+  
+Generates a random ID of a given length and [radix (base).](https://en.wikipedia.org/wiki/Radix)  
+  
+The default length is 16 and the default radix is 16 (hexadecimal).  
+You may change the radix to get digits from different numerical systems.  
+Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alphanumeric.  
+  
+If `enhancedEntropy` is set to true (false by default), the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) is used for generating the random numbers.  
+Note that this takes MUCH longer, but the generated IDs will have a higher entropy.  
+  
+⚠️ Not suitable for generating anything related to cryptography! Use [SubtleCrypto's `generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that instead.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { randomId } from "@sv443-network/userutils";
+
+randomId();       // "1bda419a73629d4f" (length 16, radix 16)
+randomId(10);     // "f86cd354a4"       (length 10, radix 16)
+randomId(10, 2);  // "1010001101"       (length 10, radix 2)
+randomId(10, 10); // "0183428506"       (length 10, radix 10)
+randomId(10, 36); // "z46jfpa37r"       (length 10, radix 36)
+```
+
 </details>
 
 <br><br>

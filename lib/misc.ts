@@ -1,4 +1,5 @@
 import { getUnsafeWindow } from "./dom.js";
+import { mapRange } from "./math.js";
 import type { Stringifiable } from "./types.js";
 
 /**
@@ -157,4 +158,28 @@ export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-
   const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
 
   return hashHex;
+}
+
+/**
+ * Generates a random ID with the specified length and radix (16 characters and hexadecimal by default)  
+ *   
+ * ⚠️ Not suitable for generating anything related to cryptography! Use [SubtleCrypto's `generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that instead.
+ * @param length The length of the ID to generate (defaults to 16)
+ * @param radix The [radix](https://en.wikipedia.org/wiki/Radix) of each digit (defaults to 16 which is hexadecimal. Use 2 for binary, 10 for decimal, 36 for alphanumeric, etc.)
+ * @param enhancedEntropy If set to true, uses [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for better cryptographic randomness (this also makes it take MUCH longer to generate)  
+ */
+export function randomId(length = 16, radix = 16, enhancedEntropy = false): string {
+  if(enhancedEntropy) {
+    const arr = new Uint8Array(length);
+    crypto.getRandomValues(arr);
+    return Array.from(
+      arr,
+      (v) => mapRange(v, 0, 255, 0, radix).toString(radix).substring(0, 1),
+    ).join("");
+  }
+
+  return Array.from(
+    { length },
+    () => Math.floor(Math.random() * radix).toString(radix),
+  ).join("");
 }
