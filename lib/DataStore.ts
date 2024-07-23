@@ -58,6 +58,9 @@ export type DataStoreOptions<TData> = {
  * Manages a hybrid synchronous & asynchronous persistent JSON database that is cached in memory and persistently saved across sessions using [GM storage.](https://wiki.greasespot.net/GM.setValue)  
  * Supports migrating data from older format versions to newer ones and populating the cache with default data if no persistent data is found.  
  *   
+ * All methods are at least `protected`, so you can easily extend this class and overwrite them to use a different storage method or to add additional functionality.  
+ * Remember that you can call `super.methodName()` in the subclass to access the original method.  
+ *   
  * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
  * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
  * 
@@ -99,19 +102,19 @@ export class DataStore<TData extends object = object> {
    */
   public async loadData(): Promise<TData> {
     try {
-      const gmData = await GM.getValue(`_uucfg-${this.id}`, this.defaultData);
-      let gmFmtVer = Number(await GM.getValue(`_uucfgver-${this.id}`, NaN));
+      const gmData = await this.getValue(`_uucfg-${this.id}`, this.defaultData);
+      let gmFmtVer = Number(await this.getValue(`_uucfgver-${this.id}`, NaN));
 
       if(typeof gmData !== "string") {
         await this.saveDefaultData();
         return { ...this.defaultData };
       }
 
-      const isEncoded = await GM.getValue(`_uucfgenc-${this.id}`, false);
+      const isEncoded = await this.getValue(`_uucfgenc-${this.id}`, false);
 
       let saveData = false;
       if(isNaN(gmFmtVer)) {
-        await GM.setValue(`_uucfgver-${this.id}`, gmFmtVer = this.formatVersion);
+        await this.setValue(`_uucfgver-${this.id}`, gmFmtVer = this.formatVersion);
         saveData = true;
       }
 
@@ -136,9 +139,12 @@ export class DataStore<TData extends object = object> {
   /**
    * Returns a copy of the data from the in-memory cache.  
    * Use {@linkcode loadData()} to get fresh data from persistent storage (usually not necessary since the cache should always exactly reflect persistent storage).
+   * @param deepCopy Whether to return a deep copy of the data (default: `false`) - only necessary if your data object is nested and may have a bigger performance impact if enabled
    */
-  public getData(): TData {
-    return this.deepCopy(this.cachedData);
+  public getData(deepCopy = false): TData {
+    return deepCopy
+      ? this.deepCopy(this.cachedData)
+      : { ...this.cachedData };
   }
 
   /** Saves the data synchronously to the in-memory cache and asynchronously to the persistent storage */
@@ -147,9 +153,9 @@ export class DataStore<TData extends object = object> {
     const useEncoding = this.encodingEnabled();
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(data, useEncoding)),
-        GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
-        GM.setValue(`_uucfgenc-${this.id}`, useEncoding),
+        this.setValue(`_uucfg-${this.id}`, await this.serializeData(data, useEncoding)),
+        this.setValue(`_uucfgver-${this.id}`, this.formatVersion),
+        this.setValue(`_uucfgenc-${this.id}`, useEncoding),
       ]);
       resolve();
     });
@@ -161,9 +167,9 @@ export class DataStore<TData extends object = object> {
     const useEncoding = this.encodingEnabled();
     return new Promise<void>(async (resolve) => {
       await Promise.all([
-        GM.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultData, useEncoding)),
-        GM.setValue(`_uucfgver-${this.id}`, this.formatVersion),
-        GM.setValue(`_uucfgenc-${this.id}`, useEncoding),
+        this.setValue(`_uucfg-${this.id}`, await this.serializeData(this.defaultData, useEncoding)),
+        this.setValue(`_uucfgver-${this.id}`, this.formatVersion),
+        this.setValue(`_uucfgenc-${this.id}`, useEncoding),
       ]);
       resolve();
     });
@@ -178,9 +184,9 @@ export class DataStore<TData extends object = object> {
    */
   public async deleteData(): Promise<void> {
     await Promise.all([
-      GM.deleteValue(`_uucfg-${this.id}`),
-      GM.deleteValue(`_uucfgver-${this.id}`),
-      GM.deleteValue(`_uucfgenc-${this.id}`),
+      this.deleteValue(`_uucfg-${this.id}`),
+      this.deleteValue(`_uucfgver-${this.id}`),
+      this.deleteValue(`_uucfgenc-${this.id}`),
     ]);
   }
 
@@ -222,9 +228,9 @@ export class DataStore<TData extends object = object> {
     }
 
     await Promise.all([
-      GM.setValue(`_uucfg-${this.id}`, await this.serializeData(newData)),
-      GM.setValue(`_uucfgver-${this.id}`, lastFmtVer),
-      GM.setValue(`_uucfgenc-${this.id}`, this.encodingEnabled()),
+      this.setValue(`_uucfg-${this.id}`, await this.serializeData(newData)),
+      this.setValue(`_uucfgver-${this.id}`, lastFmtVer),
+      this.setValue(`_uucfgenc-${this.id}`, this.encodingEnabled()),
     ]);
 
     return this.cachedData = { ...newData as TData };
@@ -236,9 +242,9 @@ export class DataStore<TData extends object = object> {
   }
 
   /** Serializes the data using the optional this.encodeData() and returns it as a string */
-  private async serializeData(data: TData, useEncoding = true): Promise<string> {
+  protected async serializeData(data: TData, useEncoding = true): Promise<string> {
     const stringData = JSON.stringify(data);
-    if(!this.encodeData || !this.decodeData || !useEncoding)
+    if(!this.encodingEnabled() || !useEncoding)
       return stringData;
 
     const encRes = this.encodeData(stringData);
@@ -248,7 +254,7 @@ export class DataStore<TData extends object = object> {
   }
 
   /** Deserializes the data using the optional this.decodeData() and returns it as a JSON object */
-  private async deserializeData(data: string, useEncoding = true): Promise<TData> {
+  protected async deserializeData(data: string, useEncoding = true): Promise<TData> {
     let decRes = this.encodingEnabled() && useEncoding ? this.decodeData(data) : undefined;
     if(decRes instanceof Promise)
       decRes = await decRes;
@@ -256,8 +262,23 @@ export class DataStore<TData extends object = object> {
     return JSON.parse(decRes ?? data) as TData;
   }
 
-  /** Copies a JSON-compatible object and loses its internal references */
-  private deepCopy<T>(obj: T): T {
+  /** Copies a JSON-compatible object and loses all its internal references in the process */
+  protected deepCopy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
+  }
+
+  /** Gets a value from persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
+  protected async getValue<TValue = GM.Value>(name: string, defaultValue: TValue): Promise<TValue> {
+    return GM.getValue<TValue>(name, defaultValue);
+  }
+
+  /** Sets a value in persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
+  protected async setValue(name: string, value: GM.Value): Promise<void> {
+    return GM.setValue(name, value);
+  }
+
+  /** Deletes a value from persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
+  protected async deleteValue(name: string): Promise<void> {
+    return GM.deleteValue(name);
   }
 }

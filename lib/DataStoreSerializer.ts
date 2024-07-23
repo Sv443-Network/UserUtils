@@ -1,4 +1,4 @@
-import { getUnsafeWindow, type DataStore } from "./index.js";
+import { getUnsafeWindow, computeHash, type DataStore } from "./index.js";
 
 export type DataStoreSerializerOptions = {
   /** Whether to add a checksum to the exported data */
@@ -23,7 +23,11 @@ export type SerializedDataStore = {
 
 /**
  * Allows for easy serialization and deserialization of multiple DataStore instances.  
- * Needs to run in a secure context (HTTPS) due to the use of the Web Crypto API.
+ *   
+ * All methods are at least `protected`, so you can easily extend this class and overwrite them to use a different storage method or to add additional functionality.  
+ * Remember that you can call `super.methodName()` in the subclass to access the original method.  
+ *   
+ * ⚠️ Needs to run in a secure context (HTTPS) due to the use of the Web Crypto API.  
  */
 export class DataStoreSerializer {
   protected stores: DataStore[];
@@ -43,31 +47,23 @@ export class DataStoreSerializer {
 
   /** Calculates the checksum of a string */
   protected async calcChecksum(input: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
-
-    return hashHex;
+    return computeHash(input, "SHA-256");
   }
 
   /** Serializes a DataStore instance */
-  protected async serializeStore(store: DataStore): Promise<SerializedDataStore> {
-    const data = store.encodingEnabled()
-      ? await store.encodeData(JSON.stringify(store.getData()))
-      : JSON.stringify(store.getData());
+  protected async serializeStore(storeInst: DataStore): Promise<SerializedDataStore> {
+    const data = storeInst.encodingEnabled()
+      ? await storeInst.encodeData(JSON.stringify(storeInst.getData()))
+      : JSON.stringify(storeInst.getData());
     const checksum = this.options.addChecksum
       ? await this.calcChecksum(data)
       : undefined;
 
     return {
-      id: store.id,
+      id: storeInst.id,
       data,
-      formatVersion: store.formatVersion,
-      encoded: store.encodingEnabled(),
+      formatVersion: storeInst.formatVersion,
+      encoded: storeInst.encodingEnabled(),
       checksum,
     };
   }
@@ -104,14 +100,10 @@ export class DataStoreSerializer {
         ? await storeInst.decodeData(storeData.data)
         : storeData.data;
 
-      if(storeData.formatVersion && !isNaN(Number(storeData.formatVersion)) && Number(storeData.formatVersion) < storeInst.formatVersion) {
-        console.log("[BetterYTM/#DEBUG] UU - running migrations");
+      if(storeData.formatVersion && !isNaN(Number(storeData.formatVersion)) && Number(storeData.formatVersion) < storeInst.formatVersion)
         await storeInst.runMigrations(JSON.parse(decodedData), Number(storeData.formatVersion), false);
-      }
-      else {
-        console.log("[BetterYTM/#DEBUG] UU - setting directly", JSON.parse(decodedData));
+      else
         await storeInst.setData(JSON.parse(decodedData));
-      }
     }
   }
 }
