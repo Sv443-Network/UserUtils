@@ -1,5 +1,8 @@
 import { debounce } from "./misc.js";
 
+let domLoaded = false;
+document.addEventListener("DOMContentLoaded", () => domLoaded = true);
+
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
 export type SelectorListenerOptions<TElem extends Element = HTMLElement> = SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>;
 
@@ -38,6 +41,8 @@ export type SelectorObserverOptions = {
   disableOnNoListeners?: boolean;
   /** Whether to ensure the observer is enabled when a new listener is added - default is true */
   enableOnAddListener?: boolean;
+  /** If set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored */
+  checkInterval?: number;
 };
 
 export type SelectorObserverConstructorOptions = MutationObserverInit & SelectorObserverOptions;
@@ -46,7 +51,7 @@ export type SelectorObserverConstructorOptions = MutationObserverInit & Selector
 export class SelectorObserver {
   private enabled = false;
   private baseElement: Element | string;
-  private observer: MutationObserver;
+  private observer?: MutationObserver;
   private observerOptions: MutationObserverInit;
   private customOptions: SelectorObserverOptions;
   private listenerMap: Map<string, SelectorListenerOptions[]>;
@@ -67,8 +72,6 @@ export class SelectorObserver {
     this.baseElement = baseElement;
 
     this.listenerMap = new Map<string, SelectorListenerOptions[]>();
-    // if the arrow func isn't there, `this` will be undefined in the callback
-    this.observer = new MutationObserver(() => this.checkAllSelectors());
 
     const {
       defaultDebounce,
@@ -90,9 +93,21 @@ export class SelectorObserver {
       disableOnNoListeners: disableOnNoListeners ?? false,
       enableOnAddListener: enableOnAddListener ?? true,
     };
+
+    if(typeof this.customOptions.checkInterval !== "number") {
+      // if the arrow func isn't there, `this` will be undefined in the callback
+      this.observer = new MutationObserver(() => this.checkAllSelectors());
+    }
+    else {
+      this.checkAllSelectors();
+      setInterval(() => this.checkAllSelectors(), this.customOptions.checkInterval);
+    }
   }
 
   private checkAllSelectors(): void {
+    if(!this.enabled || !domLoaded)
+      return;
+
     for(const [selector, listeners] of this.listenerMap.entries())
       this.checkSelector(selector, listeners);
   }
@@ -172,7 +187,7 @@ export class SelectorObserver {
     if(!this.enabled)
       return;
     this.enabled = false;
-    this.observer.disconnect();
+    this.observer?.disconnect();
   }
 
   /**
@@ -185,7 +200,7 @@ export class SelectorObserver {
     if(this.enabled || !baseElement)
       return false;
     this.enabled = true;
-    this.observer.observe(baseElement, this.observerOptions);
+    this.observer?.observe(baseElement, this.observerOptions);
     if(immediatelyCheckSelectors)
       this.checkAllSelectors();
     return true;

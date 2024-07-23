@@ -146,7 +146,8 @@ new SelectorObserver(baseElementSelector: string, options?: SelectorObserverOpti
 ```
 
 A class that manages listeners that are called when elements at given selectors are found in the DOM.  
-This is useful for userscripts that need to wait for elements to be added to the DOM at an indeterminate point in time before they can be interacted with.  
+It is useful for userscripts that need to wait for elements to be added to the DOM at an indeterminate point in time before they can be interacted with.  
+By default, it uses the MutationObserver API to observe for any element changes, and as such is highly customizable, but can also be configured to run on a fixed interval.  
   
 The constructor takes a `baseElement`, which is a parent of the elements you want to observe.  
 If a selector string is passed instead, it will be used to find the element.  
@@ -161,6 +162,7 @@ Additionally, there are the following extra options:
 - `enableOnAddListener` - whether to enable the SelectorObserver when a new listener is added (defaults to true)
 - `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
 - `defaultDebounceEdge` - can be set to "falling" (default) or "rising", to call the function at (rising) on the very first call and subsequent times after the given debounce time or (falling) the very last call after the debounce time passed with no new calls - [see `debounce()` for more info and a diagram](#debounce)
+- `checkInterval` - if set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored
   
 ⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.
 
