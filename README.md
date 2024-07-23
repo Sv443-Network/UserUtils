@@ -26,46 +26,47 @@ View the documentation of previous major releases:
 - [**License**](#license)
 - [**Features**](#features)
   - [**DOM:**](#dom)
-    - [SelectorObserver](#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
-    - [getUnsafeWindow()](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - [addParent()](#addparent) - add a parent element around another element
-    - [addGlobalStyle()](#addglobalstyle) - add a global style to the page
-    - [preloadImages()](#preloadimages) - preload images into the browser cache for faster loading later on
-    - [openInNewTab()](#openinnewtab) - open a link in a new tab
-    - [interceptEvent()](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-    - [interceptWindowEvent()](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-    - [isScrollable()](#isscrollable) - check if an element has a horizontal or vertical scroll bar
-    - [observeElementProp()](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
-    - [getSiblingsFrame()](#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+    - [`SelectorObserver`](#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
+    - [`getUnsafeWindow()`](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - [`addParent()`](#addparent) - add a parent element around another element
+    - [`addGlobalStyle()`](#addglobalstyle) - add a global style to the page
+    - [`preloadImages()`](#preloadimages) - preload images into the browser cache for faster loading later on
+    - [`openInNewTab()`](#openinnewtab) - open a link in a new tab
+    - [`interceptEvent()`](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+    - [`interceptWindowEvent()`](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+    - [`isScrollable()`](#isscrollable) - check if an element has a horizontal or vertical scroll bar
+    - [`observeElementProp()`](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - [`getSiblingsFrame()`](#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
   - [**Math:**](#math)
-    - [clamp()](#clamp) - constrain a number between a min and max value
-    - [mapRange()](#maprange) - map a number from one range to the same spot in another range
-    - [randRange()](#randrange) - generate a random number between a min and max boundary
-    - [randomId()](#randomid) - generate a random ID of a given length and radix
+    - [`clamp()`](#clamp) - constrain a number between a min and max value
+    - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
+    - [`randRange()`](#randrange) - generate a random number between a min and max boundary
+    - [`randomId()`](#randomid) - generate a random ID of a given length and radix
   - [**Misc:**](#misc)
-    - [DataStore](#datastore) - class that manages a sync & async persistent JSON database, including data migration
-    - [autoPlural()](#autoplural) - automatically pluralize a string
-    - [pauseFor()](#pausefor) - pause the execution of a function for a given amount of time
-    - [debounce()](#debounce) - call a function only once in a series of calls, after or before a given timeout
-    - [fetchAdvanced()](#fetchadvanced) - wrapper around the fetch API with a timeout option
-    - [insertValues()](#insertvalues) - insert values into a string at specified placeholders
-    - [compress()](#compress) - compress a string with Gzip or Deflate
-    - [decompress()](#decompress) - decompress a previously compressed string
+    - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
+    - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
+    - [`autoPlural()`](#autoplural) - automatically pluralize a string
+    - [`pauseFor()`](#pausefor) - pause the execution of a function for a given amount of time
+    - [`debounce()`](#debounce) - call a function only once in a series of calls, after or before a given timeout
+    - [`fetchAdvanced()`](#fetchadvanced) - wrapper around the fetch API with a timeout option
+    - [`insertValues()`](#insertvalues) - insert values into a string at specified placeholders
+    - [`compress()`](#compress) - compress a string with Gzip or Deflate
+    - [`decompress()`](#decompress) - decompress a previously compressed string
   - [**Arrays:**](#arrays)
-    - [randomItem()](#randomitem) - returns a random item from an array
-    - [randomItemIndex()](#randomitemindex) - returns a tuple of a random item and its index from an array
-    - [takeRandomItem()](#takerandomitem) - returns a random item from an array and mutates it to remove the item
-    - [randomizeArray()](#randomizearray) - returns a copy of the array with its items in a random order
+    - [`randomItem()`](#randomitem) - returns a random item from an array
+    - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
+    - [`takeRandomItem()`](#takerandomitem) - returns a random item from an array and mutates it to remove the item
+    - [`randomizeArray()`](#randomizearray) - returns a copy of the array with its items in a random order
   - [**Translation:**](#translation)
-    - [tr()](#tr) - simple translation of a string to another language
+    - [`tr()`](#tr) - simple translation of a string to another language
     - [tr.addLanguage()](#traddlanguage) - add a language and its translations
     - [tr.setLanguage()](#trsetlanguage) - set the currently active language for translations
     - [tr.getLanguage()](#trgetlanguage) - returns the currently active language
   - [**Utility types for TypeScript:**](#utility-types)
-    - [Stringifiable](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
-    - [NonEmptyArray](#nonemptyarray) - any array that should have at least one item
-    - [NonEmptyString](#nonemptystring) - any string that should have at least one character
-    - [LooseUnion](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
+    - [`Stringifiable`](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
+    - [`NonEmptyArray`](#nonemptyarray) - any array that should have at least one item
+    - [`NonEmptyString`](#nonemptystring) - any string that should have at least one character
+    - [`LooseUnion`](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
 
 <br><br>
 
@@ -971,6 +972,8 @@ A class that manages a sync & async JSON database that is persistently saved to 
 Also supports automatic migration of outdated data formats via provided migration functions.  
 You may create as many instances as you like as long as they have different IDs.  
   
+The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality.  
+  
 ⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save.  
 ⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
   
@@ -1109,6 +1112,149 @@ async function init() {
 init();
 ```
 
+</details>
+
+<br>
+
+### DataStoreSerializer
+Usage:  
+```ts
+new DataStoreSerializer(stores: DataStore[], options: DataStoreSerializerOptions)
+```
+
+A class that manages serializing and deserializing (exporting and importing) one to infinite DataStore instances.  
+The serialized data is a JSON string that can be saved to a file, copied to the clipboard, or stored in any other way.  
+Each DataStore instance's settings like data encoding are respected and saved next to the exported data.  
+Also, by default a checksum is calculated and importing data with a mismatching checksum will throw an error.  
+  
+The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality.  
+  
+⚠️ Needs to run in a secure context (HTTPS) due to the use of the Web Crypto API.  
+  
+The options object has the following properties:  
+| Property | Description |
+| :-- | :-- |
+| `addChecksum` | If set to `true` (default), a SHA-256 checksum will be calculated and saved with the serialized data. If set to `false`, no checksum will be calculated and saved. |
+| `ensureIntegrity` | If set to `true` (default), the checksum will be checked when importing data and an error will be thrown if it doesn't match. If set to `false`, the checksum will not be checked and no error will be thrown. If no checksum property exists on the imported data (because it wasn't enabled in a previous data format version), the checksum check will also be skipped. |
+
+<br>
+
+#### Methods:
+`constructor(stores: DataStore[], options?: DataStoreSerializerOptions)`  
+Creates a new DataStoreSerializer instance with the given DataStore instances and options.  
+If no options are passed, the defaults will be used.  
+  
+`serialize(): Promise<string>`  
+Serializes all DataStore instances passed in the constructor and returns the serialized data as a JSON string.  
+<details><summary>Click to view the structure of the returned data.</summary>  
+
+```jsonc
+[
+  {
+    "id": "foo-data",                               // the ID property given to the DataStore instance
+    "data": "eJyrVkrKTFeyUkrOKM1LLy1WqgUAMvAF6g==", // serialized data (may be compressed / encoded or not)
+    "formatVersion": 2,                             // the format version of the data
+    "encoded": true,                                // only set to true if both encodeData and decodeData are set in the DataStore instance
+    "checksum": "420deadbeef69",                    // property will be missing if addChecksum is set to false
+  },
+  {
+    // ...
+  }
+]
+```
+</details>  
+  
+`deserialize(data: string): Promise<void>`  
+Deserializes the given JSON string and imports the data into the DataStore instances.  
+In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.
+  
+If `ensureIntegrity` is set to `true` and the checksum doesn't match, an error will be thrown.  
+If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
+If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
+If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
+
+<br>
+
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { DataStore, DataStoreSerializer, compress, decompress } from "@sv443-network/userutils";
+
+/** This store doesn't have migrations to run and also has no encodeData and decodeData functions */
+const fooStore = new DataStore({
+  id: "foo-data",
+  defaultData: {
+    foo: "hello",
+  },
+  formatVersion: 1,
+});
+
+/** This store has migrations to run and also has encodeData and decodeData functions */
+const barStore = new DataStore({
+  id: "bar-data",
+  defaultData: {
+    foo: "hello",
+  },
+  formatVersion: 2,
+  migrations: {
+    2: (oldData) => ({
+      ...oldData,
+      bar: "world",
+    }),
+  },
+  encodeData: (data) => compress(data, "deflate-raw", "base64"),
+  decodeData: (data) => decompress(data, "deflate-raw", "base64"),
+});
+
+const serializer = new DataStoreSerializer([fooStore, barStore], {
+  addChecksum: true,
+  ensureIntegrity: true,
+});
+
+async function exportMyDataPls() {
+  const serializedData = await serializer.serialize();
+  // create file and download it:
+  const blob = new Blob([serializedData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `data_export-${new Date().toISOString()}.json`;
+  a.click();
+  a.remove();
+
+  // This function exports an object like this:
+  // [
+  //   {
+  //     "id": "foo-data",
+  //     "data": "{\"foo\":\"hello\"}", // not compressed or encoded because encodeData and decodeData are not set
+  //     "formatVersion": 1,
+  //     "encoded": false,
+  //     "checksum": "420deadbeef69"
+  //   },
+  //   {
+  //     "id": "bar-data",
+  //     "data": "eJyrVkrKTFeyUkrOKM1LLy1WqgUAMvAF6g==", // compressed because encodeData and decodeData are set
+  //     "formatVersion": 2,
+  //     "encoded": true,
+  //     "checksum": "69beefdead420"
+  //   }
+  // ]
+}
+
+async function importMyDataPls() {
+  // grab the data from the file by using the system file picker or any other method
+  const data = await getDataFromSomewhere();
+
+  try {
+    // import the data
+    await serializer.deserialize(data);
+  }
+  catch(err) {
+    console.error(err);
+    alert(`Data import failed: ${err}`);
+  }
+}
+```
 </details>
 
 <br><br>
