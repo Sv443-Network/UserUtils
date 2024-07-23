@@ -50,6 +50,7 @@ or view the documentation of previous major releases:
     - [`insertValues()`](https://github.com/Sv443-Network/UserUtils#insertvalues) - insert values into a string at specified placeholders
     - [`compress()`](https://github.com/Sv443-Network/UserUtils#compress) - compress a string with Gzip or Deflate
     - [`decompress()`](https://github.com/Sv443-Network/UserUtils#decompress) - decompress a previously compressed string
+    - [`computeHash()`](https://github.com/Sv443-Network/UserUtils#computehash) - compute the hash / checksum of a string or ArrayBuffer
 - **Arrays:**
     - [`randomItem()`](https://github.com/Sv443-Network/UserUtils#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](https://github.com/Sv443-Network/UserUtils#randomitemindex) - returns a tuple of a random item and its index from an array

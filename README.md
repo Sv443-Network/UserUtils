@@ -52,6 +52,7 @@ View the documentation of previous major releases:
     - [`insertValues()`](#insertvalues) - insert values into a string at specified placeholders
     - [`compress()`](#compress) - compress a string with Gzip or Deflate
     - [`decompress()`](#decompress) - decompress a previously compressed string
+    - [`computeHash()`](#computehash) - compute the hash / checksum of a string or ArrayBuffer
   - [**Arrays:**](#arrays)
     - [`randomItem()`](#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
@@ -1129,7 +1130,7 @@ Also, by default a checksum is calculated and importing data with a mismatching 
   
 The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality.  
   
-⚠️ Needs to run in a secure context (HTTPS) due to the use of the Web Crypto API.  
+⚠️ Needs to run in a secure context (HTTPS) due to the use of the SubtleCrypto API.  
   
 The options object has the following properties:  
 | Property | Description |
@@ -1489,6 +1490,40 @@ const decompressed = await decompress(compressed, "gzip");
 console.log(decompressed); // "Hello, World!"
 ```
 
+</details>
+
+<br>
+
+### computeHash()
+Usage:  
+```ts
+computeHash(input: string | ArrayBuffer, algorithm?: string): Promise<string>
+```
+  
+Computes a hash / checksum of a string or ArrayBuffer using the specified algorithm ("SHA-256" by default).  
+The algorithm must be supported by the [SubtleCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest).  
+  
+⚠️ This function needs to be called in a secure context (HTTPS) due to the use of the SubtleCrypto API.  
+⚠️ If you use this for cryptography, make sure to use a secure algorithm (under no circumstances use SHA-1) and to [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)) your input data.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { computeHash } from "@sv443-network/userutils";
+
+async function run() {
+  const hash1 = await computeHash("Hello, World!");
+  const hash2 = await computeHash("Hello, World!");
+
+  console.log(hash1);           // dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f
+  console.log(hash1 === hash2); // true (same input = same output)
+
+  const hash3 = await computeHash("Hello, world!"); // lowercase "w"
+  console.log(hash3); // 315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3
+}
+
+run();
+```
 </details>
 
 <br><br>

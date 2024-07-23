@@ -27,7 +27,7 @@ export type SerializedDataStore = {
  * All methods are at least `protected`, so you can easily extend this class and overwrite them to use a different storage method or to add additional functionality.  
  * Remember that you can call `super.methodName()` in the subclass to access the original method.  
  *   
- * ⚠️ Needs to run in a secure context (HTTPS) due to the use of the Web Crypto API.  
+ * ⚠️ Needs to run in a secure context (HTTPS) due to the use of the SubtleCrypto API if checksumming is enabled.  
  */
 export class DataStoreSerializer {
   protected stores: DataStore[];
