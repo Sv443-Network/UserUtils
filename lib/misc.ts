@@ -136,3 +136,18 @@ function ab2str(buf: ArrayBuffer) {
 function str2ab(str: string) {
   return Uint8Array.from(getUnsafeWindow().atob(str), c => c.charCodeAt(0));
 }
+
+/**
+ * Creates a hash / checksum of the given {@linkcode input} string using the specified {@linkcode algorithm} ("SHA-256" by default).  
+ * ⚠️ Uses the Web Crypto API so it needs to run in a secure context (HTTPS).
+ */
+export async function computeHash(input: string, algorithm = "SHA-256") {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+
+  const hashBuffer = await crypto.subtle.digest(algorithm, data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
+
+  return hashHex;
+}
