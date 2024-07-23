@@ -138,12 +138,19 @@ function str2ab(str: string) {
 }
 
 /**
- * Creates a hash / checksum of the given {@linkcode input} string using the specified {@linkcode algorithm} ("SHA-256" by default).  
- * ⚠️ Uses the Web Crypto API so it needs to run in a secure context (HTTPS).
+ * Creates a hash / checksum of the given {@linkcode input} string or ArrayBuffer using the specified {@linkcode algorithm} ("SHA-256" by default).  
+ *   
+ * ⚠️ Uses the SubtleCrypto API so it needs to run in a secure context (HTTPS).  
+ * ⚠️ If you use this for cryptography, make sure to use a secure algorithm (under no circumstances use SHA-1) and to [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)) your input data.
  */
-export async function computeHash(input: string, algorithm = "SHA-256") {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(input);
+export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-256") {
+  let data: ArrayBuffer;
+  if(typeof input === "string") {
+    const encoder = new TextEncoder();
+    data = encoder.encode(input);
+  }
+  else
+    data = input;
 
   const hashBuffer = await crypto.subtle.digest(algorithm, data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
