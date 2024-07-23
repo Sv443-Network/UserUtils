@@ -29,6 +29,8 @@ type SelectorOptionsCommon = {
   debounceEdge?: "rising" | "falling";
 };
 
+type UnsubscribeFunction = () => void;
+
 export type SelectorObserverOptions = {
   /** If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set */
   defaultDebounce?: number;
@@ -104,7 +106,8 @@ export class SelectorObserver {
     }
   }
 
-  private checkAllSelectors(): void {
+  /** Call to check all selectors in the {@linkcode listenerMap} using {@linkcode checkSelector()} */
+  protected checkAllSelectors(): void {
     if(!this.enabled || !domLoaded)
       return;
 
@@ -112,7 +115,8 @@ export class SelectorObserver {
       this.checkSelector(selector, listeners);
   }
 
-  private checkSelector(selector: string, listeners: SelectorListenerOptions[]): void {
+  /** Checks if the element(s) with the given {@linkcode selector} exist in the DOM and calls the respective {@linkcode listeners} accordingly */
+  protected checkSelector(selector: string, listeners: SelectorListenerOptions[]): void {
     if(!this.enabled)
       return;
 
@@ -149,10 +153,6 @@ export class SelectorObserver {
     }
   }
 
-  private debounce<TArgs>(func: (...args: TArgs[]) => void, time: number, edge: "falling" | "rising" = "falling"): (...args: TArgs[]) => void {
-    return debounce(func, time, edge);
-  }
-
   /**
    * Starts observing the children of the base element for changes to the given {@linkcode selector} according to the set {@linkcode options}
    * @param selector The selector to observe
@@ -161,16 +161,24 @@ export class SelectorObserver {
    * @param [options.all] Whether to use `querySelectorAll()` instead - default is false
    * @param [options.continuous] Whether to call the listener continuously instead of just once - default is false
    * @param [options.debounce] Whether to debounce the listener to reduce calls to `querySelector` or `querySelectorAll` - set undefined or <=0 to disable (default)
+   * @returns Returns a function that can be called to remove this listener more easily
    */
-  public addListener<TElem extends Element = HTMLElement>(selector: string, options: SelectorListenerOptions<TElem>): void {
-    options = { all: false, continuous: false, debounce: 0, ...options };
+  public addListener<TElem extends Element = HTMLElement>(selector: string, options: SelectorListenerOptions<TElem>): UnsubscribeFunction {
+    options = {
+      all: false,
+      continuous: false,
+      debounce: 0,
+      ...options,
+    };
+
     if((options.debounce && options.debounce > 0) || (this.customOptions.defaultDebounce && this.customOptions.defaultDebounce > 0)) {
-      options.listener = this.debounce(
+      options.listener = debounce(
         options.listener as ((arg: NodeListOf<Element> | Element) => void),
         (options.debounce || this.customOptions.defaultDebounce)!,
         (options.debounceEdge || this.customOptions.defaultDebounceEdge),
-      );
+      ) as (arg: NodeListOf<Element> | Element) => void;
     }
+
     if(this.listenerMap.has(selector))
       this.listenerMap.get(selector)!.push(options as SelectorListenerOptions<Element>);
     else
@@ -180,6 +188,8 @@ export class SelectorObserver {
       this.enable();
 
     this.checkSelector(selector, [options as SelectorListenerOptions<Element>]);
+
+    return () => this.removeListener(selector, options as SelectorListenerOptions<Element>);
   }
 
   /** Disables the observation of the child elements */

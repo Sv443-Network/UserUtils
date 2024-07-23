@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const bazObserver = new SelectorObserver(document.body);
 
   // for TypeScript, specify that input elements are returned by the listener:
-  bazObserver.addListener<HTMLInputElement>("input", {
+  const unsubscribe = bazObserver.addListener<HTMLInputElement>("input", {
     all: true,        // use querySelectorAll() instead of querySelector()
     continuous: true, // don't remove the listener after it was called once
     debounce: 50,     // debounce the listener by 50ms
@@ -309,6 +309,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   bazObserver.enable();
+
+  window.addEventListener("something", () => {
+    // remove the listener after the event "something" was dispatched:
+    unsubscribe();
+  });
 
 
   // use a different element as the base:
