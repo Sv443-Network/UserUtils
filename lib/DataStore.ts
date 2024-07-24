@@ -1,58 +1,72 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+//#region types
+
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
 type MigrationFunc = (oldData: any) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
 export type DataMigrationsDict = Record<number, MigrationFunc>;
 
 /** Options for the DataStore instance */
-export type DataStoreOptions<TData> = {
-  /** A unique internal ID for this data store - choose wisely as changing it is not supported yet. */
-  id: string;
-  /**
-   * The default data object to use if no data is saved in persistent storage yet.  
-   * Until the data is loaded from persistent storage with `loadData()`, this will be the data returned by `getData()`  
-   *   
-   * ⚠️ This has to be an object that can be serialized to JSON, so no functions or circular references are allowed, they will cause unexpected behavior.  
-   */
-  defaultData: TData;
-  /**
-   * An incremental, whole integer version number of the current format of data.  
-   * If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively.  
-   *   
-   * ⚠️ Never decrement this number and optimally don't skip any numbers either!
-   */
-  formatVersion: number;
-  /**
-   * A dictionary of functions that can be used to migrate data from older versions to newer ones.  
-   * The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value.  
-   * The values should be functions that take the data in the old format and return the data in the new format.  
-   * The functions will be run in order from the oldest to the newest version.  
-   * If the current format version is not in the dictionary, no migrations will be run.
-   */
-  migrations?: DataMigrationsDict;
-}
-& ({
-  /**
-   * Function to use to encode the data prior to saving it in persistent storage.  
-   * If this is specified, make sure to declare {@linkcode decodeData()} as well.  
-   *   
-   * You can make use of UserUtils' [`compress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#compress) function here to make the data use up less space at the cost of a little bit of performance.
-   * @param data The input data as a serialized object (JSON string)
-   */
-  encodeData: (data: string) => string | Promise<string>,
-  /**
-   * Function to use to decode the data after reading it from persistent storage.  
-   * If this is specified, make sure to declare {@linkcode encodeData()} as well.  
-   *   
-   * You can make use of UserUtils' [`decompress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#decompress) function here to make the data use up less space at the cost of a little bit of performance.
-   * @returns The resulting data as a valid serialized object (JSON string)
-   */
-  decodeData: (data: string) => string | Promise<string>,
-} | {
-  encodeData?: never,
-  decodeData?: never,
-});
+export type DataStoreOptions<TData> = 
+  & {
+    /** A unique internal ID for this data store - choose wisely as changing it is not supported yet. */
+    id: string;
+    /**
+     * The default data object to use if no data is saved in persistent storage yet.  
+     * Until the data is loaded from persistent storage with `loadData()`, this will be the data returned by `getData()`  
+     *   
+     * ⚠️ This has to be an object that can be serialized to JSON using `JSON.stringify()`, so no functions or circular references are allowed, they will cause unexpected behavior.  
+     */
+    defaultData: TData;
+    /**
+     * An incremental, whole integer version number of the current format of data.  
+     * If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively.  
+     *   
+     * ⚠️ Never decrement this number and optimally don't skip any numbers either!
+     */
+    formatVersion: number;
+    /**
+     * A dictionary of functions that can be used to migrate data from older versions to newer ones.  
+     * The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value.  
+     * The values should be functions that take the data in the old format and return the data in the new format.  
+     * The functions will be run in order from the oldest to the newest version.  
+     * If the current format version is not in the dictionary, no migrations will be run.
+     */
+    migrations?: DataMigrationsDict;
+    /**
+     * Where the data should be saved (`"GM"` by default).  
+     * The protected methods `getValue` , `setValue`  and `deleteValue` are used to interact with the storage.  
+     * If you want to use a different storage method, you can extend the class and overwrite these methods.
+     */
+    storageMethod?: "GM" | "localStorage" | "sessionStorage";
+  }
+  & (
+    | {
+      /**
+       * Function to use to encode the data prior to saving it in persistent storage.  
+       * If this is specified, make sure to declare {@linkcode decodeData()} as well.  
+       *   
+       * You can make use of UserUtils' [`compress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#compress) function here to make the data use up less space at the cost of a little bit of performance.
+       * @param data The input data as a serialized object (JSON string)
+       */
+      encodeData: (data: string) => string | Promise<string>,
+      /**
+       * Function to use to decode the data after reading it from persistent storage.  
+       * If this is specified, make sure to declare {@linkcode encodeData()} as well.  
+       *   
+       * You can make use of UserUtils' [`decompress()`](https://github.com/Sv443-Network/UserUtils?tab=readme-ov-file#decompress) function here to make the data use up less space at the cost of a little bit of performance.
+       * @returns The resulting data as a valid serialized object (JSON string)
+       */
+      decodeData: (data: string) => string | Promise<string>,
+    }
+    | {
+      encodeData?: never,
+      decodeData?: never,
+    }
+  );
+
+//#region class
 
 /**
  * Manages a hybrid synchronous & asynchronous persistent JSON database that is cached in memory and persistently saved across sessions using [GM storage.](https://wiki.greasespot.net/GM.setValue)  
@@ -61,7 +75,7 @@ export type DataStoreOptions<TData> = {
  * All methods are at least `protected`, so you can easily extend this class and overwrite them to use a different storage method or to add additional functionality.  
  * Remember that you can call `super.methodName()` in the subclass to access the original method.  
  *   
- * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
+ * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue` if the storageMethod is left as the default of `"GM"`  
  * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
  * 
  * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided) - **This has to be a JSON-compatible object!** (no undefined, circular references, etc.)
@@ -72,6 +86,7 @@ export class DataStore<TData extends object = object> {
   public readonly defaultData: TData;
   public readonly encodeData: DataStoreOptions<TData>["encodeData"];
   public readonly decodeData: DataStoreOptions<TData>["decodeData"];
+  public readonly storageMethod: Required<DataStoreOptions<TData>>["storageMethod"];
   private cachedData: TData;
   private migrations?: DataMigrationsDict;
 
@@ -79,10 +94,10 @@ export class DataStore<TData extends object = object> {
    * Creates an instance of DataStore to manage a sync & async database that is cached in memory and persistently saved across sessions.  
    * Supports migrating data from older versions to newer ones and populating the cache with default data if no persistent data is found.  
    *   
-   * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue`  
+   * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue` if the storageMethod is left as the default of `"GM"`  
    * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
    * 
-   * @template TData The type of the data that is saved in persistent storage (will be automatically inferred from `options.defaultData`) - this should also be the type of the data format associated with the current `options.formatVersion`
+   * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided) - **This has to be a JSON-compatible object!** (no undefined, circular references, etc.)
    * @param options The options for this DataStore instance
    */
   constructor(options: DataStoreOptions<TData>) {
@@ -91,9 +106,12 @@ export class DataStore<TData extends object = object> {
     this.defaultData = options.defaultData;
     this.cachedData = options.defaultData;
     this.migrations = options.migrations;
+    this.storageMethod = options.storageMethod ?? "GM";
     this.encodeData = options.encodeData;
     this.decodeData = options.decodeData;
   }
+
+  //#region public
 
   /**
    * Loads the data saved in persistent storage into the in-memory cache and also returns it.  
@@ -102,7 +120,7 @@ export class DataStore<TData extends object = object> {
    */
   public async loadData(): Promise<TData> {
     try {
-      const gmData = await this.getValue(`_uucfg-${this.id}`, this.defaultData);
+      const gmData = await this.getValue(`_uucfg-${this.id}`, JSON.stringify(this.defaultData));
       let gmFmtVer = Number(await this.getValue(`_uucfgver-${this.id}`, NaN));
 
       if(typeof gmData !== "string") {
@@ -110,7 +128,7 @@ export class DataStore<TData extends object = object> {
         return { ...this.defaultData };
       }
 
-      const isEncoded = await this.getValue(`_uucfgenc-${this.id}`, false);
+      const isEncoded = Boolean(await this.getValue(`_uucfgenc-${this.id}`, false));
 
       let saveData = false;
       if(isNaN(gmFmtVer)) {
@@ -190,6 +208,13 @@ export class DataStore<TData extends object = object> {
     ]);
   }
 
+  /** Returns whether encoding and decoding are enabled for this DataStore instance */
+  public encodingEnabled(): this is Required<Pick<DataStoreOptions<TData>, "encodeData" | "decodeData">> {
+    return Boolean(this.encodeData && this.decodeData);
+  }
+
+  //#region migrations
+
   /**
    * Runs all necessary migration functions consecutively and saves the result to the in-memory cache and persistent storage and also returns it.  
    * This method is automatically called by {@linkcode loadData()} if the data format has changed since the last time the data was saved.  
@@ -236,10 +261,7 @@ export class DataStore<TData extends object = object> {
     return this.cachedData = { ...newData as TData };
   }
 
-  /** Returns whether encoding and decoding are enabled for this DataStore instance */
-  public encodingEnabled(): this is Required<Pick<DataStoreOptions<TData>, "encodeData" | "decodeData">> {
-    return Boolean(this.encodeData && this.decodeData);
-  }
+  //#region serialization
 
   /** Serializes the data using the optional this.encodeData() and returns it as a string */
   protected async serializeData(data: TData, useEncoding = true): Promise<string> {
@@ -262,23 +284,51 @@ export class DataStore<TData extends object = object> {
     return JSON.parse(decRes ?? data) as TData;
   }
 
+  //#region misc
+
   /** Copies a JSON-compatible object and loses all its internal references in the process */
   protected deepCopy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
   }
 
+  //#region storage
+
   /** Gets a value from persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
-  protected async getValue<TValue = GM.Value>(name: string, defaultValue: TValue): Promise<TValue> {
-    return GM.getValue<TValue>(name, defaultValue);
+  protected async getValue<TValue extends GM.Value = string>(name: string, defaultValue: TValue): Promise<string | TValue> {
+    switch(this.storageMethod) {
+    case "localStorage":
+      return localStorage.getItem(name) as TValue ?? defaultValue;
+    case "sessionStorage":
+      return sessionStorage.getItem(name) as string ?? defaultValue;
+    default: 
+      return GM.getValue<TValue>(name, defaultValue);
+    }
   }
 
-  /** Sets a value in persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
+  /**
+   * Sets a value in persistent storage - can be overwritten in a subclass if you want to use something other than GM storage.  
+   * The default storage engines will stringify all passed values like numbers or booleans, so be aware of that.
+   */
   protected async setValue(name: string, value: GM.Value): Promise<void> {
-    return GM.setValue(name, value);
+    switch(this.storageMethod) {
+    case "localStorage":
+      return localStorage.setItem(name, String(value));
+    case "sessionStorage":
+      return sessionStorage.setItem(name, String(value));
+    default:
+      return GM.setValue(name, String(value));
+    }
   }
 
   /** Deletes a value from persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
   protected async deleteValue(name: string): Promise<void> {
-    return GM.deleteValue(name);
+    switch(this.storageMethod) {
+    case "localStorage":
+      return localStorage.removeItem(name);
+    case "sessionStorage":
+      return sessionStorage.removeItem(name);
+    default:
+      return GM.deleteValue(name);
+    }
   }
 }

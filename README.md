@@ -946,14 +946,17 @@ Usage:
 new DataStore(options: DataStoreOptions)
 ```
   
-A class that manages a sync & async JSON database that is persistently saved to and loaded from GM storage.  
+A class that manages a sync & async JSON database that is persistently saved to and loaded from GM storage, localStorage or sessionStorage.  
 Also supports automatic migration of outdated data formats via provided migration functions.  
 You may create as many instances as you like as long as they have different IDs.  
   
-The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality.  
+The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality, like changing the location data is stored.  
   
-⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save.  
-⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required for this to work.  
+If you have multiple DataStore instances and you want to be able to easily and safely export and import their data, take a look at the [DataStoreSerializer](#datastoreserializer) class.  
+It combines the data of multiple DataStore instances into a single object that can be exported and imported as a whole by the end user.  
+  
+⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save or cause otherwise unexpected behavior.  
+⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required if the storageMethod is left as the default of `"GM"`  
   
 The options object has the following properties:
 | Property | Description |
@@ -962,8 +965,9 @@ The options object has the following properties:
 | `defaultData` | The default data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
-| `encodeData?` | (Optional, but required when decodeData is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
-| `decodeData?` | (Optional, but required when encodeData is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
+| `storageMethod?` | (Optional) The method that is used to store the data. Can be `"GM"` (default), `"localStorage"` or `"sessionStorage"`. If you want to store the data in a different way, you can override the methods of the DataStore class. |
+| `encodeData?` | (Optional, but required when `decodeData` is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
+| `decodeData?` | (Optional, but required when `encodeData` is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
 
 <br>
 
@@ -984,9 +988,10 @@ Writes the given data synchronously to the internal cache and asynchronously to 
 Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.  
   
 `deleteData(): Promise<void>`  
-Fully deletes the data from persistent storage.  
+Fully deletes the data from persistent storage only.  
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
 If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
+This is why you should either immediately repopulate the cache and persistent storage or the page should probably be reloaded or closed after this method is called.  
 ⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
   
 `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
@@ -1012,16 +1017,16 @@ interface MyConfig {
   qux: string;
 }
 
-/** Default data */
+/** Default data returned by getData() calls until setData() is used and also fallback data if something goes wrong */
 const defaultData: MyConfig = {
   foo: "hello",
   bar: 42,
   baz: "xyz",
   qux: "something",
 };
-/** If any properties are added to, removed from or renamed in MyConfig, increment this number */
+/** If any properties are added to, removed from, or renamed in the MyConfig type, increment this number */
 const formatVersion = 2;
-/** Functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion and that no numbers are skipped! */
+/** These are functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion and that no numbers are skipped! */
 const migrations = {
   // migrate from format version 0 to 1
   1: (oldData: Record<string, unknown>) => {
@@ -1033,8 +1038,8 @@ const migrations = {
   },
   // asynchronously migrate from format version 1 to 2
   2: async (oldData: Record<string, unknown>) => {
-    // arbitrary async operation required for the new format
-    const qux = JSON.parse(await (await fetch("https://api.example.org/some-data")).text());
+    // using arbitrary async operations for the new format:
+    const qux = await grabQuxDataAsync();
     return {
       foo: oldData.foo,
       bar: oldData.bar,
@@ -1044,32 +1049,38 @@ const migrations = {
   },
 };
 
-const manager = new DataStore({
-  /** A unique ID for this instance - choose wisely as changing it is not supported yet! */
+// You probably want to export this instance (or helper functions) so you can use it anywhere in your script:
+export const manager = new DataStore({
+  /** A unique ID for this instance - choose wisely as changing it is not supported and will result in data loss! */
   id: "my-userscript-config",
-  /** Default / fallback data */
+  /** Default, initial and fallback data */
   defaultData,
   /** The current version of the data format */
   formatVersion,
-  /** Data format migration functions */
+  /** Data format migration functions called when the formatVersion is increased */
   migrations,
+  /**
+   * Where the data should be stored.  
+   * For example, you could use `"sessionStorage"` to make the data be automatically deleted after the browser session is finished, or use `"localStorage"` if you don't have access to GM storage for some reason.
+   */
+  storageMethod: "localStorage",
 
   // Compression example:
-  // Adding this will save space at the cost of a little bit of performance while initially loading and saving the data
-  // Only both of these properties or none of them should be set
-  // Everything else will be handled by the DataStore instance
+  // Adding the following will save space at the cost of a little bit of performance (only for the initial loading and every time new data is saved)
+  // Feel free to use your own functions here, as long as they take in the stringified JSON and return another string, either synchronously or asynchronously
+  // Either both of these properties or none of them should be set
 
-  /** Encodes data using the "deflate-raw" algorithm and digests it as a base64 string */
-  encodeData: (data) => compress(data, "deflate-raw", "base64"),
-  /** Decodes the "deflate-raw" encoded data as a base64 string */
-  decodeData: (data) => decompress(data, "deflate-raw", "base64"),
+  /** Compresses the data using the "deflate" algorithm and digests it as a string */
+  encodeData: (data) => compress(data, "deflate", "string"),
+  /** Decompresses the "deflate" encoded data as a string */
+  decodeData: (data) => decompress(data, "deflate", "string"),
 });
 
 /** Entrypoint of the userscript */
 async function init() {
   // wait for the data to be loaded from persistent storage
   // if no data was saved in persistent storage before or getData() is called before loadData(), the value of options.defaultData will be returned
-  // if the previously saved data needs to be migrated to a newer version, it will happen in this function call
+  // if the previously saved data needs to be migrated to a newer version, it will happen inside this function call
   const configData = await manager.loadData();
 
   console.log(configData.foo); // "hello"
@@ -1112,8 +1123,8 @@ The class' internal methods are all declared as protected, so you can extend thi
 The options object has the following properties:  
 | Property | Description |
 | :-- | :-- |
-| `addChecksum` | If set to `true` (default), a SHA-256 checksum will be calculated and saved with the serialized data. If set to `false`, no checksum will be calculated and saved. |
-| `ensureIntegrity` | If set to `true` (default), the checksum will be checked when importing data and an error will be thrown if it doesn't match. If set to `false`, the checksum will not be checked and no error will be thrown. If no checksum property exists on the imported data (because it wasn't enabled in a previous data format version), the checksum check will also be skipped. |
+| `addChecksum?` | (Optional) If set to `true` (default), a SHA-256 checksum will be calculated and saved with the serialized data. If set to `false`, no checksum will be calculated and saved. |
+| `ensureIntegrity?` | (Optional) If set to `true` (default), the checksum will be checked when importing data and an error will be thrown if it doesn't match. If set to `false`, the checksum will not be checked and no error will be thrown. If no checksum property exists on the imported data (for example because it wasn't enabled in a previous data format version), the checksum check will be skipped regardless of this setting. |
 
 <br>
 
@@ -1180,8 +1191,8 @@ const barStore = new DataStore({
       bar: "world",
     }),
   },
-  encodeData: (data) => compress(data, "deflate-raw", "base64"),
-  decodeData: (data) => decompress(data, "deflate-raw", "base64"),
+  encodeData: (data) => compress(data, "deflate", "string"),
+  decodeData: (data) => decompress(data, "deflate", "string"),
 });
 
 const serializer = new DataStoreSerializer([fooStore, barStore], {
