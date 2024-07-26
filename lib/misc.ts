@@ -73,13 +73,18 @@ export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdva
     signalOpts = { signal: controller.signal };
   }
 
-  const res = await fetch(input, {
-    ...options,
-    ...signalOpts,
-  });
-
-  clearTimeout(id);
-  return res;
+  try {
+    const res = await fetch(input, {
+      ...options,
+      ...signalOpts,
+    });
+    id && clearTimeout(id);
+    return res;
+  }
+  catch(err) {
+    id && clearTimeout(id);
+    throw err;
+  }
 }
 
 /**
