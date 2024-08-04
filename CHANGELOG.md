@@ -1,5 +1,22 @@
 # @sv443-network/userutils
 
+## 7.0.0
+
+### Major Changes
+
+- fadebf0: Removed the function `insertAfter()` because the DOM API already has the method [`insertAdjacentElement()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement) that has the same functionality and even four positions to pick from.
+  To get the same behavior as `insertAfter(refElem, newElem)`, you can use `refElem.insertAdjacentElement("afterend", newElem)`
+
+### Minor Changes
+
+- ca6ff58: Added option `checkInterval` to SelectorObserver to check on interval instead of on mutation
+- 1e2015c: Added `DataStoreSerializer` class for centralized and much easier and safer de-/serialization of any number of DataStore instances
+- 5190f0b: SelectorObserver's `addListener()` now returns an unsubscribe function to more easily remove a listener
+- e1d467c: Added function `computeHash()` to calculate the hash / checksum of a string
+- 948ac89: DataStore: made `runMigrations`, `encodeData` and `decodeData` public and added `encodingEnabled` method
+- d7cdac0: Made `randomId()` default to using Math.random() and added the parameter `enhancedEntropy` to revert back to the much slower but also much more entropic implementation
+- 287b006: Added ability to change DataStore storage engine from default "GM" to "localStorage" and "sessionStorage"
+
 ## 6.3.0
 
 ### Minor Changes
