@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 7.0.1
+
+### Patch Changes
+
+- d8f6852: Fix package.json exports
+
 ## 7.0.0
 
 ### Major Changes
