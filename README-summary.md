@@ -42,6 +42,8 @@ or view the documentation of previous major releases:
 - **Misc:**
     - [`DataStore`](https://github.com/Sv443-Network/UserUtils#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
+    - [`Dialog`](https://github.com/Sv443-Network/UserUtils#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - [`NanoEmitter`](https://github.com/Sv443-Network/UserUtils#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
     - [`autoPlural()`](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
     - [`pauseFor()`](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
     - [`debounce()`](https://github.com/Sv443-Network/UserUtils#debounce) - call a function only once in a series of calls, after or before a given timeout

@@ -2,7 +2,7 @@
 
 <!-- #MARKER Description -->
 ## UserUtils
-Zero-dependency library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
+Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
   
 Contains builtin TypeScript declarations. Fully web compatible and supports ESM and CJS imports and global declaration.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
@@ -44,6 +44,8 @@ View the documentation of previous major releases:
   - [**Misc:**](#misc)
     - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
+    - [`Dialog`](#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - [`NanoEmitter`](#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
     - [`autoPlural()`](#autoplural) - automatically pluralize a string
     - [`pauseFor()`](#pausefor) - pause the execution of a function for a given amount of time
     - [`debounce()`](#debounce) - call a function only once in a series of calls, after or before a given timeout
@@ -1246,7 +1248,197 @@ async function importMyDataPls() {
 ```
 </details>
 
-<br><br>
+<br>
+
+### Dialog
+Usage:  
+```ts
+new Dialog(options: DialogOptions)
+```  
+  
+A class that creates a customizable modal dialog with a title (optional), body and footer (optional).  
+There are tons of options for customization, like changing the close behavior, translating strings and more.  
+  
+The options object has the following properties:  
+| Property | Description |
+| :-- | :-- |
+| `id: string` | A unique internal identification string for this instance. If two Dialogs share the same ID, they will overwrite each other. |
+| `width: number` | The target and maximum width of the dialog in pixels. |
+| `height: number` | The target and maximum height of the dialog in pixels. |
+| `renderBody: () => HTMLElement \| Promise<HTMLElement>` | Called to render the body of the dialog. |
+| `renderHeader?: () => HTMLElement \| Promise<HTMLElement>` | (Optional) Called to render the header of the dialog. Leave undefined for a blank header. |
+| `renderFooter?: () => HTMLElement \| Promise<HTMLElement>` | (Optional) Called to render the footer of the dialog. Leave undefined for no footer. |
+| `closeOnBgClick?: boolean` | (Optional) Whether the dialog should close when the background is clicked. Defaults to `true`. |
+| `closeOnEscPress?: boolean` | (Optional) Whether the dialog should close when the escape key is pressed. Defaults to `true`. |
+| `destroyOnClose?: boolean` | (Optional) Whether the dialog should be destroyed when it's closed. Defaults to `false`. |
+| `unmountOnClose?: boolean` | (Optional) Whether the dialog should be unmounted when it's closed. Defaults to `true`. Superseded by `destroyOnClose`. |
+| `removeListenersOnDestroy?: boolean` | (Optional) Whether all listeners should be removed when the dialog is destroyed. Defaults to `true`. |
+| `small?: boolean` | (Optional) Whether the dialog should have a smaller overall appearance. Defaults to `false`. |
+| `verticalAlign?: "top" \| "center" \| "bottom"` | (Optional) Where to align or anchor the dialog vertically. Defaults to `"center"`. |
+| `strings?: Partial<typeof defaultStrings>` | (Optional) Strings used in the dialog (used for translations). Defaults to the default English strings (importable with the name `defaultStrings`). |
+| `dialogCss?: string` | (Optional) CSS to apply to the dialog. Defaults to the default (importable with the name `defaultDialogCss`). |
+  
+Methods:  
+`open(): Promise<void>`  
+Opens the dialog.  
+  
+`close(): void`  
+Closes the dialog.  
+  
+`mount(): Promise<void>`  
+Mounts the dialog to the DOM by calling the render functions provided in the options object.  
+Can be done before opening the dialog to avoid a delay.  
+  
+`unmount(): void`  
+Unmounts the dialog from the DOM.  
+  
+`remount(): Promise<void>`  
+Unmounts and mounts the dialog again.  
+The render functions in the options object will be called again.  
+May cause a flickering effect due to the rendering delay.  
+  
+`isOpen(): boolean`  
+Returns `true` if the dialog is open, else `false`.  
+  
+`isMounted(): boolean`  
+Returns `true` if the dialog is mounted, else `false`.  
+  
+`destroy(): void`  
+Destroys the dialog.  
+Removes all listeners and unmounts the dialog by default.  
+  
+`static getCurrentDialogId(): string`  
+Static method that returns the ID of the currently open dialog.  
+Needs to be called without creating an instance of the class.  
+  
+`static getOpenDialogs(): string[]`  
+Static method that returns an array of the IDs of all open dialogs.  
+Needs to be called without creating an instance of the class.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { Dialog } from "@sv443-network/userutils";
+
+const fooDialog = new Dialog({
+  id: "foo-dialog",
+  width: 400,
+  height: 300,
+  renderHeader() {
+    const header = document.createElement("div");
+    header.textContent = "This is the header";
+    return header;
+  },
+  renderBody() {
+    const body = document.createElement("div");
+    body.textContent = "This is the body";
+    return body;
+  },
+  renderFooter() {
+    const footer = document.createElement("div");
+    footer.textContent = "This is the footer";
+    return footer;
+  },
+  closeOnBgClick: true,
+  closeOnEscPress: true,
+  destroyOnClose: false,
+  unmountOnClose: true,
+  removeListenersOnDestroy: true,
+  small: false,
+  verticalAlign: "center",
+  strings: {
+    closeDialogTooltip: "Click to close",
+  },
+  dialogCss: getMyCustomDialogCss(),
+});
+
+fooDialog.on("close", () => {
+  console.log("Dialog closed");
+});
+
+fooDialog.open();
+```
+
+</details>
+
+<br>
+
+### NanoEmitter
+Usage:  
+```ts
+new NanoEmitter<TEventMap = EventsMap>(options?: NanoEmitterOptions): NanoEmitter<TEventMap>
+```  
+  
+A class that provides a minimalistic event emitter with a tiny footprint powered by [nanoevents.](https://npmjs.com/package/nanoevents)  
+The `TEventMap` generic is used to define the events that can be emitted and listened to.  
+  
+The intention behind this class is to extend it in your own classes to provide a simple event system.  
+You can also just create an instance and export it to use it as standalone event emitters throughout your project.  
+  
+The options object has the following properties:
+| Property | Description |
+| :-- | :-- |
+| `publicEmit?: boolean` | (Optional)  If set to true, allows emitting events through the public method `emit()` (`false` by default). |
+  
+Methods:  
+`on<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
+Registers a listener function for the given event.  
+May be called multiple times for the same event.  
+  
+`once<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
+Registers a listener function for the given event that will only be called once.
+  
+`emit<K extends keyof TEventMap>(event: K, ...args: Parameters<TEventMap[K]>): boolean`  
+Emits an event with the given arguments from outside the class instance if `publicEmit` is set to `true`.  
+If `publicEmit` is set to `true`, this method is public and can be called from outside the class and will return `true`.  
+If not, it is protected and will return `false`.  
+  
+`unsubscribeAll(): void`  
+Removes all listeners from all events.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { NanoEmitter } from "@sv443-network/userutils";
+
+interface MyEvents {
+  foo: (bar: string) => void;
+  baz: (qux: number) => void;
+}
+
+class MyClass extends NanoEmitter<MyEvents> {
+  constructor() {
+    super({
+      // allow emitting events from outside the class
+      publicEmit: true,
+    });
+    this.on("foo", (bar) => {
+      console.log("foo event:", bar);
+    });
+    this.once("baz", (qux) => {
+      console.log("baz event:", qux);
+    });
+  }
+
+  doStuff() {
+    this.emit("foo", "hello");
+    this.emit("baz", 42);
+    this.emit("foo", "world");
+    this.emit("baz", 69);
+  }
+}
+
+const myInstance = new MyClass();
+myInstance.doStuff();
+
+myInstance.emit("foo", "from da outside");
+
+myInstance.unsubscribeAll();
+```
+
+</details>
+
+<br>
 
 ### autoPlural()
 Usage:  
