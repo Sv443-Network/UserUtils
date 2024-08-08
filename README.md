@@ -62,9 +62,9 @@ View the documentation of previous major releases:
     - [`randomizeArray()`](#randomizearray) - returns a copy of the array with its items in a random order
   - [**Translation:**](#translation)
     - [`tr()`](#tr) - simple translation of a string to another language
-    - [tr.addLanguage()](#traddlanguage) - add a language and its translations
-    - [tr.setLanguage()](#trsetlanguage) - set the currently active language for translations
-    - [tr.getLanguage()](#trgetlanguage) - returns the currently active language
+    - [`tr.addLanguage()`](#traddlanguage) - add a language and its translations
+    - [`tr.setLanguage()`](#trsetlanguage) - set the currently active language for translations
+    - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
   - [**Utility types for TypeScript:**](#utility-types)
     - [`Stringifiable`](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
     - [`NonEmptyArray`](#nonemptyarray) - any array that should have at least one item
@@ -1396,31 +1396,30 @@ If not, it is protected and will return `false`.
 `unsubscribeAll(): void`  
 Removes all listeners from all events.  
   
-<details><summary><b>Example - click to view</b></summary>
+<br>
+  
+<details><summary><b>Object oriented example - click to view</b></summary>
 
 ```ts
 import { NanoEmitter } from "@sv443-network/userutils";
 
-interface MyEvents {
+interface MyEventMap {
   foo: (bar: string) => void;
   baz: (qux: number) => void;
 }
 
-class MyClass extends NanoEmitter<MyEvents> {
+class MyClass extends NanoEmitter<MyEventMap> {
   constructor() {
     super({
       // allow emitting events from outside the class
       publicEmit: true,
     });
-    this.on("foo", (bar) => {
-      console.log("foo event:", bar);
-    });
     this.once("baz", (qux) => {
-      console.log("baz event:", qux);
+      console.log("baz event (inside):", qux);
     });
   }
 
-  doStuff() {
+  public doStuff() {
     this.emit("foo", "hello");
     this.emit("baz", 42);
     this.emit("foo", "world");
@@ -1431,11 +1430,55 @@ class MyClass extends NanoEmitter<MyEvents> {
 const myInstance = new MyClass();
 myInstance.doStuff();
 
-myInstance.emit("foo", "from da outside");
+myInstance.on("foo", (bar) => {
+  console.log("foo event (outside):", bar);
+});
+
+myInstance.emit("baz", "hello from the outside");
 
 myInstance.unsubscribeAll();
 ```
 
+</details>
+
+<br>
+
+<details><summary><b>Functional example - click to view</b></summary>
+
+```ts
+import { NanoEmitter } from "@sv443-network/userutils";
+
+interface MyEventMap {
+  foo: (bar: string) => void;
+  baz: (qux: number) => void;
+}
+
+const myEmitter = new NanoEmitter<MyEventMap>({
+  // allow emitting events from outside the class
+  publicEmit: true,
+});
+
+myEmitter.on("foo", (bar) => {
+  console.log("foo event:", bar);
+});
+
+myEmitter.once("baz", (qux) => {
+  console.log("baz event:", qux);
+});
+
+function doStuff() {
+  myEmitter.emit("foo", "hello");
+  myEmitter.emit("baz", 42);
+  myEmitter.emit("foo", "world");
+  myEmitter.emit("baz", 69);
+
+  myEmitter.emit("foo", "hello from the outside");
+
+  myEmitter.unsubscribeAll();
+}
+
+doStuff();
+```
 </details>
 
 <br>
