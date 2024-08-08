@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 7.1.0
+
+### Minor Changes
+
+- 7335c59: Added Dialog class for easily creating customizable modal dialogs
+- ca50132: Added NanoEmitter class for lightweight event emitter functionality in both OOP and FP
+
 ## 7.0.1
 
 ### Patch Changes
