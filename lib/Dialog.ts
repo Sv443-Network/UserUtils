@@ -1,6 +1,5 @@
-// hoist the class declaration because either rollup or babel is being a hoe
-import { addGlobalStyle } from "./dom.js";
 import { NanoEmitter } from "./NanoEmitter.js";
+import { addGlobalStyle } from "./dom.js";
 
 export const defaultDialogCss = `\
 .uu-no-select {
