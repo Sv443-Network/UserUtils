@@ -1,0 +1,6 @@
+{
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@sv443-network/userutils",
+  "version": "7.1.0",
+  "exports": "./lib/index.ts"
+}
