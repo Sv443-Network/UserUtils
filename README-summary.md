@@ -1,6 +1,6 @@
 ## UserUtils
 Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
-Contains builtin TypeScript declarations. Fully web compatible and supports ESM and CJS imports and global declaration.  
+Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and UMD / global declaration via `@require`.  
 Licensed under the [MIT license.](https://github.com/Sv443-Network/UserUtils/blob/main/LICENSE.txt)  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
@@ -72,10 +72,11 @@ or view the documentation of previous major releases:
 <br><br>
 
 ## Installation:
-- If you are using a bundler like webpack, you can install this package using npm:
+- If you are using a bundler (like webpack, rollup, vite, etc.), you can install this package using npm:
     ```
     npm i @sv443-network/userutils
     ```
+    <sup>For other package managers, check out the respective install command on the [JavaScript Registry](https://jsr.io/@sv443-network/userutils)</sup>  
     Then, import it in your script as usual:
     ```ts
     import { addGlobalStyle } from "@sv443-network/userutils";
