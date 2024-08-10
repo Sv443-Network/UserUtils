@@ -1111,7 +1111,7 @@ init();
 ### DataStoreSerializer
 Usage:  
 ```ts
-new DataStoreSerializer(stores: DataStore[], options: DataStoreSerializerOptions)
+new DataStoreSerializer(stores: DataStore[], options?: DataStoreSerializerOptions)
 ```
 
 A class that manages serializing and deserializing (exporting and importing) one to infinite DataStore instances.  
@@ -1204,8 +1204,13 @@ const serializer = new DataStoreSerializer([fooStore, barStore], {
 });
 
 async function exportMyDataPls() {
+  // first, make sure the persistent data of the stores is loaded into their caches:
+  await fooStore.loadData();
+  await barStore.loadData();
+
+  // now serialize the data:
   const serializedData = await serializer.serialize();
-  // create file and download it:
+  // create a file and download it:
   const blob = new Blob([serializedData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -1214,7 +1219,7 @@ async function exportMyDataPls() {
   a.click();
   a.remove();
 
-  // This function exports an object like this:
+  // `serialize()` exports a stringified object that looks similar to this:
   // [
   //   {
   //     "id": "foo-data",
