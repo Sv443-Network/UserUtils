@@ -4,7 +4,7 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  ignorePatterns: ["*.map", "dist/**"],
+  ignorePatterns: ["*.map", "dist/**", "test.(ts|js)"],
   extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   globals: {
     Atomics: "readonly",
@@ -43,6 +43,7 @@ module.exports = {
         extendDefaults: true,
       },
     ],
+    "@typescript-eslint/explicit-function-return-type": "error",
     "comma-dangle": ["error", "only-multiline"],
     "no-misleading-character-class": "off",
   },

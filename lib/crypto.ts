@@ -32,7 +32,7 @@ export async function decompress(input: string | ArrayBuffer, compressionFormat:
 }
 
 /** Converts an ArrayBuffer to a base64-encoded string */
-function ab2str(buf: ArrayBuffer) {
+function ab2str(buf: ArrayBuffer): string {
   return getUnsafeWindow().btoa(
     new Uint8Array(buf)
       .reduce((data, byte) => data + String.fromCharCode(byte), "")
@@ -40,7 +40,7 @@ function ab2str(buf: ArrayBuffer) {
 }
 
 /** Converts a base64-encoded string to an ArrayBuffer representation of its bytes */
-function str2ab(str: string) {
+function str2ab(str: string): ArrayBuffer {
   return Uint8Array.from(getUnsafeWindow().atob(str), c => c.charCodeAt(0));
 }
 
@@ -50,7 +50,7 @@ function str2ab(str: string) {
  * ⚠️ Uses the SubtleCrypto API so it needs to run in a secure context (HTTPS).  
  * ⚠️ If you use this for cryptography, make sure to use a secure algorithm (under no circumstances use SHA-1) and to [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)) your input data.
  */
-export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-256") {
+export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-256"): Promise<string> {
   let data: ArrayBuffer;
   if(typeof input === "string") {
     const encoder = new TextEncoder();

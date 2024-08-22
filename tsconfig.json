@@ -18,5 +18,5 @@
     "strict": true,
     "useDefineForClassFields": true
   },
-  "exclude": ["**/*.js", "dist/**", "tools/**", "test/**"]
+  "exclude": ["**/*.js", "dist/**", "tools/**", "test/**", "**/test.ts"]
 }

@@ -1,4 +1,4 @@
-import { createNanoEvents, type DefaultEvents, type EventsMap, type Unsubscribe } from "nanoevents";
+import { createNanoEvents, type DefaultEvents, type Emitter, type EventsMap, type Unsubscribe } from "nanoevents";
 
 export interface NanoEmitterOptions {
   /** If set to true, allows emitting events through the public method emit() */
@@ -7,7 +7,7 @@ export interface NanoEmitterOptions {
 
 /** Class that can be extended or instantiated by itself to create an event emitter with helper methods and a strongly typed event map */
 export class NanoEmitter<TEvtMap extends EventsMap = DefaultEvents> {
-  protected readonly events = createNanoEvents<TEvtMap>();
+  protected readonly events: Emitter<TEvtMap> = createNanoEvents<TEvtMap>();
   protected eventUnsubscribes: Unsubscribe[] = [];
   protected emitterOptions: NanoEmitterOptions;
 
@@ -19,11 +19,11 @@ export class NanoEmitter<TEvtMap extends EventsMap = DefaultEvents> {
   }
 
   /** Subscribes to an event - returns a function that unsubscribes the event listener */
-  public on<TKey extends keyof TEvtMap>(event: TKey | "_", cb: TEvtMap[TKey]) {
+  public on<TKey extends keyof TEvtMap>(event: TKey | "_", cb: TEvtMap[TKey]): () => void {
     // eslint-disable-next-line prefer-const
     let unsub: Unsubscribe | undefined;
 
-    const unsubProxy = () => {
+    const unsubProxy = (): void => {
       if(!unsub)
         return;
       unsub();
@@ -53,7 +53,7 @@ export class NanoEmitter<TEvtMap extends EventsMap = DefaultEvents> {
   }
 
   /** Emits an event on this instance - Needs `publicEmit` to be set to true in the constructor! */
-  public emit<TKey extends keyof TEvtMap>(event: TKey, ...args: Parameters<TEvtMap[TKey]>) {
+  public emit<TKey extends keyof TEvtMap>(event: TKey, ...args: Parameters<TEvtMap[TKey]>): boolean {
     if(this.emitterOptions.publicEmit) {
       this.events.emit(event, ...args);
       return true;
@@ -62,7 +62,7 @@ export class NanoEmitter<TEvtMap extends EventsMap = DefaultEvents> {
   }
 
   /** Unsubscribes all event listeners */
-  public unsubscribeAll() {
+  public unsubscribeAll(): void {
     for(const unsub of this.eventUnsubscribes)
       unsub();
     this.eventUnsubscribes = [];

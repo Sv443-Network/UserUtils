@@ -1,7 +1,7 @@
 import { NanoEmitter } from "./NanoEmitter.js";
 import { addGlobalStyle } from "./dom.js";
 
-export const defaultDialogCss = `\
+export const defaultDialogCss: string = `\
 .uu-no-select {
   user-select: none;
 }
@@ -212,11 +212,11 @@ export class Dialog extends NanoEmitter<{
   destroy: () => void;
 }> {
   /** Options passed to the dialog in the constructor */
-  public readonly options;
+  public readonly options: DialogOptions;
   /** ID that gets added to child element IDs - has to be unique and conform to HTML ID naming rules! */
-  public readonly id;
+  public readonly id: string;
   /** Strings used in the dialog (used for translations) */
-  public strings;
+  public strings: typeof defaultStrings;
 
   protected dialogOpen = false;
   protected dialogMounted = false;
@@ -237,9 +237,8 @@ export class Dialog extends NanoEmitter<{
       destroyOnClose: false,
       unmountOnClose: true,
       removeListenersOnDestroy: true,
-      smallHeader: false,
+      small: false,
       verticalAlign: "center",
-      dialogCss: defaultDialogCss,
       ...opts,
     };
     this.id = opts.id;
@@ -248,13 +247,13 @@ export class Dialog extends NanoEmitter<{
   //#region public
 
   /** Call after DOMContentLoaded to pre-render the dialog and invisibly mount it in the DOM */
-  public async mount() {
+  public async mount(): Promise<HTMLElement | void> {
     if(this.dialogMounted)
       return;
     this.dialogMounted = true;
 
     if(!document.querySelector("style.uu-dialog-css"))
-      addGlobalStyle(this.options.dialogCss).classList.add("uu-dialog-css");
+      addGlobalStyle(this.options.dialogCss ?? defaultDialogCss).classList.add("uu-dialog-css");
 
     const bgElem = document.createElement("div");
     bgElem.id = `uu-${this.id}-dialog-bg`;
@@ -279,7 +278,7 @@ export class Dialog extends NanoEmitter<{
   }
 
   /** Closes the dialog and clears all its contents (unmounts elements from the DOM) in preparation for a new rendering call */
-  public unmount() {
+  public unmount(): void {
     this.close();
 
     this.dialogMounted = false;
@@ -296,7 +295,7 @@ export class Dialog extends NanoEmitter<{
   }
 
   /** Clears the DOM of the dialog and then renders it again */
-  public async remount() {
+  public async remount(): Promise<void> {
     this.unmount();
     await this.mount();
   }
@@ -305,7 +304,7 @@ export class Dialog extends NanoEmitter<{
    * Opens the dialog - also mounts it if it hasn't been mounted yet  
    * Prevents default action and immediate propagation of the passed event
    */
-  public async open(e?: MouseEvent | KeyboardEvent) {
+  public async open(e?: MouseEvent | KeyboardEvent): Promise<HTMLElement | void> {
     e?.preventDefault();
     e?.stopImmediatePropagation();
 
@@ -346,7 +345,7 @@ export class Dialog extends NanoEmitter<{
   }
 
   /** Closes the dialog - prevents default action and immediate propagation of the passed event */
-  public close(e?: MouseEvent | KeyboardEvent) {
+  public close(e?: MouseEvent | KeyboardEvent): void {
     e?.preventDefault();
     e?.stopImmediatePropagation();
 
@@ -386,17 +385,17 @@ export class Dialog extends NanoEmitter<{
   }
 
   /** Returns true if the dialog is currently open */
-  public isOpen() {
+  public isOpen(): boolean {
     return this.dialogOpen;
   }
 
   /** Returns true if the dialog is currently mounted */
-  public isMounted() {
+  public isMounted(): boolean {
     return this.dialogMounted;
   }
 
   /** Clears the DOM of the dialog and removes all event listeners */
-  public destroy() {
+  public destroy(): void {
     this.unmount();
     this.events.emit("destroy");
     this.options.removeListenersOnDestroy && this.unsubscribeAll();
@@ -405,23 +404,23 @@ export class Dialog extends NanoEmitter<{
   //#region static
 
   /** Returns the ID of the top-most dialog (the dialog that has been opened last) */
-  public static getCurrentDialogId() {
+  public static getCurrentDialogId(): string | null {
     return currentDialogId;
   }
 
   /** Returns the IDs of all currently open dialogs, top-most first */
-  public static getOpenDialogs() {
+  public static getOpenDialogs(): string[] {
     return openDialogs;
   }
 
   //#region protected
 
-  protected getString(key: keyof typeof defaultStrings) {
+  protected getString(key: keyof typeof defaultStrings): string {
     return this.strings[key] ?? defaultStrings[key];
   }
 
   /** Called once to attach all generic event listeners */
-  protected attachListeners(bgElem: HTMLElement) {
+  protected attachListeners(bgElem: HTMLElement): void {
     if(this.options.closeOnBgClick) {
       bgElem.addEventListener("click", (e) => {
         if(this.isOpen() && (e.target as HTMLElement)?.id === `uu-${this.id}-dialog-bg`)
@@ -453,12 +452,12 @@ export class Dialog extends NanoEmitter<{
       preventDefault?: boolean;
       stopPropagation?: boolean;
     },
-  ) {
+  ): void {
     const { preventDefault = true, stopPropagation = true, ...listenerOpts } = listenerOptions ?? {};
 
     const interactionKeys = ["Enter", " ", "Space"];
 
-    const proxListener = (e: MouseEvent | KeyboardEvent) => {
+    const proxListener = (e: MouseEvent | KeyboardEvent): void => {
       if(e instanceof KeyboardEvent) {
         if(interactionKeys.includes(e.key)) {
           preventDefault && e.preventDefault();
@@ -481,7 +480,7 @@ export class Dialog extends NanoEmitter<{
   }
 
   /** Returns the dialog content element and all its children */
-  protected async getDialogContent() {
+  protected async getDialogContent(): Promise<HTMLElement> {
     const header = this.options.renderHeader?.();
     const footer = this.options.renderFooter?.();
 
