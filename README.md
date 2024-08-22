@@ -75,6 +75,8 @@ View the documentation of previous major releases:
 
 <!-- #MARKER Installation -->
 ## Installation:
+Shameless plug: I made a [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
+  
 - If you are using a bundler (like webpack, rollup, vite, etc.), you can install this package using npm:
   ```
   npm i @sv443-network/userutils
@@ -88,18 +90,17 @@ View the documentation of previous major releases:
 
   import * as UserUtils from "@sv443-network/userutils";
   ```
-  Shameless plug: I made a [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.
 
 <br>
 
-- If you are not using a bundler, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
+- If you are not using a bundler or want to reduce the size of your userscript, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
   ```
   // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
   ```
   ```
   // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
   ```
-  (in order for your userscript not to break on a major library update, use the versioned URL at the top of the [GreasyFork page](https://greasyfork.org/scripts/472956-userutils))  
+  (in order for your userscript not to break on a major library update, instead use the versioned URL at the top of the [GreasyFork page](https://greasyfork.org/scripts/472956-userutils))  
     
   Then, access the functions on the global variable `UserUtils`:
   ```ts
@@ -109,6 +110,12 @@ View the documentation of previous major releases:
 
   const { clamp } = UserUtils;
   console.log(clamp(1, 5, 10)); // 5
+  ```
+  If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in your project:
+  ```ts
+  declare global {
+    const UserUtils: typeof import("@sv443-network/userutils");
+  }
   ```
 
 <br><br>
@@ -2011,32 +2018,32 @@ tr.addLanguage("de-AT", {
 // example for custom pluralization:
 
 tr.addLanguage("en", {
-  "items_added-0": "Added %1 items to your cart",
-  "items_added-1": "Added %1 item to your cart",
-  "items_added-n": "Added all %1 items to your cart",
+  "cart_items_added-0": "No items were added to the cart",
+  "cart_items_added-1": "Added %1 item to the cart",
+  "cart_items_added-n": "Added %1 items to the cart",
 });
 
-/** Returns the custom pluralization identifier for the given number of items (or size of Array/NodeList) */
-function pl(num: number | unknown[] | NodeList) {
+/** Returns the translation key with a custom pluralization identifier added to it for the given number of items (or size of Array/NodeList or anything else with a `length` property) */
+function pl(key: string, num: number | Array<unknown> | NodeList | { length: number }) {
   if(typeof num !== "number")
     num = num.length;
 
   if(num === 0)
-    return "0";
+    return `${key}-0`;
   else if(num === 1)
-    return "1";
+    return `${key}-1`;
   else
-    return "n";
+    return `${key}-n`;
 };
 
 const items = [];
-tr(`items_added-${pl(items)}`, items.length); // "Added 0 items to your cart"
+console.log(tr(pl("cart_items_added", items), items.length)); // "No items were added to the cart"
 
 items.push("foo");
-tr(`items_added-${pl(items)}`, items.length); // "Added 1 item to your cart"
+console.log(tr(pl("cart_items_added", items), items.length)); // "Added 1 item to the cart"
 
 items.push("bar");
-tr(`items_added-${pl(items)}`, items.length); // "Added all 2 items to your cart"
+console.log(tr(pl("cart_items_added", items), items.length)); // "Added 2 items to the cart"
 ```
 
 </details>

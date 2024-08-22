@@ -72,6 +72,8 @@ or view the documentation of previous major releases:
 <br><br>
 
 ## Installation:
+Shameless plug: I made a [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
+  
 - If you are using a bundler (like webpack, rollup, vite, etc.), you can install this package using npm:
     ```
     npm i @sv443-network/userutils
@@ -85,19 +87,18 @@ or view the documentation of previous major releases:
 
     import * as UserUtils from "@sv443-network/userutils";
     ```
-    Shameless plug: I made a [webpack-based template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.
 
 
 <br>
 
-- If you are not using a bundler, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
+- If you are not using a bundler or want to reduce the size of your userscript, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
     ```
     // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
     ```
     ```
     // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
     ```
-    (in order for your userscript not to break on a major library update, use the versioned URL at the top of the [GreasyFork page](https://greasyfork.org/scripts/472956-userutils))  
+    (in order for your userscript not to break on a major library update, instead use the versioned URL at the top of the [GreasyFork page](https://greasyfork.org/scripts/472956-userutils))  
       
     Then, access the functions on the global variable `UserUtils`:
     ```ts
@@ -107,4 +108,10 @@ or view the documentation of previous major releases:
 
     const { clamp } = UserUtils;
     console.log(clamp(1, 5, 10)); // 5
+    ```
+    If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in your project:
+    ```ts
+    declare global {
+        const UserUtils: typeof import("@sv443-network/userutils");
+    }
     ```
