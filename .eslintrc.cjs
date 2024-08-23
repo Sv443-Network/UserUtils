@@ -26,12 +26,17 @@ module.exports = {
     indent: [
       "error",
       2,
-      { ignoredNodes: ["VariableDeclaration[declarations.length=0]"] },
+      {
+        ignoredNodes: ["VariableDeclaration[declarations.length=0]"],
+      },
     ],
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
-      { ignoreRestSiblings: true, argsIgnorePattern: "^_" },
+      {
+        ignoreRestSiblings: true,
+        argsIgnorePattern: "^_",
+      },
     ],
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-types": [
@@ -43,7 +48,15 @@ module.exports = {
         extendDefaults: true,
       },
     ],
-    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/explicit-function-return-type": [
+      "error",
+      {
+        allowConciseArrowFunctionExpressionsStartingWithVoid: true,
+        allowExpressions: true,
+        allowFunctionsWithoutTypeParameters: true,
+        allowIIFEs: true,
+      }
+    ],
     "comma-dangle": ["error", "only-multiline"],
     "no-misleading-character-class": "off",
   },

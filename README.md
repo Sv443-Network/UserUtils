@@ -65,6 +65,11 @@ View the documentation of previous major releases:
     - [`tr.addLanguage()`](#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
+  - [**Colors:**](#colors)
+    - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB number tuple
+    - [`rgbToHex()`](#rgbtohex) - convert RGB numbers to a hex color string
+    - [`lightenColor()`](#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
+    - [`darkenColor()`](#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
   - [**Utility types for TypeScript:**](#utility-types)
     - [`Stringifiable`](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
     - [`NonEmptyArray`](#nonemptyarray) - any array that should have at least one item
@@ -2071,6 +2076,104 @@ tr.getLanguage(): string | undefined
 
 Returns the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
 If no language has been set yet, it will return undefined.
+
+<br><br>
+
+## Colors:
+The color functions are used to manipulate and convert colors in various formats.  
+
+### hexToRgb()
+Usage:  
+```ts
+hexToRgb(hex: string): [red: number, green: number, blue: number]
+```  
+  
+Converts a hex color string to an RGB color tuple array.  
+Accepts the formats `#RRGGBB` and `#RGB`, with or without the hash symbol.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { hexToRgb } from "@sv443-network/userutils";
+
+hexToRgb("#ff0000"); // [255, 0, 0]
+hexToRgb("0032ef");  // [0, 50, 239]
+hexToRgb("#0f0");    // [0, 255, 0]
+```
+
+</details>
+
+<br>
+
+### rgbToHex()
+Usage:  
+```ts
+rgbToHex(red: number, green: number, blue: number, withHash?: boolean, upperCase?: boolean): string
+```  
+  
+Converts RGB color values to a hex color string.  
+The `withHash` parameter determines if the hash symbol should be included in the output (true by default).  
+The `upperCase` parameter determines if the output should be in uppercase (false by default).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { rgbToHex } from "@sv443-network/userutils";
+
+rgbToHex(255, 0, 0);             // "#ff0000"
+rgbToHex(255, 0, 0, false);      // "ff0000"
+rgbToHex(255, 0, 0, true, true); // "#FF0000"
+```
+
+</details>
+
+<br>
+
+### lightenColor()
+Usage:  
+```ts
+lightenColor(color: string, percent: number): string
+```  
+  
+Lightens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
+Will not exceed the maximum range (00-FF or 0-255).  
+Throws an error if the color format is invalid or not supported.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { lightenColor } from "@sv443-network/userutils";
+
+lightenColor("#ff0000", 20);              // "#ff3333"
+lightenColor("rgb(0, 255, 0)", 50);       // "rgb(128, 255, 128)"
+lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
+```
+
+</details>
+
+<br>
+
+### darkenColor()
+Usage:  
+```ts
+darkenColor(color: string, percent: number): string
+```  
+  
+Darkens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
+Will not exceed the maximum range (00-FF or 0-255).  
+Throws an error if the color format is invalid or not supported.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { darkenColor } from "@sv443-network/userutils";
+
+darkenColor("#ff0000", 20);              // "#cc0000"
+darkenColor("rgb(0, 255, 0)", 50);       // "rgb(0, 128, 0)"
+darkenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(0, 128, 0, 0.5)"
+```
+
+</details>
 
 <br><br>
 

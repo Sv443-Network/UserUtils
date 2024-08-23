@@ -63,6 +63,11 @@ or view the documentation of previous major releases:
     - [`tr.addLanguage()`](https://github.com/Sv443-Network/UserUtils#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
+- **Colors:**
+    - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils#hextorgb) - convert a hex color string to an RGB number tuple
+    - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils#rgbtohex) - convert RGB numbers to a hex color string
+    - [`lightenColor()`](https://github.com/Sv443-Network/UserUtils#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
+    - [`darkenColor()`](https://github.com/Sv443-Network/UserUtils#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
 - **Utility types for TypeScript:**
     - [`Stringifiable`](https://github.com/Sv443-Network/UserUtils#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
     - [`NonEmptyArray`](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
