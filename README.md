@@ -1390,13 +1390,13 @@ new NanoEmitter<TEventMap = EventsMap>(options?: NanoEmitterOptions): NanoEmitte
 A class that provides a minimalistic event emitter with a tiny footprint powered by [nanoevents.](https://npmjs.com/package/nanoevents)  
 The `TEventMap` generic is used to define the events that can be emitted and listened to.  
   
-The intention behind this class is to extend it in your own classes to provide a simple event system.  
-You can also just create an instance and export it to use it as standalone event emitters throughout your project.  
+The main intention behind this class is to extend it in your own classes to provide a simple event system directly built into the class.  
+However in a functional environment you can also just create instances for use as standalone event emitters throughout your project.  
   
 The options object has the following properties:
 | Property | Description |
 | :-- | :-- |
-| `publicEmit?: boolean` | (Optional)  If set to true, allows emitting events through the public method `emit()` (`false` by default). |
+| `publicEmit?: boolean` | (Optional) If set to true, allows emitting events through the public method `emit()` (`false` by default). |
   
 Methods:  
 `on<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
@@ -1408,8 +1408,8 @@ Registers a listener function for the given event that will only be called once.
   
 `emit<K extends keyof TEventMap>(event: K, ...args: Parameters<TEventMap[K]>): boolean`  
 Emits an event with the given arguments from outside the class instance if `publicEmit` is set to `true`.  
-If `publicEmit` is set to `true`, this method is public and can be called from outside the class and will return `true`.  
-If not, it is protected and will return `false`.  
+If `publicEmit` is set to `true`, this method will return `true` if the event was emitted.  
+If it is set to `false`, it will always return `false` and you will need to use `this.events.emit()` from inside the class instead.  
   
 `unsubscribeAll(): void`  
 Removes all listeners from all events.  
@@ -1421,6 +1421,7 @@ Removes all listeners from all events.
 ```ts
 import { NanoEmitter } from "@sv443-network/userutils";
 
+// map of events for strong typing - the functions always return void
 interface MyEventMap {
   foo: (bar: string) => void;
   baz: (qux: number) => void;
@@ -1432,8 +1433,9 @@ class MyClass extends NanoEmitter<MyEventMap> {
       // allow emitting events from outside the class
       publicEmit: true,
     });
+
     this.once("baz", (qux) => {
-      console.log("baz event (inside):", qux);
+      console.log("baz event (inside, once):", qux);
     });
   }
 
@@ -1466,6 +1468,7 @@ myInstance.unsubscribeAll();
 ```ts
 import { NanoEmitter } from "@sv443-network/userutils";
 
+// map of events for strong typing - the functions always return void
 interface MyEventMap {
   foo: (bar: string) => void;
   baz: (qux: number) => void;
@@ -1481,7 +1484,7 @@ myEmitter.on("foo", (bar) => {
 });
 
 myEmitter.once("baz", (qux) => {
-  console.log("baz event:", qux);
+  console.log("baz event (once):", qux);
 });
 
 function doStuff() {
