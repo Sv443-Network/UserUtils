@@ -15,6 +15,7 @@
     "build": "npm run build-common -- && npm run build-types",
     "post-build-global": "npm run node-ts -- ./tools/post-build-global.mts",
     "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types && echo Finished building.\"",
+    "dev-all": "npm run build-all -- --watch",
     "update-jsr-version": "npm run node-ts -- ./tools/update-jsr-version.mts",
     "publish-package": "changeset publish",
     "publish-package-jsr": "npm run update-jsr-version && npx jsr publish",

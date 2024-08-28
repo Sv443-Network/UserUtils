@@ -37,6 +37,7 @@ View the documentation of previous major releases:
     - [`isScrollable()`](#isscrollable) - check if an element has a horizontal or vertical scroll bar
     - [`observeElementProp()`](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
     - [`getSiblingsFrame()`](#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+    - [`setInnerHtmlUnsafe()`](#setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
   - [**Math:**](#math)
     - [`clamp()`](#clamp) - constrain a number between a min and max value
     - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
@@ -450,9 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fooObserver.enable();
 });
 ```
-
 </details>
-
 
 <br>
 
@@ -481,7 +480,6 @@ const mouseEvent = new MouseEvent("mousemove", {
 
 document.body.dispatchEvent(mouseEvent);
 ```
-
 </details>
 
 <br>
@@ -509,7 +507,6 @@ newParent.href = "https://example.org/";
 
 addParent(element, newParent);
 ```
-
 </details>
 
 <br>
@@ -537,7 +534,6 @@ document.addEventListener("DOMContentLoaded", () => {
   `);
 });
 ```
-
 </details>
 
 <br>
@@ -569,7 +565,6 @@ preloadImages([
     console.error("Couldn't preload all images. Results:", results);
   });
 ```
-
 </details>
 
 <br>
@@ -596,7 +591,6 @@ document.querySelector("#my-button").addEventListener("click", () => {
   openInNewTab("https://example.org/", true);
 });
 ```
-
 </details>
 
 <br>
@@ -631,7 +625,6 @@ interceptEvent(document.body, "click", (event) => {
   return false; // allow all other click events through
 });
 ```
-
 </details>
 
 <br>
@@ -661,7 +654,6 @@ import { interceptWindowEvent } from "@sv443-network/userutils";
 // as no predicate is specified, all events will be discarded by default
 interceptWindowEvent("beforeunload");
 ```
-
 </details>
 
 <br>
@@ -686,7 +678,6 @@ const { horizontal, vertical } = isScrollable(element);
 console.log("Element has a horizontal scroll bar:", horizontal);
 console.log("Element has a vertical scroll bar:", vertical);
 ```
-
 </details>
 
 <br>
@@ -739,7 +730,6 @@ observeElementProp(myInput, "value", (oldValue, newValue) => {
   console.log("Value changed from", oldValue, "to", newValue);
 });
 ```
-
 </details>
 
 <br>
@@ -862,7 +852,37 @@ const allBelowExcl = getSiblingsFrame(refElement, Infinity, "bottom", false);
 // <div>5</div>             │ frame
 // <div>6</div>          ◄──┘
 ```
+</details>
 
+<br>
+
+### setInnerHtmlUnsafe()
+Usage:  
+```ts
+setInnerHtmlUnsafe(element: Element, html: string): Element
+```
+  
+Sets the innerHTML property of the provided element without any sanitation or validation.  
+Makes use of the [Trusted Types API](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) to trick the browser into thinking the HTML is safe.  
+Use this function if the page makes use of the CSP directive `require-trusted-types-for 'script'` and throws a "This document requires 'TrustedHTML' assignment" error on Chromium-based browsers.  
+If the browser doesn't support Trusted Types, this function will fall back to regular innerHTML assignment.  
+  
+⚠️ This function does not perform any sanitization, it only tricks the browser into thinking the HTML is safe and should thus be used with utmost caution, as it can easily cause XSS vulnerabilities!  
+A much better way of doing this is by using the [DOMPurify](https://github.com/cure53/DOMPurify#what-about-dompurify-and-trusted-types) library to create your own Trusted Types policy that *actually* sanitizes the HTML and prevents (most) XSS attack vectors.  
+You can also find more info [here.](https://web.dev/articles/trusted-types#library)  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { setInnerHtmlUnsafe } from "@sv443-network/userutils";
+
+const myElement = document.querySelector("#my-element");
+setInnerHtmlUnsafe(myElement, "<img src='https://picsum.photos/100/100' />");   // hardcoded value, so no XSS risk
+
+const myXssElement = document.querySelector("#my-xss-element");
+const userModifiableVariable = `<img onerror="alert('XSS!')" src="invalid" />`; // let's pretend this came from user input
+setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       // <- uses a user-modifiable variable, so big XSS risk!
+```
 </details>
 
 <br><br>
@@ -892,7 +912,6 @@ clamp(99999, 0, 10); // 10
 clamp(-99999, -Infinity, 0); // -99999
 clamp(99999, 0, Infinity);   // 99999
 ```
-
 </details>
 
 <br>
@@ -923,7 +942,6 @@ mapRange(5, 0, 10, 0, 50);  // 25
 // for example, if 4 files of a total of 13 were downloaded:
 mapRange(4, 0, 13, 0, 100); // 30.76923076923077
 ```
-
 </details>
 
 <br>
@@ -947,7 +965,6 @@ randRange(0, 10);  // 4
 randRange(10, 20); // 17
 randRange(10);     // 7
 ```
-
 </details>
 
 <br><br>
@@ -1115,7 +1132,6 @@ async function init() {
 
 init();
 ```
-
 </details>
 
 <br>
@@ -1376,7 +1392,6 @@ fooDialog.on("close", () => {
 
 fooDialog.open();
 ```
-
 </details>
 
 <br>
@@ -1458,7 +1473,6 @@ myInstance.emit("baz", "hello from the outside");
 
 myInstance.unsubscribeAll();
 ```
-
 </details>
 
 <br>
@@ -1528,7 +1542,6 @@ autoPlural("apple", [1, 2]); // "apples"
 const items = [1, 2, 3, 4, "foo", "bar"];
 console.log(`Found ${items.length} ${autoPlural("item", items)}`); // "Found 6 items"
 ```
-
 </details>
 
 <br>
@@ -1552,7 +1565,6 @@ async function run() {
   console.log("World");
 }
 ```
-
 </details>
 
 <br>
@@ -1598,7 +1610,6 @@ const myFunc = debounce((event) => {
 
 document.body.addEventListener("scroll", myFunc);
 ```
-
 </details>
 
 <br>
@@ -1633,7 +1644,6 @@ fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
   console.error("Fetch error:", err);
 });
 ```
-
 </details>
 
 <br>
@@ -1661,7 +1671,6 @@ insertValues("Testing %1", { toString: () => "foo" });      // "Testing foo"
 const values = ["foo", "bar", "baz"];
 insertValues("Testing %1, %2, %3 and %4", ...values); // "Testing foo, bar and baz and %4"
 ```
-
 </details>
 
 <br>
@@ -1702,7 +1711,6 @@ const barDeflate = await compress("Hello, World!".repeat(20), "deflate");
 console.log(fooDeflate); // "eJzzSM3JyddRCM8vyklRBAAfngRq"
 console.log(barDeflate); // "eJzzSM3JyddRCM8vyklR9BiZHAAIEVg1"
 ```
-
 </details>
 
 <br>
@@ -1733,7 +1741,6 @@ const decompressed = await decompress(compressed, "gzip");
 
 console.log(decompressed); // "Hello, World!"
 ```
-
 </details>
 
 <br>
@@ -1800,7 +1807,6 @@ randomId(10, 2);  // "1010001101"       (length 10, radix 2)
 randomId(10, 10); // "0183428506"       (length 10, radix 10)
 randomId(10, 36); // "z46jfpa37r"       (length 10, radix 36)
 ```
-
 </details>
 
 <br><br>
@@ -1825,7 +1831,6 @@ import { randomItem } from "@sv443-network/userutils";
 randomItem(["foo", "bar", "baz"]); // "bar"
 randomItem([ ]);                   // undefined
 ```
-
 </details>
 
 <br>
@@ -1852,7 +1857,6 @@ const [item, index] = randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
 // or if you only want the index:
 const [, index] = randomItemIndex(["foo", "bar", "baz"]); // 1
 ```
-
 </details>
 
 <br>
@@ -1875,7 +1879,6 @@ const arr = ["foo", "bar", "baz"];
 takeRandomItem(arr); // "bar"
 console.log(arr);    // ["foo", "baz"]
 ```
-
 </details>
 
 <br>
@@ -1901,7 +1904,6 @@ console.log(randomizeArray(foo)); // [4, 5, 2, 1, 6, 3]
 
 console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 ```
-
 </details>
 
 <br><br>
@@ -1954,7 +1956,6 @@ tr.setLanguage("de");
 console.log(tr("welcome"));              // "Willkommen"
 console.log(tr("welcome_name", "John")); // "Willkommen, John"
 ```
-
 </details>
 
 <br>
@@ -2053,7 +2054,6 @@ console.log(tr(pl("cart_items_added", items), items.length)); // "Added 1 item t
 items.push("bar");
 console.log(tr(pl("cart_items_added", items), items.length)); // "Added 2 items to the cart"
 ```
-
 </details>
 
 <br>
@@ -2103,7 +2103,6 @@ hexToRgb("#ff0000"); // [255, 0, 0]
 hexToRgb("0032ef");  // [0, 50, 239]
 hexToRgb("#0f0");    // [0, 255, 0]
 ```
-
 </details>
 
 <br>
@@ -2127,7 +2126,6 @@ rgbToHex(255, 0, 0);             // "#ff0000"
 rgbToHex(255, 0, 0, false);      // "ff0000"
 rgbToHex(255, 0, 0, true, true); // "#FF0000"
 ```
-
 </details>
 
 <br>
@@ -2151,7 +2149,6 @@ lightenColor("#ff0000", 20);              // "#ff3333"
 lightenColor("rgb(0, 255, 0)", 50);       // "rgb(128, 255, 128)"
 lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
 ```
-
 </details>
 
 <br>
@@ -2175,7 +2172,6 @@ darkenColor("#ff0000", 20);              // "#cc0000"
 darkenColor("rgb(0, 255, 0)", 50);       // "rgb(0, 128, 0)"
 darkenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(0, 128, 0, 0.5)"
 ```
-
 </details>
 
 <br><br>
@@ -2216,7 +2212,6 @@ logSomething(fooObject); // "Log: hello world"
 
 logSomething(barObject); // Type error
 ```
-
 </details>
 
 <br>
@@ -2247,7 +2242,6 @@ function somethingElse(array: NonEmptyArray) {
 
 logFirstItem(["04abc", "69"]); // 4
 ```
-
 </details>
 
 <br>
@@ -2272,7 +2266,6 @@ function convertToNumber<T extends string>(str: NonEmptyString<T>) {
 convertToNumber("04abc"); // "4"
 convertToNumber("");      // type error: Argument of type 'string' is not assignable to parameter of type 'never'
 ```
-
 </details>
 
 <br>
@@ -2300,7 +2293,6 @@ foo("a"); // included in autocomplete, no type error
 foo("");  // *not* included in autocomplete, still no type error
 foo(1);   // type error: Argument of type '1' is not assignable to parameter of type 'LooseUnion<"a" | "b" | "c">'
 ```
-
 </details>
 
 <br><br><br><br>

@@ -1,3 +1,5 @@
+import type { TrustedTypesPolicy } from "./types.js";
+
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
@@ -35,7 +37,7 @@ export function addParent<TElem extends Element, TParentElem extends Element>(el
  */
 export function addGlobalStyle(style: string): HTMLStyleElement {
   const styleElem = document.createElement("style");
-  styleElem.innerHTML = style;
+  setInnerHtmlUnsafe(styleElem, style);
   document.head.appendChild(styleElem);
   return styleElem;
 }
@@ -231,4 +233,25 @@ export function getSiblingsFrame<
     return [...siblings.slice(elemSiblIdx - siblingAmount + Number(includeRef), elemSiblIdx + Number(includeRef))];
 
   return [] as TSibling[];
+}
+
+let ttPolicy: TrustedTypesPolicy | undefined;
+
+/**
+ * Sets the innerHTML property of the provided element without any sanitation or validation.  
+ * Uses a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) on Chromium-based browsers to trick the browser into thinking the HTML is safe.  
+ * Use this if the page makes use of the CSP directive `require-trusted-types-for 'script'` and throws a "This document requires 'TrustedHTML' assignment" error on Chromium-based browsers.  
+ *   
+ * ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities!
+ */
+export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(element: TElement, html: string): TElement {
+  if(!ttPolicy && typeof window?.trustedTypes?.createPolicy === "function") {
+    ttPolicy = window.trustedTypes.createPolicy("_uu_set_innerhtml_unsafe", {
+      createHTML: (unsafeHtml: string) => unsafeHtml,
+    });
+  }
+
+  element.innerHTML = ttPolicy?.createHTML?.(html) ?? html;
+
+  return element;
 }
