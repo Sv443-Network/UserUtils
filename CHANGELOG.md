@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 7.2.1
+
+### Patch Changes
+
+- e00d4d9: Fixed dev-only TypeScript shims being included in the final bundle
+
 ## 7.2.0
 
 ### Minor Changes
