@@ -1,6 +1,6 @@
 <div style="text-align: center;" align="center">
 
-<!-- #MARKER Description -->
+<!-- #region Description -->
 ## UserUtils
 Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
   
@@ -19,7 +19,7 @@ View the documentation of previous major releases:
 </div>
 <br>
 
-<!-- #MARKER Table of Contents -->
+<!-- #region Table of Contents -->
 ## Table of Contents:
 - [**Installation**](#installation)
 - [**Preamble** (info about the documentation)](#preamble)
@@ -78,7 +78,7 @@ View the documentation of previous major releases:
 
 <br><br>
 
-<!-- #MARKER Installation -->
+<!-- #region Installation -->
 ## Installation:
 Shameless plug: I made a [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
   
@@ -125,7 +125,7 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 <br><br>
 
-<!-- #MARKER Preamble -->
+<!-- #region Preamble -->
 ## Preamble:
 This library is written in TypeScript and contains builtin TypeScript declarations.  
   
@@ -138,19 +138,19 @@ Their documentation will contain a section marked by a warning emoji (⚠️) th
 
 <br><br>
 
-<!-- #MARKER License -->
+<!-- #region License -->
 ## License:
 This library is licensed under the MIT License.  
 See the [license file](./LICENSE.txt) for details.
 
 <br><br>
 
-<!-- #MARKER Features -->
+<!-- #region Features -->
 ## Features:
 
 <br>
 
-<!-- #SECTION DOM -->
+<!-- #region DOM -->
 ## DOM:
 
 ### SelectorObserver
@@ -867,7 +867,7 @@ const allBelowExcl = getSiblingsFrame(refElement, Infinity, "bottom", false);
 
 <br><br>
 
-<!-- #SECTION Math -->
+<!-- #region Math -->
 ## Math:
 
 ### clamp()
@@ -952,7 +952,7 @@ randRange(10);     // 7
 
 <br><br>
 
-<!-- #SECTION Misc -->
+<!-- #region Misc -->
 ## Misc:
 
 ### DataStore
@@ -1805,7 +1805,7 @@ randomId(10, 36); // "z46jfpa37r"       (length 10, radix 36)
 
 <br><br>
 
-<!-- #SECTION Arrays -->
+<!-- #region Arrays -->
 ## Arrays:
 
 ### randomItem()
@@ -1906,7 +1906,7 @@ console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 
 <br><br>
 
-<!-- #SECTION Translation -->
+<!-- #region Translation -->
 ## Translation:
 This is a very lightweight translation function that can be used to translate simple strings.  
 Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addLanguage()`](#traddlanguage) for an example on how this might be done.
@@ -2180,7 +2180,7 @@ darkenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(0, 128, 0, 0.5)"
 
 <br><br>
 
-<!-- #SECTION Utility types -->
+<!-- #region Utility types -->
 ## Utility types:
 UserUtils also offers some utility types that can be used in TypeScript projects.  
 They don't alter the runtime behavior of the code, but they can be used to make the code more readable and to prevent errors.
@@ -2305,7 +2305,7 @@ foo(1);   // type error: Argument of type '1' is not assignable to parameter of 
 
 <br><br><br><br>
 
-<!-- #MARKER Footer -->
+<!-- #region Footer -->
 <div style="text-align: center;" align="center">
 
 Made with ❤️ by [Sv443](https://github.com/Sv443)  

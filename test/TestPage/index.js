@@ -6,7 +6,7 @@ function onLoad() {
 
 document.addEventListener("DOMContentLoaded", onLoad);
 
-//#SECTION SelectorObserver
+//#region SelectorObserver
 
 function selectorObserver() {
   const container = document.querySelector("#selector-observer-cont");
@@ -51,7 +51,7 @@ async function addElements(contNum, container) {
   }
 }
 
-//#SECTION utils
+//#region utils
 
 /** @param {number} ms */
 function sleep(ms) {
