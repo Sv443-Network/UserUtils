@@ -1,5 +1,3 @@
-import type { TrustedTypesPolicy } from "./types.js";
-
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
@@ -235,7 +233,7 @@ export function getSiblingsFrame<
   return [] as TSibling[];
 }
 
-let ttPolicy: TrustedTypesPolicy | undefined;
+let ttPolicy: { createHTML: (html: string) => string } | undefined;
 
 /**
  * Sets the innerHTML property of the provided element without any sanitation or validation.  
@@ -245,7 +243,9 @@ let ttPolicy: TrustedTypesPolicy | undefined;
  * ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities!
  */
 export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(element: TElement, html: string): TElement {
+  // @ts-ignore
   if(!ttPolicy && typeof window?.trustedTypes?.createPolicy === "function") {
+    // @ts-ignore
     ttPolicy = window.trustedTypes.createPolicy("_uu_set_innerhtml_unsafe", {
       createHTML: (unsafeHtml: string) => unsafeHtml,
     });

@@ -1,18 +1,3 @@
-//#region shims
-
-export type TrustedTypesPolicy = {
-  createHTML?: (dirty: string) => string;
-};
-
-declare global {
-  interface Window {
-    // poly-shim for the new Trusted Types API
-    trustedTypes: {
-      createPolicy(name: string, policy: TrustedTypesPolicy): TrustedTypesPolicy;
-    };
-  }
-}
-
 //#region UU types
 
 /** Represents any value that is either a string itself or can be converted to one (implicitly and explicitly) because it has a toString() method */
