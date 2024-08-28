@@ -1,5 +1,16 @@
 # @sv443-network/userutils
 
+## 7.2.0
+
+### Minor Changes
+
+- 3b8aa88: Added color manipulation functions `hexToRgb()`, `rgbToHex()`, `lightenColor()` and `darkenColor()`
+- 7303aa2: Added `setInnerHtmlUnsafe()` for setting innerHTML unsanitized using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API)
+
+### Patch Changes
+
+- 7303aa2: Made `addGlobalStyle()` use the new `setInnerHtmlUnsafe()` to fix the error "This document requires 'TrustedHTML' assignment" on Chromium-based browsers
+
 ## 7.1.0
 
 ### Minor Changes
