@@ -1,4 +1,5 @@
 export * from "./array.js";
+export * from "./colors.js";
 export * from "./crypto.js";
 export * from "./DataStore.js";
 export * from "./DataStoreSerializer.js";
