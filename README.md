@@ -4,7 +4,7 @@
 ## UserUtils
 Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
   
-Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and UMD / global declaration via `@require`.  
+Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require`  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
