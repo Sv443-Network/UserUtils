@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 7.2.2
+
+### Patch Changes
+
+- a171b0d: Fix color functions not being exported 🥴
+
 ## 7.2.1
 
 ### Patch Changes
