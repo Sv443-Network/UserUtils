@@ -61,9 +61,11 @@ or view the documentation of previous major releases:
     - [`randomizeArray()`](https://github.com/Sv443-Network/UserUtils#randomizearray) - returns a copy of the array with its items in a random order
 - **Translation:**
     - [`tr()`](https://github.com/Sv443-Network/UserUtils#tr) - simple translation of a string to another language
+        - [`tr.forLang()`](https://github.com/Sv443-Network/UserUtils#trforlang) - specify a language besides the currently set one for the translation
     - [`tr.addLanguage()`](https://github.com/Sv443-Network/UserUtils#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
+    - [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils#trgettranslations) - returns the translations for the given language or the currently active one
 - **Colors:**
     - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils#hextorgb) - convert a hex color string to an RGB number tuple
     - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils#rgbtohex) - convert RGB numbers to a hex color string

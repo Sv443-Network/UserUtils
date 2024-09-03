@@ -63,9 +63,11 @@ View the documentation of previous major releases:
     - [`randomizeArray()`](#randomizearray) - returns a copy of the array with its items in a random order
   - [**Translation:**](#translation)
     - [`tr()`](#tr) - simple translation of a string to another language
+    - [`tr.forLang()`](#trforlang) - specify a language besides the currently set one for the translation
     - [`tr.addLanguage()`](#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
+    - [`tr.getTranslations()`](#trgettranslations) - returns the translations for the given language or the currently active one
   - [**Colors:**](#colors)
     - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB number tuple
     - [`rgbToHex()`](#rgbtohex) - convert RGB numbers to a hex color string
@@ -1960,6 +1962,39 @@ console.log(tr("welcome_name", "John")); // "Willkommen, John"
 
 <br>
 
+### tr.forLang()
+Usage:  
+```ts
+tr.forLang(language: string, key: string, ...values: Stringifiable[]): string
+```  
+  
+Returns the translation of the passed key in the specified language. Otherwise behaves exactly like [`tr()`](#tr)  
+This function does not change the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addLanguage("en", {
+  "welcome_name": "Welcome, %1",
+});
+
+tr.addLanguage("de", {
+  "welcome_name": "Willkommen, %1",
+});
+
+// the language is set to "en"
+tr.setLanguage("en");
+
+console.log(tr("welcome_name", "John"));               // "Welcome"
+// the language doesn't need to be changed:
+console.log(tr.forLang("de", "welcome_name", "John")); // "Willkommen, John"
+```
+</details>
+
+<br>
+
 ### tr.addLanguage()
 Usage:  
 ```ts
@@ -2079,6 +2114,37 @@ tr.getLanguage(): string | undefined
 
 Returns the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
 If no language has been set yet, it will return undefined.
+
+<br>
+
+### tr.getTranslations()
+Usage:  
+```ts
+tr.getTranslations(language?: string): Record<string, string> | undefined
+```  
+  
+Returns the translations of the specified language.  
+If no language is specified, it will return the translations of the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+If no translations are found, it will return undefined.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addLanguage("en", {
+  "welcome": "Welcome",
+});
+
+console.log(tr.getTranslations());     // undefined
+tr.setLanguage("en");
+console.log(tr.getTranslations());     // { "welcome": "Welcome" }
+
+console.log(tr.getTranslations("en")); // { "welcome": "Welcome" }
+
+console.log(tr.getTranslations("de")); // undefined
+```
+</details>
 
 <br><br>
 
