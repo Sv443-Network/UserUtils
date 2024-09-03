@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 7.3.0
+
+### Minor Changes
+
+- 7e8e147: - Added `tr.forLang()` to get the translation for a specified language code
+  - Added `tr.getTranslations()` to return the translations object for the given or currently active language
+
 ## 7.2.2
 
 ### Patch Changes
