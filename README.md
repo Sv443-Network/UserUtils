@@ -2182,7 +2182,7 @@ Usage:
 rgbToHex(red: number, green: number, blue: number, alpha?: number, withHash?: boolean, upperCase?: boolean): string
 ```  
   
-Converts RGB color values to a hex color string.  
+Converts RGB or RGBA color values to a hex color string.  
 The `withHash` parameter determines if the hash symbol should be included in the output (true by default).  
 The `upperCase` parameter determines if the output should be in uppercase (false by default).  
   
