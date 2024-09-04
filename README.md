@@ -2154,20 +2154,23 @@ The color functions are used to manipulate and convert colors in various formats
 ### hexToRgb()
 Usage:  
 ```ts
-hexToRgb(hex: string): [red: number, green: number, blue: number]
+hexToRgb(hex: string): [red: number, green: number, blue: number, alpha?: number]
 ```  
   
-Converts a hex color string to an RGB color tuple array.  
-Accepts the formats `#RRGGBB` and `#RGB`, with or without the hash symbol.  
+Converts a hex color string to an RGB or RGBA color tuple array.  
+The values of R, G and B will be in the range of 0-255, while the alpha value will be in the range of 0-1.  
+Accepts the formats `#RRGGBB`, `#RRGGBBAA`, `#RGB` and `#RGBA`, with or without the hash symbol.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { hexToRgb } from "@sv443-network/userutils";
 
-hexToRgb("#ff0000"); // [255, 0, 0]
-hexToRgb("0032ef");  // [0, 50, 239]
-hexToRgb("#0f0");    // [0, 255, 0]
+hexToRgb("#aaff85aa"); // [170, 255, 133, 0.6666666666666666]
+hexToRgb("#ff0000");   // [255, 0, 0, undefined]
+hexToRgb("0032ef");    // [0, 50, 239, undefined]
+hexToRgb("#0f0");      // [0, 255, 0, undefined]
+hexToRgb("0f0f");      // [0, 255, 0, 1]
 ```
 </details>
 
@@ -2176,7 +2179,7 @@ hexToRgb("#0f0");    // [0, 255, 0]
 ### rgbToHex()
 Usage:  
 ```ts
-rgbToHex(red: number, green: number, blue: number, withHash?: boolean, upperCase?: boolean): string
+rgbToHex(red: number, green: number, blue: number, alpha?: number, withHash?: boolean, upperCase?: boolean): string
 ```  
   
 Converts RGB color values to a hex color string.  
@@ -2188,9 +2191,9 @@ The `upperCase` parameter determines if the output should be in uppercase (false
 ```ts
 import { rgbToHex } from "@sv443-network/userutils";
 
-rgbToHex(255, 0, 0);             // "#ff0000"
-rgbToHex(255, 0, 0, false);      // "ff0000"
-rgbToHex(255, 0, 0, true, true); // "#FF0000"
+rgbToHex(255, 0, 0);                        // "#ff0000" (with hash symbol, lowercase)
+rgbToHex(255, 0, 0, 0.5, false);            // "ff000080" (with alpha, no hash symbol, lowercase)
+rgbToHex(255, 0, 0, undefined, true, true); // "#FF0000" (no alpha, with hash symbol, uppercase)
 ```
 </details>
 
@@ -2199,11 +2202,12 @@ rgbToHex(255, 0, 0, true, true); // "#FF0000"
 ### lightenColor()
 Usage:  
 ```ts
-lightenColor(color: string, percent: number): string
+lightenColor(color: string, percent: number, upperCase?: boolean): string
 ```  
   
 Lightens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
 Will not exceed the maximum range (00-FF or 0-255).  
+If the `upperCase` parameter is set to true (default is false), the output will be in uppercase.  
 Throws an error if the color format is invalid or not supported.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2212,6 +2216,7 @@ Throws an error if the color format is invalid or not supported.
 import { lightenColor } from "@sv443-network/userutils";
 
 lightenColor("#ff0000", 20);              // "#ff3333"
+lightenColor("#ff0000", 20, true);        // "#FF3333"
 lightenColor("rgb(0, 255, 0)", 50);       // "rgb(128, 255, 128)"
 lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
 ```
@@ -2222,11 +2227,12 @@ lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
 ### darkenColor()
 Usage:  
 ```ts
-darkenColor(color: string, percent: number): string
+darkenColor(color: string, percent: number, upperCase?: boolean): string
 ```  
   
 Darkens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
 Will not exceed the maximum range (00-FF or 0-255).  
+If the `upperCase` parameter is set to true (default is false), the output will be in uppercase.  
 Throws an error if the color format is invalid or not supported.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2235,6 +2241,7 @@ Throws an error if the color format is invalid or not supported.
 import { darkenColor } from "@sv443-network/userutils";
 
 darkenColor("#ff0000", 20);              // "#cc0000"
+darkenColor("#ff0000", 20, true);        // "#CC0000"
 darkenColor("rgb(0, 255, 0)", 50);       // "rgb(0, 128, 0)"
 darkenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(0, 128, 0, 0.5)"
 ```
