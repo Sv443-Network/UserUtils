@@ -1,5 +1,20 @@
 # @sv443-network/userutils
 
+## 8.0.0
+
+### Major Changes
+
+- 54ee0ce: Changed `hexToRgb()` and `rgbToHex()` to support `#RGBA` and `#RRGGBBAA` color codes (with an alpha channel).
+  Both functions now have an `alpha` value immediately after `blue`, which can be set to `undefined` to restore the old behavior.
+
+### Minor Changes
+
+- 54ee0ce: Added parameter `upperCase` (false by default) to `lightenColor()` and `darkenColor()`
+
+### Patch Changes
+
+- 54ee0ce: Consolidated behavior of `lightenColor()` and `darkenColor()` when using non-number values
+
 ## 7.3.0
 
 ### Minor Changes
