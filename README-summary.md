@@ -67,8 +67,8 @@ or view the documentation of previous major releases:
     - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
     - [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils#trgettranslations) - returns the translations for the given language or the currently active one
 - **Colors:**
-    - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils#hextorgb) - convert a hex color string to an RGB number tuple
-    - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils#rgbtohex) - convert RGB numbers to a hex color string
+    - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
+    - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils#rgbtohex) - convert RGB or RGBA values to a hex color string
     - [`lightenColor()`](https://github.com/Sv443-Network/UserUtils#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
     - [`darkenColor()`](https://github.com/Sv443-Network/UserUtils#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
 - **Utility types for TypeScript:**

@@ -69,8 +69,8 @@ View the documentation of previous major releases:
     - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
     - [`tr.getTranslations()`](#trgettranslations) - returns the translations for the given language or the currently active one
   - [**Colors:**](#colors)
-    - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB number tuple
-    - [`rgbToHex()`](#rgbtohex) - convert RGB numbers to a hex color string
+    - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
+    - [`rgbToHex()`](#rgbtohex) - convert RGB or RGBA values to a hex color string
     - [`lightenColor()`](#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
     - [`darkenColor()`](#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
   - [**Utility types for TypeScript:**](#utility-types)
