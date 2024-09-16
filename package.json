@@ -4,7 +4,14 @@
   "version": "8.0.0",
   "description": "Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "browser": "./dist/index.global.js"
+    }
+  },
   "types": "dist/lib/index.d.ts",
   "type": "module",
   "scripts": {
