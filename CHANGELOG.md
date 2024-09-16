@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.0.1
+
+### Patch Changes
+
+- a92000b: Added `exports` to package.json and corrected `module` property
+
 ## 8.0.0
 
 ### Major Changes
