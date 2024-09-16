@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.0.2
+
+### Patch Changes
+
+- a8bca8f: Added `exports.types` in addition to just `types` in package.json
+
 ## 8.0.1
 
 ### Patch Changes
