@@ -1,4 +1,5 @@
 {
+  "npm.packageManager": "pnpm",
   "javascript.preferences.importModuleSpecifier": "relative",
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,
