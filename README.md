@@ -1004,7 +1004,7 @@ It combines the data of multiple DataStore instances into a single object that c
 The options object has the following properties:
 | Property | Description |
 | :-- | :-- |
-| `id` | A unique internal identification string for this instance. If two DataStores share the same ID, they will overwrite each other's data. Choose wisely because if it is changed, the previously saved data will not be able to be loaded anymore. |
+| `id` | A unique internal identification string for this instance. If two DataStores share the same ID, they will overwrite each other's data, so it is recommended that you use a prefix that is unique to your project. |
 | `defaultData` | The default data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
@@ -1019,26 +1019,26 @@ The options object has the following properties:
 Usage: `loadData(): Promise<TData>`  
 Asynchronously loads the data from persistent storage and returns it.  
 If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and written to persistent storage.  
-If the formatVersion of the saved data is lower than the current one and the `options.migrations` property is present, the data will be migrated to the latest format before the Promise resolves.  
+If the formatVersion of the saved data is lower than the current one and the `options.migrations` property is present, the data will be migrated to the latest format before the Promise resolves.
 
 <br>
 
 #### `DataStore.getData()`
 Usage: `getData(): TData`  
 Synchronously returns the current data that is stored in the internal cache.  
-If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultData` will be returned.  
+If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultData` will be returned.
 
 <br>
 
 #### `DataStore.setData()`
 Usage: `setData(data: TData): Promise<void>`  
-Writes the given data synchronously to the internal cache and asynchronously to persistent storage.  
+Writes the given data synchronously to the internal cache and asynchronously to persistent storage.
 
 <br>
 
 #### `DataStore.saveDefaultData()`
 Usage: `saveDefaultData(): Promise<void>`  
-Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.  
+Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.
 
 <br>
 
@@ -1048,14 +1048,21 @@ Fully deletes the data from persistent storage only.
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
 If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
 This is why you should either immediately repopulate the cache and persistent storage or the page should probably be reloaded or closed after this method is called.  
-⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
+⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.
 
 <br>
 
 #### `DataStore.runMigrations()`
 Usage: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
 Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
-If `resetOnError` is set to `false`, the migration will be aborted if an error is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.  
+If `resetOnError` is set to `false`, the migration will be aborted if an error is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
+
+<br>
+
+#### `DataStore.migrateId()`
+Usage: `migrateId(oldIds: string | string[]): Promise<void>`  
+Tries to migrate the currently saved persistent data from one or more old IDs to the ID set in the constructor.  
+If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data.
 
 <br>
 
@@ -1113,7 +1120,7 @@ const migrations = {
 
 // You probably want to export this instance (or helper functions) so you can use it anywhere in your script:
 export const manager = new DataStore({
-  /** A unique ID for this instance - choose wisely as changing it is not supported and will result in data loss! */
+  /** A unique ID for this instance */
   id: "my-userscript-config",
   /** Default, initial and fallback data */
   defaultData,

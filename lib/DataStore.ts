@@ -10,7 +10,11 @@ export type DataMigrationsDict = Record<number, MigrationFunc>;
 /** Options for the DataStore instance */
 export type DataStoreOptions<TData> = 
   & {
-    /** A unique internal ID for this data store - choose wisely as changing it is not supported yet. */
+    /**
+     * A unique internal ID for this data store.  
+     * To avoid conflicts with other scripts, it is recommended to use a prefix that is unique to your script.  
+     * If you want to change the ID, you should make use of the {@linkcode DataStore.migrateId()} method.
+     */
     id: string;
     /**
      * The default data object to use if no data is saved in persistent storage yet.  
@@ -261,6 +265,32 @@ export class DataStore<TData extends object = object> {
     ]);
 
     return this.cachedData = { ...newData as TData };
+  }
+
+  /**
+   * Tries to migrate the currently saved persistent data from one or more old IDs to the ID set in the constructor.  
+   * If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data.
+   */
+  public async migrateId(oldIds: string | string[]): Promise<void> {
+    const ids = Array.isArray(oldIds) ? oldIds : [oldIds];
+    await Promise.all(ids.map(async id => {
+      const data = await this.getValue(`_uucfg-${id}`, JSON.stringify(this.defaultData));
+      const fmtVer = Number(await this.getValue(`_uucfgver-${id}`, NaN));
+      const isEncoded = Boolean(await this.getValue(`_uucfgenc-${id}`, false));
+
+      if(data === undefined || isNaN(fmtVer))
+        return;
+
+      const parsed = await this.deserializeData(data, isEncoded);
+      await Promise.allSettled([
+        this.setValue(`_uucfg-${this.id}`, await this.serializeData(parsed)),
+        this.setValue(`_uucfgver-${this.id}`, fmtVer),
+        this.setValue(`_uucfgenc-${this.id}`, isEncoded),
+        this.deleteValue(`_uucfg-${id}`),
+        this.deleteValue(`_uucfgver-${id}`),
+        this.deleteValue(`_uucfgenc-${id}`),
+      ]);
+    }));
   }
 
   //#region serialization
