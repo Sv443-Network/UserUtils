@@ -14,7 +14,7 @@ export type DataStoreOptions<TData> =
     id: string;
     /**
      * The default data object to use if no data is saved in persistent storage yet.  
-     * Until the data is loaded from persistent storage with `loadData()`, this will be the data returned by `getData()`  
+     * Until the data is loaded from persistent storage with {@linkcode DataStore.loadData()}, this will be the data returned by {@linkcode DataStore.getData()}.  
      *   
      * ⚠️ This has to be an object that can be serialized to JSON using `JSON.stringify()`, so no functions or circular references are allowed, they will cause unexpected behavior.  
      */
@@ -36,8 +36,8 @@ export type DataStoreOptions<TData> =
     migrations?: DataMigrationsDict;
     /**
      * Where the data should be saved (`"GM"` by default).  
-     * The protected methods `getValue` , `setValue`  and `deleteValue` are used to interact with the storage.  
-     * If you want to use a different storage method, you can extend the class and overwrite these methods.
+     * The protected methods {@linkcode DataStore.getValue()}, {@linkcode DataStore.setValue()}  and {@linkcode DataStore.deleteValue()} are used to interact with the storage.  
+     * `"GM"` storage, `"localStorage"` and `"sessionStorage"` are supported out of the box, but in an extended class you can overwrite those methods to implement any other storage method.
      */
     storageMethod?: "GM" | "localStorage" | "sessionStorage";
   }
@@ -69,16 +69,18 @@ export type DataStoreOptions<TData> =
 //#region class
 
 /**
- * Manages a hybrid synchronous & asynchronous persistent JSON database that is cached in memory and persistently saved across sessions using [GM storage.](https://wiki.greasespot.net/GM.setValue)  
+ * Manages a hybrid synchronous & asynchronous persistent JSON database that is cached in memory and persistently saved across sessions using [GM storage](https://wiki.greasespot.net/GM.setValue) (default), [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) or [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).  
  * Supports migrating data from older format versions to newer ones and populating the cache with default data if no persistent data is found.  
+ * Can be overridden to implement any other storage method.  
  *   
  * All methods are at least `protected`, so you can easily extend this class and overwrite them to use a different storage method or to add additional functionality.  
  * Remember that you can call `super.methodName()` in the subclass to access the original method.  
  *   
- * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue` if the storageMethod is left as the default of `"GM"`  
- * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
+ * ⚠️ The stored data has to be **serializable using `JSON.stringify()`**, meaning no undefined, circular references, etc. are allowed.  
+ * ⚠️ If the storageMethod is left as the default of `"GM"` the directives `@grant GM.getValue` and `@grant GM.setValue` are required. If you then also use the method {@linkcode DataStore.deleteData()}, the extra directive `@grant GM.deleteValue` is needed too.  
+ * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`  
  * 
- * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided) - **This has to be a JSON-compatible object!** (no undefined, circular references, etc.)
+ * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided)
  */
 export class DataStore<TData extends object = object> {
   public readonly id: string;
@@ -198,7 +200,7 @@ export class DataStore<TData extends object = object> {
    * The in-memory cache will be left untouched, so you may still access the data with {@linkcode getData()}  
    * Calling {@linkcode loadData()} or {@linkcode setData()} after this method was called will recreate persistent storage with the cached or default data.  
    *   
-   * ⚠️ This requires the additional directive `@grant GM.deleteValue`
+   * ⚠️ This requires the additional directive `@grant GM.deleteValue` if the storageMethod is left as the default of `"GM"`
    */
   public async deleteData(): Promise<void> {
     await Promise.all([
