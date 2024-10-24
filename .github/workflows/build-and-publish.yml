@@ -18,7 +18,7 @@ jobs:
       matrix:
         node-version: [22.x]
     permissions:
-      contents: read
+      contents: write # For pushing Git tags and creating releases
       id-token: write # The OIDC ID token is used for authentication with JSR
     steps:
       - uses: actions/checkout@v4
