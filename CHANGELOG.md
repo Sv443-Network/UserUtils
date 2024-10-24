@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 8.1.0
+
+### Minor Changes
+
+- 6296529: Added new DataStoreSerializer methods `loadStoresData()`, `resetStoresData()` and `deleteStoresData()` for parallelized bulk operations on DataStore instances
+- b0bce9c: Added DataStore method `migrateId()` to be able to migrate to a new ID
+
 ## 8.0.2
 
 ### Patch Changes
