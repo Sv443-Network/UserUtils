@@ -930,16 +930,12 @@ clamp(99999, 0, Infinity);   // 99999
 ### mapRange()
 Usage:  
 ```ts
-mapRange(
-  value: number,
-  range1min: number,
-  range1max: number,
-  range2min: number,
-  range2max: number
-): number
+mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number
+mapRange(value: number, range1max: number, range2max: number): number
 ```
   
 Maps a number from one range to the spot it would be in another range.  
+If only the `max` arguments are passed, the function will set the `min` for both ranges to 0.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -948,6 +944,7 @@ import { mapRange } from "@sv443-network/userutils";
 
 mapRange(5, 0, 10, 0, 100); // 50
 mapRange(5, 0, 10, 0, 50);  // 25
+mapRange(5, 10, 50);        // 25
 
 // to calculate a percentage from arbitrary values, use 0 and 100 as the second range
 // for example, if 4 files of a total of 13 were downloaded:

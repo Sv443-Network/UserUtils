@@ -4,10 +4,24 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * Transforms the value parameter from the numerical range `range1min─range1max` to the numerical range `range2min─range2max`  
+ * Transforms the value parameter from the numerical range `range1min` to `range1max` to the numerical range `range2min` to `range2max`  
  * For example, you can map the value 2 in the range of 0-5 to the range of 0-10 and you'd get a 4 as a result.
  */
-export function mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number {
+export function mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number;
+/**
+ * Transforms the value parameter from the numerical range `0` to `range1max` to the numerical range `0` to `range2max`
+ * For example, you can map the value 2 in the range of 0-5 to the range of 0-10 and you'd get a 4 as a result.
+ */
+export function mapRange(value: number, range1max: number, range2max: number): number;
+export function mapRange(value: number, range1min: number, range1max: number, range2min?: number, range2max?: number): number {
+  // overload
+  if(typeof range2min === "undefined" || range2max === undefined) {
+    range2max = range1max;
+    range2min = 0;
+    range1max = range1min;
+    range1min = 0;
+  }
+
   if(Number(range1min) === 0.0 && Number(range2min) === 0.0)
     return value * (range2max / range1max);
 
