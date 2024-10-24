@@ -1,6 +1,6 @@
 import { access, constants as fsconstants, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import pkg from "../package.json" assert { type: "json" };
+import pkg from "../package.json" with { type: "json" };
 
 const { exit } = process;
 
