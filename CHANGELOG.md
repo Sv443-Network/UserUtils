@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.2.0
+
+### Minor Changes
+
+- 3fe8b25: Added overload to mapRange() that only needs both `max` range values and assumes 0 for both `min` values
+
 ## 8.1.0
 
 ### Minor Changes
