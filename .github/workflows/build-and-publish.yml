@@ -32,7 +32,7 @@ jobs:
           name: dist
           path: dist/
           retention-days: 2
-      - name: Create release
+      - name: Create release or publish package
         uses: changesets/action@v1
         id: changesets
         with:
