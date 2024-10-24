@@ -25,7 +25,7 @@
     "dev": "npm run build-common -- --sourcemap --watch --onSuccess \"npm run build-types && echo Finished building.\"",
     "dev-all": "npm run build-all -- --watch",
     "update-jsr-version": "npm run node-ts -- ./tools/update-jsr-version.mts",
-    "publish-package": "changeset publish && npm run publish-package-jsr",
+    "publish-package": "changeset publish",
     "publish-package-jsr": "npm run update-jsr-version && npx jsr publish",
     "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm",
     "test-serve": "npm run node-ts -- ./test/TestPage/server.mts",
