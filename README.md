@@ -186,8 +186,9 @@ Additionally, there are the following extra options:
 
 <br>
 
-#### Methods:
-`addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
+### Methods:
+#### `SelectorObserver.addListener()`
+Usage: `SelectorObserver.addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
 Adds a listener (specified in `options.listener`) for the given selector that will be called once the selector exists in the DOM. It will be passed the element(s) that match the selector as the only argument.  
 The listener will be called immediately if the selector already exists in the DOM.  
 
@@ -216,45 +217,53 @@ The listener will be called immediately if the selector already exists in the DO
   
 <br>
 
-`enable(immediatelyCheckSelectors?: boolean): boolean`  
+#### `SelectorObserver.enable()`
+Usage: `SelectorObserver.enable(immediatelyCheckSelectors?: boolean): boolean`  
 Enables the observation of the child elements for the first time or if it was disabled before.  
 `immediatelyCheckSelectors` is set to true by default, which means all previously registered selectors will be checked. Set to false to only check them on the first detected mutation.  
 Returns true if the observation was enabled, false if it was already enabled or the passed `baseElementSelector` couldn't be found.  
   
 <br>
 
-`disable(): void`  
+#### `SelectorObserver.disable()`
+Usage: `SelectorObserver.disable(): void`  
 Disables the observation of the child elements.  
 If selectors are currently being checked, the current selector will be finished before disabling.  
   
 <br>
 
-`isEnabled(): boolean`  
+#### `SelectorObserver.isEnabled()`
+Usage: `SelectorObserver.isEnabled(): boolean`  
 Returns whether the observation of the child elements is currently enabled.  
   
 <br>
 
-`clearListeners(): void`  
+#### `SelectorObserver.clearListeners()`
+Usage: `SelectorObserver.clearListeners(): void`  
 Removes all listeners for all selectors.  
   
 <br>
 
-`removeAllListeners(selector: string): boolean`  
+#### `SelectorObserver.removeAllListeners()`
+Usage: `SelectorObserver.removeAllListeners(selector: string): boolean`  
 Removes all listeners for the given selector.  
   
 <br>
 
-`removeListener(selector: string, options: SelectorListenerOptions): boolean`  
+#### `SelectorObserver.removeListener()`
+Usage: `SelectorObserver.removeListener(selector: string, options: SelectorListenerOptions): boolean`  
 Removes a specific listener for the given selector and options.  
   
 <br>
 
-`getAllListeners(): Map<string, SelectorListenerOptions[]>`  
+#### `SelectorObserver.getAllListeners()`
+Usage: `SelectorObserver.getAllListeners(): Map<string, SelectorListenerOptions[]>`  
 Returns a Map of all selectors and their listeners.  
   
 <br>
 
-`getListeners(selector: string): SelectorListenerOptions[] | undefined`  
+#### `SelectorObserver.getListeners()`
+Usage: `SelectorObserver.getListeners(selector: string): SelectorListenerOptions[] | undefined`  
 Returns all listeners for the given selector or undefined if there are none.  
 
 <br>
@@ -1005,34 +1014,53 @@ The options object has the following properties:
 
 <br>
 
-#### Methods:
-`loadData(): Promise<TData>`  
+### Methods:
+#### `DataStore.loadData()`
+Usage: `loadData(): Promise<TData>`  
 Asynchronously loads the data from persistent storage and returns it.  
 If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and written to persistent storage.  
 If the formatVersion of the saved data is lower than the current one and the `options.migrations` property is present, the data will be migrated to the latest format before the Promise resolves.  
-  
-`getData(): TData`  
+
+<br>
+
+#### `DataStore.getData()`
+Usage: `getData(): TData`  
 Synchronously returns the current data that is stored in the internal cache.  
 If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultData` will be returned.  
-  
-`setData(data: TData): Promise<void>`  
+
+<br>
+
+#### `DataStore.setData()`
+Usage: `setData(data: TData): Promise<void>`  
 Writes the given data synchronously to the internal cache and asynchronously to persistent storage.  
-  
-`saveDefaultData(): Promise<void>`  
+
+<br>
+
+#### `DataStore.saveDefaultData()`
+Usage: `saveDefaultData(): Promise<void>`  
 Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.  
-  
-`deleteData(): Promise<void>`  
+
+<br>
+
+#### `DataStore.deleteData()`
+Usage: `deleteData(): Promise<void>`  
 Fully deletes the data from persistent storage only.  
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
 If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
 This is why you should either immediately repopulate the cache and persistent storage or the page should probably be reloaded or closed after this method is called.  
 ⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.  
-  
-`runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
+
+<br>
+
+#### `DataStore.runMigrations()`
+Usage: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
 Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
 If `resetOnError` is set to `false`, the migration will be aborted if an error is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.  
-  
-`encodingEnabled(): boolean`  
+
+<br>
+
+#### `DataStore.encodingEnabled()`
+Usage: `encodingEnabled(): boolean`  
 Returns `true` if both `options.encodeData` and `options.decodeData` are set, else `false`.  
 Uses TypeScript's type guard notation for easier use in conditional statements.
 
@@ -1161,12 +1189,9 @@ The options object has the following properties:
 
 <br>
 
-#### Methods:
-`constructor(stores: DataStore[], options?: DataStoreSerializerOptions)`  
-Creates a new DataStoreSerializer instance with the given DataStore instances and options.  
-If no options are passed, the defaults will be used.  
-  
-`serialize(): Promise<string>`  
+### Methods:
+#### `DataStoreSerializer.serialize()`
+Usage: `serialize(): Promise<string>`  
 Serializes all DataStore instances passed in the constructor and returns the serialized data as a JSON string.  
 <details><summary>Click to view the structure of the returned data.</summary>  
 
@@ -1185,15 +1210,65 @@ Serializes all DataStore instances passed in the constructor and returns the ser
 ]
 ```
 </details>  
-  
-`deserialize(data: string): Promise<void>`  
-Deserializes the given JSON string and imports the data into the DataStore instances.  
+
+<br>
+
+#### `DataStoreSerializer.deserialize()`
+Usage: `deserialize(data: string): Promise<void>`  
+Deserializes the given string that was created with `serialize()` and imports the contained data each DataStore instance.  
 In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.
   
 If `ensureIntegrity` is set to `true` and the checksum doesn't match, an error will be thrown.  
 If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
 If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
 If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
+  
+<br>
+
+#### `DataStoreSerializer.loadStoresData()`
+Usage: `loadStoresData(): PromiseSettledResult<{ id: string, data: object }>[];`  
+Loads the persistent data of the DataStore instances into the in-memory cache of each DataStore instance.  
+Also triggers the migration process if the data format has changed.  
+See the [`DataStore.loadData()`](#datastoreloaddata) method for more information.  
+  
+<details><summary>Click to view the structure of the returned data.</summary>  
+
+```jsonc
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "id": "foo-data",
+      "data": {
+        "foo": "hello",
+        "bar": "world"
+      }
+    }
+  },
+  {
+    "status": "rejected",
+    "reason": "Checksum mismatch for DataStore with ID \"bar-data\"!\nExpected: 69beefdead420\nHas: 420abcdef69"
+  }
+]
+```
+
+</details>
+
+<br>
+
+#### `DataStoreSerializer.resetStoresData()`
+Usage: `resetStoresData(): PromiseSettledResult[];`  
+Resets the persistent data of the DataStore instances to their default values.  
+This affects both the in-memory cache and the persistent storage.  
+Any call to `serialize()` will then use the value of `options.defaultData` of the respective DataStore instance.  
+
+<br>
+
+#### `DataStoreSerializer.deleteStoresData()`
+Usage: `deleteStoresData(): PromiseSettledResult[];`  
+Deletes the persistent data of the DataStore instances from the set storage method.  
+Leaves the in-memory cache of the DataStore instances untouched.  
+Any call to `setData()` on the instances will recreate their own persistent storage data.
 
 <br>
 
@@ -1234,9 +1309,8 @@ const serializer = new DataStoreSerializer([fooStore, barStore], {
 });
 
 async function exportMyDataPls() {
-  // first, make sure the persistent data of the stores is loaded into their caches:
-  await fooStore.loadData();
-  await barStore.loadData();
+  // first, make sure the persistent data of all stores is loaded into their caches:
+  await serializer.loadStoresData();
 
   // now serialize the data:
   const serializedData = await serializer.serialize();
@@ -1269,17 +1343,22 @@ async function exportMyDataPls() {
 }
 
 async function importMyDataPls() {
-  // grab the data from the file by using the system file picker or any other method
+  // grab the data from the file by using the system file picker or a text field or something similar
   const data = await getDataFromSomewhere();
 
   try {
-    // import the data
+    // import the data and run migrations if necessary
     await serializer.deserialize(data);
   }
   catch(err) {
     console.error(err);
     alert(`Data import failed: ${err}`);
   }
+}
+
+async function resetMyDataPls() {
+  // reset the data of all stores in both the cache and the persistent storage
+  await serializer.resetStoresData();
 }
 ```
 </details>
@@ -1313,41 +1392,71 @@ The options object has the following properties:
 | `verticalAlign?: "top" \| "center" \| "bottom"` | (Optional) Where to align or anchor the dialog vertically. Defaults to `"center"`. |
 | `strings?: Partial<typeof defaultStrings>` | (Optional) Strings used in the dialog (used for translations). Defaults to the default English strings (importable with the name `defaultStrings`). |
 | `dialogCss?: string` | (Optional) CSS to apply to the dialog. Defaults to the default (importable with the name `defaultDialogCss`). |
-  
-Methods:  
-`open(): Promise<void>`  
+
+<br>
+
+### Methods:
+#### `Dialog.open()`
+Usage: `open(): Promise<void>`  
 Opens the dialog.  
-  
-`close(): void`  
+
+<br>
+
+#### `Dialog.close()`
+Usage: `close(): void`  
 Closes the dialog.  
-  
-`mount(): Promise<void>`  
+
+<br>
+
+#### `Dialog.mount()`
+Usage: `mount(): Promise<void>`  
 Mounts the dialog to the DOM by calling the render functions provided in the options object.  
 Can be done before opening the dialog to avoid a delay.  
-  
-`unmount(): void`  
+
+<br>
+
+#### `Dialog.unmount()`
+Usage: `unmount(): void`  
 Unmounts the dialog from the DOM.  
-  
-`remount(): Promise<void>`  
+
+<br>
+
+#### `Dialog.remount()`
+Usage: `remount(): Promise<void>`  
 Unmounts and mounts the dialog again.  
 The render functions in the options object will be called again.  
 May cause a flickering effect due to the rendering delay.  
-  
-`isOpen(): boolean`  
+
+<br>
+
+#### `Dialog.isOpen()`
+Usage: `isOpen(): boolean`  
 Returns `true` if the dialog is open, else `false`.  
-  
-`isMounted(): boolean`  
+
+<br>
+
+#### `Dialog.isMounted()`
+Usage: `isMounted(): boolean`  
 Returns `true` if the dialog is mounted, else `false`.  
-  
-`destroy(): void`  
+
+<br>
+
+#### `Dialog.destroy()`
+Usage: `destroy(): void`  
 Destroys the dialog.  
 Removes all listeners and unmounts the dialog by default.  
-  
-`static getCurrentDialogId(): string`  
+
+<br>
+
+#### `Dialog.getCurrentDialogId()`
+Usage: `static getCurrentDialogId(): string`  
 Static method that returns the ID of the currently open dialog.  
 Needs to be called without creating an instance of the class.  
-  
-`static getOpenDialogs(): string[]`  
+
+<br>
+
+#### `Dialog.getOpenDialogs()`
+Usage: `static getOpenDialogs(): string[]`  
 Static method that returns an array of the IDs of all open dialogs.  
 Needs to be called without creating an instance of the class.  
   

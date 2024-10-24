@@ -21,6 +21,14 @@ export type SerializedDataStore = {
   checksum?: string;
 };
 
+/** Result of {@linkcode DataStoreSerializer.loadStoresData()} */
+export type LoadStoresDataResult = {
+  /** The ID of the DataStore instance */
+  id: string;
+  /** The in-memory data object */
+  data: object;
+}
+
 /**
  * Allows for easy serialization and deserialization of multiple DataStore instances.  
  *   
@@ -105,5 +113,32 @@ export class DataStoreSerializer {
       else
         await storeInst.setData(JSON.parse(decodedData));
     }
+  }
+
+  /**
+   * Loads the persistent data of the DataStore instances into the in-memory cache.  
+   * Also triggers the migration process if the data format has changed.
+   * @returns Returns a PromiseSettledResult array with the results of each DataStore instance in the format `{ id: string, data: object }`
+   */
+  public async loadStoresData(): Promise<PromiseSettledResult<LoadStoresDataResult>[]> {
+    return Promise.allSettled(this.stores.map(
+      async store => ({
+        id: store.id,
+        data: await store.loadData(),
+      })
+    ));
+  }
+
+  /** Resets the persistent data of the DataStore instances to their default values. */
+  public async resetStoresData(): Promise<PromiseSettledResult<void>[]> {
+    return Promise.allSettled(this.stores.map(store => store.saveDefaultData()));
+  }
+
+  /**
+   * Deletes the persistent data of the DataStore instances.  
+   * Leaves the in-memory data untouched.
+   */
+  public async deleteStoresData(): Promise<PromiseSettledResult<void>[]> {
+    return Promise.allSettled(this.stores.map(store => store.deleteData()));
   }
 }
