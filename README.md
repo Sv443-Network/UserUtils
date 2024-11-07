@@ -1403,25 +1403,28 @@ The options object has the following properties:
 #### `Dialog.open()`
 Usage: `open(): Promise<void>`  
 Opens the dialog.  
+If the dialog is not mounted yet, it will be mounted before opening.  
 
 <br>
 
 #### `Dialog.close()`
 Usage: `close(): void`  
 Closes the dialog.  
+If `options.destroyOnClose` is set to `true`, [`Dialog.destroy()`](#dialogdestroy) will be called immediately after closing.
 
 <br>
 
 #### `Dialog.mount()`
 Usage: `mount(): Promise<void>`  
 Mounts the dialog to the DOM by calling the render functions provided in the options object.  
-Can be done before opening the dialog to avoid a delay.  
+After calling, the dialog will exist in the DOM but will be invisible until [`Dialog.open()`](#dialogopen) is called.  
+Call this before opening the dialog to avoid a rendering delay.  
 
 <br>
 
 #### `Dialog.unmount()`
 Usage: `unmount(): void`  
-Unmounts the dialog from the DOM.  
+Closes the dialog first if it's open, then removes it from the DOM.  
 
 <br>
 
@@ -1448,7 +1451,7 @@ Returns `true` if the dialog is mounted, else `false`.
 #### `Dialog.destroy()`
 Usage: `destroy(): void`  
 Destroys the dialog.  
-Removes all listeners and unmounts the dialog by default.  
+Removes all listeners by default and closes and unmounts the dialog.  
 
 <br>
 
@@ -1503,6 +1506,10 @@ const fooDialog = new Dialog({
 
 fooDialog.on("close", () => {
   console.log("Dialog closed");
+});
+
+fooDialog.on("open", () => {
+  console.log("Currently open dialogs:", Dialog.getOpenDialogs());
 });
 
 fooDialog.open();
