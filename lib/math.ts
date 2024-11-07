@@ -28,13 +28,22 @@ export function mapRange(value: number, range1min: number, range1max: number, ra
   return (value - range1min) * ((range2max - range2min) / (range1max - range1min)) + range2min;
 }
 
-/** Returns a random number between {@linkcode min} and {@linkcode max} (inclusive) */
-export function randRange(min: number, max: number): number
-/** Returns a random number between 0 and {@linkcode max} (inclusive) */
-export function randRange(max: number): number
-/** Returns a random number between {@linkcode min} and {@linkcode max} (inclusive) */
-export function randRange(...args: number[]): number {
-  let min: number, max: number;
+/**
+ * Returns a random number between {@linkcode min} and {@linkcode max} (inclusive)  
+ * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take MUCH longer to generate)
+ */
+export function randRange(min: number, max: number, enhancedEntropy?: boolean): number
+/**
+ * Returns a random number between 0 and {@linkcode max} (inclusive)  
+ * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take MUCH longer to generate)
+ */
+export function randRange(max: number, enhancedEntropy?: boolean): number
+/**
+ * Returns a random number between {@linkcode min} and {@linkcode max} (inclusive)  
+ * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take MUCH longer to generate)
+ */
+export function randRange(...args: (number | boolean | undefined)[]): number {
+  let min: number, max: number, enhancedEntropy = false;
 
   // using randRange(min, max)
   if(typeof args[0] === "number" && typeof args[1] === "number")
@@ -47,6 +56,11 @@ export function randRange(...args: number[]): number {
   else
     throw new TypeError(`Wrong parameter(s) provided - expected: "number" and "number|undefined", got: "${typeof args[0]}" and "${typeof args[1]}"`);
 
+  if(typeof args[2] === "boolean")
+    enhancedEntropy = args[2];
+  else if(typeof args[1] === "boolean")
+    enhancedEntropy = args[1];
+
   min = Number(min);
   max = Number(max);
 
@@ -56,5 +70,14 @@ export function randRange(...args: number[]): number {
   if(min > max)
     throw new TypeError("Parameter \"min\" can't be bigger than \"max\"");
 
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  if(enhancedEntropy) {
+    const uintArr = new Uint8Array(1);
+    crypto.getRandomValues(uintArr);
+    return Number(Array.from(
+      uintArr,
+      (v) => mapRange(v, 0, 255, min, max).toString(10).substring(0, 1),
+    ).join(""));
+  }
+  else
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
