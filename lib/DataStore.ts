@@ -39,6 +39,13 @@ export type DataStoreOptions<TData> =
      */
     migrations?: DataMigrationsDict;
     /**
+     * If an ID or multiple IDs are passed here, the data will be migrated from the old ID(s) to the current ID.  
+     * This will happen once per page load, when {@linkcode DataStore.loadData()} is called.  
+     * All future calls to {@linkcode DataStore.loadData()} in the session will not check for the old ID(s) anymore.  
+     * To migrate IDs manually, use the method {@linkcode DataStore.migrateId()} instead.
+     */
+    migrateIds?: string | string[];
+    /**
      * Where the data should be saved (`"GM"` by default).  
      * The protected methods {@linkcode DataStore.getValue()}, {@linkcode DataStore.setValue()}  and {@linkcode DataStore.deleteValue()} are used to interact with the storage.  
      * `"GM"` storage, `"localStorage"` and `"sessionStorage"` are supported out of the box, but in an extended class you can overwrite those methods to implement any other storage method.
@@ -95,6 +102,7 @@ export class DataStore<TData extends object = object> {
   public readonly storageMethod: Required<DataStoreOptions<TData>>["storageMethod"];
   private cachedData: TData;
   private migrations?: DataMigrationsDict;
+  private migrateIds: string[] = [];
 
   /**
    * Creates an instance of DataStore to manage a sync & async database that is cached in memory and persistently saved across sessions.  
@@ -112,6 +120,8 @@ export class DataStore<TData extends object = object> {
     this.defaultData = options.defaultData;
     this.cachedData = options.defaultData;
     this.migrations = options.migrations;
+    if(options.migrateIds)
+      this.migrateIds = Array.isArray(options.migrateIds) ? options.migrateIds : [options.migrateIds];
     this.storageMethod = options.storageMethod ?? "GM";
     this.encodeData = options.encodeData;
     this.decodeData = options.decodeData;
@@ -126,6 +136,11 @@ export class DataStore<TData extends object = object> {
    */
   public async loadData(): Promise<TData> {
     try {
+      if(this.migrateIds.length > 0) {
+        await this.migrateId(this.migrateIds);
+        this.migrateIds = [];
+      }
+
       const gmData = await this.getValue(`_uucfg-${this.id}`, JSON.stringify(this.defaultData));
       let gmFmtVer = Number(await this.getValue(`_uucfgver-${this.id}`, NaN));
 

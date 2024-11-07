@@ -1009,6 +1009,7 @@ The options object has the following properties:
 | `defaultData` | The default data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
+| `migrateIds?` | (Optional) A string or array of strings that migrate from one or more old IDs to the ID set in the constructor. If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data. The ID migration will be done once per session in the call to [`loadData()`](#datastoreloaddata). |
 | `storageMethod?` | (Optional) The method that is used to store the data. Can be `"GM"` (default), `"localStorage"` or `"sessionStorage"`. If you want to store the data in a different way, you can override the methods of the DataStore class. |
 | `encodeData?` | (Optional, but required when `decodeData` is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
 | `decodeData?` | (Optional, but required when `encodeData` is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
@@ -1019,8 +1020,9 @@ The options object has the following properties:
 #### `DataStore.loadData()`
 Usage: `loadData(): Promise<TData>`  
 Asynchronously loads the data from persistent storage and returns it.  
-If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and written to persistent storage.  
-If the formatVersion of the saved data is lower than the current one and the `options.migrations` property is present, the data will be migrated to the latest format before the Promise resolves.
+If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and also written to persistent storage before resolving.  
+If the `options.migrateIds` property is present and this is the first time calling this function in this session, the data will be migrated from the old ID(s) to the current one.  
+Then, if the `formatVersion` of the saved data is lower than the current one and the `options.migrations` property is present, the instance will try to migrate the data to the latest format before resolving, updating the in-memory cache and persistent storage.  
 
 <br>
 
@@ -1063,7 +1065,8 @@ If `resetOnError` is set to `false`, the migration will be aborted if an error i
 #### `DataStore.migrateId()`
 Usage: `migrateId(oldIds: string | string[]): Promise<void>`  
 Tries to migrate the currently saved persistent data from one or more old IDs to the ID set in the constructor.  
-If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data.
+If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data.  
+Instead of calling this manually, consider setting the `migrateIds` property in the constructor to automatically migrate the data once per session in the call to `loadData()`, unless you know that you need to migrate the ID(s) manually.
 
 <br>
 
@@ -1125,10 +1128,12 @@ export const manager = new DataStore({
   id: "my-userscript-config",
   /** Default, initial and fallback data */
   defaultData,
-  /** The current version of the data format */
+  /** The current version of the data format - should be a whole number that is only ever incremented */
   formatVersion,
   /** Data format migration functions called when the formatVersion is increased */
   migrations,
+  /** If the data was saved under different ID(s) before, providing them here will make sure the data is migrated to the current ID when `loadData()` is called */
+  migrateIds: ["my-data", "config"],
   /**
    * Where the data should be stored.  
    * For example, you could use `"sessionStorage"` to make the data be automatically deleted after the browser session is finished, or use `"localStorage"` if you don't have access to GM storage for some reason.
@@ -1255,7 +1260,7 @@ See the [`DataStore.loadData()`](#datastoreloaddata) method for more information
   },
   {
     "status": "rejected",
-    "reason": "Checksum mismatch for DataStore with ID \"bar-data\"!\nExpected: 69beefdead420\nHas: 420abcdef69"
+    "reason": "Checksum mismatch for DataStore with ID \"bar-data\"!\nExpected: 69beefdead420\nHas: abcdef42"
   }
 ]
 ```
