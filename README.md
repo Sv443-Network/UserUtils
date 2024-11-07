@@ -1600,6 +1600,7 @@ myInstance.on("foo", (bar) => {
   console.log("foo event (outside):", bar);
 });
 
+// only works if publicEmit is set to true
 myInstance.emit("baz", "hello from the outside");
 
 myInstance.unsubscribeAll();
@@ -1633,6 +1634,7 @@ myEmitter.once("baz", (qux) => {
 });
 
 function doStuff() {
+  // only works if publicEmit is set to true
   myEmitter.emit("foo", "hello");
   myEmitter.emit("baz", 42);
   myEmitter.emit("foo", "world");
