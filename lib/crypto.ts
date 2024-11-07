@@ -1,5 +1,5 @@
 import { getUnsafeWindow } from "./dom.js";
-import { mapRange } from "./math.js";
+import { mapRange, randRange } from "./math.js";
 
 /** Compresses a string or an ArrayBuffer using the provided {@linkcode compressionFormat} and returns it as a base64 string */
 export async function compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
@@ -73,19 +73,29 @@ export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-
  * @param length The length of the ID to generate (defaults to 16)
  * @param radix The [radix](https://en.wikipedia.org/wiki/Radix) of each digit (defaults to 16 which is hexadecimal. Use 2 for binary, 10 for decimal, 36 for alphanumeric, etc.)
  * @param enhancedEntropy If set to true, uses [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for better cryptographic randomness (this also makes it take MUCH longer to generate)  
+ * @param randomCase If set to false, the generated ID will be lowercase only - also makes use of the `enhancedEntropy` parameter unless the output doesn't contain letters
  */
-export function randomId(length = 16, radix = 16, enhancedEntropy = false): string {
+export function randomId(length = 16, radix = 16, enhancedEntropy = false, randomCase = true): string {
+  let arr: string[] = [];
+  const caseArr = randomCase ? [0, 1] : [0];
+
   if(enhancedEntropy) {
-    const arr = new Uint8Array(length);
-    crypto.getRandomValues(arr);
-    return Array.from(
-      arr,
+    const uintArr = new Uint8Array(length);
+    crypto.getRandomValues(uintArr);
+    arr = Array.from(
+      uintArr,
       (v) => mapRange(v, 0, 255, 0, radix).toString(radix).substring(0, 1),
-    ).join("");
+    );
+  }
+  else {
+    arr = Array.from(
+      { length },
+      () => Math.floor(Math.random() * radix).toString(radix),
+    );
   }
 
-  return Array.from(
-    { length },
-    () => Math.floor(Math.random() * radix).toString(radix),
-  ).join("");
+  if(!arr.some((v) => /[a-zA-Z]/.test(v)))
+    return arr.join("");
+
+  return arr.map((v) => caseArr[randRange(0, caseArr.length - 1, enhancedEntropy)] === 1 ? v.toUpperCase() : v).join("");
 }
