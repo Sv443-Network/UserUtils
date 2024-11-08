@@ -30,17 +30,17 @@ export function mapRange(value: number, range1min: number, range1max: number, ra
 
 /**
  * Returns a random number between {@linkcode min} and {@linkcode max} (inclusive)  
- * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take MUCH longer to generate)
+ * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take longer to generate)
  */
 export function randRange(min: number, max: number, enhancedEntropy?: boolean): number
 /**
  * Returns a random number between 0 and {@linkcode max} (inclusive)  
- * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take MUCH longer to generate)
+ * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take longer to generate)
  */
 export function randRange(max: number, enhancedEntropy?: boolean): number
 /**
  * Returns a random number between {@linkcode min} and {@linkcode max} (inclusive)  
- * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take MUCH longer to generate)
+ * Set {@linkcode enhancedEntropy} to true to use `crypto.getRandomValues()` for better cryptographic randomness (this also makes it take longer to generate)
  */
 export function randRange(...args: (number | boolean | undefined)[]): number {
   let min: number, max: number, enhancedEntropy = false;
@@ -75,7 +75,7 @@ export function randRange(...args: (number | boolean | undefined)[]): number {
     crypto.getRandomValues(uintArr);
     return Number(Array.from(
       uintArr,
-      (v) => mapRange(v, 0, 255, min, max).toString(10).substring(0, 1),
+      (v) => Math.round(mapRange(v, 0, 255, min, max)).toString(10).substring(0, 1),
     ).join(""));
   }
   else
