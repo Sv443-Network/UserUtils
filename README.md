@@ -966,7 +966,7 @@ Returns a random number between `min` and `max` (inclusive).
 If only one argument is passed, it will be used as the `max` value and `min` will be set to 0.  
   
 If `enhancedEntropy` is set to true (false by default), the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) is used for generating the random numbers.  
-Note that this takes MUCH longer, but the generated IDs will have a higher entropy.  
+Note that this makes the function call take longer, but the generated IDs will have a higher entropy.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -977,6 +977,22 @@ randRange(0, 10);       // 4
 randRange(10, 20);      // 17
 randRange(10);          // 7
 randRange(0, 10, true); // 4 (the devil is in the details)
+
+
+function benchmark(enhancedEntropy: boolean) {
+  const timestamp = Date.now();
+  for(let i = 0; i < 100_000; i++)
+    randRange(0, 100, enhancedEntropy);
+  console.log(`Generated 100k in ${Date.now() - timestamp}ms`)
+}
+
+// using Math.random():
+benchmark(false); // Generated 100k in 90ms
+
+// using crypto.getRandomValues():
+benchmark(true);  // Generated 100k in 461ms
+
+// about a 5x slowdown, but the generated numbers are more entropic
 ```
 </details>
 
@@ -1926,7 +1942,7 @@ You may change the radix to get digits from different numerical systems.
 Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alphanumeric.  
   
 If `enhancedEntropy` is set to true (false by default), the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) is used for generating the random numbers.  
-Note that this takes MUCH longer, but the generated IDs will have a higher entropy.  
+Note that this makes the function call take longer, but the generated IDs will have a higher entropy.  
   
 If `randomCase` is set to true (which it is by default), the generated ID will contain both upper and lower case letters.  
 This randomization is also affected by the `enhancedEntropy` setting, unless there are no alphabetic characters in the output in which case it will be skipped.  
@@ -1943,6 +1959,24 @@ randomId(10);                  // "f86cd354a4"       (length 10, radix 16)
 randomId(10, 2);               // "1010001101"       (length 10, radix 2)
 randomId(10, 10);              // "0183428506"       (length 10, radix 10)
 randomId(10, 36, false, true); // "z46jFPa37R"       (length 10, radix 36, random case)
+
+
+function benchmark(enhancedEntropy: boolean, randomCase: boolean) {
+  const timestamp = Date.now();
+  for(let i = 0; i < 10_000; i++)
+    randomId(16, 36, enhancedEntropy, randomCase);
+  console.log(`Generated 10k in ${Date.now() - timestamp}ms`)
+}
+
+// using Math.random():
+benchmark(false, false); // Generated 10k in 239ms
+benchmark(false, true);  // Generated 10k in 248ms
+
+// using crypto.getRandomValues():
+benchmark(true, false);  // Generated 10k in 1076ms
+benchmark(true, true);   // Generated 10k in 1054ms
+
+// 3rd and 4th have a similar time, but in reality the 4th blocks the event loop for much longer
 ```
 </details>
 
