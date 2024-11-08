@@ -26,7 +26,7 @@
     "dev-all": "npm run build-all -- --watch",
     "update-jsr-version": "npm run node-ts -- ./tools/update-jsr-version.mts",
     "publish-package": "changeset publish",
-    "publish-package-jsr": "npm run update-jsr-version && npx jsr publish",
+    "publish-package-jsr": "npm run update-jsr-version && npx jsr publish --allow-dirty",
     "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm",
     "test-serve": "npm run node-ts -- ./test/TestPage/server.mts",
     "test-dev": "cd test/TestScript && npm run dev",
