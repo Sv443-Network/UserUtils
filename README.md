@@ -1775,23 +1775,31 @@ fetchAdvanced(input: string | Request | URL, options?: {
   
 A drop-in replacement for the native `fetch()` function that adds options like a timeout property.  
 The timeout will default to 10 seconds if left undefined. Set it to a negative number to disable the timeout.  
-Note that the `signal` option will be overwritten if passed.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { fetchAdvanced } from "@sv443-network/userutils";
 
+const { signal, abort } = new AbortController();
+
 fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
+  // times out after 5 seconds:
   timeout: 5000,
-  // also accepts any other fetch options like headers:
+  // also accepts any other fetch options like headers and signal:
   headers: {
     "Accept": "text/plain",
   },
+  // makes the request abortable:
+  signal,
 }).then(async (response) => {
   console.log("Fetch data:", await response.text());
 }).catch((err) => {
   console.error("Fetch error:", err);
+});
+
+document.querySelector("button#cancel")?.addEventListener("click", () => {
+  abort();
 });
 ```
 </details>

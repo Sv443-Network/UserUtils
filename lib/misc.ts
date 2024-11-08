@@ -46,42 +46,43 @@ export function debounce<
   timeout = 300,
   edge: "rising" | "falling" = "falling"
 ): (...args: TArgs[]) => void {
-  let timer: NodeJS.Timeout | undefined;
+  let id: ReturnType<typeof setTimeout> | undefined;
 
   return function(...args: TArgs[]) {
     if(edge === "rising") {
-      if(!timer) {
+      if(!id) {
         func.apply(this, args);
-        timer = setTimeout(() => timer = undefined, timeout);
+        id = setTimeout(() => id = undefined, timeout);
       }
     }
     else {
-      clearTimeout(timer);
-      timer = setTimeout(() => func.apply(this, args), timeout);
+      clearTimeout(id);
+      id = setTimeout(() => func.apply(this, args), timeout);
     }
   };
 }
 
 /** Options for the `fetchAdvanced()` function */
-export type FetchAdvancedOpts = Prettify<Omit<
-  RequestInit & Partial<{
+export type FetchAdvancedOpts = Prettify<
+  Partial<{
     /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
     timeout: number;
-  }>,
-  "signal"
->>;
+  }> & RequestInit
+>;
 
 /** Calls the fetch API with special options like a timeout */
 export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdvancedOpts = {}): Promise<Response> {
   const { timeout = 10000 } = options;
+  const { signal, abort } = new AbortController();
+
+  options.signal?.addEventListener("abort", abort);
 
   let signalOpts: Partial<RequestInit> = {},
-    id: NodeJS.Timeout | undefined = undefined;
+    id: ReturnType<typeof setTimeout> | undefined = undefined;
 
   if(timeout >= 0) {
-    const controller = new AbortController();
-    id = setTimeout(() => controller.abort(), timeout);
-    signalOpts = { signal: controller.signal };
+    id = setTimeout(() => abort(), timeout);
+    signalOpts = { signal };
   }
 
   try {
