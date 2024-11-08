@@ -1,4 +1,4 @@
-import type { Stringifiable } from "./types.js";
+import type { Prettify, Stringifiable } from "./types.js";
 
 /**
  * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1
@@ -63,13 +63,13 @@ export function debounce<
 }
 
 /** Options for the `fetchAdvanced()` function */
-export type FetchAdvancedOpts = Omit<
+export type FetchAdvancedOpts = Prettify<Omit<
   RequestInit & Partial<{
     /** Timeout in milliseconds after which the fetch call will be canceled with an AbortController signal */
     timeout: number;
   }>,
   "signal"
->;
+>>;
 
 /** Calls the fetch API with special options like a timeout */
 export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdvancedOpts = {}): Promise<Response> {

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { Prettify } from "./types.js";
+
 //#region types
 
 /** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
@@ -8,7 +10,7 @@ type MigrationFunc = (oldData: any) => any | Promise<any>;
 export type DataMigrationsDict = Record<number, MigrationFunc>;
 
 /** Options for the DataStore instance */
-export type DataStoreOptions<TData> = 
+export type DataStoreOptions<TData> = Prettify<
   & {
     /**
      * A unique internal ID for this data store.  
@@ -75,7 +77,8 @@ export type DataStoreOptions<TData> =
       encodeData?: never,
       decodeData?: never,
     }
-  );
+  )
+>;
 
 //#region class
 

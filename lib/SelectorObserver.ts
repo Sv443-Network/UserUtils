@@ -1,10 +1,11 @@
 import { debounce } from "./misc.js";
+import type { Prettify } from "./types.js";
 
 let domLoaded = false;
 document.addEventListener("DOMContentLoaded", () => domLoaded = true);
 
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
-export type SelectorListenerOptions<TElem extends Element = HTMLElement> = SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>;
+export type SelectorListenerOptions<TElem extends Element = HTMLElement> = Prettify<SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>>;
 
 type SelectorOptionsOne<TElem extends Element> = SelectorOptionsCommon & {
   /** Whether to use `querySelectorAll()` instead - default is false */
@@ -47,7 +48,7 @@ export type SelectorObserverOptions = {
   checkInterval?: number;
 };
 
-export type SelectorObserverConstructorOptions = MutationObserverInit & SelectorObserverOptions;
+export type SelectorObserverConstructorOptions = Prettify<MutationObserverInit & SelectorObserverOptions>;
 
 /** Observes the children of the given element for changes */
 export class SelectorObserver {
