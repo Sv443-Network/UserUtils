@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.3.0
+
+### Minor Changes
+
+- 1ecd63c: Added support for the `signal` property in `fetchAdvanced()`
+
 ## 8.2.0
 
 ### Minor Changes
