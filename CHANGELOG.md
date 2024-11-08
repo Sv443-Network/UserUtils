@@ -1,5 +1,15 @@
 # @sv443-network/userutils
 
+## 8.2.0
+
+### Minor Changes
+
+- 3fe8b25: Added overload to `mapRange()` that only needs both `max` values and assumes 0 for both `min` values
+- d7e8a31: Added utility type `Prettify` to make complex types more readable
+- 8ec2010: Added `randomCase` parameter to the function `randomId()` (true by default)
+- d9a36d5: Added property `migrateIds` to the constructor of `DataStore` for easier ID migration
+- b2f757e: Added `enhancedEntropy` parameter to the function `randRange()` (false by default)
+
 ## 8.1.0
 
 ### Minor Changes
