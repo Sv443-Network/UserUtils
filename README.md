@@ -1769,12 +1769,13 @@ Usage:
 ```ts
 fetchAdvanced(input: string | Request | URL, options?: {
   timeout?: number,
-  // any other options from fetch() except for signal
+  // any other options from fetch()
 }): Promise<Response>
 ```
   
 A drop-in replacement for the native `fetch()` function that adds options like a timeout property.  
 The timeout will default to 10 seconds if left undefined. Set it to a negative number to disable the timeout.  
+Pass an [AbortController's signal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to the `signal` property to be able to abort the request before it finishes or the timeout kicks in.  
   
 <details><summary><b>Example - click to view</b></summary>
 
