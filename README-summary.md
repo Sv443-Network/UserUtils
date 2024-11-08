@@ -76,6 +76,7 @@ or view the documentation of previous major releases:
     - [`NonEmptyArray`](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
     - [`NonEmptyString`](https://github.com/Sv443-Network/UserUtils#nonemptystring) - any string that should have at least one character
     - [`LooseUnion`](https://github.com/Sv443-Network/UserUtils#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
+    - [`Prettify`](https://github.com/Sv443-Network/UserUtils#prettify) - expands a complex type into a more readable format while keeping functionality the same
 
 <br><br>
 

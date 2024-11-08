@@ -78,6 +78,7 @@ View the documentation of previous major releases:
     - [`NonEmptyArray`](#nonemptyarray) - any array that should have at least one item
     - [`NonEmptyString`](#nonemptystring) - any string that should have at least one character
     - [`LooseUnion`](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
+    - [`Prettify`](#prettify) - expands a complex type into a more readable format while keeping functionality the same
 
 <br><br>
 
@@ -2429,7 +2430,7 @@ Usage:
 NonEmptyArray<TItem = unknown>
 ```
   
-This type describes an array that has at least one item.  
+This generic type describes an array that has at least one item.  
 Use the generic parameter to specify the type of the items in the array.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2459,7 +2460,7 @@ Usage:
 NonEmptyString<TString extends string>
 ```
   
-This type describes a string that has at least one character.  
+This generic type describes a string that has at least one character.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -2483,7 +2484,7 @@ Usage:
 LooseUnion<TUnion extends string | number | object>
 ```
   
-A type that offers autocomplete in the IDE for the passed union but also allows any value of the same type to be passed.  
+A generic type that offers autocomplete in the IDE for the passed union but also allows any value of the same type to be passed.  
 Supports unions of strings, numbers and objects.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2499,6 +2500,61 @@ function foo(bar: LooseUnion<"a" | "b" | "c">) {
 foo("a"); // included in autocomplete, no type error
 foo("");  // *not* included in autocomplete, still no type error
 foo(1);   // type error: Argument of type '1' is not assignable to parameter of type 'LooseUnion<"a" | "b" | "c">'
+```
+</details>
+
+<br>
+
+## Prettify
+Usage:
+```ts
+Prettify<T>
+```
+  
+A generic type that makes TypeScript and your IDE display the type in a more readable way.  
+This is especially useful for types that reference other types or are very complex.  
+It will also make a variable show its type's structure instead of just the type name (see example).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+// tooltip shows all constituent types, leaving you to figure it out yourself:
+// type Foo = {
+//   a: number;
+// } & Omit<{
+//   b: string;
+//   c: boolean;
+// }, "c">
+type Foo = {
+  a: number;
+} & Omit<{
+  b: string;
+  c: boolean;
+}, "c">;
+
+// tooltip shows just the type name:
+// const foo: Foo
+const foo: Foo = {
+  a: 1,
+  b: "2"
+};
+
+// tooltip shows the actual type structure:
+// type Bar = {
+//   a: number;
+//   b: string;
+// }
+type Bar = Prettify<Foo>;
+
+// tooltip again shows the actual type structure:
+// const bar: {
+//   a: number;
+//   b: string;
+// }
+const bar: Bar = {
+  a: 1,
+  b: "2"
+};
 ```
 </details>
 

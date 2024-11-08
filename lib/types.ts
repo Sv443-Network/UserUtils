@@ -31,3 +31,11 @@ export type LooseUnion<TUnion extends string | number | object> =
  * }
  */
 export type NonEmptyString<TString extends string> = TString extends "" ? never : TString;
+
+/**
+ * Makes the structure of a type more readable by expanding it.  
+ * This can be useful for debugging or for improving the readability of complex types.
+ */
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
