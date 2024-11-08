@@ -48,7 +48,7 @@ export type SelectorObserverOptions = {
   checkInterval?: number;
 };
 
-export type SelectorObserverConstructorOptions = Prettify<MutationObserverInit & SelectorObserverOptions>;
+export type SelectorObserverConstructorOptions = Prettify<SelectorObserverOptions & MutationObserverInit>;
 
 /** Observes the children of the given element for changes */
 export class SelectorObserver {
