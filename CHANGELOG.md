@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.3.2
+
+### Patch Changes
+
+- 99abaab: Made CJS bundle available on JSR
+
 ## 8.3.1
 
 ### Patch Changes
