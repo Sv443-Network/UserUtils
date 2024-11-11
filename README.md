@@ -622,6 +622,7 @@ If no predicate is specified, all events will be discarded.
 Calling this function will set the `Error.stackTraceLimit` to 100 (if it's not already higher) to ensure the stack trace is preserved.  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
+⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw an error.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -655,7 +656,8 @@ If no predicate is specified, all events will be discarded.
 This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` (or falls back to regular `window`).  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
-⚠️ In order for all events to be interceptable, the directive `@grant unsafeWindow` should be set.  
+⚠️ In order to have the best chance at intercepting events, the directive `@grant unsafeWindow` should be set.  
+⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw an error.  
   
 <details><summary><b>Example - click to view</b></summary>
 
