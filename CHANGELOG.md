@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.3.1
+
+### Patch Changes
+
+- 390110e: Throw an error when calling `interceptEvent()` on `window` or `unsafeWindow` on FireMonkey instead of crashing the entire page
+
 ## 8.3.0
 
 ### Minor Changes
