@@ -7,7 +7,7 @@
     "include": [
       "lib/**/*.ts",
       "dist/index.js",
-      "dist/index.mjs",
+      "dist/index.cjs",
       "dist/index.global.js",
       "dist/lib/**/*.d.ts",
       "package.json",
