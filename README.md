@@ -128,8 +128,9 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   // @require https://update.greasyfork.org/scripts/472956/UserUtils.js
   // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
   ```
-  > [!NOTE]  
-  > In order for your userscript not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `8.3.2`) or the versioned URL that's shown at the top of the [GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
+    
+> [!NOTE]  
+> In order for your userscript not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `8.3.2`) or the versioned URL that's shown at the top of the [GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
 
 <br>
 
