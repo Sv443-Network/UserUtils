@@ -104,7 +104,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   npx jsr install @sv443-network/userutils
   deno add jsr:@sv443-network/userutils
   ```
-  Then, import it in your script as usual:
+  Then import it in your script as usual:  
+  
   ```ts
   import { addGlobalStyle } from "@sv443-network/userutils";
 
@@ -115,7 +116,7 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 <br>
 
-- If you are not using a bundler or want to reduce the size of your userscript, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
+- If you are not using a bundler, want to reduce the size of your userscript, or declared the package as external in your bundler, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
   
   Versioned (recommended):
   ```
@@ -145,11 +146,24 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 <br>
 
-- If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in your project:  
+- If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in the directory (or a subdirectory) defined in your `tsconfig.json`'s `baseUrl` option or `include` array:  
   
   ```ts
+  declare const UserUtils: typeof import("@sv443-network/userutils");
+
   declare global {
-    const UserUtils: typeof import("@sv443-network/userutils");
+    interface Window {
+      UserUtils: typeof UserUtils;
+    }
+  }
+  ```
+
+<br>
+
+- If you're using a linter like ESLint, it might complain about the global variable `UserUtils` not being defined. To fix this, add the following to your ESLint configuration file:
+  ```json
+  "globals": {
+      "UserUtils": "readonly"
   }
   ```
 
