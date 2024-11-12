@@ -5,9 +5,19 @@
 Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
   
 Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require`  
+  
+You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
+
+[![minified bundle size badge](https://badgen.net/bundlephobia/min/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+[![minified and gzipped bundle size badge](https://badgen.net/bundlephobia/minzip/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+[![tree shaking support badge](https://badgen.net/bundlephobia/tree-shaking/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+
+[![github stargazers badge](https://badgen.net/github/stars/Sv443-Network/UserUtils?icon=github)](https://github.com/Sv443-Network/UserUtils/stargazers)
+[![discord server badge](https://badgen.net/discord/online-members/aBH4uRG?icon=discord)](https://dc.sv443.net/)
+
 <sup>
 View the documentation of previous major releases:
 </sup>
@@ -86,11 +96,14 @@ View the documentation of previous major releases:
 ## Installation:
 Shameless plug: I made a [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
   
-- If you are using a bundler (like webpack, rollup, vite, etc.), you can install this package using npm:
+- If you are using a bundler (like webpack, rollup, vite, etc.), you can install this package in one of the following ways:
   ```
   npm i @sv443-network/userutils
+  pnpm i @sv443-network/userutils
+  yarn add @sv443-network/userutils
+  npx jsr install @sv443-network/userutils
+  deno add jsr:@sv443-network/userutils
   ```
-  <sup>For other package managers, check out the respective install command on the [JavaScript Registry](https://jsr.io/@sv443-network/userutils)</sup>  
   Then, import it in your script as usual:
   ```ts
   import { addGlobalStyle } from "@sv443-network/userutils";
@@ -103,15 +116,24 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 <br>
 
 - If you are not using a bundler or want to reduce the size of your userscript, you can include the latest release by adding one of these directives to the userscript header, depending on your preferred CDN:
+  
+  Versioned (recommended):
   ```
-  // @require https://greasyfork.org/scripts/472956-userutils/code/UserUtils.js
+  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js
+  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js
   ```
+  Non-versioned (not recommended because auto-updating):
   ```
+  // @require https://update.greasyfork.org/scripts/472956/UserUtils.js
   // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
   ```
-  (in order for your userscript not to break on a major library update, instead use the versioned URL at the top of the [GreasyFork page](https://greasyfork.org/scripts/472956-userutils))  
-    
-  Then, access the functions on the global variable `UserUtils`:
+  > [!NOTE]  
+  > In order for your userscript not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `8.3.2`) or the versioned URL that's shown at the top of the [GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
+
+<br>
+
+- Then, access the functions on the global variable `UserUtils`:
+  
   ```ts
   UserUtils.addGlobalStyle("body { background-color: red; }");
 
@@ -120,7 +142,11 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   const { clamp } = UserUtils;
   console.log(clamp(1, 5, 10)); // 5
   ```
-  If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in your project:
+
+<br>
+
+- If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in your project:  
+  
   ```ts
   declare global {
     const UserUtils: typeof import("@sv443-network/userutils");
@@ -137,8 +163,11 @@ Each feature has example code that can be expanded by clicking on the text "Exam
 The usages and examples are written in TypeScript and use ESM import syntax, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS or the global declaration).  
 If the usage section contains multiple usages of the function, each occurrence represents an overload and you can choose which one you want to use.  
   
-Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other requirements.  
-Their documentation will contain a section marked by a warning emoji (⚠️) that will go into more detail.
+Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other specific requirements and limitations.  
+Those will be listed in a section marked by a warning emoji (⚠️) each.  
+  
+If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
+For submitting bug reports or feature requests, please use the [GitHub issue tracker.](https://github.com/Sv443-Network/UserUtils/issues)
 
 <br><br>
 
