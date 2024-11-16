@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.3.3
+
+### Patch Changes
+
+- ca8b62e: Made CJS bundle available on NPM too
+
 ## 8.3.2
 
 ### Patch Changes
