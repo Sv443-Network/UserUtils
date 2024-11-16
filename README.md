@@ -2211,8 +2211,8 @@ tr.addLanguage("de", {
 // the language is set to "en"
 tr.setLanguage("en");
 
-console.log(tr("welcome_name", "John"));               // "Welcome"
-// the language doesn't need to be changed:
+console.log(tr("welcome_name", "John"));               // "Welcome, John"
+// no need to call tr.setLanguage():
 console.log(tr.forLang("de", "welcome_name", "John")); // "Willkommen, John"
 ```
 </details>
@@ -2225,9 +2225,9 @@ Usage:
 tr.addLanguage(language: string, translations: Record<string, string>): void
 ```
 
-Adds a language and its associated translations to the translation function.  
-The passed language can be any unique identifier, though I recommend sticking to the [ISO 639-1 standard.](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)  
-The passed translations should be an object where the key is the translation key used in `tr()` and the value is the translation itself.  
+Adds or overwrites a language and its associated translations to the translation function.  
+The passed language can be any unique identifier, though I highly recommend sticking to a standard like [BCP 47 / RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.txt) (which is used by the [`Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) and methods like [`Number.toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString)), or [ISO 639-1.](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)  
+The passed translations should be a flat object (no nested objects are allowed for now), where the key is the translation key used in `tr()` and the value is the translation itself.  
 If `tr.addLanguage()` is called multiple times with the same language, the previous translations of that language will be overwritten.  
   
 The translation values may contain placeholders in the format `%n`, where `n` is the number of the value starting at 1.  
@@ -2257,10 +2257,13 @@ tr.addLanguage("en", {
 // can be used for different locales too:
 
 tr.addLanguage("en-US", {
-  "fries": "french fries",
+  "fries": "fries",
+  "color": "color",
 });
+
 tr.addLanguage("en-GB", {
   "fries": "chips",
+  "color": "colour",
 });
 
 
@@ -2270,15 +2273,18 @@ const translation_de = {
   "greeting": "Guten Tag!",
   "foo": "Foo",
 };
+
 tr.addLanguage("de-DE", translation_de);
+
 tr.addLanguage("de-CH", {
+  // overwrite the "greeting" but keep other keys as they are:
   ...translation_de,
-  // overwrite the "greeting" but keep other keys as they are
   "greeting": "Grüezi!",
 });
+
 tr.addLanguage("de-AT", {
+  // overwrite "greeting" again but keep other keys as they are:
   ...translation_de,
-  // overwrite "greeting" again but keep other keys as they are
   "greeting": "Grüß Gott!",
 });
 
@@ -2291,17 +2297,23 @@ tr.addLanguage("en", {
   "cart_items_added-n": "Added %1 items to the cart",
 });
 
-/** Returns the translation key with a custom pluralization identifier added to it for the given number of items (or size of Array/NodeList or anything else with a `length` property) */
-function pl(key: string, num: number | Array<unknown> | NodeList | { length: number }) {
-  if(typeof num !== "number")
-    num = num.length;
+type Numberish = number | Array<unknown> | NodeList | { length: number } | { size: number };
+
+/** Returns the translation key with a custom pluralization identifier added to it for the given number of items (or size of Array/NodeList or anything else with a `length` or `size` property) */
+function pl(key: string, num: Numberish): string {
+  if(typeof num !== "number") {
+    if("length" in num)
+      num = num.length;
+    else if("size" in num)
+      num = num.size;
+  }
 
   if(num === 0)
     return `${key}-0`;
   else if(num === 1)
     return `${key}-1`;
   else
-    return `${key}-n`;
+    return `${key}-n`; // will also be the fallback for non-numeric values
 };
 
 const items = [];
@@ -2312,6 +2324,9 @@ console.log(tr(pl("cart_items_added", items), items.length)); // "Added 1 item t
 
 items.push("bar");
 console.log(tr(pl("cart_items_added", items), items.length)); // "Added 2 items to the cart"
+
+// you will need to catch cases like this manually or in your own implementation of `pl()`:
+console.log(tr(pl("cart_items_added", NaN), NaN)); // "Added NaN items to the cart"
 ```
 </details>
 
