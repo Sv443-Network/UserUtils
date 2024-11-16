@@ -70,6 +70,7 @@
   },
   "files": [
     "/dist/index.js",
+    "/dist/index.cjs",
     "/dist/index.mjs",
     "/dist/index.global.js",
     "/dist/lib/**.d.ts",
