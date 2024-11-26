@@ -1,7 +1,7 @@
 //#region UU types
 
 /** Represents any value that is either a string itself or can be converted to one (implicitly and explicitly) because it has a toString() method */
-export type Stringifiable = string | { toString(): string };
+export type Stringifiable = string | { toString(): string } | { [Symbol.toStringTag]: string } | number | boolean | null | undefined;
 
 /**
  * A type that offers autocomplete for the passed union but also allows any arbitrary value of the same type to be passed.  

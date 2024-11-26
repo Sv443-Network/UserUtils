@@ -66,6 +66,8 @@ View the documentation of previous major releases:
     - [`decompress()`](#decompress) - decompress a previously compressed string
     - [`computeHash()`](#computehash) - compute the hash / checksum of a string or ArrayBuffer
     - [`randomId()`](#randomid) - generate a random ID of a given length and radix
+    - [`consumeGen()`](#consumegen) - consumes a ValueGen and returns the value
+    - [`consumeStringGen()`](#consumestringgen) - consumes a StringGen and returns the string
   - [**Arrays:**](#arrays)
     - [`randomItem()`](#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
@@ -89,6 +91,8 @@ View the documentation of previous major releases:
     - [`NonEmptyString`](#nonemptystring) - any string that should have at least one character
     - [`LooseUnion`](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
     - [`Prettify`](#prettify) - expands a complex type into a more readable format while keeping functionality the same
+    - [`ValueGen`](#valuegen) - a "generator" value that allows for super flexible value typing and declaration
+    - [`StringGen`](#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including support for unions
 
 <br><br>
 
@@ -2037,6 +2041,70 @@ benchmark(true, true);   // Generated 10k in 1054ms
 
 <br><br>
 
+### consumeGen()
+Usage:  
+```ts
+consumeGen(valGen: ValueGen): 
+```
+  
+Turns a [`ValueGen`](#valuegen) into its final value.  
+ValueGen allows for tons of flexibility in how the value can be obtained. Calling this function will resolve the final value.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { consumeGen, type ValueGen } from "@sv443-network/userutils";
+
+async function doSomething(value: ValueGen<number>) {
+  // type gets inferred because `value` is correctly typed as a ValueGen<number>
+  const finalValue = await consumeGen(value);
+  console.log(finalValue);
+}
+
+// the following are all valid and yield 42:
+doSomething(42);
+doSomething(() => 42);
+doSomething(Promise.resolve(42));
+doSomething(async () => 42);
+```
+
+</details>
+
+<br><br>
+
+### consumeStringGen()
+Usage:  
+```ts
+consumeStringGen(strGen: StringGen): Promise<string>
+```
+  
+Turns a [`StringGen`](#stringgen) into its final string value.  
+StringGen allows for tons of flexibility in how the string can be obtained. Calling this function will resolve the final string.  
+Optionally you can use the template parameter to define the union of strings that the StringGen should yield.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { consumeStringGen, type StringGen } from "@sv443-network/userutils";
+
+export class MyTextPromptThing {
+  // full flexibility on how to pass the string:
+  constructor(private text: StringGen) {}
+
+  /** Returns the HTML content to show in the prompt */
+  private async getContent() {
+    const promptText = await consumeGen(this.text);
+    return promptText.trim().replace(/\n/g, "<br>");
+  }
+
+  // ...
+}
+```
+
+</details>
+
+<br><br>
+
 <!-- #region Arrays -->
 ## Arrays:
 
@@ -2528,7 +2596,7 @@ logSomething(barObject); // Type error
 
 <br>
 
-## NonEmptyArray
+### NonEmptyArray
 Usage:
 ```ts
 NonEmptyArray<TItem = unknown>
@@ -2558,7 +2626,7 @@ logFirstItem(["04abc", "69"]); // 4
 
 <br>
 
-## NonEmptyString
+### NonEmptyString
 Usage:
 ```ts
 NonEmptyString<TString extends string>
@@ -2582,7 +2650,7 @@ convertToNumber("");      // type error: Argument of type 'string' is not assign
 
 <br>
 
-## LooseUnion
+### LooseUnion
 Usage:
 ```ts
 LooseUnion<TUnion extends string | number | object>
@@ -2609,7 +2677,7 @@ foo(1);   // type error: Argument of type '1' is not assignable to parameter of 
 
 <br>
 
-## Prettify
+### Prettify
 Usage:
 ```ts
 Prettify<T>
@@ -2661,6 +2729,31 @@ const bar: Bar = {
 };
 ```
 </details>
+
+<br><br>
+
+### ValueGen
+Usage:
+```ts
+ValueGen<TValueType>
+```
+  
+A type that describes a value that can be obtained in various ways.  
+Those include the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
+This type is used in the [`consumeGen()`](#consumegen) function to convert it to the type it represents. Refer to that function for an example.  
+
+<br><br>
+
+### StringGen
+Usage:
+```ts
+StringGen<TStrUnion>
+```
+  
+A type that describes a string that can be obtained in various ways.  
+Those include the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
+Contrary to [`ValueGen`](#valuegen), this type allows for specifying a union of strings that the StringGen should yield, as long as it is loosely typed as just `string`.  
+It is used in the [`consumeStringGen()`](#consumestringgen) function to convert it to a plain string. Refer to that function for an example.
 
 <br><br><br><br>
 

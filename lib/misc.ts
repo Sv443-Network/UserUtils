@@ -71,7 +71,7 @@ export type FetchAdvancedOpts = Prettify<
 >;
 
 /** Calls the fetch API with special options like a timeout */
-export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdvancedOpts = {}): Promise<Response> {
+export async function fetchAdvanced(input: string | RequestInfo | URL, options: FetchAdvancedOpts = {}): Promise<Response> {
   const { timeout = 10000 } = options;
   const { signal, abort } = new AbortController();
 
@@ -97,4 +97,44 @@ export async function fetchAdvanced(input: RequestInfo | URL, options: FetchAdva
     id && clearTimeout(id);
     throw err;
   }
+}
+
+/**
+ * A ValueGen value is either its type, a promise that resolves to its type, or a function that returns its type, either synchronous or asynchronous.  
+ * ValueGen allows for the utmost flexibility when applied to any type, as long as {@linkcode consumeGen()} is used to get the final value.
+ * @template TValueType The type of the value that the ValueGen should yield
+ */
+export type ValueGen<TValueType> = TValueType | Promise<TValueType> | (() => TValueType | Promise<TValueType>);
+
+/**
+ * Turns a {@linkcode ValueGen} into its final value.  
+ * @template TValueType The type of the value that the ValueGen should yield
+ */
+export async function consumeGen<TValueType>(valGen: ValueGen<TValueType>): Promise<TValueType> {
+  return await (typeof valGen === "function"
+    ? (valGen as (() => Promise<TValueType> | TValueType))()
+    : valGen
+  )as TValueType;
+}
+
+/**
+ * A StringGen value is either a string, anything that can be converted to a string, or a function that returns one of the previous two, either synchronous or asynchronous, or a promise that returns a string.  
+ * StringGen allows for the utmost flexibility when dealing with strings, as long as {@linkcode consumeStringGen()} is used to get the final string.
+ */
+export type StringGen = ValueGen<Stringifiable>;
+
+/**
+ * Turns a {@linkcode StringGen} into its final string value.  
+ * @template TStrUnion The union of strings that the StringGen should yield - this allows for finer type control compared to {@linkcode consumeGen()}
+ */
+export async function consumeStringGen<TStrUnion extends string>(strGen: StringGen): Promise<TStrUnion> {
+  return (
+    typeof strGen === "string"
+      ? strGen
+      : String(
+        typeof strGen === "function"
+          ? await strGen()
+          : strGen
+      )
+  ) as TStrUnion;
 }
