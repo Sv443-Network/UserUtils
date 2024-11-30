@@ -81,3 +81,12 @@ export function randRange(...args: (number | boolean | undefined)[]): number {
   else
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+/** Calculates the amount of digits in the given number - the given number or string will be passed to the `Number()` constructor. Returns NaN if the number is invalid. */
+export function digitCount(num: number | string): number {
+  return num === 0
+    ? 1
+    : Math.floor(
+      Math.log10(Math.abs(Number(num))) + 1
+    );
+}
