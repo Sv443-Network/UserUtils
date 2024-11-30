@@ -49,6 +49,7 @@ or view the documentation of previous major releases:
     - [`clamp()`](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
     - [`mapRange()`](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
     - [`randRange()`](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
+    - [`digitCount()`](https://github.com/Sv443-Network/UserUtils#digitcount) - calculate the amount of digits in a number
 - **Misc:**
     - [`DataStore`](https://github.com/Sv443-Network/UserUtils#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations

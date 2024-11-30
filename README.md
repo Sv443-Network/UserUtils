@@ -52,6 +52,7 @@ View the documentation of previous major releases:
     - [`clamp()`](#clamp) - constrain a number between a min and max value
     - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
     - [`randRange()`](#randrange) - generate a random number between a min and max boundary
+    - [`digitCount()`](#digitcount) - calculate the amount of digits in a number
   - [**Misc:**](#misc)
     - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
@@ -1044,6 +1045,40 @@ benchmark(true);  // Generated 100k in 461ms
 
 // about a 5x slowdown, but the generated numbers are more entropic
 ```
+</details>
+
+<br>
+
+### digitCount()
+Usage:  
+```ts
+digitCount(num: number | string): number
+```
+  
+Calculates and returns the amount of digits in the given number.  
+The number or string will be passed to the `Number()` constructor before the calculation.  
+The function returns `NaN` if the number is invalid.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { digitCount } from "@sv443-network/userutils";
+
+const num1 = 123;
+const num2 = 123456789;
+const num3 = "  123456789    ";
+const num4 = Number.MAX_SAFE_INTEGER;
+const num5 = "a123b456c789d";
+const num6 = parseInt("0x123456789abcdef", 16);
+
+digitCount(num1); // 3
+digitCount(num2); // 9
+digitCount(num3); // 9
+digitCount(num4); // 16
+digitCount(num5); // NaN (because hex conversion has to be done through parseInt(str, 16)), like below:
+digitCount(num6); // 17
+```
+
 </details>
 
 <br><br>
