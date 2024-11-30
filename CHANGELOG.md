@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 8.4.0
+
+### Minor Changes
+
+- 52d392a: Added `ValueGen` and `StringGen` types with accompanying `consumeGen()` and `consumeStringGen()` functions to allow for super flexible typing and declaration of values
+
 ## 8.3.3
 
 ### Patch Changes
