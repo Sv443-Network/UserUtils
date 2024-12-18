@@ -2254,36 +2254,52 @@ The function returns the translation of the passed key in the language added by 
 Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `values` rest parameter.  
 The items of the `values` rest parameter will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the translation.
   
-If the key is not found or no language has been added or set before calling this function, it will return the key itself.  
-If the key is found and the translation contains placeholders but no values are passed, it will return the translation as-is, including unmodified placeholders.  
-If the key is found, the translation doesn't contain placeholders but values are still passed, they will be ignored and the translation will be returned as-is.  
+Should you be using nested objects in your translations, you can use the dot notation to access them.  
+First, the key will be split by dots and the parts will be used to traverse the translation object.  
+If that doesn't yield a result, the function will try to access the key including dots on the top level of the translation object.  
+If that also doesn't yield a result, the key itself will be returned.  
+  
+If no language has been added or set before calling this function, it will return the key itself.  
+If the key is found and the translation contains placeholders but none or an insufficient amount of values are passed, it will try to insert as many values as were passed and leave the rest of the placeholders untouched in their `%n` format.  
+If the key is found, the translation doesn't contain placeholders but values are still passed, the values will be ignored and the translation will be returned without modification.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
+// add languages and translations:
 tr.addLanguage("en", {
-  "welcome": "Welcome",
-  "welcome_name": "Welcome, %1",
+  welcome: {
+    generic: "Welcome",
+    with_name: "Welcome, %1",
+  },
 });
+
 tr.addLanguage("de", {
-  "welcome": "Willkommen",
-  "welcome_name": "Willkommen, %1",
+  welcome: {
+    generic: "Willkommen",
+    with_name: "Willkommen, %1",
+  },
 });
 
 // this has to be called at least once before calling tr()
 tr.setLanguage("en");
 
-console.log(tr("welcome"));              // "Welcome"
-console.log(tr("welcome_name", "John")); // "Welcome, John"
-console.log(tr("non_existent_key"));     // "non_existent_key"
+console.log(tr("welcome.generic"));           // "Welcome"
+console.log(tr("welcome.with_name", "John")); // "Welcome, John"
+
+console.log(tr("non_existent_key")); // "non_existent_key"
+console.log(tr("welcome"));          // "welcome" (because anything that isn't a string will make the function return the key itself)
 
 // language can be changed at any time, synchronously
 tr.setLanguage("de");
 
-console.log(tr("welcome"));              // "Willkommen"
-console.log(tr("welcome_name", "John")); // "Willkommen, John"
+console.log(tr("welcome.generic")); // "Willkommen"
+
+// or without overwriting the current language:
+
+console.log(tr.forLang("en", "welcome.generic")); // "Welcome"
 ```
 </details>
 
@@ -2325,12 +2341,12 @@ console.log(tr.forLang("de", "welcome_name", "John")); // "Willkommen, John"
 ### tr.addLanguage()
 Usage:  
 ```ts
-tr.addLanguage(language: string, translations: Record<string, string>): void
+tr.addLanguage(language: string, translations: Record<string, string | object>): void
 ```
 
 Adds or overwrites a language and its associated translations to the translation function.  
 The passed language can be any unique identifier, though I highly recommend sticking to a standard like [BCP 47 / RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.txt) (which is used by the [`Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) and methods like [`Number.toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString)), or [ISO 639-1.](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)  
-The passed translations should be a flat object (no nested objects are allowed for now), where the key is the translation key used in `tr()` and the value is the translation itself.  
+The passed translations can either be a flat object where the key is the translation key used in `tr()` and the value is the translation itself, or an infinitely nestable object structure containing the same.  
 If `tr.addLanguage()` is called multiple times with the same language, the previous translations of that language will be overwritten.  
   
 The translation values may contain placeholders in the format `%n`, where `n` is the number of the value starting at 1.  
@@ -2344,37 +2360,44 @@ import { tr } from "@sv443-network/userutils";
 // add a language with associated translations:
 
 tr.addLanguage("de", {
-  "color": "Farbe",
+  color: "Farbe",
 });
 
 
-// with placeholders:
+// with nested object and placeholders:
 
 tr.addLanguage("en", {
-  "welcome_generic": "Welcome!",
-  "welcome_name": "Welcome, %1!",
-  "welcome_extended": "Welcome, %1!\nYour last login was on %2\nYou have %3 unread messages",
+  // to get this value, you could call `tr.forLang("en", "lang_name")`
+  lang_name: "English",
+  home_page: {
+    welcome: {
+      generic: "Welcome!",
+      // this can be accessed with `tr("home_page.welcome.name", "John")`
+      name: "Welcome, %1!",
+      extended: "Welcome, %1!\nYour last login was on %2\nYou have %3 unread messages",
+    },
+  },
 });
 
 
 // can be used for different locales too:
 
 tr.addLanguage("en-US", {
-  "fries": "fries",
-  "color": "color",
+  fries: "fries",
+  color: "color",
 });
 
 tr.addLanguage("en-GB", {
-  "fries": "chips",
-  "color": "colour",
+  fries: "chips",
+  color: "colour",
 });
 
 
 // apply default values for different locales to reduce redundancy in shared translation values:
 
 const translation_de = {
-  "greeting": "Guten Tag!",
-  "foo": "Foo",
+  greeting: "Guten Tag!",
+  foo: "Foo",
 };
 
 tr.addLanguage("de-DE", translation_de);
@@ -2382,17 +2405,17 @@ tr.addLanguage("de-DE", translation_de);
 tr.addLanguage("de-CH", {
   // overwrite the "greeting" but keep other keys as they are:
   ...translation_de,
-  "greeting": "Grüezi!",
+  greeting: "Grüezi!",
 });
 
 tr.addLanguage("de-AT", {
   // overwrite "greeting" again but keep other keys as they are:
   ...translation_de,
-  "greeting": "Grüß Gott!",
+  greeting: "Grüß Gott!",
 });
 
 
-// example for custom pluralization:
+// example for custom pluralization using a predefined suffix:
 
 tr.addLanguage("en", {
   "cart_items_added-0": "No items were added to the cart",
@@ -2400,9 +2423,13 @@ tr.addLanguage("en", {
   "cart_items_added-n": "Added %1 items to the cart",
 });
 
+/** A number or any object with a length or size property */
 type Numberish = number | Array<unknown> | NodeList | { length: number } | { size: number };
 
-/** Returns the translation key with a custom pluralization identifier added to it for the given number of items (or size of Array/NodeList or anything else with a `length` or `size` property) */
+/**
+ * Returns the translation key with a common pluralization identifier appended to it,  
+ * given the number of items (or size of Array/NodeList or anything else with a `length` or `size` property).
+ */
 function pl(key: string, num: Numberish): string {
   if(typeof num !== "number") {
     if("length" in num)
@@ -2416,7 +2443,7 @@ function pl(key: string, num: Numberish): string {
   else if(num === 1)
     return `${key}-1`;
   else
-    return `${key}-n`; // will also be the fallback for non-numeric values
+    return `${key}-n`; // will be the fallback for everything like non-numeric values or NaN
 };
 
 const items = [];
@@ -2441,10 +2468,11 @@ Usage:
 tr.setLanguage(language: string): void
 ```
 
-Synchronously sets the language that will be used for translations.  
+Synchronously sets the language that will be used for translations by default.  
+Alternatively, you can use [`tr.forLang()`](#trforlang) to get translations in a different language without changing the current language.  
 No validation is done on the passed language, so make sure it is correct and it has been added with `tr.addLanguage()` before calling `tr()`  
   
-For an example, see [`tr()`](#tr)
+For an example, please see [`tr()`](#tr)
 
 <br>
 
@@ -2462,7 +2490,7 @@ If no language has been set yet, it will return undefined.
 ### tr.getTranslations()
 Usage:  
 ```ts
-tr.getTranslations(language?: string): Record<string, string> | undefined
+tr.getTranslations(language?: string): Record<string, string | object> | undefined
 ```  
   
 Returns the translations of the specified language.  
@@ -2475,7 +2503,7 @@ If no translations are found, it will return undefined.
 import { tr } from "@sv443-network/userutils";
 
 tr.addLanguage("en", {
-  "welcome": "Welcome",
+  welcome: "Welcome",
 });
 
 console.log(tr.getTranslations());     // undefined
