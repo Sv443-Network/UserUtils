@@ -16,7 +16,7 @@
   },
   "type": "module",
   "scripts": {
-    "lint": "tsc --noEmit && eslint .",
+    "lint": "eslint . && tsc --noEmit",
     "build-types": "tsc --emitDeclarationOnly --declaration --outDir dist",
     "build-common": "tsup lib/index.ts --format cjs,esm --clean --treeshake",
     "build-all": "tsup lib/index.ts --format cjs,esm,iife --treeshake --onSuccess \"npm run build-types && npm run post-build-global && echo Finished building.\"",
