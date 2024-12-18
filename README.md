@@ -2359,16 +2359,15 @@ These can be used to inject values into the translation when calling `tr()`
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr } from "@sv443-network/userutils";
+import { tr, type Stringifiable } from "@sv443-network/userutils";
 
 // add a language with associated translations:
 
-tr.addLanguage("de", {
-  color: "Farbe",
+tr.addLanguage("en", {
+  lang_name: "Eglis", // no worries, the example below will overwrite this value
 });
 
-
-// with nested object and placeholders:
+// overwriting previous translation, now with nested objects and placeholders:
 
 tr.addLanguage("en", {
   // to get this value, you could call `tr.forLang("en", "lang_name")`
@@ -2383,7 +2382,6 @@ tr.addLanguage("en", {
   },
 });
 
-
 // can be used for different locales too:
 
 tr.addLanguage("en-US", {
@@ -2395,7 +2393,6 @@ tr.addLanguage("en-GB", {
   fries: "chips",
   color: "colour",
 });
-
 
 // apply default values for different locales to reduce redundancy in shared translation values:
 
@@ -2418,7 +2415,6 @@ tr.addLanguage("de-AT", {
   greeting: "Grüß Gott!",
 });
 
-
 // example for custom pluralization using a predefined suffix:
 
 tr.addLanguage("en", {
@@ -2431,10 +2427,10 @@ tr.addLanguage("en", {
 type Numberish = number | Array<unknown> | NodeList | { length: number } | { size: number };
 
 /**
- * Returns the translation key with a common pluralization identifier appended to it,  
+ * Returns the translated value given the key with a common pluralization identifier appended to it,  
  * given the number of items (or size of Array/NodeList or anything else with a `length` or `size` property).
  */
-function pl(key: string, num: Numberish): string {
+function trpl(key: string, num: Numberish, ...values: Stringifiable[]): string {
   if(typeof num !== "number") {
     if("length" in num)
       num = num.length;
@@ -2442,25 +2438,32 @@ function pl(key: string, num: Numberish): string {
       num = num.size;
   }
 
+  let plKey = key;
   if(num === 0)
-    return `${key}-0`;
+    plKey = `${key}-0`;
   else if(num === 1)
-    return `${key}-1`;
+    plKey = `${key}-1`;
   else
-    return `${key}-n`; // will be the fallback for everything like non-numeric values or NaN
+    plKey = `${key}-n`; // will be the fallback for everything like non-numeric values or NaN
+
+  return tr(plKey, ...values);
 };
 
+// this has to be called once for tr("key") to work - otherwise you can use tr.forLang("en", "key")
+tr.setLanguage("en");
+
 const items = [];
-console.log(tr(pl("cart_items_added", items), items.length)); // "No items were added to the cart"
+console.log(trpl("cart_items_added", items, items.length)); // "No items were added to the cart"
 
 items.push("foo");
-console.log(tr(pl("cart_items_added", items), items.length)); // "Added 1 item to the cart"
+console.log(trpl("cart_items_added", items, items.length)); // "Added 1 item to the cart"
 
 items.push("bar");
-console.log(tr(pl("cart_items_added", items), items.length)); // "Added 2 items to the cart"
+console.log(trpl("cart_items_added", items, items.length)); // "Added 2 items to the cart"
 
-// you will need to catch cases like this manually or in your own implementation of `pl()`:
-console.log(tr(pl("cart_items_added", NaN), NaN)); // "Added NaN items to the cart"
+// if you run across cases like this, you need to modify your implementation of `trpl()` accordingly:
+const someVal = parseInt("not a number");
+console.log(trpl("cart_items_added", someVal, someVal)); // "Added NaN items to the cart"
 ```
 </details>
 
