@@ -14,28 +14,63 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         node-version: [22.x]
+
     permissions:
       contents: write # For pushing Git tags and creating releases
       pull-requests: write # For creating the changesets relese PR
       id-token: write # The OIDC ID token is used for authentication with JSR
+
+    env:
+      CI: "true"
+      STORE_PATH: ""
+      PNPM_VERSION: 9
+      RETENTION_DAYS: 2
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js v${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install dependencies
-        run: npm ci
+        run: pnpm i
+
       - name: Build package
-        run: npm run build-all
+        run: pnpm build-all
+
       - name: Create artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
-          retention-days: 2
+          retention-days: ${{ env.RETENTION_DAYS }}
+
       - name: Create release or publish package
         uses: changesets/action@v1
         id: changesets
