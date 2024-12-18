@@ -70,8 +70,8 @@ or view the documentation of previous major releases:
     - [`takeRandomItem()`](https://github.com/Sv443-Network/UserUtils#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [`randomizeArray()`](https://github.com/Sv443-Network/UserUtils#randomizearray) - returns a copy of the array with its items in a random order
 - **Translation:**
-    - [`tr()`](https://github.com/Sv443-Network/UserUtils#tr) - simple translation of a string to another language
-    - [`tr.forLang()`](https://github.com/Sv443-Network/UserUtils#trforlang) - specify a language besides the currently set one for the translation
+    - [`tr()`](https://github.com/Sv443-Network/UserUtils#tr) - simple JSON-based translation system with placeholder and nesting support
+    - [`tr.forLang()`](https://github.com/Sv443-Network/UserUtils#trforlang) - translate with the specified language instead of the currently active one
     - [`tr.addLanguage()`](https://github.com/Sv443-Network/UserUtils#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language

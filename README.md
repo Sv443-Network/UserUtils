@@ -75,8 +75,8 @@ View the documentation of previous major releases:
     - [`takeRandomItem()`](#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [`randomizeArray()`](#randomizearray) - returns a copy of the array with its items in a random order
   - [**Translation:**](#translation)
-    - [`tr()`](#tr) - simple translation of a string to another language
-    - [`tr.forLang()`](#trforlang) - specify a language besides the currently set one for the translation
+    - [`tr()`](#tr) - simple JSON-based translation system with placeholder and nesting support
+    - [`tr.forLang()`](#trforlang) - translate with the specified language instead of the currently active one
     - [`tr.addLanguage()`](#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
