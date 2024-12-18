@@ -1,31 +1,12 @@
-name: "Lint and Analyze Code"
+name: "Analyze Code with CodeQL"
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
   pull_request:
     branches: [main]
 
 jobs:
-  lint:
-    name: Lint Code
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [22.x]
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: npm ci
-      - name: Lint
-        run: npm run lint
-
   analyze:
     name: Analyze Code
 

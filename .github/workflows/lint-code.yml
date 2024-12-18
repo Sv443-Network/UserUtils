@@ -1,28 +1,20 @@
-name: "Build and Publish on NPM"
+name: "Lint Code"
 
 on:
   push:
-    branches:
-      - main
-
-env:
-  PR_TITLE: "Create Release"
-  COMMIT_MSG: "chore: create new release"
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
 
 jobs:
-  publish:
+  lint:
+    name: Lint Code
+
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [22.x]
-
-    permissions:
-      contents: write # For pushing Git tags and creating releases
-      pull-requests: write # For creating the changesets relese PR
-      id-token: write # The OIDC ID token is used for authentication with JSR
 
     env:
       CI: "true"
@@ -61,23 +53,5 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Build package
-        run: pnpm build-all
-
-      - name: Create artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: ${{ env.RETENTION_DAYS }}
-
-      - name: Create release or publish package
-        uses: changesets/action@v1
-        id: changesets
-        with:
-          publish: npm run publish-package
-          commit: ${{ env.COMMIT_MSG }}
-          title: ${{ env.PR_TITLE }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Lint
+        run: npm run lint
