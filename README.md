@@ -2247,19 +2247,23 @@ Pluralization is not supported but can be achieved manually by adding variations
 ### tr()
 Usage:  
 ```ts
-tr(key: string, ...values: Stringifiable[]): string
+tr(key: string, ...insertValues: Stringifiable[]): string
 ```
   
 The function returns the translation of the passed key in the language added by [`tr.addLanguage()`](#traddlanguage) and set by [`tr.setLanguage()`](#trsetlanguage)  
-Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `values` rest parameter.  
-The items of the `values` rest parameter will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the translation.
+Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `insertValues` rest parameter.  
+The items of the `insertValues` rest parameter will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the translation.
   
 Should you be using nested objects in your translations, you can use the dot notation to access them.  
 First, the key will be split by dots and the parts will be used to traverse the translation object.  
 If that doesn't yield a result, the function will try to access the key including dots on the top level of the translation object.  
 If that also doesn't yield a result, the key itself will be returned.  
   
-If no language has been added or set before calling this function, it will return the key itself.  
+If no language has been added or set before calling this function, it will also return the key itself.  
+  
+To check if a translation has been found, compare the returned value with the key. If they are the same, the translation was not found.  
+You could also write a wrapper function that can then return a default value or `null` if the translation was not found instead.  
+  
 If the key is found and the translation contains placeholders but none or an insufficient amount of values are passed, it will try to insert as many values as were passed and leave the rest of the placeholders untouched in their `%n` format.  
 If the key is found, the translation doesn't contain placeholders but values are still passed, the values will be ignored and the translation will be returned without modification.  
   
@@ -2308,7 +2312,7 @@ console.log(tr.forLang("en", "welcome.generic")); // "Welcome"
 ### tr.forLang()
 Usage:  
 ```ts
-tr.forLang(language: string, key: string, ...values: Stringifiable[]): string
+tr.forLang(language: string, key: string, ...insertValues: Stringifiable[]): string
 ```  
   
 Returns the translation of the passed key in the specified language. Otherwise behaves exactly like [`tr()`](#tr)  
