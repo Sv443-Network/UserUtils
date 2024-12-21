@@ -1,5 +1,13 @@
 /** Ensures the passed {@linkcode value} always stays between {@linkcode min} and {@linkcode max} */
-export function clamp(value: number, min: number, max: number): number {
+export function clamp(value: number, min: number, max: number): number
+/** Ensures the passed {@linkcode value} always stays between 0 and {@linkcode max} */
+export function clamp(value: number, max: number): number
+/** Ensures the passed {@linkcode value} always stays between {@linkcode min} and {@linkcode max} - if `max` isn't given, it defaults to `min` and `min` defaults to 0 */
+export function clamp(value: number, min: number, max?: number): number {
+  if(typeof max !== "number") {
+    max = min;
+    min = 0;
+  }
   return Math.max(Math.min(value, max), min);
 }
 
@@ -14,12 +22,10 @@ export function mapRange(value: number, range1min: number, range1max: number, ra
  */
 export function mapRange(value: number, range1max: number, range2max: number): number;
 export function mapRange(value: number, range1min: number, range1max: number, range2min?: number, range2max?: number): number {
-  // overload
-  if(typeof range2min === "undefined" || range2max === undefined) {
+  if(typeof range2min === "undefined" || typeof range2max === "undefined") {
     range2max = range1max;
-    range2min = 0;
     range1max = range1min;
-    range1min = 0;
+    range2min = range1min = 0;
   }
 
   if(Number(range1min) === 0.0 && Number(range2min) === 0.0)
@@ -54,7 +60,7 @@ export function randRange(...args: (number | boolean | undefined)[]): number {
     [ max ] = args;
   }
   else
-    throw new TypeError(`Wrong parameter(s) provided - expected: "number" and "number|undefined", got: "${typeof args[0]}" and "${typeof args[1]}"`);
+    throw new TypeError(`Wrong parameter(s) provided - expected (number, boolean|undefined) or (number, number, boolean|undefined) but got (${args.map(a => typeof a).join(", ")}) instead`);
 
   if(typeof args[2] === "boolean")
     enhancedEntropy = args[2];

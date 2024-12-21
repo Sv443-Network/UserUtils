@@ -956,10 +956,12 @@ setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       
 ### clamp()
 Usage:  
 ```ts
+clamp(num: number, max: number): number
 clamp(num: number, min: number, max: number): number
 ```
   
 Clamps a number between a min and max boundary (inclusive).  
+If only two arguments are passed, the function will set the `min` boundary to 0.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -967,13 +969,14 @@ Clamps a number between a min and max boundary (inclusive).
 import { clamp } from "@sv443-network/userutils";
 
 clamp(7, 0, 10);     // 7
+clamp(7, 10);        // 7
 clamp(-1, 0, 10);    // 0
 clamp(5, -5, 0);     // 0
 clamp(99999, 0, 10); // 10
 
-// clamp without a min or max boundary:
-clamp(-99999, -Infinity, 0); // -99999
-clamp(99999, 0, Infinity);   // 99999
+// clamp without either a min or max boundary:
+clamp(Number.MAX_SAFE_INTEGER, Infinity);     // 9007199254740991
+clamp(Number.MIN_SAFE_INTEGER, -Infinity, 0); // -9007199254740991
 ```
 </details>
 
