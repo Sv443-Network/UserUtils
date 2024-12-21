@@ -1,22 +1,61 @@
 import { insertValues } from "./misc.js";
 import type { Stringifiable } from "./types.js";
 
-/** Trans rights! 🏳️‍⚧️ */
-const trans: Record<string, Record<string, string>> = {};
-let curLang: string;
+/**
+ * Translation object to pass to {@linkcode tr.addLanguage()}  
+ * Can be a flat object of identifier keys and the translation text as the value, or an infinitely nestable object containing the same.  
+ *   
+ * @example
+ * // Flat object:
+ * const tr_en: TrObject = {
+ *   hello: "Hello, %1!",
+ *   foo: "Foo",
+ * };
+ * 
+ * // Nested object:
+ * const tr_de: TrObject = {
+ *   hello: "Hallo, %1!",
+ *   foo: {
+ *     bar: "Foo bar",
+ *   },
+ * };
+ */
+export interface TrObject {
+  [key: string]: string | TrObject;
+}
 
-const trLang = (language: string, key: string, ...args: Stringifiable[]): string => {
-  if(!language)
-    return key;
-  const trText = trans[language]?.[key];
-  if(!trText)
+/** All translations and some metadata */
+const trans: {
+  [language: string]: TrObject;
+} = {};
+/** Currently set language */
+let curLang = "";
+
+/** Common function to resolve the translation text in a specific language. */
+function translate(language: string, key: string, ...args: Stringifiable[]): string {
+  const trObj = trans[language]?.data;
+  if(typeof language !== "string" || typeof trObj !== "object" || trObj === null)
     return key;
 
-  if(args.length > 0 && trText.match(/%\d/)) {
-    return insertValues(trText, ...args);
+  // try to resolve via traversal (e.g. `trObj["key"]["parts"]`)
+  const keyParts = key.split(".");
+  let value: string | TrObject | undefined = trObj;
+  for(const part of keyParts) {
+    if(typeof value !== "object" || value === null)
+      break;
+    value = value?.[part];
   }
-  return trText;
-};
+  if(typeof value === "string")
+    return insertValues(value, args);
+
+  // try falling back to `trObj["key.parts"]`
+  value = trObj?.[key];
+  if(typeof value === "string")
+    return insertValues(value, args);
+
+  // default to translation key
+  return key;
+}
 
 /**
  * Returns the translated text for the specified key in the current language set by {@linkcode tr.setLanguage()}  
@@ -27,9 +66,7 @@ const trLang = (language: string, key: string, ...args: Stringifiable[]): string
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-function tr(key: string, ...args: Stringifiable[]): string {
-  return trLang(curLang, key, ...args);
-}
+const tr = (key: string, ...args: Stringifiable[]): string => translate(curLang, key, ...args);
 
 /**
  * Returns the translated text for the specified key in the specified language.  
@@ -40,7 +77,7 @@ function tr(key: string, ...args: Stringifiable[]): string {
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-tr.forLang = trLang;
+tr.forLang = translate;
 
 /**
  * Registers a new language with its translations.  
@@ -50,8 +87,16 @@ tr.forLang = trLang;
  * These placeholders will be replaced by the arguments passed to the translation functions.  
  * @param language Language code to register
  * @param translations Translations for the specified language
+ * @example ```ts
+ * tr.addLanguage("en", {
+ *   hello: "Hello, %1!",
+ *   foo: {
+ *     bar: "Foo bar",
+ *   },
+ * });
+ * ```
  */
-tr.addLanguage = (language: string, translations: Record<string, string>): void => {
+tr.addLanguage = (language: string, translations: TrObject): void => {
   trans[language] = translations;
 };
 
@@ -77,10 +122,10 @@ tr.getLanguage = (): string => {
 /**
  * Returns the translations for the specified language or currently active one.  
  * If the language is not registered with {@linkcode tr.addLanguage()}, this function will return `undefined`.  
- * @param language Language code to get translations for - defaults to the active language set by {@linkcode tr.setLanguage()}
+ * @param language Language code to get translations for - defaults to the currently active language (set by {@linkcode tr.setLanguage()})
  * @returns Translations for the specified language
  */
-tr.getTranslations = (language?: string): Record<string, string> | undefined => {
+tr.getTranslations = (language?: string): TrObject | undefined => {
   return trans[language ?? curLang];
 };
 
