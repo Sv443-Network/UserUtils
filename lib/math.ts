@@ -1,3 +1,5 @@
+import type { Stringifiable } from "./types.js";
+
 /** Ensures the passed {@linkcode value} always stays between {@linkcode min} and {@linkcode max} */
 export function clamp(value: number, min: number, max: number): number
 /** Ensures the passed {@linkcode value} always stays between 0 and {@linkcode max} */
@@ -89,7 +91,12 @@ export function randRange(...args: (number | boolean | undefined)[]): number {
 }
 
 /** Calculates the amount of digits in the given number - the given number or string will be passed to the `Number()` constructor. Returns NaN if the number is invalid. */
-export function digitCount(num: number | string): number {
+export function digitCount(num: number | Stringifiable): number {
+  num = Number((!["string", "number"].includes(typeof num)) ? String(num) : num);
+
+  if(typeof num === "number" && isNaN(num))
+    return NaN;
+
   return num === 0
     ? 1
     : Math.floor(
