@@ -87,6 +87,8 @@ or view the documentation of previous major releases:
     - [`NonEmptyString`](https://github.com/Sv443-Network/UserUtils#nonemptystring) - any string that should have at least one character
     - [`LooseUnion`](https://github.com/Sv443-Network/UserUtils#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
     - [`Prettify`](https://github.com/Sv443-Network/UserUtils#prettify) - expands a complex type into a more readable format while keeping functionality the same
+    - [`ValueGen`](https://github.com/Sv443-Network/UserUtils#valuegen) - a "generator" value that allows for super flexible value typing and declaration
+    - [`StringGen`](https://github.com/Sv443-Network/UserUtils#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
 
 <br><br>
 

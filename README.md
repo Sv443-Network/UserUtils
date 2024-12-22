@@ -93,7 +93,7 @@ View the documentation of previous major releases:
     - [`LooseUnion`](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
     - [`Prettify`](#prettify) - expands a complex type into a more readable format while keeping functionality the same
     - [`ValueGen`](#valuegen) - a "generator" value that allows for super flexible value typing and declaration
-    - [`StringGen`](#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including support for unions
+    - [`StringGen`](#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
 
 <br><br>
 
@@ -956,12 +956,12 @@ setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       
 ### clamp()
 Usage:  
 ```ts
-clamp(num: number, max: number): number
 clamp(num: number, min: number, max: number): number
+clamp(num: number, max: number): number
 ```
   
 Clamps a number between a min and max boundary (inclusive).  
-If only two arguments are passed, the function will set the `min` boundary to 0.  
+If only the `num` and `max` arguments are passed, the `min` boundary will be set to 0.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -969,12 +969,12 @@ If only two arguments are passed, the function will set the `min` boundary to 0.
 import { clamp } from "@sv443-network/userutils";
 
 clamp(7, 0, 10);     // 7
-clamp(7, 10);        // 7
-clamp(-1, 0, 10);    // 0
+clamp(7, 10);        // 7 (equivalent to the above)
+clamp(-1, 10);       // 0
 clamp(5, -5, 0);     // 0
 clamp(99999, 0, 10); // 10
 
-// clamp without either a min or max boundary:
+// use Infinity to clamp without a min or max boundary:
 clamp(Number.MAX_SAFE_INTEGER, Infinity);     // 9007199254740991
 clamp(Number.MIN_SAFE_INTEGER, -Infinity, 0); // -9007199254740991
 ```
@@ -1055,12 +1055,12 @@ benchmark(true);  // Generated 100k in 461ms
 ### digitCount()
 Usage:  
 ```ts
-digitCount(num: number | string): number
+digitCount(num: number | Stringifiable): number
 ```
   
 Calculates and returns the amount of digits in the given number.  
-The number or string will be passed to the `Number()` constructor before the calculation.  
-The function returns `NaN` if the number is invalid.  
+The given value will be converted by being passed to `String()` and then `Number()` before the calculation.  
+Returns `NaN` if the number is invalid.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1770,15 +1770,15 @@ If an array or NodeList is passed, the amount of contained items will be used.
 ```ts
 import { autoPlural } from "@sv443-network/userutils";
 
-autoPlural("apple", 0); // "apples"
-autoPlural("apple", 1); // "apple"
-autoPlural("apple", 2); // "apples"
+autoPlural("item", 0); // "items"
+autoPlural("item", 1); // "item"
+autoPlural("item", 2); // "items"
 
-autoPlural("apple", [1]);    // "apple"
-autoPlural("apple", [1, 2]); // "apples"
+autoPlural("element", document.querySelectorAll("html")); // "element"
+autoPlural("element", document.querySelectorAll("*"));    // "elements"
 
 const items = [1, 2, 3, 4, "foo", "bar"];
-console.log(`Found ${items.length} ${autoPlural("item", items)}`); // "Found 6 items"
+console.log(items.length, autoPlural("item", items)); // "6 items"
 ```
 </details>
 
@@ -2094,7 +2094,7 @@ ValueGen allows for tons of flexibility in how the value can be obtained. Callin
 import { consumeGen, type ValueGen } from "@sv443-network/userutils";
 
 async function doSomething(value: ValueGen<number>) {
-  // type gets inferred because `value` is correctly typed as a ValueGen<number>
+  // type gets inferred as `number` because above `value` is typed as a ValueGen<number>
   const finalValue = await consumeGen(value);
   console.log(finalValue);
 }
@@ -2104,6 +2104,9 @@ doSomething(42);
 doSomething(() => 42);
 doSomething(Promise.resolve(42));
 doSomething(async () => 42);
+
+// throws a typescript error:
+doSomething("foo");
 ```
 
 </details>
@@ -2126,17 +2129,29 @@ Optionally you can use the template parameter to define the union of strings tha
 import { consumeStringGen, type StringGen } from "@sv443-network/userutils";
 
 export class MyTextPromptThing {
-  // full flexibility on how to pass the string:
+  // full flexibility on how the string can be passed to the constructor,
+  // because it can be obtained synchronously or asynchronously,
+  // in string or function form:
   constructor(private text: StringGen) {}
 
-  /** Returns the HTML content to show in the prompt */
-  private async getContent() {
-    const promptText = await consumeGen(this.text);
-    return promptText.trim().replace(/\n/g, "<br>");
-  }
+  /** Shows the prompt dialog */
+  public async showPrompt() {
+    const promptText = await consumeStringGen(this.text);
+    const promptHtml = promptText.trim().replace(/\n/g, "<br>");
 
-  // ...
+    // ...
+  }
 }
+
+// all valid:
+const myText = "Hello, World!";
+new MyTextPromptThing(myText);
+new MyTextPromptThing(() => myText);
+new MyTextPromptThing(Promise.resolve(myText));
+new MyTextPromptThing(async () => myText);
+
+// throws a typescript error:
+new MyTextPromptThing(420);
 ```
 
 </details>
@@ -2811,9 +2826,8 @@ Usage:
 ValueGen<TValueType>
 ```
   
-A type that describes a value that can be obtained in various ways.  
-Those include the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
-This type is used in the [`consumeGen()`](#consumegen) function to convert it to the type it represents. Refer to that function for an example.  
+Describes a value that can be obtained in various ways, including via the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
+Use it in the [`consumeGen()`](#consumegen) function to convert the given ValueGen value to the type it represents. Also refer to that function for an example.  
 
 <br><br>
 
@@ -2823,10 +2837,9 @@ Usage:
 StringGen<TStrUnion>
 ```
   
-A type that describes a string that can be obtained in various ways.  
-Those include the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
+Describes a string that can be obtained in various ways, including via the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
 Contrary to [`ValueGen`](#valuegen), this type allows for specifying a union of strings that the StringGen should yield, as long as it is loosely typed as just `string`.  
-It is used in the [`consumeStringGen()`](#consumestringgen) function to convert it to a plain string. Refer to that function for an example.
+Use it in the [`consumeStringGen()`](#consumestringgen) function to convert the given StringGen value to a plain string. Also refer to that function for an example.
 
 <br><br><br><br>
 
