@@ -1,5 +1,14 @@
 # @sv443-network/userutils
 
+## 8.4.0
+
+### Minor Changes
+
+- e10d629: Added function `digitCount()` to calculate the amount of digits in the passed number
+- 949877a: Added support for nested objects in translations (e.g. `tr("foo.bar.baz")`)
+- 52d392a: Added `ValueGen` and `StringGen` types with accompanying `consumeGen()` and `consumeStringGen()` functions to allow for super flexible typing and declaration of values
+- bbce0e1: Added overload to `clamp()` without `min` parameter
+
 ## 8.3.3
 
 ### Patch Changes
