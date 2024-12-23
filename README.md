@@ -77,10 +77,14 @@ View the documentation of previous major releases:
   - [**Translation:**](#translation)
     - [`tr()`](#tr) - simple JSON-based translation system with placeholder and nesting support
     - [`tr.forLang()`](#trforlang) - translate with the specified language instead of the currently active one
-    - [`tr.addLanguage()`](#traddlanguage) - add a language and its translations
     - [`tr.setLanguage()`](#trsetlanguage) - set the currently active language for translations
     - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
+    - [`tr.addTranslations()`](#traddtranslations) - add a language and its translations
     - [`tr.getTranslations()`](#trgettranslations) - returns the translations for the given language or the currently active one
+    - [`tr.deleteTranslations()`](#trdeletetranslations) - delete the translations for the given language or the active one
+    - [`tr.hasKey()`](#trhaskey) - check if a translation key exists for the given or active language
+    - [`tr.addTransform()`](#traddtransform) - add a transformation function to dynamically modify the translation value
+    - [`tr.deleteTransform()`](#trdeletetransform) - delete a transformation function that was previously added
   - [**Colors:**](#colors)
     - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
     - [`rgbToHex()`](#rgbtohex) - convert RGB or RGBA values to a hex color string
@@ -2258,7 +2262,7 @@ console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 <!-- #region Translation -->
 ## Translation:
 This is a very lightweight translation function that can be used to translate simple strings.  
-Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addLanguage()`](#traddlanguage) for an example on how this might be done.
+Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addTranslations()`](#traddtranslations) for an example on how this might be done.
 
 <br>
 
@@ -2268,7 +2272,7 @@ Usage:
 tr(key: string, ...insertValues: Stringifiable[]): string
 ```
   
-The function returns the translation of the passed key in the language added by [`tr.addLanguage()`](#traddlanguage) and set by [`tr.setLanguage()`](#trsetlanguage)  
+The function returns the translation of the passed key in the language added by [`tr.addTranslations()`](#traddtranslations) and set by [`tr.setLanguage()`](#trsetlanguage)  
 Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `insertValues` rest parameter.  
 The items of the `insertValues` rest parameter will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the translation.
   
@@ -2285,20 +2289,22 @@ You could also write a wrapper function that can then return a default value or 
 If the key is found and the translation contains placeholders but none or an insufficient amount of values are passed, it will try to insert as many values as were passed and leave the rest of the placeholders untouched in their `%n` format.  
 If the key is found, the translation doesn't contain placeholders but values are still passed, the values will be ignored and the translation will be returned without modification.  
   
+You may use [`tr.addTransform()`](#traddtransform) to add a function that will be called on every translation matching a given pattern, allowing for very dynamic translations. See examples by going to that function's section.  
+  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
 // add languages and translations:
-tr.addLanguage("en", {
+tr.addTranslations("en", {
   welcome: {
     generic: "Welcome",
     with_name: "Welcome, %1",
   },
 });
 
-tr.addLanguage("de", {
+tr.addTranslations("de", {
   welcome: {
     generic: "Willkommen",
     with_name: "Willkommen, %1",
@@ -2341,11 +2347,11 @@ This function does not change the currently active language set by [`tr.setLangu
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addLanguage("en", {
+tr.addTranslations("en", {
   "welcome_name": "Welcome, %1",
 });
 
-tr.addLanguage("de", {
+tr.addTranslations("de", {
   "welcome_name": "Willkommen, %1",
 });
 
@@ -2360,19 +2366,44 @@ console.log(tr.forLang("de", "welcome_name", "John")); // "Willkommen, John"
 
 <br>
 
-### tr.addLanguage()
+### tr.setLanguage()
 Usage:  
 ```ts
-tr.addLanguage(language: string, translations: Record<string, string | object>): void
+tr.setLanguage(language: string): void
 ```
 
-Adds or overwrites a language and its associated translations to the translation function.  
+Synchronously sets the language that will be used for translations by default.  
+Alternatively, you can use [`tr.forLang()`](#trforlang) to get translations in a different language without changing the current language.  
+No validation is done on the passed language, so make sure it is correct and it has been added with `tr.addTranslations()` before calling `tr()`  
+  
+For an example, please see [`tr()`](#tr)
+
+<br>
+
+### tr.getLanguage()
+Usage:  
+```ts
+tr.getLanguage(): string | undefined
+```
+
+Returns the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+If no language has been set yet, it will return undefined.
+
+<br>
+
+### tr.addTranslations()
+Usage:  
+```ts
+tr.addTranslations(language: string, translations: Record<string, string | object>): void
+```
+
+Adds or overwrites a language and its associated translations.  
 The passed language can be any unique identifier, though I highly recommend sticking to a standard like [BCP 47 / RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.txt) (which is used by the [`Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) and methods like [`Number.toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString)), or [ISO 639-1.](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)  
 The passed translations can either be a flat object where the key is the translation key used in `tr()` and the value is the translation itself, or an infinitely nestable object structure containing the same.  
-If `tr.addLanguage()` is called multiple times with the same language, the previous translations of that language will be overwritten.  
+If `tr.addTranslations()` is called multiple times with the same language, the previous translations of that language will be overwritten.  
   
 The translation values may contain placeholders in the format `%n`, where `n` is the number of the value starting at 1.  
-These can be used to inject values into the translation when calling `tr()`  
+These can be used to inject values into the translation when calling [`tr()`](#tr)  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -2381,13 +2412,13 @@ import { tr, type Stringifiable } from "@sv443-network/userutils";
 
 // add a language with associated translations:
 
-tr.addLanguage("en", {
+tr.addTranslations("en", {
   lang_name: "Eglis", // no worries, the example below will overwrite this value
 });
 
 // overwriting previous translation, now with nested objects and placeholders:
 
-tr.addLanguage("en", {
+tr.addTranslations("en", {
   // to get this value, you could call `tr.forLang("en", "lang_name")`
   lang_name: "English",
   home_page: {
@@ -2402,12 +2433,12 @@ tr.addLanguage("en", {
 
 // can be used for different locales too:
 
-tr.addLanguage("en-US", {
+tr.addTranslations("en-US", {
   fries: "fries",
   color: "color",
 });
 
-tr.addLanguage("en-GB", {
+tr.addTranslations("en-GB", {
   fries: "chips",
   color: "colour",
 });
@@ -2419,15 +2450,15 @@ const translation_de = {
   foo: "Foo",
 };
 
-tr.addLanguage("de-DE", translation_de);
+tr.addTranslations("de-DE", translation_de);
 
-tr.addLanguage("de-CH", {
+tr.addTranslations("de-CH", {
   // overwrite the "greeting" but keep other keys as they are:
   ...translation_de,
   greeting: "Grüezi!",
 });
 
-tr.addLanguage("de-AT", {
+tr.addTranslations("de-AT", {
   // overwrite "greeting" again but keep other keys as they are:
   ...translation_de,
   greeting: "Grüß Gott!",
@@ -2435,7 +2466,7 @@ tr.addLanguage("de-AT", {
 
 // example for custom pluralization using a predefined suffix:
 
-tr.addLanguage("en", {
+tr.addTranslations("en", {
   "cart_items_added-0": "No items were added to the cart",
   "cart_items_added-1": "Added %1 item to the cart",
   "cart_items_added-n": "Added %1 items to the cart",
@@ -2487,31 +2518,6 @@ console.log(trpl("cart_items_added", someVal, someVal)); // "Added NaN items to 
 
 <br>
 
-### tr.setLanguage()
-Usage:  
-```ts
-tr.setLanguage(language: string): void
-```
-
-Synchronously sets the language that will be used for translations by default.  
-Alternatively, you can use [`tr.forLang()`](#trforlang) to get translations in a different language without changing the current language.  
-No validation is done on the passed language, so make sure it is correct and it has been added with `tr.addLanguage()` before calling `tr()`  
-  
-For an example, please see [`tr()`](#tr)
-
-<br>
-
-### tr.getLanguage()
-Usage:  
-```ts
-tr.getLanguage(): string | undefined
-```
-
-Returns the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
-If no language has been set yet, it will return undefined.
-
-<br>
-
 ### tr.getTranslations()
 Usage:  
 ```ts
@@ -2527,7 +2533,7 @@ If no translations are found, it will return undefined.
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addLanguage("en", {
+tr.addTranslations("en", {
   welcome: "Welcome",
 });
 
@@ -2538,6 +2544,164 @@ console.log(tr.getTranslations());     // { "welcome": "Welcome" }
 console.log(tr.getTranslations("en")); // { "welcome": "Welcome" }
 
 console.log(tr.getTranslations("de")); // undefined
+```
+</details>
+
+<br>
+
+### tr.deleteTranslations()
+Usage:  
+```ts
+tr.deleteTranslations(language?: string): void
+```
+  
+Deletes the translations of the specified language.  
+If no language is given, tries to use the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  welcome: "Welcome",
+});
+
+tr.addTranslations("de", {
+  welcome: "Willkommen",
+});
+
+console.log(tr.getTranslations("en")); // { "welcome": "Welcome" }
+
+tr.setLanguage("en");
+
+// no language code needed anymore because of tr.setLanguage("en"):
+tr.deleteTranslations();
+
+console.log(tr.getTranslations()); // undefined
+```
+</details>
+
+<br>
+
+### tr.hasKey()
+Usage:  
+```ts
+tr.hasKey(key: string, language?: string): boolean
+```
+  
+Checks if the specified key exists in the translations of the specified language.  
+If no language is given, tries to use the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  welcome: "Welcome",
+});
+
+tr.setLanguage("en");
+
+console.log(tr.hasKey("welcome"));       // true
+console.log(tr.hasKey("foo"));           // false
+console.log(tr.hasKey("welcome", "de")); // false
+```
+</details>
+
+<br>
+
+### tr.addTransform()
+Usage:  
+```ts
+tr.addTransform(pattern: RegExp | string, fn: (matches: RegExpMatchArray, language: string) => Stringifiable): void
+```
+  
+Registers a transformation function that will be called on every translation that matches the specified regexp pattern. You can also pass a simple string that will be converted to a RegExp object with the `gm` flags.  
+After all %n-formatted values have been injected, the transform functions will be called sequentially in the order they were added.  
+Each function will receive the RegExpMatchArray [see MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match) and the current language as arguments.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  "greeting": {
+    "hello": "Hello",
+  },
+  "welcome": "Welcome, <$USERNAME>",
+  "welcome_headline_html": "Welcome, <$USERNAME>\n<col=orangered>You have %1 unread notifications.</col>\n<col=#128923>You have %2 unread messages.</col>",
+});
+
+tr.setLanguage("en");
+
+// generic transform to inject global values on demand:
+tr.addTransform(/<\$([A-Z_]+)>/gm, (matches) => {
+  switch(matches[1]) {
+    default: return matches[0];
+    // retrieved from somewhere else in the app:
+    case "USERNAME": return "John";
+  }
+});
+
+// match <col=red>...</col> and replace it with an HTML span tag:
+tr.addTransform(/<col=([a-z]+)>(.*?)<\/col>/gm, (matches) => {
+  return `<span style="color: ${matches[1]};">${matches[2]}</span>`;
+});
+
+// replace all occurrences of "Welcome" with "Hello" and make sure this works across all languages:
+tr.addTransform("Welcome", (_matches, language) => tr.forLang(language, "greeting.hello"));
+tr.addTransform("welcome", (_matches, language) => tr.forLang(language, "greeting.hello").toLowerCase());
+
+console.log(tr("welcome")); // "Hello, John"
+
+console.log(tr("welcome_headline_html", 3, 5));
+// `Hello, John\n
+// <span style="color: orangered;">You have 3 unread notifications.</span>\n
+// <span style="color: #128923;">You have 5 unread messages.</span>`
+```
+</details>
+
+<br>
+
+### tr.deleteTransform()
+Usage:  
+```ts
+tr.deleteTransform(patternOrFn: RegExp | string | ((matches: RegExpMatchArray, language: string) => Stringifiable)): void
+```
+  
+Deletes the transformation function that matches the specified pattern or function.  
+If the function is not found, nothing will happen.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  "welcome": "Welcome, <$USERNAME>",
+});
+
+tr.setLanguage("en");
+
+// generic transform to inject global values on demand:
+const globalValTransform = (matches) => {
+  switch(matches[1]) {
+    default: return matches[0];
+    // retrieved from somewhere else in the app:
+    case "USERNAME": return "John";
+  }
+};
+
+tr.addTransform(/<\$([A-Z_]+)>/gm, globalValTransform);
+
+console.log(tr("welcome")); // "Welcome, John"
+
+tr.deleteTransform(globalValTransform);
+
+console.log(tr("welcome")); // "Welcome, <$USERNAME>"
 ```
 </details>
 
