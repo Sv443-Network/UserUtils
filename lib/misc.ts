@@ -31,6 +31,7 @@ export function pauseFor(time: number): Promise<void> {
   });
 }
 
+// TODO:FIXME: https://github.com/Sv443-Network/UserUtils/issues/46
 /**
  * Calls the passed {@linkcode func} after the specified {@linkcode timeout} in ms (defaults to 300).  
  * Any subsequent calls to this function will reset the timer and discard all previous calls.
