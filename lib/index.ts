@@ -3,6 +3,7 @@ export * from "./colors.js";
 export * from "./crypto.js";
 export * from "./DataStore.js";
 export * from "./DataStoreSerializer.js";
+export * from "./Debouncer.js";
 export * from "./Dialog.js";
 export * from "./dom.js";
 export * from "./math.js";
