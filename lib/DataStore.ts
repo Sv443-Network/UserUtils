@@ -22,14 +22,14 @@ export type DataStoreOptions<TData> = Prettify<
      * The default data object to use if no data is saved in persistent storage yet.  
      * Until the data is loaded from persistent storage with {@linkcode DataStore.loadData()}, this will be the data returned by {@linkcode DataStore.getData()}.  
      *   
-     * ⚠️ This has to be an object that can be serialized to JSON using `JSON.stringify()`, so no functions or circular references are allowed, they will cause unexpected behavior.  
+     * - ⚠️ This has to be an object that can be serialized to JSON using `JSON.stringify()`, so no functions or circular references are allowed, they will cause unexpected behavior.  
      */
     defaultData: TData;
     /**
      * An incremental, whole integer version number of the current format of data.  
      * If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively.  
      *   
-     * ⚠️ Never decrement this number and optimally don't skip any numbers either!
+     * - ⚠️ Never decrement this number and optimally don't skip any numbers either!
      */
     formatVersion: number;
     /**
@@ -87,12 +87,12 @@ export type DataStoreOptions<TData> = Prettify<
  * Supports migrating data from older format versions to newer ones and populating the cache with default data if no persistent data is found.  
  * Can be overridden to implement any other storage method.  
  *   
- * All methods are at least `protected`, so you can easily extend this class and overwrite them to use a different storage method or to add additional functionality.  
- * Remember that you can call `super.methodName()` in the subclass to access the original method.  
+ * All methods are `protected` or `public`, so you can easily extend this class and overwrite them to use a different storage method or to add other functionality.  
+ * Remember that you can use `super.methodName()` in the subclass to call the original method if needed.  
  *   
- * ⚠️ The stored data has to be **serializable using `JSON.stringify()`**, meaning no undefined, circular references, etc. are allowed.  
- * ⚠️ If the storageMethod is left as the default of `"GM"` the directives `@grant GM.getValue` and `@grant GM.setValue` are required. If you then also use the method {@linkcode DataStore.deleteData()}, the extra directive `@grant GM.deleteValue` is needed too.  
- * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`  
+ * - ⚠️ The data is stored as a JSON string, so only data compatible with [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) can be used. Circular structures and complex objects (containing functions, symbols, etc.) will either throw an error on load and save or cause otherwise unexpected behavior. Properties with a value of `undefined` will be removed from the data prior to saving it, so use `null` instead.  
+ * - ⚠️ If the storageMethod is left as the default of `"GM"`, the directives `@grant GM.getValue` and `@grant GM.setValue` are required. If you then also use the method {@linkcode DataStore.deleteData()}, the extra directive `@grant GM.deleteValue` is needed too.  
+ * - ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`  
  * 
  * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided)
  */
@@ -111,8 +111,8 @@ export class DataStore<TData extends object = object> {
    * Creates an instance of DataStore to manage a sync & async database that is cached in memory and persistently saved across sessions.  
    * Supports migrating data from older versions to newer ones and populating the cache with default data if no persistent data is found.  
    *   
-   * ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue` if the storageMethod is left as the default of `"GM"`  
-   * ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
+   * - ⚠️ Requires the directives `@grant GM.getValue` and `@grant GM.setValue` if the storageMethod is left as the default of `"GM"`  
+   * - ⚠️ Make sure to call {@linkcode loadData()} at least once after creating an instance, or the returned data will be the same as `options.defaultData`
    * 
    * @template TData The type of the data that is saved in persistent storage for the currently set format version (will be automatically inferred from `defaultData` if not provided) - **This has to be a JSON-compatible object!** (no undefined, circular references, etc.)
    * @param options The options for this DataStore instance
@@ -222,7 +222,7 @@ export class DataStore<TData extends object = object> {
    * The in-memory cache will be left untouched, so you may still access the data with {@linkcode getData()}  
    * Calling {@linkcode loadData()} or {@linkcode setData()} after this method was called will recreate persistent storage with the cached or default data.  
    *   
-   * ⚠️ This requires the additional directive `@grant GM.deleteValue` if the storageMethod is left as the default of `"GM"`
+   * - ⚠️ This requires the additional directive `@grant GM.deleteValue` if the storageMethod is left as the default of `"GM"`
    */
   public async deleteData(): Promise<void> {
     await Promise.all([
@@ -343,7 +343,7 @@ export class DataStore<TData extends object = object> {
 
   //#region storage
 
-  /** Gets a value from persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
+  /** Gets a value from persistent storage - can be overwritten in a subclass if you want to use something other than the default storage methods */
   protected async getValue<TValue extends GM.Value = string>(name: string, defaultValue: TValue): Promise<string | TValue> {
     switch(this.storageMethod) {
     case "localStorage":
@@ -356,7 +356,7 @@ export class DataStore<TData extends object = object> {
   }
 
   /**
-   * Sets a value in persistent storage - can be overwritten in a subclass if you want to use something other than GM storage.  
+   * Sets a value in persistent storage - can be overwritten in a subclass if you want to use something other than the default storage methods.  
    * The default storage engines will stringify all passed values like numbers or booleans, so be aware of that.
    */
   protected async setValue(name: string, value: GM.Value): Promise<void> {
@@ -370,7 +370,7 @@ export class DataStore<TData extends object = object> {
     }
   }
 
-  /** Deletes a value from persistent storage - can be overwritten in a subclass if you want to use something other than GM storage */
+  /** Deletes a value from persistent storage - can be overwritten in a subclass if you want to use something other than the default storage methods */
   protected async deleteValue(name: string): Promise<void> {
     switch(this.storageMethod) {
     case "localStorage":

@@ -47,8 +47,8 @@ function str2ab(str: string): ArrayBuffer {
 /**
  * Creates a hash / checksum of the given {@linkcode input} string or ArrayBuffer using the specified {@linkcode algorithm} ("SHA-256" by default).  
  *   
- * ⚠️ Uses the SubtleCrypto API so it needs to run in a secure context (HTTPS).  
- * ⚠️ If you use this for cryptography, make sure to use a secure algorithm (under no circumstances use SHA-1) and to [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)) your input data.
+ * - ⚠️ Uses the SubtleCrypto API so it needs to run in a secure context (HTTPS).  
+ * - ⚠️ If you use this for cryptography, make sure to use a secure algorithm (under no circumstances use SHA-1) and to [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)) your input data.
  */
 export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-256"): Promise<string> {
   let data: ArrayBuffer;
@@ -69,7 +69,7 @@ export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-
 /**
  * Generates a random ID with the specified length and radix (16 characters and hexadecimal by default)  
  *   
- * ⚠️ Not suitable for generating anything related to cryptography! Use [SubtleCrypto's `generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that instead.
+ * - ⚠️ Not suitable for generating anything related to cryptography! Use [SubtleCrypto's `generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that instead.
  * @param length The length of the ID to generate (defaults to 16)
  * @param radix The [radix](https://en.wikipedia.org/wiki/Radix) of each digit (defaults to 16 which is hexadecimal. Use 2 for binary, 10 for decimal, 36 for alphanumeric, etc.)
  * @param enhancedEntropy If set to true, uses [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) for better cryptographic randomness (this also makes it take longer to generate)  
