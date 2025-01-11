@@ -1,5 +1,7 @@
-import { debounce } from "./misc.js";
+import { Debouncer, debounce, type DebouncerType } from "./Debouncer.js";
 import type { Prettify } from "./types.js";
+
+void ["type only", Debouncer];
 
 let domLoaded = false;
 document.addEventListener("DOMContentLoaded", () => domLoaded = true);
@@ -7,39 +9,36 @@ document.addEventListener("DOMContentLoaded", () => domLoaded = true);
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
 export type SelectorListenerOptions<TElem extends Element = HTMLElement> = Prettify<SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>>;
 
-type SelectorOptionsOne<TElem extends Element> = SelectorOptionsCommon & {
+export type SelectorOptionsOne<TElem extends Element> = SelectorOptionsCommon & {
   /** Whether to use `querySelectorAll()` instead - default is false */
   all?: false;
   /** Gets called whenever the selector was found in the DOM */
   listener: (element: TElem) => void;
 };
 
-type SelectorOptionsAll<TElem extends Element> = SelectorOptionsCommon & {
+export type SelectorOptionsAll<TElem extends Element> = SelectorOptionsCommon & {
   /** Whether to use `querySelectorAll()` instead - default is false */
   all: true;
   /** Gets called whenever the selector was found in the DOM */
   listener: (elements: NodeListOf<TElem>) => void;
 };
 
-type SelectorOptionsCommon = {
+export type SelectorOptionsCommon = {
   /** Whether to call the listener continuously instead of once - default is false */
   continuous?: boolean;
   /** Whether to debounce the listener to reduce calls to `querySelector` or `querySelectorAll` - set undefined or <=0 to disable (default) */
   debounce?: number;
-  /** Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default) */
-  debounceEdge?: "rising" | "falling";
+  /** The edge type of the debouncer - default is "queuedImmediate" - refer to {@linkcode Debouncer} for more info */
+  debounceType?: DebouncerType;
 };
 
-type UnsubscribeFunction = () => void;
+export type UnsubscribeFunction = () => void;
 
 export type SelectorObserverOptions = {
   /** If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set */
   defaultDebounce?: number;
-  /**
-   * If set, applies this debounce edge to all listeners that don't have their own set.  
-   * Edge = Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default)
-   */
-  defaultDebounceEdge?: "rising" | "falling";
+  /** If set, applies this debounce edge type to all listeners that don't have their own set - refer to {@linkcode Debouncer} for more info */
+  defaultDebounceType?: DebouncerType;
   /** Whether to disable the observer when no listeners are present - default is true */
   disableOnNoListeners?: boolean;
   /** Whether to ensure the observer is enabled when a new listener is added - default is true */
@@ -78,7 +77,7 @@ export class SelectorObserver {
 
     const {
       defaultDebounce,
-      defaultDebounceEdge,
+      defaultDebounceType,
       disableOnNoListeners,
       enableOnAddListener,
       ...observerOptions
@@ -92,7 +91,7 @@ export class SelectorObserver {
 
     this.customOptions = {
       defaultDebounce: defaultDebounce ?? 0,
-      defaultDebounceEdge: defaultDebounceEdge ?? "rising",
+      defaultDebounceType: defaultDebounceType ?? "queuedImmediate",
       disableOnNoListeners: disableOnNoListeners ?? false,
       enableOnAddListener: enableOnAddListener ?? true,
     };
@@ -176,7 +175,7 @@ export class SelectorObserver {
       options.listener = debounce(
         options.listener as ((arg: NodeListOf<Element> | Element) => void),
         (options.debounce || this.customOptions.defaultDebounce)!,
-        (options.debounceEdge || this.customOptions.defaultDebounceEdge),
+        (options.debounceType || this.customOptions.defaultDebounceType),
       ) as (arg: NodeListOf<Element> | Element) => void;
     }
 
