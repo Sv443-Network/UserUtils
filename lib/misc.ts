@@ -31,38 +31,6 @@ export function pauseFor(time: number): Promise<void> {
   });
 }
 
-// TODO:FIXME: https://github.com/Sv443-Network/UserUtils/issues/46
-/**
- * Calls the passed {@linkcode func} after the specified {@linkcode timeout} in ms (defaults to 300).  
- * Any subsequent calls to this function will reset the timer and discard all previous calls.
- * @param func The function to call after the timeout
- * @param timeout The time in ms to wait before calling the function
- * @param edge Whether to call the function at the very first call ("rising" edge) or the very last call ("falling" edge, default)
- */
-export function debounce<
-  TFunc extends (...args: TArgs[]) => void, // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TArgs = any,
-> (
-  func: TFunc,
-  timeout = 300,
-  edge: "rising" | "falling" = "falling"
-): (...args: TArgs[]) => void {
-  let id: ReturnType<typeof setTimeout> | undefined;
-
-  return function(...args: TArgs[]) {
-    if(edge === "rising") {
-      if(!id) {
-        func.apply(this, args);
-        id = setTimeout(() => id = undefined, timeout);
-      }
-    }
-    else {
-      clearTimeout(id);
-      id = setTimeout(() => func.apply(this, args), timeout);
-    }
-  };
-}
-
 /** Options for the `fetchAdvanced()` function */
 export type FetchAdvancedOpts = Prettify<
   Partial<{
