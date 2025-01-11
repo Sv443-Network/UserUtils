@@ -1,5 +1,8 @@
 import { readdir, readFile, writeFile, lstat } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import k from "kleur";
+
+const dtsPath = resolve("./dist/lib/");
 
 /** Adds two spaces to the end of each line in JSDoc comments to preserve the meticulous line breaks */
 async function addTrailingSpaces(filePath: string) {
@@ -30,4 +33,11 @@ async function processRecursive(directory: string) {
   }
 }
 
-processRecursive("./dist/lib");
+try {
+  await processRecursive(dtsPath);
+
+  console.log(k.green(`Fixed all .d.ts files in ${k.reset(`'${dtsPath}'`)}`));
+}
+catch(err) {
+  console.error(k.red(`Encountered error while fixing .d.ts files in ${k.reset(`'${dtsPath}'`)}:\n`), err);
+}

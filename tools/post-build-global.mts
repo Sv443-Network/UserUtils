@@ -1,5 +1,6 @@
 import { access, constants as fsconstants, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import k from "kleur";
 import pkg from "../package.json" with { type: "json" };
 
 const { exit } = process;
@@ -43,7 +44,7 @@ async function run() {
     .replace(/^\s*'use strict';\s*(\r?\n){1,2}/gm, "");
 
   await writeFile(iifeBundlePath, finalBundle, "utf8");
-  console.log(`\x1b[32mGlobal bundle at path \x1b[0m'${iifeBundlePath}'\x1b[32m has been updated\x1b[0m`);
+  console.log(k.green(`Successfully updated global bundle at path ${k.reset(`'${iifeBundlePath}'`)}\n`));
 
   setImmediate(() => exit(0));
 }
