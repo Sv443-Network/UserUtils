@@ -244,7 +244,7 @@ let ttPolicy: { createHTML: (html: string) => string } | undefined;
  * Uses a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) on Chromium-based browsers to trick the browser into thinking the HTML is safe.  
  * Use this if the page makes use of the CSP directive `require-trusted-types-for 'script'` and throws a "This document requires 'TrustedHTML' assignment" error on Chromium-based browsers.  
  *   
- * ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities!
+ * - ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities!
  */
 export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(element: TElement, html: string): TElement {
   // @ts-ignore
