@@ -125,8 +125,8 @@ export function debounce<
  * @deprecated Replaced by {@linkcode Debouncer} and {@linkcode debounce()}
  */
 export function debounceOld<
-  TFunc extends (...args: TArgs[]) => void, // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TArgs = any,
+  TFunc extends (...args: TArgs[]) => void,
+  TArgs = unknown,
 > (
   func: TFunc,
   timeout = 300,

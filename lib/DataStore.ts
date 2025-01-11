@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { Prettify } from "./types.js";
 
 //#region types
 
-/** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
-type MigrationFunc = (oldData: any) => any | Promise<any>;
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
-export type DataMigrationsDict = Record<number, MigrationFunc>;
+export type DataMigrationsDict = Record<number, ((oldData: unknown) => unknown | Promise<unknown>)>;
 
 /** Options for the DataStore instance */
 export type DataStoreOptions<TData> = Prettify<
@@ -246,7 +242,7 @@ export class DataStore<TData extends object = object> {
    *   
    * If one of the migrations fails, the data will be reset to the default value if `resetOnError` is set to `true` (default). Otherwise, an error will be thrown and no data will be saved.
    */
-  public async runMigrations(oldData: any, oldFmtVer: number, resetOnError = true): Promise<TData> {
+  public async runMigrations(oldData: unknown, oldFmtVer: number, resetOnError = true): Promise<TData> {
     if(!this.migrations)
       return oldData as TData;
 
@@ -277,7 +273,7 @@ export class DataStore<TData extends object = object> {
     }
 
     await Promise.all([
-      this.setValue(`_uucfg-${this.id}`, await this.serializeData(newData)),
+      this.setValue(`_uucfg-${this.id}`, await this.serializeData(newData as TData)),
       this.setValue(`_uucfgver-${this.id}`, lastFmtVer),
       this.setValue(`_uucfgenc-${this.id}`, this.encodingEnabled()),
     ]);
