@@ -1100,16 +1100,16 @@ new DataStore(options: DataStoreOptions)
 ```
   
 A class that manages a sync & async JSON database that is persistently saved to and loaded from GM storage, localStorage or sessionStorage.  
-Also supports automatic migration of outdated data formats via provided migration functions.  
+Supports automatic migration of outdated data formats via configured migration functions.  
 You may create as many instances as you like as long as they have different IDs.  
   
-The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality, like changing the location data is stored.  
+The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality, like changing the location where all data is stored.  
   
 If you have multiple DataStore instances and you want to be able to easily and safely export and import their data, take a look at the [DataStoreSerializer](#datastoreserializer) class.  
 It combines the data of multiple DataStore instances into a single object that can be exported and imported as a whole by the end user.  
   
-⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects will throw an error on load and save or cause otherwise unexpected behavior.  
-⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required if the storageMethod is left as the default of `"GM"`  
+⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects (containing functions, symbols, etc.) will either throw an error on load and save or cause otherwise unexpected behavior. Properties with a value of `undefined` will be removed from the data prior to saving it, so use `null` instead.  
+⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required if the `storageMethod` is left as the default (`"GM"`)  
   
 The options object has the following properties:
 | Property | Description |
@@ -1119,7 +1119,7 @@ The options object has the following properties:
 | `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
 | `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
 | `migrateIds?` | (Optional) A string or array of strings that migrate from one or more old IDs to the ID set in the constructor. If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data. The ID migration will be done once per session in the call to [`loadData()`](#datastoreloaddata). |
-| `storageMethod?` | (Optional) The method that is used to store the data. Can be `"GM"` (default), `"localStorage"` or `"sessionStorage"`. If you want to store the data in a different way, you can override the methods of the DataStore class. |
+| `storageMethod?` | (Optional) The location where data is stored. Can be `"GM"` (default), `"localStorage"` or `"sessionStorage"`. If you want to store the data in a different way, you can override the methods in your own subclass. |
 | `encodeData?` | (Optional, but required when `decodeData` is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
 | `decodeData?` | (Optional, but required when `encodeData` is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
 
