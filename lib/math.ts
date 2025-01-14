@@ -79,6 +79,7 @@ export function randRange(...args: (number | boolean | undefined)[]): number {
     throw new TypeError("Parameter \"min\" can't be bigger than \"max\"");
 
   if(enhancedEntropy) {
+    // TODO:FIXME: doesn't work
     const uintArr = new Uint8Array(1);
     crypto.getRandomValues(uintArr);
     return Number(Array.from(
