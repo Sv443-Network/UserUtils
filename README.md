@@ -75,16 +75,18 @@ View the documentation of previous major releases:
     - [`takeRandomItem()`](#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [`randomizeArray()`](#randomizearray) - returns a copy of the array with its items in a random order
   - [**Translation:**](#translation)
-    - [`tr()`](#tr) - simple JSON-based translation system with placeholder and nesting support
-    - [`tr.forLang()`](#trforlang) - translate with the specified language instead of the currently active one
-    - [`tr.setLanguage()`](#trsetlanguage) - set the currently active language for translations
-    - [`tr.getLanguage()`](#trgetlanguage) - returns the currently active language
-    - [`tr.addTranslations()`](#traddtranslations) - add a language and its translations
-    - [`tr.getTranslations()`](#trgettranslations) - returns the translations for the given language or the currently active one
-    - [`tr.deleteTranslations()`](#trdeletetranslations) - delete the translations for the given language or the active one
-    - [`tr.hasKey()`](#trhaskey) - check if a translation key exists for the given or active language
-    - [`tr.addTransform()`](#traddtransform) - add a transformation function to dynamically modify the translation value
-    - [`tr.deleteTransform()`](#trdeletetransform) - delete a transformation function that was previously added
+    - [`tr.for()`](#trfor) - translates a key for the specified language
+    - [`tr.use()`](#truse) - creates a translation function for the specified language
+    - [`tr.hasKey()`](#trhaskey) - checks if a key exists in the given language
+    - [`tr.addTranslations()`](#traddtranslations) - add a flat or recursive translation object for a language
+    - [`tr.getTranslations()`](#trgettranslations) - returns the translation object for a language
+    - [`tr.deleteTranslations()`](#trdeletetranslations) - delete the translation object for a language
+    - [`tr.setFallbackLanguage()`](#trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
+    - [`tr.getFallbackLanguage()`](#trgetfallbacklanguage) - returns the fallback language
+    - [`tr.addTransform()`](#traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+    - [`tr.deleteTransform()`](#trdeletetransform) - removes a transform function
+    - [`tr.transforms`](#trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - [`TrKeys`](#trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
   - [**Colors:**](#colors)
     - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
     - [`rgbToHex()`](#rgbtohex) - convert RGB or RGBA values to a hex color string
@@ -2262,85 +2264,65 @@ console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 <!-- #region Translation -->
 ## Translation:
 This is a very lightweight translation function that can be used to translate simple strings.  
-Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addTranslations()`](#traddtranslations) for an example on how this might be done.
+TODO: Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addTranslations()`](#traddtranslations) for an example on how this might be done.
 
 <br>
 
-### tr()
+### tr.for()
 Usage:  
 ```ts
-tr(key: string, ...insertValues: Stringifiable[]): string
+tr.for<TTrKey extends string = string>(language: string, key: TTrKey, ...args: Stringifiable[]): string
 ```
   
-The function returns the translation of the passed key in the language added by [`tr.addTranslations()`](#traddtranslations) and set by [`tr.setLanguage()`](#trsetlanguage)  
-Should the translation contain placeholders in the format `%n`, where `n` is the number of the value starting at 1, they will be replaced with the respective item of the `insertValues` rest parameter.  
-The items of the `insertValues` rest parameter will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the translation.
+Returns the translation for a given key in the specified language.  
+If the key does not exist in the current language nor the fallback language set by [`tr.setFallbackLanguage()`](#trsetfallbacklanguage), the key itself will be returned.  
+The `args` parameter is used for argument insertion, provided a transform function was set up via [`tr.addTransform()`](#traddtransform).  
   
-Should you be using nested objects in your translations, you can use the dot notation to access them.  
-First, the key will be split by dots and the parts will be used to traverse the translation object.  
-If that doesn't yield a result, the function will try to access the key including dots on the top level of the translation object.  
-If that also doesn't yield a result, the key itself will be returned.  
+You should probably prefer to use [`tr.use()`](#truse), as it provides a more convenient way to translate multiple strings without having to repeat the language parameter.  
   
-If no language has been added or set before calling this function, it will also return the key itself.  
-  
-To check if a translation has been found, compare the returned value with the key. If they are the same, the translation was not found.  
-You could also write a wrapper function that can then return a default value or `null` if the translation was not found instead.  
-  
-If the key is found and the translation contains placeholders but none or an insufficient amount of values are passed, it will try to insert as many values as were passed and leave the rest of the placeholders untouched in their `%n` format.  
-If the key is found, the translation doesn't contain placeholders but values are still passed, the values will be ignored and the translation will be returned without modification.  
-  
-You may use [`tr.addTransform()`](#traddtransform) to add a function that will be called on every translation matching a given pattern, allowing for very dynamic translations. See examples by going to that function's section.  
+The generic `TTrKey` can be used to enforce type safety for the keys.  
+You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-// add languages and translations:
 tr.addTranslations("en", {
-  welcome: {
-    generic: "Welcome",
-    with_name: "Welcome, %1",
-  },
+  hello: "Hello, World!",
+  goodbye: "Goodbye, World!",
 });
 
 tr.addTranslations("de", {
-  welcome: {
-    generic: "Willkommen",
-    with_name: "Willkommen, %1",
-  },
+  hello: "Hallo, Welt!",
+  // goodbye is missing here
 });
 
-// this has to be called at least once before calling tr()
-tr.setLanguage("en");
+tr.setFallbackLanguage("en");
 
-console.log(tr("welcome.generic"));           // "Welcome"
-console.log(tr("welcome.with_name", "John")); // "Welcome, John"
+tr.for("en", "hello"); // "Hello, World!"
+tr.for("de", "hello"); // "Hallo, Welt!"
 
-console.log(tr("non_existent_key")); // "non_existent_key"
-console.log(tr("welcome"));          // "welcome" (because anything that isn't a string will make the function return the key itself)
-
-// language can be changed at any time, synchronously
-tr.setLanguage("de");
-
-console.log(tr("welcome.generic")); // "Willkommen"
-
-// or without overwriting the current language:
-
-console.log(tr.forLang("en", "welcome.generic")); // "Welcome"
+// these calls fall back to "en":
+tr.for("de", "goodbye");      // "Goodbye, World!"
+tr.for(undefined, "goodbye"); // "Goodbye, World!"
 ```
 </details>
 
 <br>
 
-### tr.forLang()
+### tr.use()
 Usage:  
 ```ts
-tr.forLang(language: string, key: string, ...insertValues: Stringifiable[]): string
-```  
+tr.use<TTrKey extends string = string>(language: string): (key: TTrKey, ...args: Stringifiable[]) => string
+```
   
-Returns the translation of the passed key in the specified language. Otherwise behaves exactly like [`tr()`](#tr)  
-This function does not change the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+Returns a function that can be used to translate strings in the specified language.  
+This allows you to only specify the language once and then translate multiple strings without having to repeat the language parameter.  
+The returned function works exactly like [`tr.for()`](#trfor), minus the language parameter.  
+  
+The generic `TTrKey` can be used to enforce type safety for the keys.  
+You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -2348,237 +2330,13 @@ This function does not change the currently active language set by [`tr.setLangu
 import { tr } from "@sv443-network/userutils";
 
 tr.addTranslations("en", {
-  "welcome_name": "Welcome, %1",
+  hello: "Hello, World!",
 });
 
-tr.addTranslations("de", {
-  "welcome_name": "Willkommen, %1",
-});
+const t = tr.use("en");
 
-// the language is set to "en"
-tr.setLanguage("en");
-
-console.log(tr("welcome_name", "John"));               // "Welcome, John"
-// no need to call tr.setLanguage():
-console.log(tr.forLang("de", "welcome_name", "John")); // "Willkommen, John"
-```
-</details>
-
-<br>
-
-### tr.setLanguage()
-Usage:  
-```ts
-tr.setLanguage(language: string): void
-```
-
-Synchronously sets the language that will be used for translations by default.  
-Alternatively, you can use [`tr.forLang()`](#trforlang) to get translations in a different language without changing the current language.  
-No validation is done on the passed language, so make sure it is correct and it has been added with `tr.addTranslations()` before calling `tr()`  
-  
-For an example, please see [`tr()`](#tr)
-
-<br>
-
-### tr.getLanguage()
-Usage:  
-```ts
-tr.getLanguage(): string | undefined
-```
-
-Returns the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
-If no language has been set yet, it will return undefined.
-
-<br>
-
-### tr.addTranslations()
-Usage:  
-```ts
-tr.addTranslations(language: string, translations: Record<string, string | object>): void
-```
-
-Adds or overwrites a language and its associated translations.  
-The passed language can be any unique identifier, though I highly recommend sticking to a standard like [BCP 47 / RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.txt) (which is used by the [`Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) and methods like [`Number.toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString)), or [ISO 639-1.](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)  
-The passed translations can either be a flat object where the key is the translation key used in `tr()` and the value is the translation itself, or an infinitely nestable object structure containing the same.  
-If `tr.addTranslations()` is called multiple times with the same language, the previous translations of that language will be overwritten.  
-  
-The translation values may contain placeholders in the format `%n`, where `n` is the number of the value starting at 1.  
-These can be used to inject values into the translation when calling [`tr()`](#tr)  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { tr, type Stringifiable } from "@sv443-network/userutils";
-
-// add a language with associated translations:
-
-tr.addTranslations("en", {
-  lang_name: "Eglis", // no worries, the example below will overwrite this value
-});
-
-// overwriting previous translation, now with nested objects and placeholders:
-
-tr.addTranslations("en", {
-  // to get this value, you could call `tr.forLang("en", "lang_name")`
-  lang_name: "English",
-  home_page: {
-    welcome: {
-      generic: "Welcome!",
-      // this can be accessed with `tr("home_page.welcome.name", "John")`
-      name: "Welcome, %1!",
-      extended: "Welcome, %1!\nYour last login was on %2\nYou have %3 unread messages",
-    },
-  },
-});
-
-// can be used for different locales too:
-
-tr.addTranslations("en-US", {
-  fries: "fries",
-  color: "color",
-});
-
-tr.addTranslations("en-GB", {
-  fries: "chips",
-  color: "colour",
-});
-
-// apply default values for different locales to reduce redundancy in shared translation values:
-
-const translation_de = {
-  greeting: "Guten Tag!",
-  foo: "Foo",
-};
-
-tr.addTranslations("de-DE", translation_de);
-
-tr.addTranslations("de-CH", {
-  // overwrite the "greeting" but keep other keys as they are:
-  ...translation_de,
-  greeting: "Grüezi!",
-});
-
-tr.addTranslations("de-AT", {
-  // overwrite "greeting" again but keep other keys as they are:
-  ...translation_de,
-  greeting: "Grüß Gott!",
-});
-
-// example for custom pluralization using a predefined suffix:
-
-tr.addTranslations("en", {
-  "cart_items_added-0": "No items were added to the cart",
-  "cart_items_added-1": "Added %1 item to the cart",
-  "cart_items_added-n": "Added %1 items to the cart",
-});
-
-/** A number or any object with a length or size property */
-type Numberish = number | Array<unknown> | NodeList | { length: number } | { size: number };
-
-/**
- * Returns the translated value given the key with a common pluralization identifier appended to it,  
- * given the number of items (or size of Array/NodeList or anything else with a `length` or `size` property).
- */
-function trpl(key: string, num: Numberish, ...values: Stringifiable[]): string {
-  if(typeof num !== "number") {
-    if("length" in num)
-      num = num.length;
-    else if("size" in num)
-      num = num.size;
-  }
-
-  let plKey = key;
-  if(num === 0)
-    plKey = `${key}-0`;
-  else if(num === 1)
-    plKey = `${key}-1`;
-  else
-    plKey = `${key}-n`; // will be the fallback for everything like non-numeric values or NaN
-
-  return tr(plKey, ...values);
-};
-
-// this has to be called once for tr("key") to work - otherwise you can use tr.forLang("en", "key")
-tr.setLanguage("en");
-
-const items = [];
-console.log(trpl("cart_items_added", items, items.length)); // "No items were added to the cart"
-
-items.push("foo");
-console.log(trpl("cart_items_added", items, items.length)); // "Added 1 item to the cart"
-
-items.push("bar");
-console.log(trpl("cart_items_added", items, items.length)); // "Added 2 items to the cart"
-
-// if you run across cases like this, you need to modify your implementation of `trpl()` accordingly:
-const someVal = parseInt("not a number");
-console.log(trpl("cart_items_added", someVal, someVal)); // "Added NaN items to the cart"
-```
-</details>
-
-<br>
-
-### tr.getTranslations()
-Usage:  
-```ts
-tr.getTranslations(language?: string): Record<string, string | object> | undefined
-```  
-  
-Returns the translations of the specified language.  
-If no language is specified, it will return the translations of the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
-If no translations are found, it will return undefined.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { tr } from "@sv443-network/userutils";
-
-tr.addTranslations("en", {
-  welcome: "Welcome",
-});
-
-console.log(tr.getTranslations());     // undefined
-tr.setLanguage("en");
-console.log(tr.getTranslations());     // { "welcome": "Welcome" }
-
-console.log(tr.getTranslations("en")); // { "welcome": "Welcome" }
-
-console.log(tr.getTranslations("de")); // undefined
-```
-</details>
-
-<br>
-
-### tr.deleteTranslations()
-Usage:  
-```ts
-tr.deleteTranslations(language?: string): void
-```
-  
-Deletes the translations of the specified language.  
-If no language is given, tries to use the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { tr } from "@sv443-network/userutils";
-
-tr.addTranslations("en", {
-  welcome: "Welcome",
-});
-
-tr.addTranslations("de", {
-  welcome: "Willkommen",
-});
-
-console.log(tr.getTranslations("en")); // { "welcome": "Welcome" }
-
-tr.setLanguage("en");
-
-// no language code needed anymore because of tr.setLanguage("en"):
-tr.deleteTranslations();
-
-console.log(tr.getTranslations()); // undefined
+// very concise and easy to use:
+t("hello"); // "Hello, World!"
 ```
 </details>
 
@@ -2587,11 +2345,14 @@ console.log(tr.getTranslations()); // undefined
 ### tr.hasKey()
 Usage:  
 ```ts
-tr.hasKey(key: string, language?: string): boolean
+tr.hasKey<TTrKey extends string = string>(language: string | undefined, key: TTrKey): boolean
 ```
   
-Checks if the specified key exists in the translations of the specified language.  
-If no language is given, tries to use the currently active language set by [`tr.setLanguage()`](#trsetlanguage)  
+Returns `true` if the given key exists in the specified language, else `false`.  
+If no language parameter was provided, it will default to the fallback language set by [`tr.setFallbackLanguage()`](#trsetfallbacklanguage).  
+  
+The generic `TTrKey` can be used to enforce type safety for the keys.  
+You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -2599,14 +2360,163 @@ If no language is given, tries to use the currently active language set by [`tr.
 import { tr } from "@sv443-network/userutils";
 
 tr.addTranslations("en", {
-  welcome: "Welcome",
+  hello: "Hello, World!",
 });
 
-tr.setLanguage("en");
+tr.hasKey("en", "hello");   // true
+tr.hasKey("en", "goodbye"); // false
+```
+</details>
 
-console.log(tr.hasKey("welcome"));       // true
-console.log(tr.hasKey("foo"));           // false
-console.log(tr.hasKey("welcome", "de")); // false
+<br>
+
+### tr.addTranslations()
+Usage:  
+```ts
+tr.addTranslations(language: string, translations: TrObject): void
+```
+  
+Registers a translation object for the given language.  
+The translation object should be a key-value pair object where the keys are strings and the values are the translation strings.  
+The object can be flat or infinitely nested, but it may only contain JSON-serializable values.  
+If the object is nested, the keys are joined with a dot (`.`) to form the final key.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+const trEn = {
+  hello: "Hello, World!",
+  nested: {
+    key: "This is a nested key",
+  },
+  "foo.bar": "This key isn't nested, it just has a dot",
+};
+
+tr.addTranslations("en", trEn);
+
+// full type safety and autocomplete:
+const t = tr.use<TrKeys<typeof trEn>>("en");
+
+t("hello");      // "Hello, World!"
+t("nested.key"); // "This is a nested key"
+t("foo.bar");    // "This key isn't nested, it just has a dot"
+```
+</details>
+
+<br>
+
+### tr.getTranslations()
+Usage:  
+```ts
+tr.getTranslations(language: string): TrObject | undefined
+```
+  
+Returns the translation object for the given language.  
+If the language does not exist, it will return `undefined`.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  hello: "Hello, World!",
+});
+
+tr.getTranslations("en"); // { hello: "Hello, World!" }
+```
+</details>
+
+<br>
+
+### tr.deleteTranslations()
+Usage:  
+```ts
+tr.deleteTranslations(language: string): boolean
+```
+  
+Deletes the translation object for the given language.  
+Returns `true` if the object was deleted, or `false` if it couldn't be found.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  hello: "Hello, World!",
+});
+
+tr.for("en", "hello"); // "Hello, World!"
+
+tr.deleteTranslations("en");
+
+// returns the key itself:
+tr.for("en", "hello"); // "hello"
+```
+</details>
+
+<br>
+
+### tr.setFallbackLanguage()
+Usage:  
+```ts
+tr.setFallbackLanguage(language: string | undefined): void
+```
+  
+Sets the fallback language to be used when a key is not found.  
+If `undefined` is passed, the fallback language will be disabled (default behavior).  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+const trEn = {
+  hello: "Hello, World!",
+  goodbye: "Goodbye, World!",
+};
+
+const trDe = {
+  hello: "Hallo, Welt!",
+};
+
+tr.addTranslations("en", trEn);
+tr.addTranslations("de", trDe);
+
+tr.setFallbackLanguage("en");
+
+// "en" should always have the most up-to-date keys, so it is used for the generic parameter:
+const t = tr.use<TrKeys<typeof trEn>>("de");
+
+t("hello"); // "Hallo, Welt!"
+// doesn't exist, so falls back to "en":
+t("goodbye"); // "Goodbye, World!"
+```
+</details>
+
+<br>
+
+### tr.getFallbackLanguage()
+Usage:  
+```ts
+tr.getFallbackLanguage(): string | undefined
+```
+  
+Returns the currently set fallback language, or `undefined` if no fallback language was set.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.getFallbackLanguage(); // undefined
+
+tr.setFallbackLanguage("en");
+
+tr.getFallbackLanguage(); // "en"
 ```
 </details>
 
@@ -2615,12 +2525,25 @@ console.log(tr.hasKey("welcome", "de")); // false
 ### tr.addTransform()
 Usage:  
 ```ts
-tr.addTransform(pattern: RegExp | string, fn: (matches: RegExpMatchArray, language: string) => Stringifiable): void
+addTransform<TTrKey extends string = string>(transform: [RegExp, TransformFn<TTrKey>]): void
 ```
   
-Registers a transformation function that will be called on every translation that matches the specified regexp pattern. You can also pass a simple string that will be converted to a RegExp object with the `gm` flags.  
-After all %n-formatted values have been injected, the transform functions will be called sequentially in the order they were added.  
-Each function will receive the RegExpMatchArray [see MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match) and the current language as arguments.  
+Registers a transformation pattern and function for argument insertion or miscellaneous preprocessing.  
+The transforms will be applied in the order they were added, so you can easily chain multiple transformations.  
+  
+The pattern should be a regular expression that matches the desired format in the translation strings.  
+The function should return the transformed string synchronously and will be called with a single object parameter that has the following properties:  
+| Property | Type | Description |
+| :-- | :-- | :-- |
+| `language` | string | The current or fallback language - empty string if both are not set |
+| `matches` | RegExpExecArray | All matches as returned by `RegExp.exec()` |
+| `trKey` | TTrKey | The translation key |
+| `trValue` | string | The translation value before any transformations |
+| `currentValue` | string | The current value, possibly in-between transformations |
+| `trArgs` | (Stringifiable \| Record<string, Stringifiable>)[] | The arguments that were passed to the translation function |
+  
+The generic `TTrKey` can be used to enforce type safety for the keys.  
+You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -2628,39 +2551,54 @@ Each function will receive the RegExpMatchArray [see MDN](https://developer.mozi
 import { tr } from "@sv443-network/userutils";
 
 tr.addTranslations("en", {
-  "greeting": {
-    "hello": "Hello",
-  },
-  "welcome": "Welcome, <$USERNAME>",
-  "welcome_headline_html": "Welcome, <$USERNAME>\n<col=orangered>You have %1 unread notifications.</col>\n<col=#128923>You have %2 unread messages.</col>",
+  templateLiteral: "Hello, ${name}!\nYou have ${notifs} notifications.",
+  percent: "Hello, %1!\nYou have %2 notifications.",
+  profanity: "Damn, that's a lot of God damn notifications!",
+  markup: "<c=#ff0000>This is red</c> and <c=#0f0>this is green.</c>",
 });
 
-tr.setLanguage("en");
+const t = tr.use("en");
 
-// generic transform to inject global values on demand:
-tr.addTransform(/<\$([A-Z_]+)>/gm, (matches) => {
-  switch(matches[1]) {
-    default: return matches[0];
-    // retrieved from somewhere else in the app:
-    case "USERNAME": return "John";
-  }
-});
 
-// match <col=red>...</col> and replace it with an HTML span tag:
-tr.addTransform(/<col=([a-z]+)>(.*?)<\/col>/gm, (matches) => {
-  return `<span style="color: ${matches[1]};">${matches[2]}</span>`;
-});
+// using the templateLiteral transform:
 
-// replace all occurrences of "Welcome" with "Hello" and make sure this works across all languages:
-tr.addTransform("Welcome", (_matches, language) => tr.forLang(language, "greeting.hello"));
-tr.addTransform("welcome", (_matches, language) => tr.forLang(language, "greeting.hello").toLowerCase());
+tr.addTransform(tr.transforms.templateLiteral);
 
-console.log(tr("welcome")); // "Hello, John"
+// both of these are equivalent:
+t("templateLiteral", { name: "John", notifs: 42 });  // "Hello, John!\nYou have 42 notifications."
+t("templateLiteral", "John", 42);                    // "Hello, John!\nYou have 42 notifications."
 
-console.log(tr("welcome_headline_html", 3, 5));
-// `Hello, John\n
-// <span style="color: orangered;">You have 3 unread notifications.</span>\n
-// <span style="color: #128923;">You have 5 unread messages.</span>`
+// if the first argument is an object and implements toString(), positional insertion will be used:
+t("templateLiteral", { toString: () => "John"}, 42); // "Hello, John!\nYou have 42 notifications."
+
+
+// using the percent transform:
+
+tr.addTransform(tr.transforms.percent);
+
+// objects will be stringified and inserted positionally:
+t("percent", { toString: () => "John" }, 42); // "Hello, John!\nYou have 42 notifications."
+t("percent", {}, {});                         // "Hello, [object Object]!\nYou have [object Object] notifications."
+
+
+// custom transform for a very rudimentary profanity filter:
+
+tr.addTransform([
+  /damn/gmi,
+  ({ trValue }) => trValue.replace(/damn/gm, "darn").replace(/Damn/gm, "Darn"),
+]);
+
+t("profanity"); // "Darn, that's a lot of God darn notifications!"
+
+
+// custom transform for simple markup text coloration using HTML in the format <c=#hex>text</c>:
+
+tr.addTransform([
+  /<c=#((?:[0-9a-f]{3}|[0-9a-f]{6}))>(.*?)<\/c>/gmi,
+  ({ matches }) => `<span style="color: #${matches[1]};">${matches[2] ?? ""}</span>`,
+]);
+
+t("markup"); // "<span style="color: #ff0000;">This is red</span> and <span style="color: #0f0;">this is green.</span>"
 ```
 </details>
 
@@ -2669,41 +2607,113 @@ console.log(tr("welcome_headline_html", 3, 5));
 ### tr.deleteTransform()
 Usage:  
 ```ts
-tr.deleteTransform(patternOrFn: RegExp | string | ((matches: RegExpMatchArray, language: string) => Stringifiable)): void
+deleteTransform(patternOrFn: RegExp | string | TransformFn): boolean
 ```
   
-Deletes the transformation function that matches the specified pattern or function.  
-If the function is not found, nothing will happen.  
+Deletes a transformation based on the given pattern or regex or function reference.  
+Returns `true` if the transformation was found and deleted, else `false`.  
+If the given pattern is of type `string`, it will be compared to the regexes' `source` property.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
-  "welcome": "Welcome, <$USERNAME>",
-});
+const myMarkupTransform = [
+  /<c=#((?:[0-9a-f]{3}|[0-9a-f]{6}))>(.*?)<\/c>/gmi,
+  ({ matches }) => `<span style="color: #${matches[1]};">${matches[2] ?? ""}</span>`,
+] satisfies TransformTuple;
 
-tr.setLanguage("en");
+tr.addTransform(myMarkupTransform);
 
-// generic transform to inject global values on demand:
-const globalValTransform = (matches) => {
-  switch(matches[1]) {
-    default: return matches[0];
-    // retrieved from somewhere else in the app:
-    case "USERNAME": return "John";
-  }
-};
-
-tr.addTransform(/<\$([A-Z_]+)>/gm, globalValTransform);
-
-console.log(tr("welcome")); // "Welcome, John"
-
-tr.deleteTransform(globalValTransform);
-
-console.log(tr("welcome")); // "Welcome, <$USERNAME>"
+// any of these will work:
+tr.deleteTransform(myMarkupTransform[0]);
+tr.deleteTransform(myMarkupTransform[1]);
+tr.deleteTransform("<c=#((?:[0-9a-f]{3}|[0-9a-f]{6}))>(.*?)<\\/c>");
 ```
 </details>
+
+<br>
+
+### tr.transforms
+This object contains some predefined transformation functions that can be used to quickly set up argument insertion.  
+  
+Currently available transforms:
+| Key | Pattern | Type(s) |
+| :-- | :-- | :-- |
+| `templateLiteral` | `${key}` | Keyed / Positional |
+| `percent` | `%n` | Positional |
+
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", {
+  templateLiteral: "Hello, ${name}!\nYou have ${notifs} notifications.",
+  percent: "Hello, %1!\nYou have %2 notifications.",
+});
+
+const t = tr.use("en");
+
+
+// using the templateLiteral transform:
+
+tr.addTransform(tr.transforms.templateLiteral);
+
+// both of these are equivalent:
+t("templateLiteral", { name: "John", notifs: 42 });  // "Hello, John!\nYou have 42 notifications."
+t("templateLiteral", "John", 42);                    // "Hello, John!\nYou have 42 notifications."
+
+// if the first argument is an object and implements toString(), positional insertion will be used:
+t("templateLiteral", { toString: () => "John"}, 42); // "Hello, John!\nYou have 42 notifications."
+
+
+// using the percent transform:
+
+tr.addTransform(tr.transforms.percent);
+
+// objects will be stringified and inserted positionally:
+t("percent", { toString: () => "John" }, 42); // "Hello, John!\nYou have 42 notifications."
+t("percent", {}, {});                         // "Hello, [object Object]!\nYou have [object Object] notifications."
+```
+
+</details>
+
+<br>
+
+### TrKeys
+Usage:  
+```ts
+type MyKeys = TrKeys<TrObject>
+```
+  
+This type is used to generate a union type of all keys in a given translation object.  
+Nested keys will be joined with a dot (`.`) to form the final key.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr, type TrKeys } from "@sv443-network/userutils";
+
+const trEn = {
+  hello: "Hello, World!",
+  nested: {
+    key: "This is a nested key",
+  },
+  "foo.bar": "This key isn't nested, it just has a dot",
+};
+
+tr.addTranslations("en", trEn);
+
+type MyKeysEn = TrKeys<typeof trEn>; // "hello" | "nested.key" | "foo.bar"
+
+// full type safety and autocomplete:
+const t = tr.use<MyKeysEn>("en");
+```
+</details>
+
+<!-- #region Colors -->
 
 <br><br>
 
