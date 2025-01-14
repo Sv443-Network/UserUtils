@@ -1,5 +1,7 @@
 import { NanoEmitter } from "./NanoEmitter.js";
 
+//#region types
+
 /**
  * The type of edge to use for the debouncer - [see this issue for an explanation and diagram.](https://github.com/Sv443-Network/UserUtils/issues/46)  
  * - `queuedImmediate`  
@@ -19,6 +21,10 @@ export type DebouncerType = "queuedImmediate" | "queuedIdle" | "discardingImmedi
 
 export type DebouncerFunc<TArgs> = (...args: TArgs[]) => void | unknown;
 
+export type DebouncerListener<TArgs> = [time: number, fn: DebouncerFunc<TArgs>];
+
+//#region class
+
 /**
  * A debouncer that calls all listeners after a specified timeout, discarding all calls in-between.  
  * It is very useful for event listeners that fire quickly, like `input` or `mousemove`, to prevent the listeners from being called too often and hogging resources.  
@@ -33,10 +39,13 @@ export class Debouncer<TArgs> extends NanoEmitter<{
   change: (timeout: number, type: DebouncerType) => void;
 }> {
   /** All registered listener functions and the time they were attached */
-  protected listeners: [time: number, fn: DebouncerFunc<TArgs>][] = [];
+  protected listeners: DebouncerListener<TArgs>[] = [];
 
   /** The latest call that was queued */
-  protected queuedListener: typeof this.listeners[number] | undefined = undefined;
+  protected queuedListener: DebouncerListener<TArgs> | undefined = undefined;
+
+  /** Whether the timeout is currently active */
+  protected timeoutActive = false;
 
   /**
    * Creates a new debouncer with the specified timeout and edge type.
@@ -65,12 +74,7 @@ export class Debouncer<TArgs> extends NanoEmitter<{
     this.listeners = [];
   }
 
-  //#region call
-
-  /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
-  public call(...args: TArgs[]) {
-    void ["TODO:", args];
-  }
+  //#region timeout
 
   /** Sets the timeout for the debouncer */
   public setTimeout(timeout: number) {
@@ -82,6 +86,13 @@ export class Debouncer<TArgs> extends NanoEmitter<{
     return this.timeout;
   }
 
+  /** Whether the timeout is currently active, meaning any latest call to the {@linkcode call()} method will be queued */
+  public isTimeoutActive() {
+    return this.timeoutActive;
+  }
+
+  //#region type
+
   /** Sets the edge type for the debouncer */
   public setType(type: DebouncerType) {
     this.emit("change", this.timeout, this.type = type);
@@ -91,7 +102,49 @@ export class Debouncer<TArgs> extends NanoEmitter<{
   public getType() {
     return this.type;
   }
+
+  //#region call
+
+  /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
+  public call(...args: TArgs[]) {
+    const cl = () => {
+      this.emit("call", ...args);
+      this.timeoutActive = false;
+      this.queuedListener = undefined;
+    };
+
+    if(this.timeoutActive) {
+      this.queuedListener = [Date.now(), cl];
+      return;
+    }
+
+    this.timeoutActive = true;
+
+    switch(this.type) {
+    case "queuedImmediate":
+      cl();
+      setTimeout(() => this.timeoutActive = false, this.timeout);
+      break;
+    case "queuedIdle":
+      setTimeout(() => {
+        if(this.queuedListener) {
+          this.emit("call", ...args);
+          this.timeoutActive = false;
+          this.queuedListener = undefined;
+        }
+      }, this.timeout);
+      break;
+    case "discardingImmediate":
+      setTimeout(() => this.timeoutActive = false, this.timeout);
+      cl();
+      break;
+    default:
+      throw new Error(`Unknown debouncer edge type: ${this.type}`);
+    }
+  }
 }
+
+//#region debounce fn
 
 /**
  * Creates a {@linkcode Debouncer} instance with the specified timeout and edge type and attaches the passed function as a listener.  
@@ -114,6 +167,8 @@ export function debounce<
 
   return func;
 }
+
+//#region #DBG old
 
 // TODO:FIXME: https://github.com/Sv443-Network/UserUtils/issues/46
 /**
