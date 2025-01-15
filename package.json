@@ -28,7 +28,6 @@
     "publish-package": "changeset publish",
     "publish-package-jsr": "pnpm update-jsr-version && npx jsr publish --allow-dirty",
     "change": "changeset",
-    "node-ts": "node --no-warnings=ExperimentalWarning --enable-source-maps --loader ts-node/esm",
     "test-serve": "node --import tsx ./test/TestPage/server.mts",
     "test-dev": "cd test/TestScript && pnpm dev",
     "test": "concurrently \"pnpm test-serve\" \"pnpm test-dev\""
