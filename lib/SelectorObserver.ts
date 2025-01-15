@@ -28,7 +28,7 @@ export type SelectorOptionsCommon = {
   continuous?: boolean;
   /** Whether to debounce the listener to reduce calls to `querySelector` or `querySelectorAll` - set undefined or <=0 to disable (default) */
   debounce?: number;
-  /** The edge type of the debouncer - default is "queuedImmediate" - refer to {@linkcode Debouncer} for more info */
+  /** The edge type of the debouncer - default is "immediate" - refer to {@linkcode Debouncer} for more info */
   debounceType?: DebouncerType;
 };
 
@@ -91,7 +91,7 @@ export class SelectorObserver {
 
     this.customOptions = {
       defaultDebounce: defaultDebounce ?? 0,
-      defaultDebounceType: defaultDebounceType ?? "queuedImmediate",
+      defaultDebounceType: defaultDebounceType ?? "immediate",
       disableOnNoListeners: disableOnNoListeners ?? false,
       enableOnAddListener: enableOnAddListener ?? true,
     };
