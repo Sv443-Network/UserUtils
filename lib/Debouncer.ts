@@ -21,7 +21,8 @@ export type DebouncerType = "queuedImmediate" | "queuedIdle" | "discardingImmedi
 
 export type DebouncerFunc<TArgs> = (...args: TArgs[]) => void | unknown;
 
-export type DebouncerListener<TArgs> = [time: number, fn: DebouncerFunc<TArgs>];
+// #DEBUG
+let cli = 0;
 
 //#region class
 
@@ -39,13 +40,13 @@ export class Debouncer<TArgs> extends NanoEmitter<{
   change: (timeout: number, type: DebouncerType) => void;
 }> {
   /** All registered listener functions and the time they were attached */
-  protected listeners: DebouncerListener<TArgs>[] = [];
+  protected listeners: DebouncerFunc<TArgs>[] = [];
 
-  /** The latest call that was queued */
-  protected queuedListener: DebouncerListener<TArgs> | undefined = undefined;
+  /** The currently active timeout */
+  protected activeTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  /** Whether the timeout is currently active */
-  protected timeoutActive = false;
+  /** The latest queued call */
+  protected queuedCall: DebouncerFunc<TArgs> | undefined;
 
   /**
    * Creates a new debouncer with the specified timeout and edge type.
@@ -60,12 +61,12 @@ export class Debouncer<TArgs> extends NanoEmitter<{
 
   /** Adds a listener function that will be called on timeout */
   public addListener(fn: DebouncerFunc<TArgs>) {
-    return this.listeners.push([Date.now(), fn]);
+    return this.listeners.push(fn);
   }
 
   /** Removes the listener with the specified function reference */
   public removeListener(fn: DebouncerFunc<TArgs>) {
-    const idx = this.listeners.findIndex((l) => l[1] === fn);
+    const idx = this.listeners.findIndex((l) => l === fn);
     idx !== -1 && this.listeners.splice(idx, 1);
   }
 
@@ -88,7 +89,7 @@ export class Debouncer<TArgs> extends NanoEmitter<{
 
   /** Whether the timeout is currently active, meaning any latest call to the {@linkcode call()} method will be queued */
   public isTimeoutActive() {
-    return this.timeoutActive;
+    return this.activeTimeout;
   }
 
   //#region type
@@ -107,39 +108,53 @@ export class Debouncer<TArgs> extends NanoEmitter<{
 
   /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
   public call(...args: TArgs[]) {
-    const cl = () => {
-      this.emit("call", ...args);
-      this.timeoutActive = false;
-      this.queuedListener = undefined;
+    console.log(`  (call attempt ${cli})`);
+    cli++;
+
+    /** When called, calls all registered listeners */
+    const cl = (...a: TArgs[]) => {
+      this.queuedCall = undefined;
+      this.emit("call", ...a);
+      this.listeners.forEach((l) => l.apply(this, a));
     };
 
-    if(this.timeoutActive) {
-      this.queuedListener = [Date.now(), cl];
-      return;
-    }
-
-    this.timeoutActive = true;
-
-    switch(this.type) {
-    case "queuedImmediate":
-      cl();
-      setTimeout(() => this.timeoutActive = false, this.timeout);
-      break;
-    case "queuedIdle":
-      setTimeout(() => {
-        if(this.queuedListener) {
-          this.emit("call", ...args);
-          this.timeoutActive = false;
-          this.queuedListener = undefined;
+    /** Sets a timeout that will call the latest queued call and then set another timeout if there was a queued call */
+    const setPersistingTimeout = () => {
+      this.activeTimeout = setTimeout(() => {
+        if(this.queuedCall) {
+          this.queuedCall();
+          setPersistingTimeout();
         }
+        else
+          this.activeTimeout = undefined;
       }, this.timeout);
-      break;
-    case "discardingImmediate":
-      setTimeout(() => this.timeoutActive = false, this.timeout);
-      cl();
-      break;
-    default:
-      throw new Error(`Unknown debouncer edge type: ${this.type}`);
+    };
+
+    if(this.type === "queuedImmediate") {
+      if(typeof this.activeTimeout === "undefined") {
+        cl(...args);
+        setPersistingTimeout();
+      }
+      else
+        this.queuedCall = () => cl(...args);
+    }
+    // TODO: verify
+    else if(this.type === "queuedIdle") {
+      if(this.activeTimeout)
+        clearTimeout(this.activeTimeout);
+
+      this.activeTimeout = setTimeout(() => {
+        cl(...args);
+        this.activeTimeout = undefined;
+      }, this.timeout);
+    }
+    // TODO: verify
+    else if(this.type === "discardingImmediate") {
+      if(this.activeTimeout)
+        return;
+
+      cl(...args);
+      this.activeTimeout = setTimeout(() => this.activeTimeout = undefined, this.timeout);
     }
   }
 }
