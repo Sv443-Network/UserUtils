@@ -1687,33 +1687,41 @@ interface MyEventMap {
 class MyClass extends NanoEmitter<MyEventMap> {
   constructor() {
     super({
-      // allow emitting events from outside the class
+      // allow emitting events from outside the class:
       publicEmit: true,
     });
 
+    // the class can also listen to its own events:
     this.once("baz", (qux) => {
       console.log("baz event (inside, once):", qux);
     });
   }
 
   public doStuff() {
+    // any call to the public emit() method, even when inside the own class, won't work if publicEmit is set to false:
     this.emit("foo", "hello");
     this.emit("baz", 42);
     this.emit("foo", "world");
-    this.emit("baz", 69);
+    // this one will always work when used inside the class and functions identically:
+    this.events.emit("baz", 69);
   }
 }
 
 const myInstance = new MyClass();
 myInstance.doStuff();
 
+// listeners attached with on() can be called multiple times:
 myInstance.on("foo", (bar) => {
   console.log("foo event (outside):", bar);
 });
 
-// only works if publicEmit is set to true
+// throws a TS error since `events` is protected:
+myInstance.events.emit("foo", "hello");
+
+// only works if publicEmit is set to true:
 myInstance.emit("baz", "hello from the outside");
 
+// remove all listeners:
 myInstance.unsubscribeAll();
 ```
 </details>
