@@ -1821,6 +1821,7 @@ async function run() {
 
 <br>
 
+<!-- TODO: refactor into new Debouncer class and debounce func docs -->
 ### debounce()
 Usage:  
 ```ts
