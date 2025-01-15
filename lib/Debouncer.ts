@@ -4,25 +4,29 @@ import { NanoEmitter } from "./NanoEmitter.js";
 
 /**
  * The type of edge to use for the debouncer - [see this issue for an explanation and diagram.](https://github.com/Sv443-Network/UserUtils/issues/46)  
- * - `queuedImmediate`  
- *   - (Default & recommended) calls the listeners at the very first call ("rising" edge) and queues the latest call until the timeout expires  
- *   - Pros: reacts immediately, doesn't delete the last call  
- *   - Cons: All subsequent calls are delayed by the timeout duration
- * - `queuedIdle`  
- *   - Queues all calls until there are no more calls in the given timeout duration ("falling" edge), and only then executes the very last call  
- *   - Pros: Always makes sure the last call is executed  
- *   - Cons: Calls are always delayed by the timeout duration, first call is likely to be discarded, calls could get stuck in the queue indefinitely if the calls are made faster than the timeout
- * - `discardingImmediate`  
- *   - Calls the listeners at the very last call ("falling" edge), then allows another through after the timeout expired, without queuing any calls  
- *   - Pros: Always acts upon calls immediately without delaying them in a queue, interval is somewhat predictable with events that fire often  
- *   - Cons: Likely to discard the latest call leading to a loss of data
+ * - `immediate` - (default & recommended) - calls the listeners at the very first call ("rising" edge) and queues the latest call until the timeout expires  
+ *   - Pros:  
+ *     - First call is let through immediately  
+ *   - Cons:  
+ *     - After all calls stop, the JS engine's event loop will continue to run until the last timeout expires (doesn't really matter on the web, but could cause a process exit delay in Node.js)
+ * - `idle` - queues all calls until there are no more calls in the given timeout duration ("falling" edge), and only then executes the very last call  
+ *   - Pros:  
+ *     - Makes sure there are zero calls in the given `timeoutDuration` before executing the last call
+ *   - Cons:
+ *     - Calls are always delayed by at least `1 * timeoutDuration`
+ *     - Calls could get stuck in the queue indefinitely if there is no downtime between calls that is greater than the `timeoutDuration`
  */
-export type DebouncerType = "queuedImmediate" | "queuedIdle" | "discardingImmediate";
+export type DebouncerType = "immediate" | "idle";
 
 export type DebouncerFunc<TArgs> = (...args: TArgs[]) => void | unknown;
 
-// #DEBUG
-let cli = 0;
+/** Event map for the {@linkcode Debouncer} */
+export type DebouncerEventMap<TArgs> = {
+  /** Emitted when the debouncer calls all registered listeners, as a pub-sub alternative */
+  call: DebouncerFunc<TArgs>;
+  /** Emitted when the timeout or edge type is changed after the instance was created */
+  change: (timeout: number, type: DebouncerType) => void;
+};
 
 //#region class
 
@@ -32,13 +36,10 @@ let cli = 0;
  * The exact behavior can be customized with the `type` parameter.  
  *   
  * The instance inherits from NanoEmitter and emits the following events:  
- * - `call` - emitted when the debouncer calls all listeners
- * - `change` - emitted when the timeout or edge type is changed
+ * - `call` - emitted when the debouncer calls all listeners - use this as a pub-sub alternative to the default callback-style listeners
+ * - `change` - emitted when the timeout or edge type is changed after the instance was created
  */
-export class Debouncer<TArgs> extends NanoEmitter<{
-  call: DebouncerFunc<TArgs>;
-  change: (timeout: number, type: DebouncerType) => void;
-}> {
+export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
   /** All registered listener functions and the time they were attached */
   protected listeners: DebouncerFunc<TArgs>[] = [];
 
@@ -51,9 +52,9 @@ export class Debouncer<TArgs> extends NanoEmitter<{
   /**
    * Creates a new debouncer with the specified timeout and edge type.
    * @param timeout Timeout in milliseconds between letting through calls - defaults to 200
-   * @param type The type of edge to use for the debouncer - see {@linkcode DebouncerType} for details or [this issue for an explanation and diagram](https://github.com/Sv443-Network/UserUtils/issues/46) - defaults to "queuedImmediate"
+   * @param type The type of edge to use for the debouncer - see {@linkcode DebouncerType} for details or [this issue for an explanation and diagram](https://github.com/Sv443-Network/UserUtils/issues/46) - defaults to "immediate"
    */
-  constructor(protected timeout = 200, protected type: DebouncerType = "queuedImmediate") {
+  constructor(protected timeout = 200, protected type: DebouncerType = "immediate") {
     super();
   }
 
@@ -108,9 +109,6 @@ export class Debouncer<TArgs> extends NanoEmitter<{
 
   /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
   public call(...args: TArgs[]) {
-    console.log(`  (call attempt ${cli})`);
-    cli++;
-
     /** When called, calls all registered listeners */
     const cl = (...a: TArgs[]) => {
       this.queuedCall = undefined;
@@ -119,27 +117,28 @@ export class Debouncer<TArgs> extends NanoEmitter<{
     };
 
     /** Sets a timeout that will call the latest queued call and then set another timeout if there was a queued call */
-    const setPersistingTimeout = () => {
+    const setRepeatTimeout = () => {
       this.activeTimeout = setTimeout(() => {
         if(this.queuedCall) {
           this.queuedCall();
-          setPersistingTimeout();
+          setRepeatTimeout();
         }
         else
           this.activeTimeout = undefined;
       }, this.timeout);
     };
 
-    if(this.type === "queuedImmediate") {
+    switch(this.type) {
+    case "immediate":
       if(typeof this.activeTimeout === "undefined") {
         cl(...args);
-        setPersistingTimeout();
+        setRepeatTimeout();
       }
       else
         this.queuedCall = () => cl(...args);
-    }
-    // TODO: verify
-    else if(this.type === "queuedIdle") {
+
+      break;
+    case "idle":
       if(this.activeTimeout)
         clearTimeout(this.activeTimeout);
 
@@ -147,14 +146,10 @@ export class Debouncer<TArgs> extends NanoEmitter<{
         cl(...args);
         this.activeTimeout = undefined;
       }, this.timeout);
-    }
-    // TODO: verify
-    else if(this.type === "discardingImmediate") {
-      if(this.activeTimeout)
-        return;
 
-      cl(...args);
-      this.activeTimeout = setTimeout(() => this.activeTimeout = undefined, this.timeout);
+      break;
+    default:
+      throw new Error(`Invalid debouncer type: ${this.type}`);
     }
   }
 }
@@ -172,7 +167,7 @@ export function debounce<
 > (
   fn: TFunc,
   timeout = 200,
-  edge: DebouncerType = "queuedImmediate"
+  edge: DebouncerType = "immediate"
 ): DebouncerFunc<TArgs> & { debouncer: Debouncer<TArgs> } {
   const debouncer = new Debouncer<TArgs>(timeout, edge);
   debouncer.addListener(fn);
