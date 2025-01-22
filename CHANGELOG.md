@@ -1,5 +1,48 @@
 # @sv443-network/userutils
 
+## 9.0.0
+
+### Major Changes
+
+- 9abfc6b: **BREAKING** - Reworked translation system:
+  - Removed `tr()`, `tr.setLanguage()` and `tr.getLanguage()`
+  - Renamed function `tr.addLanguage()` to `tr.addTranslations()`
+  - Removed `%n`-based argument insertion by default (re-enable explicitly with `tr.addTransform(tr.transforms.percent)`).
+  - Added ability for nested translation objects and object traversal via dot notation.
+  - Added functions:
+    - `tr.for()` - translates a key for the specified language.
+    - `tr.use()` - creates a translation function for the specified language for much easier usage.
+    - `tr.hasKey()` - checks if a key exists in the given language.
+    - `tr.setFallbackLanguage()` - sets the fallback language used when a key is not found in the given language.
+    - `tr.getFallbackLanguage()` - returns the fallback language.
+    - `tr.addTransform()` - adds a transform function to the translation system, allowing for custom argument insertion and much more.
+    - `tr.deleteTransform()` - removes a transform function.
+  - Added ability to specify transform patterns and functions for arbitrary modification of the translation string.
+    - Added transform for template literal syntax (e.g. `${keyName}`) with `tr.addTransform(tr.transforms.templateLiteral)`. This transform supports positional argument injection, as well as named arguments via an object with the same keys as in the template literal pattern. See the documentation for more information and a code example.
+  - Added TS type `TrKeys<T>` for extracting the keys of a translation object (both flat and nested).
+  - Fixed bug with resolving translations for flat objects.
+- d0737dc: **BREAKING** - Reworked debounce system:
+  - Edge types `rising` and `falling` have been removed.
+  - Added new edge types `immediate` and `idle` with new behavior.
+    - `immediate` (default & recommended) will trigger immediately, then queue all subsequent calls until the timeout has passed.
+    - `idle` will trigger the last queued call only after there haven't been any subsequent calls for the specified timeout.
+  - Added `Debouncer` class for more advanced control over debouncing, and with that the following changes:
+    - Ability to attach and manage multiple listeners.
+    - Inherits from NanoEmitter, allowing event-based debouncing.
+    - Can be inherited by your own classes for built-in debouncing.
+  - `debounce()` function can still be called as usual (after replacing the edge type names with the new ones). Internally, it will instantiate a `Debouncer` instance, which is available via the `debouncer` property on the returned function.
+  - Reduced default timeout from 300ms to 200ms.
+
+### Minor Changes
+
+- cd241b0: Added `additionalProps` parameter to `openInNewTab()` to add or overwrite anchor element props (only if `GM.openInTab()` is unavailable)
+- d0737dc: Moved documentation to separate file `docs.md` to speed up `README.md` load time.
+
+### Patch Changes
+
+- 1a754db: Fixed newlines being collapsed in TSDoc comments.
+- d0737dc: Fixed `randRange()` with `enhancedEntropy = true` only returning the first digit.
+
 ## 8.4.0
 
 ### Minor Changes
