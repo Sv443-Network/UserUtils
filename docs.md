@@ -2451,8 +2451,10 @@ const trEn = {
 
 tr.addTranslations("en", trEn);
 
-// full type safety and autocomplete:
-const t = tr.use<TrKeys<typeof trEn>>("en");
+// full type safety and autocomplete
+// LooseUnion is used so there's still autocomplete but you can supply any string as the translation key
+// this can be useful if you have some custom keys that don't adhere to the strict typing, like adding a pluralization suffix
+const t = tr.use<LooseUnion<TrKeys<typeof trEn>>>("de");
 
 t("hello");      // "Hello, World!"
 t("nested.key"); // "This is a nested key"
@@ -2527,7 +2529,7 @@ If `undefined` is passed, the fallback language will be disabled (default behavi
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr } from "@sv443-network/userutils";
+import { tr, type TrKeys, type LooseUnion } from "@sv443-network/userutils";
 
 const trEn = {
   hello: "Hello, World!",
@@ -2543,8 +2545,9 @@ tr.addTranslations("de", trDe);
 
 tr.setFallbackLanguage("en");
 
-// "en" should always have the most up-to-date keys, so it is used for the generic parameter:
-const t = tr.use<TrKeys<typeof trEn>>("de");
+// "en" should always have the most up-to-date keys, so it is used for the generic parameter
+// also, LooseUnion is used to enable the use of any string while still giving type safety, in case there's some custom key that doesn't adhere to the strict typing
+const t = tr.use<LooseUnion<TrKeys<typeof trEn>>>("de");
 
 t("hello"); // "Hallo, Welt!"
 // doesn't exist, so falls back to "en":
