@@ -119,10 +119,13 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   Then import it in your script as usual:  
   
   ```ts
+  // on Node:
   import { addGlobalStyle } from "@sv443-network/userutils";
 
-  // or just import everything (not recommended because of worse treeshaking support):
+  // on Deno:
+  import { addGlobalStyle } from "jsr:@sv443-network/userutils";
 
+  // you can also import the entire library as an object (not recommended because of worse treeshaking support):
   import * as UserUtils from "@sv443-network/userutils";
   ```
 
@@ -187,8 +190,10 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 This library is written in TypeScript and contains builtin TypeScript declarations.  
   
 Each feature has example code that can be expanded by clicking on the text "Example - click to view".  
-The usages and examples are written in TypeScript and use ESM import syntax, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS or the global declaration).  
-If the usage section contains multiple usages of the function, each occurrence represents an overload and you can choose which one you want to use.  
+The signatures and examples are written in TypeScript and use ESM import syntax, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS or the global declaration).  
+  
+If the signature section contains multiple signatures of the function, each occurrence represents an overload and you can choose which one you want to use.  
+They will also be further explained in the description below that section.  
   
 Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other specific requirements and limitations.  
 Those will be listed in a section marked by a warning emoji (⚠️) each.  
