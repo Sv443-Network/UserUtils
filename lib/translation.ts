@@ -127,10 +127,13 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
   const keyParts = key.split(".");
   let value: string | TrObject | undefined = trObj;
   for(const part of keyParts) {
-    if(typeof value !== "object" || value === null)
+    if(typeof value !== "object" || value === null) {
+      value = undefined;
       break;
+    }
     value = value?.[part];
   }
+
   if(typeof value === "string")
     return transformTrVal(key, value);
 
@@ -140,7 +143,9 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
     return transformTrVal(key, value);
 
   // default to fallbackLang or translation key
-  return fallbackLang ? translate(fallbackLang, key, ...trArgs) : key;
+  return fallbackLang
+    ? translate(fallbackLang, key, ...trArgs)
+    : key;
 }
 
 //#region tr funcs
