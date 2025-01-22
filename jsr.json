@@ -12,7 +12,7 @@
       "dist/index.umd.js",
       "dist/lib/**/*",
       "package.json",
-      "README-summary.md",
+      "README.md",
       "CHANGELOG.md",
       "LICENSE.txt"
     ]
