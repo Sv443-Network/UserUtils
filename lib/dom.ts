@@ -61,10 +61,11 @@ export function preloadImages(srcUrls: string[], rejects = false): Promise<Promi
  * For the fallback to work, this function needs to be run in response to a user interaction event, else the browser might reject it.
  * @param href The URL to open in a new tab
  * @param background If set to `true`, the tab will be opened in the background - set to `undefined` (default) to use the browser's default behavior
+ * @param additionalProps Additional properties to set on the anchor element (only applies when `GM.openInTab` is not available)
  */
-export function openInNewTab(href: string, background?: boolean) {
+export function openInNewTab(href: string, background?: boolean, additionalProps?: Partial<HTMLAnchorElement>): void {
   try {
-    GM.openInTab(href, background);
+    GM.openInTab?.(href, background);
   }
   catch(e) {
     const openElem = document.createElement("a");
@@ -72,14 +73,21 @@ export function openInNewTab(href: string, background?: boolean) {
       className: "userutils-open-in-new-tab",
       target: "_blank",
       rel: "noopener noreferrer",
+      tabIndex: -1,
+      ariaHidden: "true",
       href,
+      ...additionalProps,
     });
-    openElem.style.display = "none";
+    Object.assign(openElem.style, {
+      display: "none",
+      pointerEvents: "none",
+    });
 
     document.body.appendChild(openElem);
     openElem.click();
-    // timeout just to be safe
-    setTimeout(openElem.remove, 50);
+
+    // schedule removal after the click event has been processed
+    setTimeout(openElem.remove, 0);
   }
 }
 
