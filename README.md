@@ -2,10 +2,9 @@
 
 <!-- #region Description -->
 ## UserUtils
-Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
-It is licensed under the [MIT license.](./LICENSE.txt)  
-  
+Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more.  
 Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require`  
+The library also works in any DOM environment without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
 If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
