@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /**
  * @module lib/Debouncer
  * This module contains the Debouncer class and debounce function that allow you to reduce the amount of calls in rapidly firing event listeners and such - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer)
@@ -23,12 +25,15 @@ import { NanoEmitter } from "./NanoEmitter.js";
  */
 export type DebouncerType = "immediate" | "idle";
 
-export type DebouncerFunc<TArgs> = (...args: TArgs[]) => void | unknown;
+type AnyFunc = (...args: any) => any;
+
+/** The debounced function type that is returned by the {@linkcode debounce} function */
+export type DebouncedFunction<TFunc extends AnyFunc> = ((...args: Parameters<TFunc>) => ReturnType<TFunc>) & { debouncer: Debouncer<TFunc> };
 
 /** Event map for the {@linkcode Debouncer} */
-export type DebouncerEventMap<TArgs> = {
+export type DebouncerEventMap<TFunc extends AnyFunc> = {
   /** Emitted when the debouncer calls all registered listeners, as a pub-sub alternative */
-  call: DebouncerFunc<TArgs>;
+  call: TFunc;
   /** Emitted when the timeout or edge type is changed after the instance was created */
   change: (timeout: number, type: DebouncerType) => void;
 };
@@ -44,15 +49,15 @@ export type DebouncerEventMap<TArgs> = {
  * - `call` - emitted when the debouncer calls all listeners - use this as a pub-sub alternative to the default callback-style listeners
  * - `change` - emitted when the timeout or edge type is changed after the instance was created
  */
-export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
+export class Debouncer<TFunc extends AnyFunc> extends NanoEmitter<DebouncerEventMap<TFunc>> {
   /** All registered listener functions and the time they were attached */
-  protected listeners: DebouncerFunc<TArgs>[] = [];
+  protected listeners: TFunc[] = [];
 
   /** The currently active timeout */
   protected activeTimeout: ReturnType<typeof setTimeout> | undefined;
 
   /** The latest queued call */
-  protected queuedCall: DebouncerFunc<TArgs> | undefined;
+  protected queuedCall: (() => void) | undefined;
 
   /**
    * Creates a new debouncer with the specified timeout and edge type.
@@ -66,12 +71,12 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
   //#region listeners
 
   /** Adds a listener function that will be called on timeout */
-  public addListener(fn: DebouncerFunc<TArgs>): void {
+  public addListener(fn: TFunc): void {
     this.listeners.push(fn);
   }
 
   /** Removes the listener with the specified function reference */
-  public removeListener(fn: DebouncerFunc<TArgs>): void {
+  public removeListener(fn: TFunc): void {
     const idx = this.listeners.findIndex((l) => l === fn);
     idx !== -1 && this.listeners.splice(idx, 1);
   }
@@ -113,9 +118,9 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
   //#region call
 
   /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
-  public call(...args: TArgs[]): void {
+  public call(...args: Parameters<TFunc>): void {
     /** When called, calls all registered listeners */
-    const cl = (...a: TArgs[]) => {
+    const cl = (...a: Parameters<TFunc>) => {
       this.queuedCall = undefined;
       this.emit("call", ...a);
       this.listeners.forEach((l) => l.apply(this, a));
@@ -168,18 +173,15 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
  *   
  * Refer to the {@linkcode Debouncer} class definition or the [Debouncer documentation](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer) for more information.
  */
-export function debounce<
-  TFunc extends DebouncerFunc<TArgs>,
-  TArgs,
-> (
+export function debounce<TFunc extends (...args: any[]) => any>(
   fn: TFunc,
   timeout = 200,
   type: DebouncerType = "immediate"
-): DebouncerFunc<TArgs> & { debouncer: Debouncer<TArgs> } {
-  const debouncer = new Debouncer<TArgs>(timeout, type);
+): DebouncedFunction<TFunc> {
+  const debouncer = new Debouncer<TFunc>(timeout, type);
   debouncer.addListener(fn);
 
-  const func = (...args: TArgs[]) => debouncer.call(...args);
+  const func = (((...args: Parameters<TFunc>) => debouncer.call(...args))) as DebouncedFunction<TFunc>;
   func.debouncer = debouncer;
 
   return func;
