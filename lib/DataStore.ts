@@ -7,8 +7,11 @@ import type { Prettify } from "./types.js";
 
 //#region types
 
+/** Function that takes the data in the old format and returns the data in the new format. Also supports an asynchronous migration. */
+type MigrationFunc = (oldData: any) => any | Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+
 /** Dictionary of format version numbers and the function that migrates to them from the previous whole integer */
-export type DataMigrationsDict = Record<number, ((oldData: unknown) => unknown | Promise<unknown>)>;
+export type DataMigrationsDict = Record<number, MigrationFunc>;
 
 /** Options for the DataStore instance */
 export type DataStoreOptions<TData> = Prettify<
