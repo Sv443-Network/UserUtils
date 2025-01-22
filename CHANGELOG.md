@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.0.1
+
+### Patch Changes
+
+- f24f355: Fixed missing return type signatures for JSR
+
 ## 9.0.0
 
 ### Major Changes
