@@ -528,11 +528,12 @@ preloadImages([
 ### openInNewTab()
 Signature:  
 ```ts
-openInNewTab(url: string, background?: boolean): void
+openInNewTab(url: string, background?: boolean, additionalProps?: Partial<HTMLAnchorElement>): void
 ```
   
 Tries to use `GM.openInTab` to open the given URL in a new tab, or as a fallback if the grant is not given, creates an invisible anchor element and clicks it.  
 If `background` is set to true, the tab will be opened in the background. Leave `undefined` to use the browser's default behavior.  
+If `additionalProps` is set and `GM.openInTab` is not available, the given properties will be added or overwritten on the created anchor element.  
   
 ⚠️ Needs the `@grant GM.openInTab` directive, otherwise only the fallback behavior will be used and the warning below is extra important:  
 ⚠️ For the fallback to work, this function needs to be run in response to a user interaction event, else the browser might reject it.  
@@ -954,8 +955,8 @@ digitCount(num: number | Stringifiable): number
 ```
   
 Calculates and returns the amount of digits in the given number.  
-The given value will be converted by being passed to `String()` and then `Number()` before the calculation.  
-Returns `NaN` if the number is invalid.  
+If it isn't a number already, the value will be converted by being passed to `String()` and then `Number()` before the calculation.  
+Returns `NaN` if the number is invalid and `Infinity` if the number is too large to be represented as a regular number.
   
 <details><summary><b>Example - click to view</b></summary>
 
