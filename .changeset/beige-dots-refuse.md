@@ -18,3 +18,4 @@
 - Added ability to specify transform patterns and functions for arbitrary modification of the translation string.
   - Added transform for template literal syntax (e.g. `${keyName}`) with `tr.addTransform(tr.transforms.templateLiteral)`. This transform supports positional argument injection, as well as named arguments via an object with the same keys as in the template literal pattern. See the documentation for more information and a code example.
 - Added TS type `TrKeys<T>` for extracting the keys of a translation object (both flat and nested).
+- Fixed bug with resolving translations for flat objects.
