@@ -1,4 +1,9 @@
 /**
+ * @module lib/dom
+ * This module contains various functions for working with the DOM - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dom)
+ */
+
+/**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
 export function getUnsafeWindow(): Window {

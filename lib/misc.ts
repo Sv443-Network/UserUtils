@@ -1,3 +1,8 @@
+/**
+ * @module lib/misc
+ * This module contains miscellaneous functions that don't fit in another category - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#misc)
+ */
+
 import type { Prettify, Stringifiable } from "./types.js";
 
 /**

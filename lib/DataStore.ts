@@ -1,3 +1,8 @@
+/**
+ * @module lib/DataStore
+ * This module contains the DataStore class, which is a general purpose, sync and async persistent JSON database - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastore)
+ */
+
 import type { Prettify } from "./types.js";
 
 //#region types

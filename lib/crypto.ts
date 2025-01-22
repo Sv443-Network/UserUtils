@@ -1,3 +1,8 @@
+/**
+ * @module lib/crypto
+ * This module contains various cryptographic functions using the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#table-of-contents)
+ */
+
 import { getUnsafeWindow } from "./dom.js";
 import { mapRange, randRange } from "./math.js";
 

@@ -1,3 +1,8 @@
+/**
+ * @module lib/Dialog
+ * This module contains the Dialog class, which allows you to quickly and easily create modal dialogs - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dialog)
+ */
+
 import { NanoEmitter } from "./NanoEmitter.js";
 import { addGlobalStyle } from "./dom.js";
 

@@ -1,3 +1,8 @@
+/**
+ * @module lib/types
+ * This module contains various TS types - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#utility-types)
+ */
+
 //#region UU types
 
 /** Represents any value that is either a string itself or can be converted to one (implicitly and explicitly) because it has a toString() method */

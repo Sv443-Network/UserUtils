@@ -1,3 +1,8 @@
+/**
+ * @module UserUtils
+ * UserUtils is a lightweight library with various utilities for userscripts, allowing you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more
+ */
+
 export * from "./array.js";
 export * from "./colors.js";
 export * from "./crypto.js";

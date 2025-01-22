@@ -1,3 +1,8 @@
+/**
+ * @module lib/array
+ * This module contains various functions for working with arrays - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#arrays)
+ */
+
 import { randRange } from "./math.js";
 
 /** Describes an array with at least one item */

@@ -1,3 +1,8 @@
+/**
+ * @module lib/math
+ * This module contains various math functions - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#math)
+ */
+
 import type { Stringifiable } from "./types.js";
 
 /** Ensures the passed {@linkcode value} always stays between {@linkcode min} and {@linkcode max} */

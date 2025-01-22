@@ -1,3 +1,8 @@
+/**
+ * @module lib/translation
+ * This module contains a translation system that supports flat and nested JSON objects and value transformation functions - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#translation)
+ */
+
 import type { Stringifiable } from "./types.js";
 
 //#region types

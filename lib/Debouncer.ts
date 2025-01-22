@@ -1,3 +1,8 @@
+/**
+ * @module lib/Debouncer
+ * This module contains the Debouncer class and debounce function that allow you to reduce the amount of calls in rapidly firing event listeners and such - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer)
+ */
+
 import { NanoEmitter } from "./NanoEmitter.js";
 
 //#region types
