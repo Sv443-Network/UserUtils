@@ -178,7 +178,7 @@ function trFor<TTrKey extends string = string>(language: string, key: TTrKey, ..
  * t("hello", "John"); // "Hello, John!"
  * ```
  */
-function useTr<TTrKey extends string = string>(language: string) {
+function useTr<TTrKey extends string = string>(language: string): (key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => ReturnType<typeof trFor<TTrKey>> {
   return (key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) =>
     translate<TTrKey>(language, key, ...args);
 }
@@ -350,7 +350,7 @@ function deleteTransform(patternOrFn: RegExp | string | TransformFn): boolean {
  * t("greeting", { user: "John" }); // "Hello, John!\nYou have ${notifs} notifications."
  * ```
  */
-const templateLiteralTransform = [
+const templateLiteralTransform: TransformTuple<string> = [
   /\$\{([a-zA-Z0-9$_-]+)\}/gm,
   ({ matches, trArgs, trValue }) => {
     const patternStart = "${",
@@ -392,7 +392,7 @@ const templateLiteralTransform = [
 
     return str;
   },
-] as const satisfies TransformTuple<string>;
+] as const;
 
 /**
  * This transform will replace `%n` placeholders with the value of the passed arguments.  
@@ -414,7 +414,7 @@ const templateLiteralTransform = [
 * t("greeting", "John"); // "Hello, John!\nYou have %2 notifications."
 * ```
 */
-const percentTransform = [
+const percentTransform: TransformTuple<string> = [
   /\$\{([a-zA-Z0-9$_-]+)\}/gm,
   ({ matches, trArgs, trValue }) => {
     let str = String(trValue);
@@ -427,14 +427,17 @@ const percentTransform = [
 
     return str;
   },
-] as const satisfies TransformTuple<string>;
+] as const;
 
 //#region exports
 
 const tr = {
-  for: <TTrKey extends string = string>(...params: Parameters<typeof trFor<TTrKey>>) => trFor<TTrKey>(...params as Parameters<typeof trFor<TTrKey>>),
-  use: <TTrKey extends string = string>(...params: Parameters<typeof useTr<TTrKey>>) => useTr<TTrKey>(...params as Parameters<typeof useTr<TTrKey>>),
-  hasKey: <TTrKey extends string = string>(language = fallbackLang ?? "", key: TTrKey) => hasKey<TTrKey>(language, key),
+  for: <TTrKey extends string = string>(...params: Parameters<typeof trFor<TTrKey>>): ReturnType<typeof trFor<TTrKey>> =>
+    trFor<TTrKey>(...params as Parameters<typeof trFor<TTrKey>>),
+  use: <TTrKey extends string = string>(...params: Parameters<typeof useTr<TTrKey>>): ReturnType<typeof useTr<TTrKey>> =>
+    useTr<TTrKey>(...params as Parameters<typeof useTr<TTrKey>>),
+  hasKey: <TTrKey extends string = string>(language = fallbackLang ?? "", key: TTrKey): ReturnType<typeof hasKey<TTrKey>> =>
+    hasKey<TTrKey>(language, key),
   addTranslations,
   getTranslations,
   deleteTranslations,

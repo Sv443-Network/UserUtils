@@ -27,6 +27,7 @@
     "update-jsr-version": "node --import tsx ./tools/update-jsr-version.mts",
     "publish-package": "changeset publish",
     "publish-package-jsr": "pnpm update-jsr-version && npx jsr publish --allow-dirty",
+    "check-jsr": "npx jsr publish --allow-dirty --dry-run",
     "change": "changeset",
     "test-serve": "node --import tsx ./test/TestPage/server.mts",
     "test-dev": "cd test/TestScript && pnpm dev",

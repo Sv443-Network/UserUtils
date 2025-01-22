@@ -61,54 +61,54 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
   //#region listeners
 
   /** Adds a listener function that will be called on timeout */
-  public addListener(fn: DebouncerFunc<TArgs>) {
+  public addListener(fn: DebouncerFunc<TArgs>): void {
     this.listeners.push(fn);
   }
 
   /** Removes the listener with the specified function reference */
-  public removeListener(fn: DebouncerFunc<TArgs>) {
+  public removeListener(fn: DebouncerFunc<TArgs>): void {
     const idx = this.listeners.findIndex((l) => l === fn);
     idx !== -1 && this.listeners.splice(idx, 1);
   }
 
   /** Removes all listeners */
-  public removeAllListeners() {
+  public removeAllListeners(): void {
     this.listeners = [];
   }
 
   //#region timeout
 
   /** Sets the timeout for the debouncer */
-  public setTimeout(timeout: number) {
+  public setTimeout(timeout: number): void {
     this.emit("change", this.timeout = timeout, this.type);
   }
 
   /** Returns the current timeout */
-  public getTimeout() {
+  public getTimeout(): number {
     return this.timeout;
   }
 
   /** Whether the timeout is currently active, meaning any latest call to the {@linkcode call()} method will be queued */
-  public isTimeoutActive() {
+  public isTimeoutActive(): boolean {
     return typeof this.activeTimeout !== "undefined";
   }
 
   //#region type
 
   /** Sets the edge type for the debouncer */
-  public setType(type: DebouncerType) {
+  public setType(type: DebouncerType): void {
     this.emit("change", this.timeout, this.type = type);
   }
 
   /** Returns the current edge type */
-  public getType() {
+  public getType(): DebouncerType {
     return this.type;
   }
 
   //#region call
 
   /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
-  public call(...args: TArgs[]) {
+  public call(...args: TArgs[]): void {
     /** When called, calls all registered listeners */
     const cl = (...a: TArgs[]) => {
       this.queuedCall = undefined;

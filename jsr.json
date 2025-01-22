@@ -10,7 +10,7 @@
       "dist/index.cjs",
       "dist/index.global.js",
       "dist/index.umd.js",
-      "dist/lib/**/*.d.ts",
+      "dist/lib/**/*",
       "package.json",
       "README-summary.md",
       "CHANGELOG.md",
