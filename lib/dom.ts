@@ -6,7 +6,7 @@ export function getUnsafeWindow(): Window {
     // throws ReferenceError if the "@grant unsafeWindow" isn't present
     return unsafeWindow;
   }
-  catch(e) {
+  catch {
     return window;
   }
 }
@@ -67,7 +67,7 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
   try {
     GM.openInTab?.(href, background);
   }
-  catch(e) {
+  catch {
     const openElem = document.createElement("a");
     Object.assign(openElem, {
       className: "userutils-open-in-new-tab",

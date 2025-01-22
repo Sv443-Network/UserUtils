@@ -55,7 +55,7 @@ async function exists(path: string, mode = fsconstants.R_OK | fsconstants.W_OK) 
     await access(path, mode);
     return true;
   }
-  catch(err) {
+  catch {
     return false;
   }
 }
