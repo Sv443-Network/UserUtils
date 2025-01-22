@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.0.2
+
+### Patch Changes
+
+- 69c4dd1: Fixed wrong readme being included in JSR package and added `@module` comments
+
 ## 9.0.1
 
 ### Patch Changes
