@@ -1,7 +1,7 @@
 ## UserUtils
 Library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and more.  
 Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require`  
-Licensed under the [MIT license.](https://github.com/Sv443-Network/UserUtils/blob/main/LICENSE.txt)  
+It is licensed under the [MIT license.](https://github.com/Sv443-Network/UserUtils/blob/main/LICENSE.txt)  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
   
@@ -18,14 +18,15 @@ If you like using this library, please consider [supporting the development ❤�
 
 <br>
 
-## &gt; [Full documentation on GitHub](https://github.com/Sv443-Network/UserUtils#readme) &lt;
+## &gt; [Full documentation on GitHub](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#readme) &lt;
 
 <br>
 
 <span style="font-size: 0.8em;">
 
-or view the documentation of previous major releases:  
+View the documentation of previous major releases:  
 <a href="https://github.com/Sv443-Network/UserUtils/blob/v8.0.0/README.md" rel="noopener noreferrer">8.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v7.0.0/README.md" rel="noopener noreferrer">7.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v6.0.0/README.md" rel="noopener noreferrer">6.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v5.0.0/README.md" rel="noopener noreferrer">5.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v4.0.0/README.md" rel="noopener noreferrer">4.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md" rel="noopener noreferrer">3.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v2.0.0/README.md" rel="noopener noreferrer">2.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v1.0.0/README.md" rel="noopener noreferrer">1.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md" rel="noopener noreferrer">0.5.3</a>
+<!-- <a href="https://github.com/Sv443-Network/UserUtils/blob/vX.0.0/docs.md" rel="noopener noreferrer">X.0.0</a>, -->
 </span>
 
 <br>
@@ -33,67 +34,67 @@ or view the documentation of previous major releases:
 <!-- https://github.com/Sv443-Network/UserUtils  < #foo    -->
 ## Feature Summary:
 - **DOM:**
-    - [`SelectorObserver`](https://github.com/Sv443-Network/UserUtils#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
-    - [`getUnsafeWindow()`](https://github.com/Sv443-Network/UserUtils#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - [`addParent()`](https://github.com/Sv443-Network/UserUtils#addparent) - add a parent element around another element
-    - [`addGlobalStyle()`](https://github.com/Sv443-Network/UserUtils#addglobalstyle) - add a global style to the page
-    - [`preloadImages()`](https://github.com/Sv443-Network/UserUtils#preloadimages) - preload images into the browser cache for faster loading later on
-    - [`openInNewTab()`](https://github.com/Sv443-Network/UserUtils#openinnewtab) - open a link in a new tab
-    - [`interceptEvent()`](https://github.com/Sv443-Network/UserUtils#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-    - [`interceptWindowEvent()`](https://github.com/Sv443-Network/UserUtils#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-    - [`isScrollable()`](https://github.com/Sv443-Network/UserUtils#isscrollable) - check if an element has a horizontal or vertical scroll bar
-    - [`observeElementProp()`](https://github.com/Sv443-Network/UserUtils#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
-    - [`getSiblingsFrame()`](https://github.com/Sv443-Network/UserUtils#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
-    - [`setInnerHtmlUnsafe()`](https://github.com/Sv443-Network/UserUtils#setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+    - [`SelectorObserver`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
+    - [`getUnsafeWindow()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - [`addParent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#addparent) - add a parent element around another element
+    - [`addGlobalStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#addglobalstyle) - add a global style to the page
+    - [`preloadImages()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#preloadimages) - preload images into the browser cache for faster loading later on
+    - [`openInNewTab()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#openinnewtab) - open a link in a new tab
+    - [`interceptEvent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+    - [`interceptWindowEvent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+    - [`isScrollable()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#isscrollable) - check if an element has a horizontal or vertical scroll bar
+    - [`observeElementProp()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - [`getSiblingsFrame()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+    - [`setInnerHtmlUnsafe()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
 - **Math:**
-    - [`clamp()`](https://github.com/Sv443-Network/UserUtils#clamp) - constrain a number between a min and max value
-    - [`mapRange()`](https://github.com/Sv443-Network/UserUtils#maprange) - map a number from one range to the same spot in another range
-    - [`randRange()`](https://github.com/Sv443-Network/UserUtils#randrange) - generate a random number between a min and max boundary
-    - [`digitCount()`](https://github.com/Sv443-Network/UserUtils#digitcount) - calculate the amount of digits in a number
+    - [`clamp()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#clamp) - constrain a number between a min and max value
+    - [`mapRange()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#maprange) - map a number from one range to the same spot in another range
+    - [`randRange()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randrange) - generate a random number between a min and max boundary
+    - [`digitCount()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#digitcount) - calculate the amount of digits in a number
 - **Misc:**
-    - [`DataStore`](https://github.com/Sv443-Network/UserUtils#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
-    - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
-    - [`Dialog`](https://github.com/Sv443-Network/UserUtils#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
-    - [`NanoEmitter`](https://github.com/Sv443-Network/UserUtils#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
-    - [`Debouncer`](https://github.com/Sv443-Network/UserUtils#debouncer) - class for debouncing function calls with a given timeout
-    - [`debounce()`](https://github.com/Sv443-Network/UserUtils#debounce) - function wrapper for the Debouncer class for easier usage
-    - [`autoPlural()`](https://github.com/Sv443-Network/UserUtils#autoplural) - automatically pluralize a string
-    - [`pauseFor()`](https://github.com/Sv443-Network/UserUtils#pausefor) - pause the execution of a function for a given amount of time
-    - [`fetchAdvanced()`](https://github.com/Sv443-Network/UserUtils#fetchadvanced) - wrapper around the fetch API with a timeout option
-    - [`insertValues()`](https://github.com/Sv443-Network/UserUtils#insertvalues) - insert values into a string at specified placeholders
-    - [`compress()`](https://github.com/Sv443-Network/UserUtils#compress) - compress a string with Gzip or Deflate
-    - [`decompress()`](https://github.com/Sv443-Network/UserUtils#decompress) - decompress a previously compressed string
-    - [`computeHash()`](https://github.com/Sv443-Network/UserUtils#computehash) - compute the hash / checksum of a string or ArrayBuffer
-    - [`randomId()`](https://github.com/Sv443-Network/UserUtils#randomid) - generate a random ID of a given length and radix
+    - [`DataStore`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
+    - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
+    - [`Dialog`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - [`NanoEmitter`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
+    - [`Debouncer`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer) - class for debouncing function calls with a given timeout
+    - [`debounce()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debounce) - function wrapper for the Debouncer class for easier usage
+    - [`autoPlural()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#autoplural) - automatically pluralize a string
+    - [`pauseFor()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#pausefor) - pause the execution of a function for a given amount of time
+    - [`fetchAdvanced()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#fetchadvanced) - wrapper around the fetch API with a timeout option
+    - [`insertValues()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#insertvalues) - insert values into a string at specified placeholders
+    - [`compress()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#compress) - compress a string with Gzip or Deflate
+    - [`decompress()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#decompress) - decompress a previously compressed string
+    - [`computeHash()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#computehash) - compute the hash / checksum of a string or ArrayBuffer
+    - [`randomId()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomid) - generate a random ID of a given length and radix
 - **Arrays:**
-    - [`randomItem()`](https://github.com/Sv443-Network/UserUtils#randomitem) - returns a random item from an array
-    - [`randomItemIndex()`](https://github.com/Sv443-Network/UserUtils#randomitemindex) - returns a tuple of a random item and its index from an array
-    - [`takeRandomItem()`](https://github.com/Sv443-Network/UserUtils#takerandomitem) - returns a random item from an array and mutates it to remove the item
-    - [`randomizeArray()`](https://github.com/Sv443-Network/UserUtils#randomizearray) - returns a copy of the array with its items in a random order
+    - [`randomItem()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomitem) - returns a random item from an array
+    - [`randomItemIndex()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomitemindex) - returns a tuple of a random item and its index from an array
+    - [`takeRandomItem()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#takerandomitem) - returns a random item from an array and mutates it to remove the item
+    - [`randomizeArray()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomizearray) - returns a copy of the array with its items in a random order
 - **Translation:**
-    - [`tr()`](https://github.com/Sv443-Network/UserUtils#tr) - simple JSON-based translation system with placeholder and nesting support
-    - [`tr.forLang()`](https://github.com/Sv443-Network/UserUtils#trforlang) - translate with the specified language instead of the currently active one
-    - [`tr.setLanguage()`](https://github.com/Sv443-Network/UserUtils#trsetlanguage) - set the currently active language for translations
-    - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils#trgetlanguage) - returns the currently active language
-    - [`tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils#traddtranslations) - add a language and its translations
-    - [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils#trgettranslations) - returns the translations for the given language or the currently active one
-    - [`tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils#trdeletetranslations) - delete the translations for the given language or the active one
-    - [`tr.hasKey()`](https://github.com/Sv443-Network/UserUtils#trhaskey) - check if a translation key exists for the given or active language
-    - [`tr.addTransform()`](https://github.com/Sv443-Network/UserUtils#traddtransform) - add a transformation function to dynamically modify the translation value
-    - [`tr.deleteTransform()`](https://github.com/Sv443-Network/UserUtils#trdeletetransform) - delete a transformation function that was previously added
+    - [`tr()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#tr) - simple JSON-based translation system with placeholder and nesting support
+    - [`tr.forLang()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trforlang) - translate with the specified language instead of the currently active one
+    - [`tr.setLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trsetlanguage) - set the currently active language for translations
+    - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trgetlanguage) - returns the currently active language
+    - [`tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#traddtranslations) - add a language and its translations
+    - [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trgettranslations) - returns the translations for the given language or the currently active one
+    - [`tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trdeletetranslations) - delete the translations for the given language or the active one
+    - [`tr.hasKey()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trhaskey) - check if a translation key exists for the given or active language
+    - [`tr.addTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#traddtransform) - add a transformation function to dynamically modify the translation value
+    - [`tr.deleteTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trdeletetransform) - delete a transformation function that was previously added
 - **Colors:**
-    - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
-    - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils#rgbtohex) - convert RGB or RGBA values to a hex color string
-    - [`lightenColor()`](https://github.com/Sv443-Network/UserUtils#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
-    - [`darkenColor()`](https://github.com/Sv443-Network/UserUtils#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
+    - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
+    - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#rgbtohex) - convert RGB or RGBA values to a hex color string
+    - [`lightenColor()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
+    - [`darkenColor()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
 - **Utility types for TypeScript:**
-    - [`Stringifiable`](https://github.com/Sv443-Network/UserUtils#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
-    - [`NonEmptyArray`](https://github.com/Sv443-Network/UserUtils#nonemptyarray) - any array that should have at least one item
-    - [`NonEmptyString`](https://github.com/Sv443-Network/UserUtils#nonemptystring) - any string that should have at least one character
-    - [`LooseUnion`](https://github.com/Sv443-Network/UserUtils#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
-    - [`Prettify`](https://github.com/Sv443-Network/UserUtils#prettify) - expands a complex type into a more readable format while keeping functionality the same
-    - [`ValueGen`](https://github.com/Sv443-Network/UserUtils#valuegen) - a "generator" value that allows for super flexible value typing and declaration
-    - [`StringGen`](https://github.com/Sv443-Network/UserUtils#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
+    - [`Stringifiable`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
+    - [`NonEmptyArray`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#nonemptyarray) - any array that should have at least one item
+    - [`NonEmptyString`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#nonemptystring) - any string that should have at least one character
+    - [`LooseUnion`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
+    - [`Prettify`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#prettify) - expands a complex type into a more readable format while keeping functionality the same
+    - [`ValueGen`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#valuegen) - a "generator" value that allows for super flexible value typing and declaration
+    - [`StringGen`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
 
 <br><br>
 
@@ -174,3 +175,17 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
         "UserUtils": "readonly"
     }
     ```
+
+<br><br>
+
+<!-- #region License -->
+## License:
+This library is licensed under the MIT License.  
+See the [license file](./LICENSE.txt) for details.
+
+<br><br>
+
+---
+
+Made with ❤️ by [Sv443](https://github.com/Sv443)  
+If you like this library, please consider [supporting the development](https://github.com/sponsors/Sv443)

@@ -3,7 +3,7 @@ import { NanoEmitter } from "./NanoEmitter.js";
 //#region types
 
 /**
- * The type of edge to use for the debouncer - [see the docs for a diagram and explanation.](https://github.com/Sv443-Network/UserUtils/blob/main/README.md#debouncer)  
+ * The type of edge to use for the debouncer - [see the docs for a diagram and explanation.](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer)  
  * - `immediate` - (default & recommended) - calls the listeners at the very first call ("rising" edge) and queues the latest call until the timeout expires  
  *   - Pros:  
  *     - First call is let through immediately  
@@ -52,7 +52,7 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
   /**
    * Creates a new debouncer with the specified timeout and edge type.
    * @param timeout Timeout in milliseconds between letting through calls - defaults to 200
-   * @param type The edge type to use for the debouncer - see {@linkcode DebouncerType} for details or [the documentation for an explanation and diagram](https://github.com/Sv443-Network/UserUtils/blob/main/README.md#debouncer) - defaults to "immediate"
+   * @param type The edge type to use for the debouncer - see {@linkcode DebouncerType} for details or [the documentation for an explanation and diagram](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer) - defaults to "immediate"
    */
   constructor(protected timeout = 200, protected type: DebouncerType = "immediate") {
     super();
@@ -161,7 +161,7 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
  * The returned function can be called with any arguments and will execute the `call()` method of the debouncer.  
  * The debouncer instance is accessible via the `debouncer` property of the returned function.  
  *   
- * Refer to the {@linkcode Debouncer} class definition or the [Debouncer documentation](https://github.com/Sv443-Network/UserUtils/blob/main/README.md#debouncer) for more information.
+ * Refer to the {@linkcode Debouncer} class definition or the [Debouncer documentation](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer) for more information.
  */
 export function debounce<
   TFunc extends DebouncerFunc<TArgs>,

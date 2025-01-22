@@ -9,9 +9,10 @@
       "dist/index.js",
       "dist/index.cjs",
       "dist/index.global.js",
+      "dist/index.umd.js",
       "dist/lib/**/*.d.ts",
       "package.json",
-      "README.md",
+      "README-summary.md",
       "CHANGELOG.md",
       "LICENSE.txt"
     ]
