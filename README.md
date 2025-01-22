@@ -58,9 +58,10 @@ View the documentation of previous major releases:
     - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
     - [`Dialog`](#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
     - [`NanoEmitter`](#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
+    - [`Debouncer`](#debouncer) - class for debouncing function calls with a given timeout
+    - [`debounce()`](#debounce) - function wrapper for the Debouncer class for easier usage
     - [`autoPlural()`](#autoplural) - automatically pluralize a string
     - [`pauseFor()`](#pausefor) - pause the execution of a function for a given amount of time
-    - [`debounce()`](#debounce) - call a function only once in a series of calls, after or before a given timeout
     - [`fetchAdvanced()`](#fetchadvanced) - wrapper around the fetch API with a timeout option
     - [`insertValues()`](#insertvalues) - insert values into a string at specified placeholders
     - [`compress()`](#compress) - compress a string with Gzip or Deflate
@@ -213,7 +214,7 @@ See the [license file](./LICENSE.txt) for details.
 ## DOM:
 
 ### SelectorObserver
-Usage:  
+Signatures:  
 ```ts
 new SelectorObserver(baseElement: Element, options?: SelectorObserverOptions)
 new SelectorObserver(baseElementSelector: string, options?: SelectorObserverOptions)
@@ -244,7 +245,7 @@ Additionally, there are the following extra options:
 
 ### Methods:
 #### `SelectorObserver.addListener()`
-Usage: `SelectorObserver.addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
+Signature: `SelectorObserver.addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
 Adds a listener (specified in `options.listener`) for the given selector that will be called once the selector exists in the DOM. It will be passed the element(s) that match the selector as the only argument.  
 The listener will be called immediately if the selector already exists in the DOM.  
 
@@ -274,7 +275,7 @@ The listener will be called immediately if the selector already exists in the DO
 <br>
 
 #### `SelectorObserver.enable()`
-Usage: `SelectorObserver.enable(immediatelyCheckSelectors?: boolean): boolean`  
+Signature: `SelectorObserver.enable(immediatelyCheckSelectors?: boolean): boolean`  
 Enables the observation of the child elements for the first time or if it was disabled before.  
 `immediatelyCheckSelectors` is set to true by default, which means all previously registered selectors will be checked. Set to false to only check them on the first detected mutation.  
 Returns true if the observation was enabled, false if it was already enabled or the passed `baseElementSelector` couldn't be found.  
@@ -282,51 +283,51 @@ Returns true if the observation was enabled, false if it was already enabled or 
 <br>
 
 #### `SelectorObserver.disable()`
-Usage: `SelectorObserver.disable(): void`  
+Signature: `SelectorObserver.disable(): void`  
 Disables the observation of the child elements.  
 If selectors are currently being checked, the current selector will be finished before disabling.  
   
 <br>
 
 #### `SelectorObserver.isEnabled()`
-Usage: `SelectorObserver.isEnabled(): boolean`  
+Signature: `SelectorObserver.isEnabled(): boolean`  
 Returns whether the observation of the child elements is currently enabled.  
   
 <br>
 
 #### `SelectorObserver.clearListeners()`
-Usage: `SelectorObserver.clearListeners(): void`  
+Signature: `SelectorObserver.clearListeners(): void`  
 Removes all listeners for all selectors.  
   
 <br>
 
 #### `SelectorObserver.removeAllListeners()`
-Usage: `SelectorObserver.removeAllListeners(selector: string): boolean`  
+Signature: `SelectorObserver.removeAllListeners(selector: string): boolean`  
 Removes all listeners for the given selector.  
   
 <br>
 
 #### `SelectorObserver.removeListener()`
-Usage: `SelectorObserver.removeListener(selector: string, options: SelectorListenerOptions): boolean`  
+Signature: `SelectorObserver.removeListener(selector: string, options: SelectorListenerOptions): boolean`  
 Removes a specific listener for the given selector and options.  
   
 <br>
 
 #### `SelectorObserver.getAllListeners()`
-Usage: `SelectorObserver.getAllListeners(): Map<string, SelectorListenerOptions[]>`  
+Signature: `SelectorObserver.getAllListeners(): Map<string, SelectorListenerOptions[]>`  
 Returns a Map of all selectors and their listeners.  
   
 <br>
 
 #### `SelectorObserver.getListeners()`
-Usage: `SelectorObserver.getListeners(selector: string): SelectorListenerOptions[] | undefined`  
+Signature: `SelectorObserver.getListeners(selector: string): SelectorListenerOptions[] | undefined`  
 Returns all listeners for the given selector or undefined if there are none.  
 
 <br>
 
 <details><summary><b>Examples - click to view</b></summary>
 
-#### Basic usage:
+#### Basic Signature:
 
 ```ts
 import { SelectorObserver } from "@sv443-network/userutils";
@@ -523,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <br>
 
 ### getUnsafeWindow()
-Usage:  
+Signature:  
 ```ts
 getUnsafeWindow(): Window
 ```
@@ -552,7 +553,7 @@ document.body.dispatchEvent(mouseEvent);
 <br>
 
 ### addParent()
-Usage:  
+Signature:  
 ```ts
 addParent(element: Element, newParent: Element): Element
 ```
@@ -579,7 +580,7 @@ addParent(element, newParent);
 <br>
 
 ### addGlobalStyle()
-Usage:  
+Signature:  
 ```ts
 addGlobalStyle(css: string): HTMLStyleElement
 ```
@@ -606,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <br>
 
 ### preloadImages()
-Usage:  
+Signature:  
 ```ts
 preloadImages(urls: string[], rejects?: boolean): Promise<Array<PromiseSettledResult<HTMLImageElement>>>
 ```
@@ -637,7 +638,7 @@ preloadImages([
 <br>
 
 ### openInNewTab()
-Usage:  
+Signature:  
 ```ts
 openInNewTab(url: string, background?: boolean): void
 ```
@@ -663,7 +664,7 @@ document.querySelector("#my-button").addEventListener("click", () => {
 <br>
 
 ### interceptEvent()
-Usage:  
+Signature:  
 ```ts
 interceptEvent(
   eventObject: EventTarget,
@@ -698,7 +699,7 @@ interceptEvent(document.body, "click", (event) => {
 <br>
 
 ### interceptWindowEvent()
-Usage:  
+Signature:  
 ```ts
 interceptWindowEvent(
   eventName: string,
@@ -728,7 +729,7 @@ interceptWindowEvent("beforeunload");
 <br>
 
 ### isScrollable()
-Usage:  
+Signature:  
 ```ts
 isScrollable(element: Element): { horizontal: boolean, vertical: boolean }
 ```
@@ -752,7 +753,7 @@ console.log("Element has a vertical scroll bar:", vertical);
 <br>
 
 ### observeElementProp()
-Usage:  
+Signature:  
 ```ts
 observeElementProp(
   element: Element,
@@ -804,11 +805,11 @@ observeElementProp(myInput, "value", (oldValue, newValue) => {
 <br>
 
 ### getSiblingsFrame()
-Usage:  
+Signature:  
 ```ts
 getSiblingsFrame<
   TSiblingType extends Element = HTMLElement
->(
+> (
   refElement: Element,
   siblingAmount: number,
   refElementAlignment: "center-top" | "center-bottom" | "top" | "bottom" = "center-top",
@@ -926,7 +927,7 @@ const allBelowExcl = getSiblingsFrame(refElement, Infinity, "bottom", false);
 <br>
 
 ### setInnerHtmlUnsafe()
-Usage:  
+Signature:  
 ```ts
 setInnerHtmlUnsafe(element: Element, html: string): Element
 ```
@@ -960,7 +961,7 @@ setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       
 ## Math:
 
 ### clamp()
-Usage:  
+Signatures:  
 ```ts
 clamp(num: number, min: number, max: number): number
 clamp(num: number, max: number): number
@@ -989,7 +990,7 @@ clamp(Number.MIN_SAFE_INTEGER, -Infinity, 0); // -9007199254740991
 <br>
 
 ### mapRange()
-Usage:  
+Signatures:  
 ```ts
 mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number
 mapRange(value: number, range1max: number, range2max: number): number
@@ -1016,7 +1017,7 @@ mapRange(4, 0, 13, 0, 100); // 30.76923076923077
 <br>
 
 ### randRange()
-Usages:  
+Signatures:  
 ```ts
 randRange(min: number, max: number, enhancedEntropy?: boolean): number
 randRange(max: number, enhancedEntropy?: boolean): number
@@ -1059,7 +1060,7 @@ benchmark(true);  // Generated 100k in 461ms
 <br>
 
 ### digitCount()
-Usage:  
+Signature:  
 ```ts
 digitCount(num: number | Stringifiable): number
 ```
@@ -1096,7 +1097,7 @@ digitCount(num6); // 17
 ## Misc:
 
 ### DataStore
-Usage:  
+Signature:  
 ```ts
 new DataStore(options: DataStoreOptions)
 ```
@@ -1129,7 +1130,7 @@ The options object has the following properties:
 
 ### Methods:
 #### `DataStore.loadData()`
-Usage: `loadData(): Promise<TData>`  
+Signature: `loadData(): Promise<TData>`  
 Asynchronously loads the data from persistent storage and returns it.  
 If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and also written to persistent storage before resolving.  
 If the `options.migrateIds` property is present and this is the first time calling this function in this session, the data will be migrated from the old ID(s) to the current one.  
@@ -1138,26 +1139,26 @@ Then, if the `formatVersion` of the saved data is lower than the current one and
 <br>
 
 #### `DataStore.getData()`
-Usage: `getData(): TData`  
+Signature: `getData(): TData`  
 Synchronously returns the current data that is stored in the internal cache.  
 If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultData` will be returned.
 
 <br>
 
 #### `DataStore.setData()`
-Usage: `setData(data: TData): Promise<void>`  
+Signature: `setData(data: TData): Promise<void>`  
 Writes the given data synchronously to the internal cache and asynchronously to persistent storage.
 
 <br>
 
 #### `DataStore.saveDefaultData()`
-Usage: `saveDefaultData(): Promise<void>`  
+Signature: `saveDefaultData(): Promise<void>`  
 Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.
 
 <br>
 
 #### `DataStore.deleteData()`
-Usage: `deleteData(): Promise<void>`  
+Signature: `deleteData(): Promise<void>`  
 Fully deletes the data from persistent storage only.  
 The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
 If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
@@ -1167,14 +1168,14 @@ This is why you should either immediately repopulate the cache and persistent st
 <br>
 
 #### `DataStore.runMigrations()`
-Usage: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
+Signature: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
 Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
 If `resetOnError` is set to `false`, the migration will be aborted if an error is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
 
 <br>
 
 #### `DataStore.migrateId()`
-Usage: `migrateId(oldIds: string | string[]): Promise<void>`  
+Signature: `migrateId(oldIds: string | string[]): Promise<void>`  
 Tries to migrate the currently saved persistent data from one or more old IDs to the ID set in the constructor.  
 If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data.  
 Instead of calling this manually, consider setting the `migrateIds` property in the constructor to automatically migrate the data once per session in the call to `loadData()`, unless you know that you need to migrate the ID(s) manually.
@@ -1182,7 +1183,7 @@ Instead of calling this manually, consider setting the `migrateIds` property in 
 <br>
 
 #### `DataStore.encodingEnabled()`
-Usage: `encodingEnabled(): boolean`  
+Signature: `encodingEnabled(): boolean`  
 Returns `true` if both `options.encodeData` and `options.decodeData` are set, else `false`.  
 Uses TypeScript's type guard notation for easier use in conditional statements.
 
@@ -1291,7 +1292,7 @@ init();
 <br>
 
 ### DataStoreSerializer
-Usage:  
+Signature:  
 ```ts
 new DataStoreSerializer(stores: DataStore[], options?: DataStoreSerializerOptions)
 ```
@@ -1315,7 +1316,7 @@ The options object has the following properties:
 
 ### Methods:
 #### `DataStoreSerializer.serialize()`
-Usage: `serialize(): Promise<string>`  
+Signature: `serialize(): Promise<string>`  
 Serializes all DataStore instances passed in the constructor and returns the serialized data as a JSON string.  
 <details><summary>Click to view the structure of the returned data.</summary>  
 
@@ -1338,7 +1339,7 @@ Serializes all DataStore instances passed in the constructor and returns the ser
 <br>
 
 #### `DataStoreSerializer.deserialize()`
-Usage: `deserialize(data: string): Promise<void>`  
+Signature: `deserialize(data: string): Promise<void>`  
 Deserializes the given string that was created with `serialize()` and imports the contained data each DataStore instance.  
 In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.
   
@@ -1350,7 +1351,7 @@ If `encoded` is set to `true`, the data will be decoded using the `decodeData` f
 <br>
 
 #### `DataStoreSerializer.loadStoresData()`
-Usage: `loadStoresData(): PromiseSettledResult<{ id: string, data: object }>[];`  
+Signature: `loadStoresData(): PromiseSettledResult<{ id: string, data: object }>[];`  
 Loads the persistent data of the DataStore instances into the in-memory cache of each DataStore instance.  
 Also triggers the migration process if the data format has changed.  
 See the [`DataStore.loadData()`](#datastoreloaddata) method for more information.  
@@ -1381,7 +1382,7 @@ See the [`DataStore.loadData()`](#datastoreloaddata) method for more information
 <br>
 
 #### `DataStoreSerializer.resetStoresData()`
-Usage: `resetStoresData(): PromiseSettledResult[];`  
+Signature: `resetStoresData(): PromiseSettledResult[];`  
 Resets the persistent data of the DataStore instances to their default values.  
 This affects both the in-memory cache and the persistent storage.  
 Any call to `serialize()` will then use the value of `options.defaultData` of the respective DataStore instance.  
@@ -1389,7 +1390,7 @@ Any call to `serialize()` will then use the value of `options.defaultData` of th
 <br>
 
 #### `DataStoreSerializer.deleteStoresData()`
-Usage: `deleteStoresData(): PromiseSettledResult[];`  
+Signature: `deleteStoresData(): PromiseSettledResult[];`  
 Deletes the persistent data of the DataStore instances from the set storage method.  
 Leaves the in-memory cache of the DataStore instances untouched.  
 Any call to `setData()` on the instances will recreate their own persistent storage data.
@@ -1490,7 +1491,7 @@ async function resetMyDataPls() {
 <br>
 
 ### Dialog
-Usage:  
+Signature:  
 ```ts
 new Dialog(options: DialogOptions)
 ```  
@@ -1521,21 +1522,21 @@ The options object has the following properties:
 
 ### Methods:
 #### `Dialog.open()`
-Usage: `open(): Promise<void>`  
+Signature: `open(): Promise<void>`  
 Opens the dialog.  
 If the dialog is not mounted yet, it will be mounted before opening.  
 
 <br>
 
 #### `Dialog.close()`
-Usage: `close(): void`  
+Signature: `close(): void`  
 Closes the dialog.  
 If `options.destroyOnClose` is set to `true`, [`Dialog.destroy()`](#dialogdestroy) will be called immediately after closing.
 
 <br>
 
 #### `Dialog.mount()`
-Usage: `mount(): Promise<void>`  
+Signature: `mount(): Promise<void>`  
 Mounts the dialog to the DOM by calling the render functions provided in the options object.  
 After calling, the dialog will exist in the DOM but will be invisible until [`Dialog.open()`](#dialogopen) is called.  
 Call this before opening the dialog to avoid a rendering delay.  
@@ -1543,13 +1544,13 @@ Call this before opening the dialog to avoid a rendering delay.
 <br>
 
 #### `Dialog.unmount()`
-Usage: `unmount(): void`  
+Signature: `unmount(): void`  
 Closes the dialog first if it's open, then removes it from the DOM.  
 
 <br>
 
 #### `Dialog.remount()`
-Usage: `remount(): Promise<void>`  
+Signature: `remount(): Promise<void>`  
 Unmounts and mounts the dialog again.  
 The render functions in the options object will be called again.  
 May cause a flickering effect due to the rendering delay.  
@@ -1557,33 +1558,33 @@ May cause a flickering effect due to the rendering delay.
 <br>
 
 #### `Dialog.isOpen()`
-Usage: `isOpen(): boolean`  
+Signature: `isOpen(): boolean`  
 Returns `true` if the dialog is open, else `false`.  
 
 <br>
 
 #### `Dialog.isMounted()`
-Usage: `isMounted(): boolean`  
+Signature: `isMounted(): boolean`  
 Returns `true` if the dialog is mounted, else `false`.  
 
 <br>
 
 #### `Dialog.destroy()`
-Usage: `destroy(): void`  
+Signature: `destroy(): void`  
 Destroys the dialog.  
 Removes all listeners by default and closes and unmounts the dialog.  
 
 <br>
 
 #### `Dialog.getCurrentDialogId()`
-Usage: `static getCurrentDialogId(): string`  
+Signature: `static getCurrentDialogId(): string`  
 Static method that returns the ID of the currently open dialog.  
 Needs to be called without creating an instance of the class.  
 
 <br>
 
 #### `Dialog.getOpenDialogs()`
-Usage: `static getOpenDialogs(): string[]`  
+Signature: `static getOpenDialogs(): string[]`  
 Static method that returns an array of the IDs of all open dialogs.  
 Needs to be called without creating an instance of the class.  
   
@@ -1639,7 +1640,7 @@ fooDialog.open();
 <br>
 
 ### NanoEmitter
-Usage:  
+Signature:  
 ```ts
 new NanoEmitter<TEventMap = EventsMap>(options?: NanoEmitterOptions): NanoEmitter<TEventMap>
 ```  
@@ -1770,8 +1771,210 @@ doStuff();
 
 <br>
 
+### Debouncer
+Signature:  
+```ts
+new Debouncer<TArgs = any>(timeout?: number, type?: "immediate" | "idle")
+```
+A class that debounces function calls to prevent them from being executed too often.  
+The debouncer will wait for the specified timeout between calls before executing the registered listener functions.  
+This is especially useful when dealing with events that fire every frame, like "scroll", "resize", "mousemove", etc.  
+  
+If creating a whole class is too much overhead for your use case, you can also use the standalone function [`debounce()`](#debounce).  
+It works similarly to other debounce implementations like Lodash's `_.debounce()`.  
+  
+If `timeout` is not provided, it will default to 200 milliseconds.  
+If `type` isn't provided, it will default to `"immediate"`.  
+  
+The `type` parameter can be set to `"immediate"` (default and recommended) to let the first call through immediately and then queue the following calls until the timeout is over.  
+  
+If set to `"idle"`, the debouncer will wait until there is a pause of the given timeout length before executing the queued call.  
+Note that this might make the calls be queued up for all eternity if there isn't a long enough gap between them.  
+
+See the below diagram for a visual representation of the different types.  
+  
+<details><summary><b>Diagram - click to view</b></summary>
+
+![Debouncer type diagram](./.github/assets/debounce.png)
+
+</details>
+
+### Methods:
+#### `Debouncer.addListener()`
+Signature: `addListener(fn: ((...args: TArgs[]) => void | unknown)): void`  
+Adds a listener function that will be called on timeout.  
+You can attach as many listeners as you want and they will all be called synchronously in the order they were added.
+
+<br>
+
+#### `Debouncer.removeListener()`
+Signature: `removeListener(fn: ((...args: TArgs[]) => void | unknown)): void`  
+Removes the listener with the specified function reference.
+
+<br>
+
+#### `Debouncer.removeAllListeners()`
+Signature: `removeAllListeners(): void`  
+Removes all listeners.
+
+<br>
+
+#### `Debouncer.call()`
+Signature: `call(...args: TArgs[]): void`  
+Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with `addListener()`.  
+Not every call will trigger the listeners - only when there is no active timeout.  
+If the timeout is active, the call will be queued until it either gets overridden by the next call or the timeout is over.
+
+<br>
+
+#### `Debouncer.setTimeout()`  
+Signature: `setTimeout(timeout: number): void`  
+Changes the timeout for the debouncer.
+
+<br>
+
+#### `Debouncer.getTimeout()`
+Signature: `getTimeout(): number`  
+Returns the current timeout.
+
+<br>
+
+#### `Debouncer.isTimeoutActive()`
+Signature: `isTimeoutActive(): boolean`  
+Returns `true` if the timeout is currently active, meaning any call to the `call()` method will be queued.
+
+<br>
+
+#### `Debouncer.setType()`
+Signature: `setType(type: "immediate" | "idle"): void`  
+Changes the edge type for the debouncer.
+
+<br>
+
+#### `Debouncer.getType()`
+Signature: `getType(): "immediate" | "idle"`  
+Returns the current edge type.
+
+<br>
+
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { Debouncer } from "@sv443-network/userutils";
+
+const deb = new Debouncer(); // defaults to 200ms and "immediate"
+
+// register a function to be called when the debouncer triggers
+deb.addListener(onResize);
+
+window.addEventListener("resize", (evt) => {
+  // arguments will be passed along to all registered listeners
+  deb.call(evt);
+});
+
+function onResize(evt: Event) {
+  console.log("Resized to:", window.innerWidth, "x", window.innerHeight);
+
+  // timeout and type can be modified after the fact:
+  deb.setTimeout(500);
+  deb.setType("idle");
+}
+
+// call these from anywhere else to detach the registered listeners:
+
+function removeResizeListener() {
+  deb.removeListener(onResize);
+}
+
+function removeAllListeners() {
+  deb.removeAllListeners();
+}
+```
+</details>
+
+<br>
+
+### debounce()
+Signature:  
+```ts
+debounce<
+  TFunc extends ((...args: TArgs[]) => void | unknown),
+  TArgs = any
+> (
+  fn: TFunc,
+  timeout?: number,
+  type?: "immediate" | "idle"
+): TFunc
+```
+  
+A standalone function that debounces a given function to prevent it from being executed too often.  
+The function will wait for the specified timeout between calls before executing the function.  
+This is especially useful when dealing with events that fire every frame, like "scroll", "resize", "mousemove", etc.  
+  
+This function works in the same way as the [`Debouncer`](#debouncer) class, but is more lightweight and doesn't require creating a whole class.  
+Still, you will have access to the created Debouncer instance via the `debouncer` prop on the returned function should you need it.  
+  
+If `timeout` is not provided, it will default to 200 milliseconds.  
+If `type` isn't provided, it will default to `"immediate"`.  
+  
+The `type` parameter can be set to `"immediate"` (default and recommended) to let the first call through immediately and then queue the following calls until the timeout is over.  
+  
+If set to `"idle"`, the debouncer will wait until there is a pause of the given timeout length before executing the queued call.  
+Note that this might make the calls be queued up for all eternity if there isn't a long enough gap between them.  
+
+See the below diagram for a visual representation of the different types.  
+  
+<details><summary><b>Diagram - click to view</b></summary>
+
+![Debouncer type diagram](./.github/assets/debounce.png)
+
+</details>
+
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { debounce } from "@sv443-network/userutils";
+
+// simple example:
+window.addEventListener("resize", debounce((evt) => {
+  console.log("Resized to:", window.innerWidth, "x", window.innerHeight);
+}));
+
+// or if you need access to the Debouncer instance:
+
+function myFunc(iteration: number) {
+  // for the edge type "immediate", iteration 0 and 19 will *always* be called
+  // this is so you can react immediately and always have the latest data at the end
+  console.log(`Call #${iteration} went through!`);
+}
+
+// debouncedFunction can be called at very short intervals but will never let calls through twice within 0.5s:
+const debouncedFunction = debounce(myFunc, 500);
+
+function increaseTimeout() {
+  // instance can be accessed on the function returned by debounce()
+  debouncedFunction.debouncer.setTimeout(debouncedFunction.debouncer.getTimeout() + 100);
+}
+
+// and now call the function a bunch of times with varying intervals:
+
+let i = 0;
+function callFunc() {
+  debouncedFunction(i, Date.now());
+
+  i++;
+  // call the function 20 times with a random interval between 0 and 1s (weighted towards the lower end):
+  if(i < 20)
+    setTimeout(callFunc, Math.floor(1000 * Math.pow(Math.random(), 2.5)));
+}
+```
+
+</details>
+
+<br>
+
 ### autoPlural()
-Usage:  
+Signature:  
 ```ts
 autoPlural(str: string, num: number | Array | NodeList): string
 ```
@@ -1799,7 +2002,7 @@ console.log(items.length, autoPlural("item", items)); // "6 items"
 <br>
 
 ### pauseFor()
-Usage:  
+Signature:  
 ```ts
 pauseFor(ms: number): Promise<void>
 ```
@@ -1821,54 +2024,8 @@ async function run() {
 
 <br>
 
-<!-- TODO: refactor into new Debouncer class and debounce func docs -->
-### debounce()
-Usage:  
-```ts
-debounce(func: Function, timeout?: number, edge?: "falling" | "rising"): Function
-```
-  
-Returns a debounced wrapper function, meaning that the given `func` will only be called once after or before a given amount of time.  
-This is very useful for functions that are called repeatedly, like event listeners, to remove a substantial amount of unnecessary calls.  
-All parameters passed to the returned function will be passed along to the input `func`  
-  
-The `timeout` will default to 300ms if left undefined.  
-  
-The `edge` ("falling" by default) determines if the function should be called after the timeout has passed or before it.  
-In simpler terms, this results in "falling" edge functions being called once at the very end of a sequence of calls, and "rising" edge functions being called once at the beginning and possibly multiple times following that, but at the very least they're spaced apart by what's passed in `timeout`.  
-  
-This diagram can hopefully help bring the difference across:  
-<details><summary><b>Click to view the diagram</b></summary>
-
-![debounce function edge diagram](./.github/assets/debounce.png)
-
-</details>
-
-<br>
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { debounce } from "@sv443-network/userutils";
-
-// uses "falling" edge by default:
-window.addEventListener("resize", debounce((event) => {
-  console.log("Window was resized:", event);
-}, 500)); // 500ms timeout
-
-// using "rising" edge:
-const myFunc = debounce((event) => {
-  console.log("Body was scrolled:", event);
-}, 100, "rising"); // 100ms timeout
-
-document.body.addEventListener("scroll", myFunc);
-```
-</details>
-
-<br>
-
 ### fetchAdvanced()
-Usage:  
+Signature:  
 ```ts
 fetchAdvanced(input: string | Request | URL, options?: {
   timeout?: number,
@@ -1911,7 +2068,7 @@ document.querySelector("button#cancel")?.addEventListener("click", () => {
 <br>
 
 ### insertValues()
-Usage:  
+Signature:  
 ```ts
 insertValues(input: string, ...values: Stringifiable[]): string
 ```
@@ -1938,7 +2095,7 @@ insertValues("Testing %1, %2, %3 and %4", ...values); // "Testing foo, bar and b
 <br>
 
 ### compress()
-Usage:  
+Signatures:  
 ```ts
 compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "base64"): Promise<string>
 compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
@@ -1978,7 +2135,7 @@ console.log(barDeflate); // "eJzzSM3JyddRCM8vyklR9BiZHAAIEVg1"
 <br>
 
 ### decompress()
-Usage:  
+Signatures:  
 ```ts
 decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
 decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
@@ -2008,7 +2165,7 @@ console.log(decompressed); // "Hello, World!"
 <br>
 
 ### computeHash()
-Usage:  
+Signature:  
 ```ts
 computeHash(input: string | ArrayBuffer, algorithm?: string): Promise<string>
 ```
@@ -2042,7 +2199,7 @@ run();
 <br>
 
 ### randomId()
-Usage:  
+Signature:  
 ```ts
 randomId(length?: number, radix?: number, enhancedEntropy?: boolean, randomCase?: boolean): string
 ```
@@ -2095,7 +2252,7 @@ benchmark(true, true);   // Generated 10k in 1054ms
 <br><br>
 
 ### consumeGen()
-Usage:  
+Signature:  
 ```ts
 consumeGen(valGen: ValueGen): 
 ```
@@ -2129,7 +2286,7 @@ doSomething("foo");
 <br><br>
 
 ### consumeStringGen()
-Usage:  
+Signature:  
 ```ts
 consumeStringGen(strGen: StringGen): Promise<string>
 ```
@@ -2177,7 +2334,7 @@ new MyTextPromptThing(420);
 ## Arrays:
 
 ### randomItem()
-Usage:  
+Signature:  
 ```ts
 randomItem(array: Array): any
 ```
@@ -2198,7 +2355,7 @@ randomItem([ ]);                   // undefined
 <br>
 
 ### randomItemIndex()
-Usage:  
+Signature:  
 ```ts
 randomItemIndex(array: Array): [item: any, index: number]
 ```
@@ -2224,7 +2381,7 @@ const [, index] = randomItemIndex(["foo", "bar", "baz"]); // 1
 <br>
 
 ### takeRandomItem()
-Usage:  
+Signature:  
 ```ts
 takeRandomItem(array: Array): any
 ```
@@ -2246,7 +2403,7 @@ console.log(arr);    // ["foo", "baz"]
 <br>
 
 ### randomizeArray()
-Usage:  
+Signature:  
 ```ts
 randomizeArray(array: Array): Array
 ```
@@ -2278,7 +2435,7 @@ TODO: Pluralization is not supported but can be achieved manually by adding vari
 <br>
 
 ### tr.for()
-Usage:  
+Signature:  
 ```ts
 tr.for<TTrKey extends string = string>(language: string, key: TTrKey, ...args: Stringifiable[]): string
 ```
@@ -2321,7 +2478,7 @@ tr.for(undefined, "goodbye"); // "Goodbye, World!"
 <br>
 
 ### tr.use()
-Usage:  
+Signature:  
 ```ts
 tr.use<TTrKey extends string = string>(language: string): (key: TTrKey, ...args: Stringifiable[]) => string
 ```
@@ -2352,7 +2509,7 @@ t("hello"); // "Hello, World!"
 <br>
 
 ### tr.hasKey()
-Usage:  
+Signature:  
 ```ts
 tr.hasKey<TTrKey extends string = string>(language: string | undefined, key: TTrKey): boolean
 ```
@@ -2380,7 +2537,7 @@ tr.hasKey("en", "goodbye"); // false
 <br>
 
 ### tr.addTranslations()
-Usage:  
+Signature:  
 ```ts
 tr.addTranslations(language: string, translations: TrObject): void
 ```
@@ -2417,7 +2574,7 @@ t("foo.bar");    // "This key isn't nested, it just has a dot"
 <br>
 
 ### tr.getTranslations()
-Usage:  
+Signature:  
 ```ts
 tr.getTranslations(language: string): TrObject | undefined
 ```
@@ -2441,7 +2598,7 @@ tr.getTranslations("en"); // { hello: "Hello, World!" }
 <br>
 
 ### tr.deleteTranslations()
-Usage:  
+Signature:  
 ```ts
 tr.deleteTranslations(language: string): boolean
 ```
@@ -2470,7 +2627,7 @@ tr.for("en", "hello"); // "hello"
 <br>
 
 ### tr.setFallbackLanguage()
-Usage:  
+Signature:  
 ```ts
 tr.setFallbackLanguage(language: string | undefined): void
 ```
@@ -2509,7 +2666,7 @@ t("goodbye"); // "Goodbye, World!"
 <br>
 
 ### tr.getFallbackLanguage()
-Usage:  
+Signature:  
 ```ts
 tr.getFallbackLanguage(): string | undefined
 ```
@@ -2532,7 +2689,7 @@ tr.getFallbackLanguage(); // "en"
 <br>
 
 ### tr.addTransform()
-Usage:  
+Signature:  
 ```ts
 addTransform<TTrKey extends string = string>(transform: [RegExp, TransformFn<TTrKey>]): void
 ```
@@ -2614,7 +2771,7 @@ t("markup"); // "<span style="color: #ff0000;">This is red</span> and <span styl
 <br>
 
 ### tr.deleteTransform()
-Usage:  
+Signature:  
 ```ts
 deleteTransform(patternOrFn: RegExp | string | TransformFn): boolean
 ```
@@ -2692,7 +2849,7 @@ t("percent", {}, {});                         // "Hello, [object Object]!\nYou h
 <br>
 
 ### TrKeys
-Usage:  
+Signature:  
 ```ts
 type MyKeys = TrKeys<TrObject>
 ```
@@ -2730,7 +2887,7 @@ const t = tr.use<MyKeysEn>("en");
 The color functions are used to manipulate and convert colors in various formats.  
 
 ### hexToRgb()
-Usage:  
+Signature:  
 ```ts
 hexToRgb(hex: string): [red: number, green: number, blue: number, alpha?: number]
 ```  
@@ -2755,7 +2912,7 @@ hexToRgb("0f0f");      // [0, 255, 0, 1]
 <br>
 
 ### rgbToHex()
-Usage:  
+Signature:  
 ```ts
 rgbToHex(red: number, green: number, blue: number, alpha?: number, withHash?: boolean, upperCase?: boolean): string
 ```  
@@ -2778,7 +2935,7 @@ rgbToHex(255, 0, 0, undefined, true, true); // "#FF0000" (no alpha, with hash sy
 <br>
 
 ### lightenColor()
-Usage:  
+Signature:  
 ```ts
 lightenColor(color: string, percent: number, upperCase?: boolean): string
 ```  
@@ -2803,7 +2960,7 @@ lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
 <br>
 
 ### darkenColor()
-Usage:  
+Signature:  
 ```ts
 darkenColor(color: string, percent: number, upperCase?: boolean): string
 ```  
@@ -2868,7 +3025,7 @@ logSomething(barObject); // Type error
 <br>
 
 ### NonEmptyArray
-Usage:
+Signature:
 ```ts
 NonEmptyArray<TItem = unknown>
 ```
@@ -2898,7 +3055,7 @@ logFirstItem(["04abc", "69"]); // 4
 <br>
 
 ### NonEmptyString
-Usage:
+Signature:
 ```ts
 NonEmptyString<TString extends string>
 ```
@@ -2922,7 +3079,7 @@ convertToNumber("");      // type error: Argument of type 'string' is not assign
 <br>
 
 ### LooseUnion
-Usage:
+Signature:
 ```ts
 LooseUnion<TUnion extends string | number | object>
 ```
@@ -2949,7 +3106,7 @@ foo(1);   // type error: Argument of type '1' is not assignable to parameter of 
 <br>
 
 ### Prettify
-Usage:
+Signature:
 ```ts
 Prettify<T>
 ```
@@ -3004,7 +3161,7 @@ const bar: Bar = {
 <br><br>
 
 ### ValueGen
-Usage:
+Signature:
 ```ts
 ValueGen<TValueType>
 ```
@@ -3015,7 +3172,7 @@ Use it in the [`consumeGen()`](#consumegen) function to convert the given ValueG
 <br><br>
 
 ### StringGen
-Usage:
+Signature:
 ```ts
 StringGen<TStrUnion>
 ```
