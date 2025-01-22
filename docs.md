@@ -2145,7 +2145,7 @@ Signature:
 consumeGen(valGen: ValueGen): 
 ```
   
-Turns a [`ValueGen`](#valuegen) into its final value.  
+Asynchronously turns a [`ValueGen`](#valuegen) into its final value.  
 ValueGen allows for tons of flexibility in how the value can be obtained. Calling this function will resolve the final value.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2179,7 +2179,7 @@ Signature:
 consumeStringGen(strGen: StringGen): Promise<string>
 ```
   
-Turns a [`StringGen`](#stringgen) into its final string value.  
+Asynchronously turns a [`StringGen`](#stringgen) into its final string value.  
 StringGen allows for tons of flexibility in how the string can be obtained. Calling this function will resolve the final string.  
 Optionally you can use the template parameter to define the union of strings that the StringGen should yield.  
   
@@ -2197,7 +2197,7 @@ export class MyTextPromptThing {
   /** Shows the prompt dialog */
   public async showPrompt() {
     const promptText = await consumeStringGen(this.text);
-    const promptHtml = promptText.trim().replace(/\n/g, "<br>");
+    const promptHtml = promptText.trim().replace(/\n/gm, "<br>");
 
     // ...
   }
@@ -3065,7 +3065,9 @@ Signature:
 StringGen<TStrUnion>
 ```
   
-Describes a string that can be obtained in various ways, including via the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
+Describes a string that can be obtained in various ways, including via a [`Stringifiable`](#stringifiable) value, a function that returns a [`Stringifiable`](#stringifiable) value, a Promise that resolves to a [`Stringifiable`](#stringifiable) value or either a sync or an async function that returns a [`Stringifiable`](#stringifiable) value.  
+Remember that [`Stringifiable`](#stringifiable) is a type that describes a value that either is a string itself or can be converted to a string implicitly using `toString()`, template literal interpolation, or by passing it to `String()`, giving you the utmost flexibility in how the string can be passed.  
+  
 Contrary to [`ValueGen`](#valuegen), this type allows for specifying a union of strings that the StringGen should yield, as long as it is loosely typed as just `string`.  
 Use it in the [`consumeStringGen()`](#consumestringgen) function to convert the given StringGen value to a plain string. Also refer to that function for an example.
 
