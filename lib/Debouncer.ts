@@ -62,7 +62,7 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
 
   /** Adds a listener function that will be called on timeout */
   public addListener(fn: DebouncerFunc<TArgs>) {
-    return this.listeners.push(fn);
+    this.listeners.push(fn);
   }
 
   /** Removes the listener with the specified function reference */
@@ -90,7 +90,7 @@ export class Debouncer<TArgs> extends NanoEmitter<DebouncerEventMap<TArgs>> {
 
   /** Whether the timeout is currently active, meaning any latest call to the {@linkcode call()} method will be queued */
   public isTimeoutActive() {
-    return this.activeTimeout;
+    return typeof this.activeTimeout !== "undefined";
   }
 
   //#region type
