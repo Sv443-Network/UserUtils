@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 9.0.3
+
+### Patch Changes
+
+- e3f1e6a: Fixed `Debouncer` TS types as to not break backwards compat
+- 5861bb4: Fixed broken ambiguity of DataStore's migration function type
+
 ## 9.0.2
 
 ### Patch Changes
