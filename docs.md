@@ -1401,11 +1401,23 @@ The options object has the following properties:
 | `closeOnEscPress?: boolean` | (Optional) Whether the dialog should close when the escape key is pressed. Defaults to `true`. |
 | `destroyOnClose?: boolean` | (Optional) Whether the dialog should be destroyed when it's closed. Defaults to `false`. |
 | `unmountOnClose?: boolean` | (Optional) Whether the dialog should be unmounted when it's closed. Defaults to `true`. Superseded by `destroyOnClose`. |
-| `removeListenersOnDestroy?: boolean` | (Optional) Whether all listeners should be removed when the dialog is destroyed. Defaults to `true`. |
+| `removeListenersOnDestroy?: boolean` | (Optional) Whether all NanoEmitter listeners should be removed when the dialog is destroyed. Defaults to `true`. |
 | `small?: boolean` | (Optional) Whether the dialog should have a smaller overall appearance. Defaults to `false`. |
 | `verticalAlign?: "top" \| "center" \| "bottom"` | (Optional) Where to align or anchor the dialog vertically. Defaults to `"center"`. |
 | `strings?: Partial<typeof defaultStrings>` | (Optional) Strings used in the dialog (used for translations). Defaults to the default English strings (importable with the name `defaultStrings`). |
 | `dialogCss?: string` | (Optional) CSS to apply to the dialog. Defaults to the default (importable with the name `defaultDialogCss`). |
+
+<br>
+
+### Events:
+The Dialog class inherits from [`NanoEmitter`](#nanoemitter), so you can use all of its inherited methods to listen to the following events:
+| Event | Arguments | Description |
+| :-- | :-- | :-- |
+| `open` | `void` | Emitted after the dialog is opened. |
+| `close` | `void` | Emitted after the dialog is closed. |
+| `render` | `void` | Emitted after the dialog contents are rendered. |
+| `clear` | `void` | Emitted after the dialog contents are cleared. |
+| `destroy` | `void` | Emitted **after** the dialog is destroyed and **before** all listeners are removed. |
 
 <br>
 
@@ -1545,21 +1557,31 @@ The options object has the following properties:
 | :-- | :-- |
 | `publicEmit?: boolean` | (Optional) If set to true, allows emitting events through the public method `emit()` (`false` by default). |
   
-Methods:  
-`on<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
+### Methods:  
+#### `NanoEmitter.on()`  
+Signature: `on<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
 Registers a listener function for the given event.  
-May be called multiple times for the same event.  
+May be called multiple times for the same event.
   
-`once<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
+<br>
+
+#### `NanoEmitter.once()`
+Signature: `once<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
 Registers a listener function for the given event that will only be called once.
-  
-`emit<K extends keyof TEventMap>(event: K, ...args: Parameters<TEventMap[K]>): boolean`  
+
+<br>
+
+#### `NanoEmitter.emit()`
+Signature: `emit<K extends keyof TEventMap>(event: K, ...args: Parameters<TEventMap[K]>): boolean`  
 Emits an event with the given arguments from outside the class instance if `publicEmit` is set to `true`.  
 If `publicEmit` is set to `true`, this method will return `true` if the event was emitted.  
-If it is set to `false`, it will always return `false` and you will need to use `this.events.emit()` from inside the class instead.  
-  
-`unsubscribeAll(): void`  
-Removes all listeners from all events.  
+If it is set to `false`, it will always return `false` and you will need to use `this.events.emit()` from inside the class instead.
+
+<br>
+
+#### `NanoEmitter.unsubscribeAll()`
+Signature: `unsubscribeAll(): void`  
+Removes all listeners from all events.
   
 <br>
   
@@ -1688,6 +1710,17 @@ See the below diagram for a visual representation of the different types.
 
 </details>
 
+<br>
+
+### Events:
+The Debouncer class inherits from [`NanoEmitter`](#nanoemitter), so you can use all of its inherited methods to listen to the following events:
+| Event | Arguments | Description |
+| :-- | :-- | :-- |
+| `call` | `...TArgs[]`, same as `addListener()` and `call()` | Emitted when the debouncer triggers and calls all listener functions, as an alternative to the callback-based `addListener()` method. |
+| `change` | `timeout: number`, `type: "immediate" \| "idle"` | Emitted when the timeout or type settings were changed. |
+
+<br>
+
 ### Methods:
 #### `Debouncer.addListener()`
 Signature: `addListener(fn: ((...args: TArgs[]) => void | unknown)): void`  
@@ -1778,6 +1811,17 @@ function removeResizeListener() {
 function removeAllListeners() {
   deb.removeAllListeners();
 }
+
+// or using NanoEmitter's event system:
+
+deb.on("call", (...args) => {
+  console.log("Debounced call executed with:", args);
+});
+
+deb.on("change", (timeout, type) => {
+  console.log("Timeout changed to:", timeout);
+  console.log("Edge type changed to:", type);
+});
 ```
 </details>
 
@@ -1856,6 +1900,17 @@ function callFunc() {
   if(i < 20)
     setTimeout(callFunc, Math.floor(1000 * Math.pow(Math.random(), 2.5)));
 }
+
+// same as with Debouncer, you can use NanoEmitter's event system:
+
+debouncedFunction.debouncer.on("call", (...args) => {
+  console.log("Debounced call executed with:", args);
+});
+
+debouncedFunction.debouncer.on("change", (timeout, type) => {
+  console.log("Timeout changed to:", timeout);
+  console.log("Edge type changed to:", type);
+});
 ```
 
 </details>
