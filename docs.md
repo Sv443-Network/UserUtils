@@ -1689,7 +1689,7 @@ new Debouncer<TArgs = any>(timeout?: number, type?: "immediate" | "idle")
 ```
 A class that debounces function calls to prevent them from being executed too often.  
 The debouncer will wait for the specified timeout between calls before executing the registered listener functions.  
-This is especially useful when dealing with events that fire every frame, like "scroll", "resize", "mousemove", etc.  
+This is especially useful when dealing with events that fire rapidly, like "scroll", "resize", "mousemove", etc.  
   
 If creating a whole class is too much overhead for your use case, you can also use the standalone function [`debounce()`](#debounce).  
 It works similarly to other debounce implementations like Lodash's `_.debounce()`.  
@@ -1842,9 +1842,9 @@ debounce<
   
 A standalone function that debounces a given function to prevent it from being executed too often.  
 The function will wait for the specified timeout between calls before executing the function.  
-This is especially useful when dealing with events that fire every frame, like "scroll", "resize", "mousemove", etc.  
+This is especially useful when dealing with events that fire rapidly, like "scroll", "resize", "mousemove", etc.  
   
-This function works in the same way as the [`Debouncer`](#debouncer) class, but is more lightweight and doesn't require creating a whole class.  
+This function works in the same way as the [`Debouncer`](#debouncer) class, but is a more convenient wrapper for less complex use cases.  
 Still, you will have access to the created Debouncer instance via the `debouncer` prop on the returned function should you need it.  
   
 If `timeout` is not provided, it will default to 200 milliseconds.  
