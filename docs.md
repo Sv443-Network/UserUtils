@@ -124,7 +124,7 @@ Additionally, there are the following extra options:
 - `disableOnNoListeners` - whether to disable the SelectorObserver when there are no listeners left (defaults to false)
 - `enableOnAddListener` - whether to enable the SelectorObserver when a new listener is added (defaults to true)
 - `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
-- `defaultDebounceEdge` - can be set to "falling" (default) or "rising", to call the function at (rising) on the very first call and subsequent times after the given debounce time or (falling) the very last call after the debounce time passed with no new calls - [see `debounce()` for more info and a diagram](#debounce)
+- `defaultDebounceType` - can be set to "immediate" (default), to call the function on the very first call and subsequent times after the given debounce time passed, or "idle", to let through the very last call, after the debounce time passed with no subsequent calls - [see `Debouncer` for more info and a diagram](#debouncer)
 - `checkInterval` - if set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored
   
 ⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.
@@ -154,8 +154,9 @@ The listener will be called immediately if the selector already exists in the DO
 > If `options.debounce` is set to a number above 0, this listener will be debounced by that amount of milliseconds (defaults to 0).  
 > E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of this listener will be executed.
 
-> `options.debounceEdge` is set to "falling" by default, which means the debounce timer will start after the last call of this listener.  
-> If set to "rising", the debounce timer will start after the first call of this listener.
+> `options.debounceType` is set to "immediate" by default, which means the listener will be called immediately and then debounced on subsequent calls.  
+> If set to "idle", the SelectorObserver will wait until the debounce time has passed with no new calls and then calls the listener with the latest element(s) found.  
+> See the [Debouncer](#debouncer) class for a better explanation.
   
 > When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that this listener will return.  
 > It will default to HTMLElement if left undefined.
@@ -241,8 +242,8 @@ document.addEventListener("DOMContentLoaded", () => {
     attributeFilter: ["class", "style", "data-whatever"],
     // debounce all listeners by 100ms unless specified otherwise:
     defaultDebounce: 100,
-    // "rising" means listeners are called immediately and use the debounce as a timeout between subsequent calls - see the debounce() function for a better explanation
-    defaultDebounceEdge: "rising",
+    // "immediate" means listeners are called immediately and use the debounce as a timeout between subsequent calls - see the Debouncer class for a better explanation
+    defaultDebounceType: "immediate",
     // other settings from the MutationObserver API can be set here too - see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options
   });
 
@@ -255,8 +256,8 @@ document.addEventListener("DOMContentLoaded", () => {
   barObserver.addListener("#my-other-element", {
     // set the debounce higher than provided by the defaultDebounce property:
     debounce: 250,
-    // adjust the debounceEdge back to the default "falling" for this specific listener:
-    debounceEdge: "falling",
+    // change the type for this specific listener:
+    debounceType: "idle",
     listener: (element) => {
       console.log("Other element's attributes changed:", element);
     },
