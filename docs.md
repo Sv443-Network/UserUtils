@@ -104,7 +104,9 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
 ### SelectorObserver
 Signatures:  
 ```ts
+// using an Element instance:
 new SelectorObserver(baseElement: Element, options?: SelectorObserverOptions)
+// using selector string:
 new SelectorObserver(baseElementSelector: string, options?: SelectorObserverOptions)
 ```
 
@@ -853,7 +855,9 @@ setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       
 ### clamp()
 Signatures:  
 ```ts
+// with min:
 clamp(num: number, min: number, max: number): number
+// without min:
 clamp(num: number, max: number): number
 ```
   
@@ -882,7 +886,9 @@ clamp(Number.MIN_SAFE_INTEGER, -Infinity, 0); // -9007199254740991
 ### mapRange()
 Signatures:  
 ```ts
+// with min arguments:
 mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number
+// without min arguments:
 mapRange(value: number, range1max: number, range2max: number): number
 ```
   
@@ -909,7 +915,9 @@ mapRange(4, 0, 13, 0, 100); // 30.76923076923077
 ### randRange()
 Signatures:  
 ```ts
+// with min:
 randRange(min: number, max: number, enhancedEntropy?: boolean): number
+// without min:
 randRange(max: number, enhancedEntropy?: boolean): number
 ```
   
@@ -2042,11 +2050,13 @@ insertValues("Testing %1, %2, %3 and %4", ...values); // "Testing foo, bar and b
 ### compress()
 Signatures:  
 ```ts
+// return as a base64 string:
 compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "base64"): Promise<string>
+// return as an ArrayBuffer / Uint8Array:
 compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
 ```
   
-Compresses a string or ArrayBuffer using the specified compression format. Most browsers should support at least `gzip` and `deflate`  
+Compresses a string or ArrayBuffer using the specified [compression format](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream/CompressionStream#format). Most browsers should support at least `gzip`, `deflate` and `deflate-raw`.  
 The `outputType` dictates which format the output will be in. It will default to `base64` if left undefined.  
   
 ⚠️ You need to provide the `@grant unsafeWindow` directive if you are using the `base64` output type or you will get a TypeError.  
@@ -2062,7 +2072,7 @@ import { compress } from "@sv443-network/userutils";
 const fooGz = await compress("Hello, World!", "gzip");
 const barGz = await compress("Hello, World!".repeat(20), "gzip");
 
-// not as efficient with short strings but can save quite a lot of space with larger strings:
+// not as efficient with short strings but can save quite a lot of space with larger strings, see the difference between these two:
 console.log(fooGz); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVEEANDDSuwNAAAA"
 console.log(barGz); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVH0GJkcAKOPcmYEAQAA"
 
@@ -2082,11 +2092,13 @@ console.log(barDeflate); // "eJzzSM3JyddRCM8vyklR9BiZHAAIEVg1"
 ### decompress()
 Signatures:  
 ```ts
+// return as a string:
 decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
+// return as an ArrayBuffer / Uint8Array:
 decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
 ```
   
-Decompresses a string or ArrayBuffer that has been previously [compressed](#compress) using the specified compression format. Most browsers should support at least `gzip` and `deflate`  
+Decompresses a base64 string or ArrayBuffer that has been previously [compressed](#compress) using the specified [compression format](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream/CompressionStream#format). Most browsers should support at least `gzip`, `deflate` and `deflate-raw`.  
 The `outputType` dictates which format the output will be in. It will default to `string` if left undefined.  
   
 ⚠️ You need to provide the `@grant unsafeWindow` directive if you are using the `string` output type or you will get a TypeError.  
@@ -2103,7 +2115,7 @@ console.log(compressed); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVH0GJkcAKOPcmYEAQAA"
 
 const decompressed = await decompress(compressed, "gzip");
 
-console.log(decompressed); // "Hello, World!"
+console.log(decompressed); // "Hello, World!" * 20
 ```
 </details>
 
