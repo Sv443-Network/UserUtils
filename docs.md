@@ -2671,6 +2671,8 @@ The function should return the transformed string synchronously and will be call
 The generic `TTrKey` can be used to enforce type safety for the keys.  
 You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
   
+For more examples, check out the predefined transforms in the file [`lib/translation.ts`](./lib/translation.ts)
+  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
@@ -2769,6 +2771,8 @@ Currently available transforms:
 | :-- | :-- | :-- |
 | `templateLiteral` | `${key}` | Keyed / Positional |
 | `percent` | `%n` | Positional |
+
+For more examples, check out the predefined transforms in the file [`lib/translation.ts`](./lib/translation.ts)
 
 <details><summary><b>Example - click to view</b></summary>
 

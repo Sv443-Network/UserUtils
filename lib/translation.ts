@@ -401,31 +401,33 @@ const templateLiteralTransform: TransformTuple<string> = [
 
 /**
  * This transform will replace `%n` placeholders with the value of the passed arguments.  
- * The `%n` placeholders are 1-indexed, meaning `%1` will be replaced by the first argument, `%2` by the second, and so on.  
+ * The `%n` placeholders are 1-indexed, meaning `%1` will be replaced by the first argument (index 0), `%2` by the second (index 1), and so on.  
  * Objects will be stringified via `String()` before being inserted.  
  *   
  * @example ```ts
-* tr.addTranslations("en", {
-*  "greeting": "Hello, %1!\nYou have %2 notifications.",
-* });
-* tr.addTransform(tr.transforms.percent);
-* 
-* const t = tr.use("en");
-* 
-* // arguments are inserted in the order they're passed:
-* t("greeting", "John", 5); // "Hello, John!\nYou have 5 notifications."
-* 
-* // when a value isn't found, the placeholder will be left as-is:
-* t("greeting", "John"); // "Hello, John!\nYou have %2 notifications."
-* ```
-*/
+ * tr.addTranslations("en", {
+ *  "greeting": "Hello, %1!\nYou have %2 notifications.",
+ * });
+ * tr.addTransform(tr.transforms.percent);
+ * 
+ * const t = tr.use("en");
+ * 
+ * // arguments are inserted in the order they're passed:
+ * t("greeting", "John", 5); // "Hello, John!\nYou have 5 notifications."
+ * 
+ * // when a value isn't found, the placeholder will be left as-is:
+ * t("greeting", "John"); // "Hello, John!\nYou have %2 notifications."
+ * ```
+ */
 const percentTransform: TransformTuple<string> = [
-  /\$\{([a-zA-Z0-9$_-]+)\}/gm,
+  /%(\d+)/gm,
   ({ matches, trArgs, trValue }) => {
     let str = String(trValue);
 
     for(const match of matches) {
-      const repl = match[1] !== undefined ? (trArgs[0] as Record<string, string>)[match[1]] : undefined;
+      const repl = match[1] !== undefined
+        ? (trArgs as Stringifiable[])?.[Number(match[1]) - 1]
+        : undefined;
       if(typeof repl !== "undefined")
         str = str.replace(match[0], String(repl));
     }
