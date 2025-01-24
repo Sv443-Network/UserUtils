@@ -1846,7 +1846,7 @@ debounce<
   fn: TFunc,
   timeout?: number,
   type?: "immediate" | "idle"
-): TFunc
+): TFunc & { debouncer: Debouncer }
 ```
   
 A standalone function that debounces a given function to prevent it from being executed too often.  
