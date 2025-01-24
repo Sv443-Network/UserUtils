@@ -5,14 +5,25 @@
 
 import type { Prettify, Stringifiable } from "./types.js";
 
+/** Any value that is list-like, i.e. has a numeric length, count or size property */
+export type ListWithLength = unknown[] | NodeList | { length: number } | { count: number } | { size: number };
+
 /**
  * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
- * @param num If this is an array or NodeList, the amount of items is used
+ * @param num A number, or list-like value that has either a `length`, `count` or `size` property - does not support iterables
  */
-export function autoPlural(word: Stringifiable, num: number | unknown[] | NodeList): string {
-  if(Array.isArray(num) || num instanceof NodeList)
-    num = num.length;
+export function autoPlural(word: Stringifiable, num: number | ListWithLength): string {
+  if(typeof num !== "number") {
+    if(Array.isArray(num) || num instanceof NodeList)
+      num = num.length;
+    else if("length" in num)
+      num = num.length;
+    else if("count" in num)
+      num = num.count;
+    else if("size" in num)
+      num = num.size;
+  }
   return `${word}${num === 1 ? "" : "s"}`;
 }
 

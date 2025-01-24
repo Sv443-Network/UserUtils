@@ -91,6 +91,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`Prettify`](#prettify) - expands a complex type into a more readable format while keeping functionality the same
     - [`ValueGen`](#valuegen) - a "generator" value that allows for super flexible value typing and declaration
     - [`StringGen`](#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
+    - [`ListWithLength`](#listwithlength) - represents an array or object with a numeric `length`, `count` or `size` property
 
 <br><br>
 
@@ -1930,13 +1931,14 @@ debouncedFunction.debouncer.on("change", (timeout, type) => {
 ### autoPlural()
 Signature:  
 ```ts
-autoPlural(str: string, num: number | Array | NodeList): string
+autoPlural(str: string, num: number | Array | NodeList | { length: number } | { count: number } | { size: number }): string
 ```
   
 Crudely pluralizes a string by appending an `s` if the given number is not 1.  
-If an array or NodeList is passed, the amount of contained items will be used.  
-
-Of course some English words go from `-y` to `-ies`, in which case this function will not work.  
+If an array or NodeList or object with either a `length`, `count` or `size` property is passed, the amount of contained items will be used.  
+Iterables will not work until converted to an array (with `Array.from()` or `[...iterable]`).  
+  
+Some English words go from `-y` to `-ies`. Using this function in that case will not work.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -3149,6 +3151,40 @@ Remember that [`Stringifiable`](#stringifiable) is a type that describes a value
   
 Contrary to [`ValueGen`](#valuegen), this type allows for specifying a union of strings that the StringGen should yield, as long as it is loosely typed as just `string`.  
 Use it in the [`consumeStringGen()`](#consumestringgen) function to convert the given StringGen value to a plain string. Also refer to that function for an example.
+
+<br>
+
+### ListWithLength
+Represents a value that is either an array, NodeList, or any other object that has a numeric `length`, `count` or `size` property.  
+Iterables are not included because they don't have a length property. They need to be converted to an array first using `Array.from()` or `[...iterable]`.  
+
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import type { ListWithLength } from "@sv443-network/userutils";
+
+function getSize(list: ListWithLength) {
+  let size = -1;
+  if("length" in list)
+    size = list.length;
+  else if("count" in list)
+    size = list.count;
+  else if("size" in list)
+    size = list.size;
+
+  return size;
+}
+
+getSize([1, 2, 3]); // 3
+getSize(document.querySelectorAll("div")); // 5
+getSize(new Map([["a", 1], ["b", 2]])); // 2
+getSize({ count: 42 }); // 42
+
+// iterables need to be converted:
+const iter = new Map([["a", 1]]).entries();
+getSize([...iter]); // 1
+```
+</details>
 
 <br><br><br><br>
 

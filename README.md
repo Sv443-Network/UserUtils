@@ -102,6 +102,7 @@ View the documentation of previous major releases:
     - [`Prettify`](./docs.md#prettify) - expands a complex type into a more readable format while keeping functionality the same
     - [`ValueGen`](./docs.md#valuegen) - a "generator" value that allows for super flexible value typing and declaration
     - [`StringGen`](./docs.md#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
+    - [`ListWithLength`](./docs.md#listwithlength) - represents an array or object with a numeric `length`, `count` or `size` property
 
 <br><br>
 
