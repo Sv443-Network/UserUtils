@@ -4,10 +4,11 @@
 
 <!-- #region Preamble -->
 ## Preamble:
-This library is written in TypeScript and contains builtin TypeScript declarations.  
+This library is written in TypeScript and contains builtin TypeScript declarations, but it will also work in plain JavaScript after removing the `: type` annotations.  
   
 Each feature has example code that can be expanded by clicking on the text "Example - click to view".  
-The signatures and examples are written in TypeScript and use ESM import syntax, but the library can also be used in plain JavaScript after removing the type annotations (and changing the imports if you are using CommonJS or the global declaration).  
+The signatures and examples are written in TypeScript and use ESM import syntax to show you which types need to be provided and will be returned.  
+The library itself supports importing an ESM, CommonJS or global variable definition bundle, depending on your use case.  
   
 If the signature section contains multiple signatures of the function, each occurrence represents an overload and you can choose which one you want to use.  
 They will also be further explained in the description below that section.  
@@ -1932,8 +1933,10 @@ Signature:
 autoPlural(str: string, num: number | Array | NodeList): string
 ```
   
-Automatically pluralizes a string if the given number is not 1.  
+Crudely pluralizes a string by appending an `s` if the given number is not 1.  
 If an array or NodeList is passed, the amount of contained items will be used.  
+
+Of course some English words go from `-y` to `-ies`, in which case this function will not work.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1986,9 +1989,9 @@ fetchAdvanced(input: string | Request | URL, options?: {
 }): Promise<Response>
 ```
   
-A drop-in replacement for the native `fetch()` function that adds options like a timeout property.  
+A drop-in replacement for the native `fetch()` function that adds a timeout property.  
 The timeout will default to 10 seconds if left undefined. Set it to a negative number to disable the timeout.  
-Pass an [AbortController's signal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to the `signal` property to be able to abort the request before it finishes or the timeout kicks in.  
+Pass an [AbortController's signal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to the `signal` property to be able to abort the request manually in addition to the automatic timeout.  
   
 <details><summary><b>Example - click to view</b></summary>
 
