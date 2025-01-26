@@ -826,10 +826,10 @@ Signature:
 setInnerHtmlUnsafe(element: Element, html: string): Element
 ```
   
-Sets the innerHTML property of the provided element without any sanitation or validation.  
+Sets the innerHTML property of the provided element ***without any sanitization or validation.***  
 Makes use of the [Trusted Types API](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) to trick the browser into thinking the HTML is safe.  
 Use this function if the page makes use of the CSP directive `require-trusted-types-for 'script'` and throws a "This document requires 'TrustedHTML' assignment" error on Chromium-based browsers.  
-If the browser doesn't support Trusted Types, this function will fall back to regular innerHTML assignment.  
+If the browser doesn't support Trusted Types, this function will fall back to regular assignment via `innerHTML`.  
   
 ⚠️ This function does not perform any sanitization, it only tricks the browser into thinking the HTML is safe and should thus be used with utmost caution, as it can easily cause XSS vulnerabilities!  
 A much better way of doing this is by using the [DOMPurify](https://github.com/cure53/DOMPurify#what-about-dompurify-and-trusted-types) library to create your own Trusted Types policy that *actually* sanitizes the HTML and prevents (most) XSS attack vectors.  
@@ -1931,14 +1931,21 @@ debouncedFunction.debouncer.on("change", (timeout, type) => {
 ### autoPlural()
 Signature:  
 ```ts
-autoPlural(str: string, num: number | Array | NodeList | { length: number } | { count: number } | { size: number }): string
+autoPlural(
+  str: string,
+  num: number | Array | NodeList | { length: number } | { count: number } | { size: number },
+  pluralType?: "auto" | "-s" | "-ies"
+): string
 ```
   
-Crudely pluralizes a string by appending an `s` if the given number is not 1.  
+Pluralizes a string if the given number is not 1.  
 If an array or NodeList or object with either a `length`, `count` or `size` property is passed, the amount of contained items will be used.  
 Iterables will not work until converted to an array (with `Array.from()` or `[...iterable]`).  
   
-Some English words go from `-y` to `-ies`. Using this function in that case will not work.  
+If `pluralType` is set to `"auto"` (default), the function will try to guess the correct plural form.  
+If set to `-s`, the string will always be pluralized with an `s`.  
+If set to `-ies`, the string will be pluralized by removing the last character and adding `ies`.  
+If set to anything else, the word will be returned as-is.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1954,6 +1961,16 @@ autoPlural("element", document.querySelectorAll("*"));    // "elements"
 
 const items = [1, 2, 3, 4, "foo", "bar"];
 console.log(items.length, autoPlural("item", items)); // "6 items"
+
+// pluralType = "auto" switches pluralization suffix when the word ends with -y:
+autoPlural("category", 1); // "category"
+autoPlural("category", 2); // "categories"
+
+// can also be forced to pluralize with one or the other:
+autoPlural("category", 1, "-s"); // "category"
+autoPlural("category", 2, "-s"); // "categorys"
+autoPlural("apple", 1, "-ies");  // "apply"
+autoPlural("apple", 2, "-ies");  // "applies"
 ```
 </details>
 
@@ -2017,6 +2034,7 @@ fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
   console.error("Fetch error:", err);
 });
 
+// can also be aborted manually before the timeout is reached:
 document.querySelector("button#cancel")?.addEventListener("click", () => {
   abort();
 });
@@ -2228,7 +2246,7 @@ ValueGen allows for tons of flexibility in how the value can be obtained. Callin
 import { consumeGen, type ValueGen } from "@sv443-network/userutils";
 
 async function doSomething(value: ValueGen<number>) {
-  // type gets inferred as `number` because above `value` is typed as a ValueGen<number>
+  // type gets inferred as `number` because `value` is typed as a `ValueGen<number>` above
   const finalValue = await consumeGen(value);
   console.log(finalValue);
 }
@@ -2239,7 +2257,7 @@ doSomething(() => 42);
 doSomething(Promise.resolve(42));
 doSomething(async () => 42);
 
-// throws a typescript error:
+// throws a TS error:
 doSomething("foo");
 ```
 
@@ -2284,7 +2302,7 @@ new MyTextPromptThing(() => myText);
 new MyTextPromptThing(Promise.resolve(myText));
 new MyTextPromptThing(async () => myText);
 
-// throws a typescript error:
+// throws a TS error:
 new MyTextPromptThing(420);
 ```
 
@@ -2392,7 +2410,7 @@ console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
 <!-- #region Translation -->
 ## Translation:
 This is a very lightweight translation function that can be used to translate simple strings.  
-TODO: Pluralization is not supported but can be achieved manually by adding variations to the translations, identified by a different suffix. See the example section of [`tr.addTranslations()`](#traddtranslations) for an example on how this might be done.
+Pluralization is not supported out of the box, but can be achieved manually by adding a suffix to the translation keys. See the example section of [`tr.addTranslations()`](#traddtranslations) for an example on how this might be done.
 
 <br>
 
@@ -2518,20 +2536,33 @@ const trEn = {
   hello: "Hello, World!",
   nested: {
     key: "This is a nested key",
+    apples_1: "There is 1 apple",
+    apples_n: "There are %1 apples",
   },
   "foo.bar": "This key isn't nested, it just has a dot",
 };
+
+tr.addTransform(tr.transforms.percent);
 
 tr.addTranslations("en", trEn);
 
 // full type safety and autocomplete
 // LooseUnion is used so there's still autocomplete but you can supply any string as the translation key
-// this can be useful if you have some custom keys that don't adhere to the strict typing, like adding a pluralization suffix
+// this can be useful if you have some custom keys that don't adhere to the strict typing, like the pluralization suffix in this case
 const t = tr.use<LooseUnion<TrKeys<typeof trEn>>>("de");
+
+/** Translates a key with pluralization support */
+function tp(key: string, num: number, ...args: Stringifiable[]) {
+  const plSuffix = num === 1 ? "1" : "n";
+  return t(`${key}_${plSuffix}`, ...args);
+}
 
 t("hello");      // "Hello, World!"
 t("nested.key"); // "This is a nested key"
 t("foo.bar");    // "This key isn't nested, it just has a dot"
+
+tp("nested.apples", 1); // "There is 1 apple"
+tp("nested.apples", 5); // "There are 5 apples"
 ```
 </details>
 
@@ -3059,6 +3090,8 @@ Supports unions of strings, numbers and objects.
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
+import type { LooseUnion } from "@sv443-network/userutils";
+
 function foo(bar: LooseUnion<"a" | "b" | "c">) {
   console.log(bar);
 }
@@ -3087,6 +3120,8 @@ It will also make a variable show its type's structure instead of just the type 
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
+import type { Prettify } from "@sv443-network/userutils";
+
 // tooltip shows all constituent types, leaving you to figure it out yourself:
 // type Foo = {
 //   a: number;
