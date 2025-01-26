@@ -58,29 +58,31 @@ export type FetchAdvancedOpts = Prettify<
 /** Calls the fetch API with special options like a timeout */
 export async function fetchAdvanced(input: string | RequestInfo | URL, options: FetchAdvancedOpts = {}): Promise<Response> {
   const { timeout = 10000 } = options;
-  const { signal, abort } = new AbortController();
+  const ctl = new AbortController();
 
-  options.signal?.addEventListener("abort", abort);
+  const { signal, ...restOpts } = options;
 
-  let signalOpts: Partial<RequestInit> = {},
+  signal?.addEventListener("abort", () => ctl.abort());
+
+  let sigOpts: Partial<RequestInit> = {},
     id: ReturnType<typeof setTimeout> | undefined = undefined;
 
   if(timeout >= 0) {
-    id = setTimeout(() => abort(), timeout);
-    signalOpts = { signal };
+    id = setTimeout(() => ctl.abort(), timeout);
+    sigOpts = { signal: ctl.signal };
   }
 
   try {
     const res = await fetch(input, {
-      ...options,
-      ...signalOpts,
+      ...restOpts,
+      ...sigOpts,
     });
-    id && clearTimeout(id);
+    typeof id !== "undefined" && clearTimeout(id);
     return res;
   }
   catch(err) {
-    id && clearTimeout(id);
-    throw err;
+    typeof id !== "undefined" && clearTimeout(id);
+    throw new Error("Error while calling fetch", { cause: err });
   }
 }
 
