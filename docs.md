@@ -2911,7 +2911,7 @@ lightenColor(color: string, percent: number, upperCase?: boolean): string
   
 Lightens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
 Will not exceed the maximum range (00-FF or 0-255).  
-If the `upperCase` parameter is set to true (default is false), the output will be in uppercase.  
+If the `upperCase` parameter is set to true (default is false), the hex output will be in uppercase.  
 Throws an error if the color format is invalid or not supported.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2919,8 +2919,8 @@ Throws an error if the color format is invalid or not supported.
 ```ts
 import { lightenColor } from "@sv443-network/userutils";
 
-lightenColor("#ff0000", 20);              // "#ff3333"
-lightenColor("#ff0000", 20, true);        // "#FF3333"
+lightenColor("#ff0000", 20);                // "#ff3333"
+lightenColor("#ff0000", 20, true);          // "#FF3333"
 lightenColor("rgb(0, 255, 0)", 50);       // "rgb(128, 255, 128)"
 lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
 ```
@@ -2936,7 +2936,7 @@ darkenColor(color: string, percent: number, upperCase?: boolean): string
   
 Darkens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
 Will not exceed the maximum range (00-FF or 0-255).  
-If the `upperCase` parameter is set to true (default is false), the output will be in uppercase.  
+If the `upperCase` parameter is set to true (default is false), the hex output will be in uppercase.  
 Throws an error if the color format is invalid or not supported.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -2944,8 +2944,8 @@ Throws an error if the color format is invalid or not supported.
 ```ts
 import { darkenColor } from "@sv443-network/userutils";
 
-darkenColor("#ff0000", 20);              // "#cc0000"
-darkenColor("#ff0000", 20, true);        // "#CC0000"
+darkenColor("#ff0000", 20);                // "#cc0000"
+darkenColor("#ff0000", 20, true);          // "#CC0000"
 darkenColor("rgb(0, 255, 0)", 50);       // "rgb(0, 128, 0)"
 darkenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(0, 128, 0, 0.5)"
 ```
@@ -2962,7 +2962,7 @@ They don't alter the runtime behavior of the code, but they can be used to make 
 This type describes any value that either is a string itself or can be converted to a string.  
 To be considered stringifiable, the object needs to have a `toString()` method that returns a string.  
 Most primitives have this method, but something like undefined or null does not (they can only be used in the `String()` constructor or string interpolation).  
-Having this method allows not just explicit conversion by calling it, but also implicit conversion by passing it into the `String()` constructor or by interpolating it in a template string.  
+Having this method allows not just explicit conversion by using `.toString()`, but also implicit conversion by passing it into the `String()` constructor or interpolating it in a template literal string.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -2970,7 +2970,7 @@ Having this method allows not just explicit conversion by calling it, but also i
 import type { Stringifiable } from "@sv443-network/userutils";
 
 function logSomething(value: Stringifiable) {
-  console.log(`Log: ${value}`); // implicit conversion to a string
+  console.log(`Log: ${value}`); // implicit conversion
 }
 
 const fooObject = {
@@ -3101,21 +3101,21 @@ type Foo = {
   c: boolean;
 }, "c">;
 
-// tooltip shows just the type name:
+// tooltip shows just the type name, making you manually traverse to the type definition:
 // const foo: Foo
 const foo: Foo = {
   a: 1,
   b: "2"
 };
 
-// tooltip shows the actual type structure:
+// now with Prettify, the tooltips show the actual type structure:
+
 // type Bar = {
 //   a: number;
 //   b: string;
 // }
 type Bar = Prettify<Foo>;
 
-// tooltip again shows the actual type structure:
 // const bar: {
 //   a: number;
 //   b: string;
