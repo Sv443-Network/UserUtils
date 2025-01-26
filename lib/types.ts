@@ -44,3 +44,6 @@ export type NonEmptyString<TString extends string> = TString extends "" ? never 
 export type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
+
+/** Any value that is list-like, i.e. has a numeric length, count or size property */
+export type ListWithLength = unknown[] | NodeList | { length: number } | { count: number } | { size: number };

@@ -3,17 +3,18 @@
  * This module contains miscellaneous functions that don't fit in another category - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#misc)
  */
 
-import type { Prettify, Stringifiable } from "./types.js";
+import type { ListWithLength, Prettify, Stringifiable } from "./types.js";
 
-/** Any value that is list-like, i.e. has a numeric length, count or size property */
-export type ListWithLength = unknown[] | NodeList | { length: number } | { count: number } | { size: number };
+/** Which plural form to use when auto-pluralizing */
+export type PluralType = "auto" | "-s" | "-ies";
 
 /**
  * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1
  * @param word A word in singular form, to auto-convert to plural
  * @param num A number, or list-like value that has either a `length`, `count` or `size` property - does not support iterables
+ * @param pluralType Which plural form to use when auto-pluralizing. Defaults to `auto`, which removes the last char and uses `-ies` for words ending in `y` and simply appends `-s` for all other words
  */
-export function autoPlural(word: Stringifiable, num: number | ListWithLength): string {
+export function autoPlural(word: Stringifiable, num: number | ListWithLength, pluralType: PluralType = "auto"): string {
   if(typeof num !== "number") {
     if(Array.isArray(num) || num instanceof NodeList)
       num = num.length;
@@ -24,7 +25,20 @@ export function autoPlural(word: Stringifiable, num: number | ListWithLength): s
     else if("size" in num)
       num = num.size;
   }
-  return `${word}${num === 1 ? "" : "s"}`;
+
+  const pType: Exclude<PluralType, "auto"> = pluralType === "auto"
+    ? String(word).endsWith("y") ? "-ies" : "-s"
+    : pluralType;
+
+  // return `${word}${num === 1 ? "" : "s"}`;
+  switch(pType) {
+  case "-s":
+    return `${word}${num === 1 ? "" : "s"}`;
+  case "-ies":
+    return `${String(word).slice(0, -1)}${num === 1 ? "y" : "ies"}`;
+  default:
+    return String(word);
+  }
 }
 
 /**
