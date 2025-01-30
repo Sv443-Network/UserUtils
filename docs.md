@@ -1932,7 +1932,7 @@ debouncedFunction.debouncer.on("change", (timeout, type) => {
 Signature:  
 ```ts
 autoPlural(
-  str: string,
+  term: string,
   num: number | Array | NodeList | { length: number } | { count: number } | { size: number },
   pluralType?: "auto" | "-s" | "-ies"
 ): string
@@ -1952,21 +1952,22 @@ If set to anything else, the word will be returned as-is.
 ```ts
 import { autoPlural } from "@sv443-network/userutils";
 
-autoPlural("item", 0); // "items"
-autoPlural("item", 1); // "item"
-autoPlural("item", 2); // "items"
+autoPlural("red apple", 0); // "red apples"
+autoPlural("red apple", 1); // "red apple"
+autoPlural("red apple", 2); // "red apples"
 
+// The default `pluralType` ("auto") switches suffix when the word ends with y:
+autoPlural("category", 1); // "category"
+autoPlural("category", 2); // "categories"
+
+// The passed `num` object just needs to have a numeric length, count or size property:
 autoPlural("element", document.querySelectorAll("html")); // "element"
 autoPlural("element", document.querySelectorAll("*"));    // "elements"
 
 const items = [1, 2, 3, 4, "foo", "bar"];
 console.log(items.length, autoPlural("item", items)); // "6 items"
 
-// pluralType = "auto" switches pluralization suffix when the word ends with -y:
-autoPlural("category", 1); // "category"
-autoPlural("category", 2); // "categories"
-
-// can also be forced to pluralize with one or the other:
+// And you can also force pluralization with one or the other if needed:
 autoPlural("category", 1, "-s"); // "category"
 autoPlural("category", 2, "-s"); // "categorys"
 autoPlural("apple", 1, "-ies");  // "apply"
