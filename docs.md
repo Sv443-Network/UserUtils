@@ -1932,13 +1932,13 @@ debouncedFunction.debouncer.on("change", (timeout, type) => {
 Signature:  
 ```ts
 autoPlural(
-  term: string,
+  term: Stringifiable,
   num: number | Array | NodeList | { length: number } | { count: number } | { size: number },
   pluralType?: "auto" | "-s" | "-ies"
 ): string
 ```
   
-Pluralizes a string if the given number is not 1.  
+Pluralizes a [Stringifiable value](#stringifiable) if the given number is not 1.  
 If an array or NodeList or object with either a `length`, `count` or `size` property is passed, the amount of contained items will be used.  
 Iterables will not work until converted to an array (with `Array.from()` or `[...iterable]`).  
   
@@ -1959,6 +1959,10 @@ autoPlural("red apple", 2); // "red apples"
 // The default `pluralType` ("auto") switches suffix when the word ends with y:
 autoPlural("category", 1); // "category"
 autoPlural("category", 2); // "categories"
+
+// Stringifiable objects are also accepted:
+autoPlural({ toString: () => "category" }, 2); // "categories"
+autoPlural(new Map<unknown, unknown>(), 2);    // "[object Map]s"
 
 // The passed `num` object just needs to have a numeric length, count or size property:
 autoPlural("element", document.querySelectorAll("html")); // "element"
@@ -2993,7 +2997,7 @@ They don't alter the runtime behavior of the code, but they can be used to make 
 ### Stringifiable
 This type describes any value that either is a string itself or can be converted to a string.  
 To be considered stringifiable, the object needs to have a `toString()` method that returns a string.  
-Most primitives have this method, but something like undefined or null does not (they can only be used in the `String()` constructor or string interpolation).  
+Most primitives have this method, but something like undefined or null does not.  
 Having this method allows not just explicit conversion by using `.toString()`, but also implicit conversion by passing it into the `String()` constructor or interpolating it in a template literal string.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -3018,8 +3022,10 @@ logSomething(42);        // "Log: 42"
 logSomething(true);      // "Log: true"
 logSomething(Symbol(1)); // "Log: Symbol(1)"
 logSomething(fooObject); // "Log: hello world"
+logSomething(barObject); // "Log: [object Object]"
+logSomething(new Map()); // "Log: [object Map]"
 
-logSomething(barObject); // Type error
+logSomething(undefined); // Type error
 ```
 </details>
 
