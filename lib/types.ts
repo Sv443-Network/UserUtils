@@ -46,4 +46,4 @@ export type Prettify<T> = {
 } & {};
 
 /** Any value that is list-like, i.e. has a numeric length, count or size property */
-export type ListWithLength = unknown[] | NodeList | { length: number } | { count: number } | { size: number };
+export type ListWithLength = { length: number } | { count: number } | { size: number };

@@ -9,28 +9,30 @@ import type { ListWithLength, Prettify, Stringifiable } from "./types.js";
 export type PluralType = "auto" | "-s" | "-ies";
 
 /**
- * Automatically appends an `s` to the passed {@linkcode word}, if {@linkcode num} is not equal to 1
- * @param word A word in singular form, to auto-convert to plural
- * @param num A number, or list-like value that has either a `length`, `count` or `size` property - does not support iterables
- * @param pluralType Which plural form to use when auto-pluralizing. Defaults to `auto`, which removes the last char and uses `-ies` for words ending in `y` and simply appends `-s` for all other words
+ * Automatically pluralizes the given string an `-s` or `-ies` to the passed {@linkcode term}, if {@linkcode num} is not equal to 1.  
+ * By default, words ending in `-y` will have it replaced with `-ies`, and all other words will simply have `-s` appended.  
+ * If {@linkcode num} resolves to NaN or the {@linkcode pluralType} is wrong, it defaults to the {@linkcode pluralType} `auto` and sets {@linkcode num} to 2.
+ * @param term The term, written in singular form, to auto-convert to plural form
+ * @param num A number, or list-like value that has either a `length`, `count` or `size` property, like an array, Map or discord.js Collection - does not support iterables, they need to be converted to an array first
+ * @param pluralType Which plural form to use when auto-pluralizing. Defaults to `"auto"`, which removes the last char and uses `-ies` for words ending in `y` and simply appends `-s` for all other words
  */
 export function autoPlural(word: Stringifiable, num: number | ListWithLength, pluralType: PluralType = "auto"): string {
   if(typeof num !== "number") {
-    if(Array.isArray(num) || num instanceof NodeList)
+    if("length" in num)
       num = num.length;
-    else if("length" in num)
-      num = num.length;
-    else if("count" in num)
-      num = num.count;
     else if("size" in num)
       num = num.size;
+    else if("count" in num)
+      num = num.count;
   }
 
   const pType: Exclude<PluralType, "auto"> = pluralType === "auto"
     ? String(word).endsWith("y") ? "-ies" : "-s"
     : pluralType;
 
-  // return `${word}${num === 1 ? "" : "s"}`;
+  if(!["-s", "-ies"].includes(pType) || isNaN(num))
+    num = 2;
+
   switch(pType) {
   case "-s":
     return `${word}${num === 1 ? "" : "s"}`;
