@@ -2254,11 +2254,11 @@ benchmark(true, true);   // Generated 10k in 1054ms
 ### consumeGen()
 Signature:  
 ```ts
-consumeGen(valGen: ValueGen): 
+consumeGen(valGen: ValueGen<any>): Promise<any>
 ```
   
 Asynchronously turns a [`ValueGen`](#valuegen) into its final value.  
-ValueGen allows for tons of flexibility in how the value can be obtained. Calling this function will resolve the final value.  
+ValueGen allows for tons of flexibility in how the value can be obtained. Calling this function will resolve the final value, no matter in what form it was passed.  
   
 <details><summary><b>Example - click to view</b></summary>
 
