@@ -1,5 +1,20 @@
 # @sv443-network/userutils
 
+## 9.1.0
+
+### Minor Changes
+
+- eb20132: Added the type `ListWithLength` to represent an array or object with a numeric `length`, `count` or `size` property.
+- eb20132: Added `autoPlural()` support for generic objects with a numeric `length`, `count` or `size` property.
+- c9b13d8: Added `signal: AbortSignal` and `rejectOnAbort: boolean` params to `pauseFor()` to allow for cutting the pause short
+- c66324b: Support for words with `-y`/`-ies` extension in `autoPlural()`
+- c9b13d8: Added `getListLength()` function to resolve a value of the new `ListWithLength` type
+- c13e890: `autoPlural()` now defaults `pluralType` to `"auto"` and `num` to 2 if `pluralType` is invalid or `num` resolves to NaN
+
+### Patch Changes
+
+- 3f86215: Fixed fetchAdvanced error "'abort' called on an object that does not implement interface AbortController"
+
 ## 9.0.4
 
 ### Patch Changes
