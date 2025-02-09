@@ -66,22 +66,27 @@ View the documentation of previous major releases:
     - [`decompress()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#decompress) - decompress a previously compressed string
     - [`computeHash()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#computehash) - compute the hash / checksum of a string or ArrayBuffer
     - [`randomId()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomid) - generate a random ID of a given length and radix
+    - [`consumeGen()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#consumegen) - consumes a ValueGen and returns the value
+    - [`consumeStringGen()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#consumestringgen) - consumes a StringGen and returns the string
+    - [`getListLength()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#getlistlength) - get the length of any object with a numeric `length`, `count` or `size` property
 - **Arrays:**
     - [`randomItem()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomitemindex) - returns a tuple of a random item and its index from an array
     - [`takeRandomItem()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#takerandomitem) - returns a random item from an array and mutates it to remove the item
     - [`randomizeArray()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randomizearray) - returns a copy of the array with its items in a random order
 - **Translation:**
-    - [`tr()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#tr) - simple JSON-based translation system with placeholder and nesting support
-    - [`tr.forLang()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trforlang) - translate with the specified language instead of the currently active one
-    - [`tr.setLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trsetlanguage) - set the currently active language for translations
-    - [`tr.getLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trgetlanguage) - returns the currently active language
-    - [`tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#traddtranslations) - add a language and its translations
-    - [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trgettranslations) - returns the translations for the given language or the currently active one
-    - [`tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trdeletetranslations) - delete the translations for the given language or the active one
-    - [`tr.hasKey()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trhaskey) - check if a translation key exists for the given or active language
-    - [`tr.addTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#traddtransform) - add a transformation function to dynamically modify the translation value
-    - [`tr.deleteTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trdeletetransform) - delete a transformation function that was previously added
+    - [`tr.for()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trfor) - translates a key for the specified language
+    - [`tr.use()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#truse) - creates a translation function for the specified language
+    - [`tr.hasKey()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trhaskey) - checks if a key exists in the given language
+    - [`tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#traddtranslations) - add a flat or recursive translation object for a language
+    - [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trgettranslations) - returns the translation object for a language
+    - [`tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trdeletetranslations) - delete the translation object for a language
+    - [`tr.setFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
+    - [`tr.getFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trgetfallbacklanguage) - returns the fallback language
+    - [`tr.addTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+    - [`tr.deleteTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trdeletetransform) - removes a transform function
+    - [`tr.transforms`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - [`TrKeys`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
 - **Colors:**
     - [`hexToRgb()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
     - [`rgbToHex()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#rgbtohex) - convert RGB or RGBA values to a hex color string
