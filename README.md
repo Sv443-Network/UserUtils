@@ -71,6 +71,7 @@ View the documentation of previous major releases:
     - [`randomId()`](./docs.md#randomid) - generate a random ID of a given length and radix
     - [`consumeGen()`](./docs.md#consumegen) - consumes a ValueGen and returns the value
     - [`consumeStringGen()`](./docs.md#consumestringgen) - consumes a StringGen and returns the string
+    - [`getListLength()`](./docs.md#getlistlength) - get the length of any object with a numeric `length`, `count` or `size` property
   - [**Arrays:**](./docs.md#arrays)
     - [`randomItem()`](./docs.md#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](./docs.md#randomitemindex) - returns a tuple of a random item and its index from an array

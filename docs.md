@@ -60,6 +60,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`randomId()`](#randomid) - generate a random ID of a given length and radix
     - [`consumeGen()`](#consumegen) - consumes a ValueGen and returns the value
     - [`consumeStringGen()`](#consumestringgen) - consumes a StringGen and returns the string
+    - [`getListLength()`](#getlistlength) - get the length of any object with a numeric `length`, `count` or `size` property
   - [**Arrays:**](#arrays)
     - [`randomItem()`](#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
@@ -1984,10 +1985,12 @@ autoPlural("apple", 2, "-ies");  // "applies"
 ### pauseFor()
 Signature:  
 ```ts
-pauseFor(ms: number): Promise<void>
+pauseFor(time: number, abortSignal?: AbortSignal, rejectOnAbort?: boolean): Promise<void>
 ```
   
 Pauses async execution for a given amount of time.  
+If an [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) is passed, the pause will be cut short when the signal is aborted.  
+By default, this will resolve the promise, but you can set `rejectOnAbort` to true to reject it instead.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1996,8 +1999,20 @@ import { pauseFor } from "@sv443-network/userutils";
 
 async function run() {
   console.log("Hello");
+
   await pauseFor(3000); // waits for 3 seconds
+
   console.log("World");
+
+
+  // can also be cut short manually:
+
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 1000);
+
+  await pauseFor(2_147_483_647, controller.signal); // (maximum possible timeout)
+
+  console.log("This gets printed after just 1 second");
 }
 ```
 </details>
@@ -2022,26 +2037,26 @@ Pass an [AbortController's signal](https://developer.mozilla.org/en-US/docs/Web/
 ```ts
 import { fetchAdvanced } from "@sv443-network/userutils";
 
-const { signal, abort } = new AbortController();
+const controller = new AbortController();
 
-fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode", {
+fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode&format=json", {
   // times out after 5 seconds:
   timeout: 5000,
   // also accepts any other fetch options like headers and signal:
   headers: {
-    "Accept": "text/plain",
+    "Accept": "application/json",
   },
   // makes the request abortable:
-  signal,
+  signal: controller.signal,
 }).then(async (response) => {
-  console.log("Fetch data:", await response.text());
+  console.log("Fetch data:", await response.json());
 }).catch((err) => {
   console.error("Fetch error:", err);
 });
 
 // can also be aborted manually before the timeout is reached:
 document.querySelector("button#cancel")?.addEventListener("click", () => {
-  abort();
+  controller.abort();
 });
 ```
 </details>
@@ -2234,7 +2249,7 @@ benchmark(true, true);   // Generated 10k in 1054ms
 ```
 </details>
 
-<br><br>
+<br>
 
 ### consumeGen()
 Signature:  
@@ -2268,7 +2283,7 @@ doSomething("foo");
 
 </details>
 
-<br><br>
+<br>
 
 ### consumeStringGen()
 Signature:  
@@ -2311,6 +2326,39 @@ new MyTextPromptThing(async () => myText);
 new MyTextPromptThing(420);
 ```
 
+</details>
+
+<br>
+
+### getListLength()
+Signature:  
+```ts
+getListLength(obj: ListWithLength, zeroOnInvalid?: boolean): number
+```
+  
+Returns the length of the given list-like object (anything with a numeric `length`, `size` or `count` property, like an array, Map or NodeList).  
+Refer to [the ListWithLength type](#listwithlength) for more info.  
+  
+If the object doesn't have any of these properties, it will return 0 by default.  
+Set `zeroOnInvalid` to false to return NaN instead of 0 if the object doesn't have any of the properties.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { getListLength } from "@sv443-network/userutils";
+
+getListLength([1, 2, 3]); // 3
+getListLength("Hello, World!"); // 13
+getListLength(document.querySelectorAll("body")); // 1
+getListLength(new Map([["foo", "bar"], ["baz", "qux"]])); // 2
+getListLength({ size: 42 }); // 42
+
+// returns 0 by default:
+getListLength({ foo: "bar" }); // 0
+
+// can return NaN instead:
+getListLength({ foo: "bar" }, false); // NaN
+```
 </details>
 
 <br><br>

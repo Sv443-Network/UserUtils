@@ -9,7 +9,7 @@ import type { ListWithLength, Prettify, Stringifiable } from "./types.js";
 export type PluralType = "auto" | "-s" | "-ies";
 
 /**
- * Automatically pluralizes the given string an `-s` or `-ies` to the passed {@linkcode term}, if {@linkcode num} is not equal to 1.  
+ * Automatically pluralizes the given string by adding an `-s` or `-ies` to the passed {@linkcode term}, if {@linkcode num} is not equal to 1.  
  * By default, words ending in `-y` will have it replaced with `-ies`, and all other words will simply have `-s` appended.  
  * {@linkcode pluralType} will default to `auto` if invalid and {@linkcode num} is set to 2 if it resolves to `NaN`.
  * @param term The term, written in singular form, to auto-convert to plural form
@@ -17,20 +17,15 @@ export type PluralType = "auto" | "-s" | "-ies";
  * @param pluralType Which plural form to use when auto-pluralizing. Defaults to `"auto"`, which removes the last char and uses `-ies` for words ending in `y` and simply appends `-s` for all other words
  */
 export function autoPlural(term: Stringifiable, num: number | ListWithLength, pluralType: PluralType = "auto"): string {
-  if(typeof num !== "number") {
-    if("length" in num)
-      num = num.length;
-    else if("size" in num)
-      num = num.size;
-    else if("count" in num)
-      num = num.count;
-  }
+  let n = num;
+  if(typeof n !== "number")
+    n = getListLength(n, false);
 
   if(!["-s", "-ies"].includes(pluralType))
     pluralType = "auto";
 
-  if(isNaN(num))
-    num = 2;
+  if(isNaN(n))
+    n = 2;
 
   const pType: Exclude<PluralType, "auto"> = pluralType === "auto"
     ? String(term).endsWith("y") ? "-ies" : "-s"
@@ -38,9 +33,9 @@ export function autoPlural(term: Stringifiable, num: number | ListWithLength, pl
 
   switch(pType) {
   case "-s":
-    return `${term}${num === 1 ? "" : "s"}`;
+    return `${term}${n === 1 ? "" : "s"}`;
   case "-ies":
-    return `${String(term).slice(0, -1)}${num === 1 ? "y" : "ies"}`;
+    return `${String(term).slice(0, -1)}${n === 1 ? "y" : "ies"}`;
   default:
     return String(term);
   }
@@ -59,10 +54,18 @@ export function insertValues(input: string, ...values: Stringifiable[]): string 
   });
 }
 
-/** Pauses async execution for the specified time in ms */
-export function pauseFor(time: number): Promise<void> {
-  return new Promise<void>((res) => {
-    setTimeout(() => res(), time);
+/**
+ * Pauses async execution for the specified time in ms.  
+ * If an `AbortSignal` is passed, the pause will be aborted when the signal is triggered.  
+ * By default, this will resolve the promise, but you can set {@linkcode rejectOnAbort} to true to reject it instead.
+ */
+export function pauseFor(time: number, signal?: AbortSignal, rejectOnAbort = false): Promise<void> {
+  return new Promise<void>((res, rej) => {
+    const timeout = setTimeout(() => res(), time);
+    signal?.addEventListener("abort", () => {
+      clearTimeout(timeout);
+      rejectOnAbort ? rej(new Error("The pause was aborted")) : res();
+    });
   });
 }
 
@@ -143,4 +146,22 @@ export async function consumeStringGen<TStrUnion extends string>(strGen: StringG
           : strGen
       )
   ) as TStrUnion;
+}
+
+/**
+ * Returns the length of the given list-like object (anything with a numeric `length`, `size` or `count` property, like an array, Map or NodeList).  
+ * If the object doesn't have any of these properties, it will return 0 by default.  
+ * Set {@linkcode zeroOnInvalid} to false to return NaN instead of 0 if the object doesn't have any of the properties.
+ */
+export function getListLength(obj: ListWithLength, zeroOnInvalid = true): number {
+  // will I go to ternary hell for this?
+  return "length" in obj
+    ? obj.length
+    : "size" in obj
+      ? obj.size
+      : "count" in obj
+        ? obj.count
+        : zeroOnInvalid
+          ? 0
+          : NaN;
 }
