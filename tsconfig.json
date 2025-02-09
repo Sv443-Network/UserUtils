@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "target": "ES2018",
+    "target": "ES2016",
     "outDir": "dist/out",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
