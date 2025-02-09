@@ -170,7 +170,7 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 <br>
 
-- If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside a `.d.ts` file somewhere in the directory (or a subdirectory) defined in your `tsconfig.json`'s `baseUrl` option or `include` array:  
+- If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside any `.ts` file that is included in the final build:  
   
   ```ts
   declare const UserUtils: typeof import("@sv443-network/userutils");
