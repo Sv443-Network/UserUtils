@@ -1,7 +1,7 @@
 ## UserUtils
-Lightweight library with various utilities for userscripts - register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more.  
+General purpose DOM/GreaseMonkey library that allows you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more.  
 Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require`  
-The library also works in any DOM environment without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
+The library works in any DOM environment with or without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
   
@@ -139,9 +139,15 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
     // @require https://update.greasyfork.org/scripts/472956/UserUtils.js
     // @require https://openuserjs.org/src/libs/Sv443/UserUtils.js
     ```
-      
-    > **Note:**  
-    > In order for your userscript not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `8.3.2`) or the versioned URL that's shown at the top of the [GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
+
+- If you are using this library in a generic DOM environment without access to the GreaseMonkey API, either download the latest release from the [releases page](https://github.com/Sv443-Network/UserUtils/releases) to include in your project or add one of the following tags to the &lt;head&gt;:
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js"></script>
+    <script src="https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js"></script>
+    ```
+
+> **Note:**  
+> In order for your userscript not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `8.3.2`) or the versioned URL that's shown [at the top of the GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
 
 <br>
 
