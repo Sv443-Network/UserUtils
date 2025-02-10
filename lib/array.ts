@@ -46,9 +46,8 @@ export function randomizeArray<TItem = unknown>(array: TItem[]): TItem[] {
 
   // shamelessly stolen from https://javascript.info/task/shuffle
   for(let i = retArray.length - 1; i > 0; i--) {
-    const j = Math.floor((randRange(0, 10000) / 10000) * (i + 1));
-    // @ts-ignore
-    [retArray[i], retArray[j]] = [retArray[j], retArray[i]];
+    const j = Math.floor((Math.random() * (i + 1)));
+    [retArray[i], retArray[j]] = [retArray[j], retArray[i]] as [TItem, TItem];
   }
 
   return retArray;

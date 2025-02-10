@@ -81,6 +81,9 @@ export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-
  * @param randomCase If set to false, the generated ID will be lowercase only - also makes use of the `enhancedEntropy` parameter unless the output doesn't contain letters
  */
 export function randomId(length = 16, radix = 16, enhancedEntropy = false, randomCase = true): string {
+  if(radix < 2 || radix > 36)
+    throw new RangeError("The radix argument must be between 2 and 36");
+
   let arr: string[] = [];
   const caseArr = randomCase ? [0, 1] : [0];
 
