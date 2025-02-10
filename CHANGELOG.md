@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.1.1
+
+### Patch Changes
+
+- 157dacb: Fixed example code in tsdoc comments of translation functions
+
 ## 9.1.0
 
 ### Minor Changes
