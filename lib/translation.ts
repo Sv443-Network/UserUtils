@@ -27,7 +27,7 @@ import type { Stringifiable } from "./types.js";
  * };
  */
 export interface TrObject {
- [key: string]: string | TrObject;
+  [key: string]: string | TrObject;
 }
 
 /** Properties for the transform function that transforms a matched translation string into something else */
@@ -71,13 +71,13 @@ export type TrKeys<TTrObj, P extends string = ""> = {
 
 /** All translations loaded into memory */
 const trans: {
- [language: string]: TrObject;
+  [language: string]: TrObject;
 } = {};
 
 /** All registered value transformers */
 const valTransforms: Array<{
- regex: RegExp;
- fn: TransformFn;
+  regex: RegExp;
+  fn: TransformFn;
 }> = [];
 
 /** Fallback language - if undefined, the trKey itself will be returned if the translation is not found */
@@ -97,10 +97,10 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
 
   /** Apply all transforms that match the translation string */
   const transformTrVal = (trKey: TTrKey, trValue: string): string => {
-    const tfs = valTransforms.filter(({ regex }) => new RegExp(regex).test(trValue));
+    const tfs = valTransforms.filter(({ regex }) => new RegExp(regex).test(String(trValue)));
 
     if(tfs.length === 0)
-      return trValue;
+      return String(trValue);
 
     let retStr = String(trValue);
 
@@ -267,35 +267,42 @@ function getFallbackLanguage(): string | undefined {
  * After all %n-formatted values have been injected, the transform functions will be called sequentially in the order they were added.
  * @example
  * ```ts
- * tr.addTranslations("en", {
- *    "greeting": {
- *      "with_username": "Hello, ${USERNAME}",
- *      "headline_html": "Hello, ${USERNAME}<br><c=red>You have ${UNREAD_NOTIFS} unread notifications.</c>"
- *    }
- * });
+ * import { tr, type TrKeys } from "@sv443-network/userutils";
  * 
- * // replace ${PATTERN}
- * tr.addTransform(/<\$([A-Z_]+)>/g, ({ matches }) => {
+ * const transEn = {
+ *    "headline": {
+ *      "basic": "Hello, ${USERNAME}",
+ *      "html": "Hello, ${USERNAME}<br><c=red>You have ${UNREAD_NOTIFS} unread notifications.</c>"
+ *    }
+ * } as const;
+ * 
+ * tr.addTranslations("en", transEn);
+ * 
+ * // replace ${PATTERN} with predefined values
+ * tr.addTransform(/\$\{([A-Z_]+)\}/g, ({ matches }) => {
  *   switch(matches?.[1]) {
- *     default: return "<UNKNOWN_PATTERN>";
- *     // these would be grabbed from elsewhere in the application:
- *     case "USERNAME": return "JohnDoe45";
- *     case "UNREAD_NOTIFS": return 5;
+ *     default:
+ *       return `[UNKNOWN: ${matches?.[1]}]`;
+ *     // these would be grabbed from elsewhere in the application, like a DataStore, global state or variable:
+ *     case "USERNAME":
+ *       return "JohnDoe45";
+ *     case "UNREAD_NOTIFS":
+ *       return 5;
  *   }
  * });
  * 
- * // replace <c=red>...</c> with <span class="color red">...</span>
+ * // replace <c=red>...</c> with <span style="color: red;">...</span>
  * tr.addTransform(/<c=([a-z]+)>(.*?)<\/c>/g, ({ matches }) => {
  *   const color = matches?.[1];
  *   const content = matches?.[2];
  * 
- *   return "<span class=\"color " + color + "\">" + content + "</span>";
+ *   return `<span style="color: ${color};">${content}</span>`;
  * });
  * 
- * tr.setLanguage("en");
+ * const t = tr.use<TrKeys<typeof transEn>>("en");
  * 
- * tr("greeting.with_username"); // "Hello, JohnDoe45"
- * tr("greeting.headline"); // "<b>Hello, JohnDoe45</b>\nYou have 5 unread notifications."
+ * t("headline.basic"); // "Hello, JohnDoe45"
+ * t("headline.html");  // "Hello, JohnDoe45<br><span style="color: red;">You have 5 unread notifications.</span>"
  * ```
  * @param args A tuple containing the regular expression to match and the transform function to call if the pattern is found in a translation string
  */

@@ -2526,16 +2526,23 @@ You can pass the result of the generic type [`TrKeys`](#trkeys) to easily genera
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr } from "@sv443-network/userutils";
+import { tr, type TrKeys } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
+const transEn = {
   hello: "Hello, World!",
-});
+} as const;
 
-const t = tr.use("en");
+tr.addTranslations("en", transEn);
 
-// very concise and easy to use:
-t("hello"); // "Hello, World!"
+// to be loaded in from a DataStore or `navigator.language` or similar:
+let currentLanguage = "en";
+
+function greet() {
+  const t = tr.use<TrKeys<typeof transEn>>(currentLanguage);
+
+  // very concise and easy to use:
+  t("hello"); // "Hello, World!"
+}
 ```
 </details>
 
@@ -2593,7 +2600,7 @@ const trEn = {
     apples_n: "There are %1 apples",
   },
   "foo.bar": "This key isn't nested, it just has a dot",
-};
+} as const;
 
 tr.addTransform(tr.transforms.percent);
 
@@ -2691,11 +2698,11 @@ import { tr, type TrKeys, type LooseUnion } from "@sv443-network/userutils";
 const trEn = {
   hello: "Hello, World!",
   goodbye: "Goodbye, World!",
-};
+} as const;
 
 const trDe = {
   hello: "Hallo, Welt!",
-};
+} as const;
 
 tr.addTranslations("en", trEn);
 tr.addTranslations("de", trDe);
