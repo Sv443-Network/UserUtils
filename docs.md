@@ -785,7 +785,7 @@ const siblingsQuux = getSiblingsFrame(refElement, 3, "top", true);
 // <div>6</div>
 ```
 
-More useful examples:
+Example without a max boundary:
 
 ```ts
 const refElement = document.querySelector("#ref");
@@ -797,25 +797,31 @@ const refElement = document.querySelector("#ref");
 //     <div>4</div>
 //     <div>5</div>
 //     <div>6</div>
+//     <div>7</div>
+//     <div>8</div>
 // </div>
 
 // get all elements above and include the reference element:
-const allAbove = getSiblingsFrame(refElement, Infinity, "top", true);
+const allAbove = getSiblingsFrame(refElement, Infinity, "bottom", true);
 // <div>1</div>          ◄──┐ returned
 // <div>2</div>             │ frame
 // <div id="ref">3</div> ◄──┘
 // <div>4</div>
 // <div>5</div>
 // <div>6</div>
+// <div>7</div>
+// <div>8</div>
 
 // get all elements below and exclude the reference element:
-const allBelowExcl = getSiblingsFrame(refElement, Infinity, "bottom", false);
+const allBelowExcl = getSiblingsFrame(refElement, Infinity, "top", false);
 // <div>1</div>
 // <div>2</div>
 // <div id="ref">3</div>
-// <div>4</div>          ◄──┐ returned
-// <div>5</div>             │ frame
-// <div>6</div>          ◄──┘
+// <div>4</div>          ◄──┐
+// <div>5</div>             │ returned
+// <div>6</div>             │ frame
+// <div>7</div>             │
+// <div>8</div>          ◄──┘
 ```
 </details>
 
