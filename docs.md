@@ -840,7 +840,7 @@ If the browser doesn't support Trusted Types, this function will fall back to re
   
 ⚠️ This function does not perform any sanitization, it only tricks the browser into thinking the HTML is safe and should thus be used with utmost caution, as it can easily cause XSS vulnerabilities!  
 A much better way of doing this is by using the [DOMPurify](https://github.com/cure53/DOMPurify#what-about-dompurify-and-trusted-types) library to create your own Trusted Types policy that *actually* sanitizes the HTML and prevents (most) XSS attack vectors.  
-You can also find more info [here.](https://web.dev/articles/trusted-types#library)  
+You can also [find more info here](https://web.dev/articles/trusted-types#library) or see [this real world example.](https://github.com/Sv443/BetterYTM/blob/06da598/src/utils/dom.ts#L245)  
   
 <details><summary><b>Example - click to view</b></summary>
 
