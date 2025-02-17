@@ -2763,12 +2763,12 @@ The pattern should be a regular expression that matches the desired format in th
 The function should return the transformed string synchronously and will be called with a single object parameter that has the following properties:  
 | Property | Type | Description |
 | :-- | :-- | :-- |
-| `language` | string | The current or fallback language - empty string if both are not set |
-| `matches` | RegExpExecArray | All matches as returned by `RegExp.exec()` |
-| `trKey` | TTrKey | The translation key |
-| `trValue` | string | The translation value before any transformations |
-| `currentValue` | string | The current value, possibly in-between transformations |
-| `trArgs` | (Stringifiable \| Record<string, Stringifiable>)[] | The arguments that were passed to the translation function |
+| `language` | `string` | The current or fallback language - empty string if both are not set |
+| `matches` | `RegExpExecArray` | All matches as returned by `RegExp.exec()` |
+| `trKey` | `TTrKey` | The translation key |
+| `trValue` | `string` | The translation value before any transformations |
+| `currentValue` | `string` | The current value, possibly in-between transformations |
+| `trArgs` | `(Stringifiable \| Record<string, Stringifiable>)[]` | The arguments that were passed to the translation function |
   
 The generic `TTrKey` can be used to enforce type safety for the keys.  
 You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
