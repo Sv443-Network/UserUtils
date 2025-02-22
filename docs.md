@@ -1617,7 +1617,7 @@ interface MyEventMap {
 class MyClass extends NanoEmitter<MyEventMap> {
   constructor() {
     super({
-      // allow emitting events from outside the class:
+      // allow emitting events from outside the class body:
       publicEmit: true,
     });
 
@@ -1645,10 +1645,10 @@ myInstance.on("foo", (bar) => {
   console.log("foo event (outside):", bar);
 });
 
-// throws a TS error since `events` is protected:
+// throws a TS error since `events` is protected, but technically still works in JS:
 myInstance.events.emit("foo", "hello");
 
-// only works if publicEmit is set to true:
+// only works because publicEmit is set to true:
 myInstance.emit("baz", "hello from the outside");
 
 // remove all listeners:
@@ -1670,7 +1670,7 @@ interface MyEventMap {
 }
 
 const myEmitter = new NanoEmitter<MyEventMap>({
-  // allow emitting events from outside the class
+  // very important for functional usage - allow emitting events from outside the class body:
   publicEmit: true,
 });
 
