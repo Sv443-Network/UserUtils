@@ -59,6 +59,7 @@ export type DataStoreOptions<TData> = Prettify<
     storageMethod?: "GM" | "localStorage" | "sessionStorage";
   }
   & (
+    // make sure that encodeData and decodeData are *both* either defined or undefined
     | {
       /**
        * Function to use to encode the data prior to saving it in persistent storage.  
@@ -337,8 +338,6 @@ export class DataStore<TData extends object = object> {
 
     return JSON.parse(decRes ?? data) as TData;
   }
-
-  //#region misc
 
   /** Copies a JSON-compatible object and loses all its internal references in the process */
   protected deepCopy<T>(obj: T): T {
