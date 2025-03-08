@@ -541,7 +541,7 @@ Tries to use `GM.openInTab` to open the given URL in a new tab, or as a fallback
 If `background` is set to true, the tab will be opened in the background. Leave `undefined` to use the browser's default behavior.  
 If `additionalProps` is set and `GM.openInTab` is not available, the given properties will be added or overwritten on the created anchor element.  
   
-⚠️ Needs the `@grant GM.openInTab` directive, otherwise only the fallback behavior will be used and the warning below is extra important:  
+⚠️ You should add the `@grant GM.openInTab` directive, otherwise only the fallback behavior will be used and the warning below is extra important:  
 ⚠️ For the fallback to work, this function needs to be run in response to a user interaction event, else the browser might reject it.  
   
 <details><summary><b>Example - click to view</b></summary>
