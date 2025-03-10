@@ -38,6 +38,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`observeElementProp()`](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
     - [`getSiblingsFrame()`](#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
     - [`setInnerHtmlUnsafe()`](#setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+    - [`probeElementStyle()`](#probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
   - [**Math:**](#math)
     - [`clamp()`](#clamp) - constrain a number between a min and max value
     - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
@@ -853,6 +854,86 @@ setInnerHtmlUnsafe(myElement, "<img src='https://picsum.photos/100/100' />");   
 const myXssElement = document.querySelector("#my-xss-element");
 const userModifiableVariable = `<img onerror="alert('XSS!')" src="invalid" />`; // let's pretend this came from user input
 setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       // <- uses a user-modifiable variable, so big XSS risk!
+```
+</details>
+
+<br>
+
+### probeElementStyle()
+Signature:  
+```ts
+probeElementStyle<
+  TValue,
+  TElem extends HTMLElement = HTMLSpanElement,
+> (
+  probeStyle: (style: CSSStyleDeclaration, element: TElem) => TValue,
+  element?: TElem | (() => TElem),
+  hideOffscreen = true,
+): TValue
+```
+  
+Uses the provided element or the element returned by the provided function to probe its [computed style](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle) properties.  
+This might be useful for resolving the value behind a CSS variable, to get the default styles like the browser's default font size, etc.  
+This function can only be called after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+The `probeStyle` function will be called with the computed style object and the element as arguments.  
+Whatever it returns, will also be the return value of this function.  
+  
+`element` can be either an `HTMLElement` instance or a function that returns an `HTMLElement` instance.  
+It will default to a `<span>` element if not provided.  
+All elements will have the class `_uu_probe_element` added to them. You can add your own CSS to suit your needs.  
+  
+If `hideOffscreen` is set to true (default), the element will be moved offscreen to prevent it from being visible.  
+Set it to false if you want to probe the style props `position`, `left`, `top` and `zIndex`.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { probeElementStyle } from "@sv443-network/userutils";
+
+document.addEventListener("DOMContentLoaded", run);
+
+function run() {
+  // set a CSS variable and probe it:
+  document.documentElement.style.setProperty("--my-cool-color", "rgb(255, 127, 0)");
+
+  /**
+   * Probe on interval to wait until the value exists and has "settled"  
+   * Not really important for this example, but can be useful on pages with lots of loaded in or constantly changing scripts and styles
+   */
+  const tryResolveCol = (i = 0) => new Promise<string>((res, rej) => {
+    if(i > 100) // give up after ~10 seconds
+      return rej(new Error("Could not resolve color after 100 tries"));
+
+    // probedCol will be automatically typed as string:
+    const probedCol = probeElementStyle(
+      // probe the `style.backgroundColor` property:
+      (style, _element) => style.backgroundColor,
+      () => {
+        // create a new element but don't add it to the DOM:
+        const elem = document.createElement("span");
+        // specify the CSS variable here, so it will be resolved by the CSS engine and can be probed:
+        elem.style.backgroundColor = "var(--my-cool-color, #000)"; // default to black to keep the loop going until the color is resolved
+        return elem;
+      },
+      true,
+    );
+
+    // wait for the color to exist and not be white or black (again, might only be useful in some cases):
+    if(probedCol.length === 0 || probedCol.match(/^rgba?\((?:(?:255,\s?255,\s?255)|(?:0,\s?0,\s?0))/) || probedCol.match(/^#(?:fff(?:fff)?|000(?:000)?)/))
+      return setTimeout(async () => res(await tryResolveCol(++i)), 100); // try again every 100ms
+
+    return res(probedCol);
+  });
+
+  try {
+    const color = await tryResolveCol();
+    console.log("Resolved:", color); // "Resolved: rgb(255, 127, 0)"
+  }
+  catch(err) {
+    console.error(err);
+  }
+}
 ```
 </details>
 

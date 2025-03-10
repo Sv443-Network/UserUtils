@@ -272,3 +272,40 @@ export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(eleme
 
   return element;
 }
+
+/**
+ * Creates an invisible temporary element to probe its rendered style.  
+ * Has to be run after the `DOMContentLoaded` event has fired on the document object.
+ * @param probeStyle Function to probe the element's style. First argument is the element's style object from [`window.getComputedStyle()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle), second argument is the element itself
+ * @param element The element to probe, or a function that creates and returns the element - should not be added to the DOM prior to calling this function! - all probe elements will have the class `_uu_probe_element` added to them
+ * @param hideOffscreen Whether to hide the element offscreen, enabled by default - disable if you want to probe the position style properties of the element
+ * @returns The value returned by the `probeElement` function
+ */
+export function probeElementStyle<
+  TValue,
+  TElem extends HTMLElement = HTMLSpanElement,
+> (
+  probeStyle: (style: CSSStyleDeclaration, element: TElem) => TValue,
+  element?: TElem | (() => TElem),
+  hideOffscreen = true,
+): TValue {
+  const el = element
+    ? typeof element === "function" ? element() : element
+    : document.createElement("span") as TElem;
+
+  if(hideOffscreen) {
+    el.style.position = "absolute";
+    el.style.left = "-9999px";
+    el.style.top = "-9999px";
+    el.style.zIndex = "-9999";
+  }
+
+  el.classList.add("_uu_probe_element");
+  document.body.appendChild(el);
+
+  const style = window.getComputedStyle(el);
+  const result = probeStyle(style, el);
+
+  setTimeout(() => el.remove(), 1);
+  return result;
+}

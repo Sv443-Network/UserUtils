@@ -46,6 +46,7 @@ View the documentation of previous major releases:
     - [`observeElementProp()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
     - [`getSiblingsFrame()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
     - [`setInnerHtmlUnsafe()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+    - [`probeElementStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
 - **Math:**
     - [`clamp()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#clamp) - constrain a number between a min and max value
     - [`mapRange()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#maprange) - map a number from one range to the same spot in another range
