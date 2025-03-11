@@ -30,7 +30,7 @@ export function hexToRgb(hex: string): [red: number, green: number, blue: number
 
 /** Converts RGB or RGBA number values to a hex color string in the format `#RRGGBB` or `#RRGGBBAA` */
 export function rgbToHex(red: number, green: number, blue: number, alpha?: number, withHash = true, upperCase = false): string {
-  const toHexVal = (n: number) =>
+  const toHexVal = (n: number): string =>
     clamp(Math.round(n), 0, 255).toString(16).padStart(2, "0")[(upperCase ? "toUpperCase" : "toLowerCase")]();
   return `${withHash ? "#" : ""}${toHexVal(red)}${toHexVal(green)}${toHexVal(blue)}${alpha ? toHexVal(alpha * 255) : ""}`;
 }

@@ -371,9 +371,9 @@ const templateLiteralTransform: TransformTuple<string> = [
 
     let str = String(trValue);
 
-    const eachKeyInTrString = (keys: string[]) => keys.every((key) => trValue.includes(`${patternStart}${key}${patternEnd}`));
+    const eachKeyInTrString = (keys: string[]): boolean => keys.every((key) => trValue.includes(`${patternStart}${key}${patternEnd}`));
 
-    const namedMapping = () => {
+    const namedMapping = (): void => {
       if(!str.includes(patternStart) || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
         return;
       for(const match of matches) {
@@ -383,7 +383,7 @@ const templateLiteralTransform: TransformTuple<string> = [
       }
     };
 
-    const positionalMapping = () => {
+    const positionalMapping = (): void => {
       if(!(patternRegex.test(str)) || !trArgs[0])
         return;
       let matchNum = -1;

@@ -5,7 +5,7 @@ import k from "kleur";
 const dtsPath = resolve("./dist/lib/");
 
 /** Adds two spaces to the end of each line in JSDoc comments to preserve the meticulous line breaks */
-async function addTrailingSpaces(filePath: string) {
+async function addTrailingSpaces(filePath: string): Promise<void> {
   const content = String(await readFile(filePath, "utf8"));
 
   const fixedContent = content.replace(/\/\*\*[\s\S]*?\*\//g, (m) =>
@@ -18,7 +18,7 @@ async function addTrailingSpaces(filePath: string) {
 }
 
 /** Recursively processes all files in the given directory */
-async function processRecursive(directory: string) {
+async function processRecursive(directory: string): Promise<void> {
   directory = resolve(directory);
   const files = await readdir(directory);
 
