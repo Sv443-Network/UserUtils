@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-async function run() {
+async function run(): Promise<void> {
   try {
     const pkgJson = JSON.parse(String(await readFile("package.json", "utf8")));
     const { version } = pkgJson;

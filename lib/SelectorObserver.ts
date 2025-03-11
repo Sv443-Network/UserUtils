@@ -4,12 +4,10 @@
  */
 
 import { Debouncer, debounce, type DebouncerType } from "./Debouncer.js";
+import { isDomLoaded } from "./dom.js";
 import type { Prettify } from "./types.js";
 
 void ["type only", Debouncer];
-
-let domLoaded = false;
-document.addEventListener("DOMContentLoaded", () => domLoaded = true);
 
 /** Options for the `onSelector()` method of {@linkcode SelectorObserver} */
 export type SelectorListenerOptions<TElem extends Element = HTMLElement> = Prettify<SelectorOptionsOne<TElem> | SelectorOptionsAll<TElem>>;
@@ -113,7 +111,7 @@ export class SelectorObserver {
 
   /** Call to check all selectors in the {@linkcode listenerMap} using {@linkcode checkSelector()} */
   protected checkAllSelectors(): void {
-    if(!this.enabled || !domLoaded)
+    if(!this.enabled || !isDomLoaded())
       return;
 
     for(const [selector, listeners] of this.listenerMap.entries())

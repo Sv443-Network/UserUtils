@@ -120,14 +120,14 @@ export class Debouncer<TFunc extends AnyFunc> extends NanoEmitter<DebouncerEvent
   /** Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with {@linkcode addListener()} */
   public call(...args: Parameters<TFunc>): void {
     /** When called, calls all registered listeners */
-    const cl = (...a: Parameters<TFunc>) => {
+    const cl = (...a: Parameters<TFunc>): void => {
       this.queuedCall = undefined;
       this.emit("call", ...a);
       this.listeners.forEach((l) => l.apply(this, a));
     };
 
     /** Sets a timeout that will call the latest queued call and then set another timeout if there was a queued call */
-    const setRepeatTimeout = () => {
+    const setRepeatTimeout = (): void => {
       this.activeTimeout = setTimeout(() => {
         if(this.queuedCall) {
           this.queuedCall();

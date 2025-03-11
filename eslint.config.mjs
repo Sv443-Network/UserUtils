@@ -25,6 +25,7 @@ const config = [
       "dist/**/*",
       "**/dev/**/*",
       "**/test.ts",
+      "test/**/*",
     ],
   }, ...compat.extends(
     "eslint:recommended",
@@ -73,6 +74,10 @@ const config = [
         allowTaggedTemplates: true,
       }],
       "@typescript-eslint/no-unsafe-declaration-merging": "off",
+      "@typescript-eslint/explicit-function-return-type": ["error", {
+        allowExpressions: true,
+        allowIIFEs: true,
+      }],
       "comma-dangle": ["error", "only-multiline"],
       "no-misleading-character-class": "off",
     },
@@ -80,6 +85,7 @@ const config = [
     files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
     rules: {
       "@typescript-eslint/no-var-requires": "off",
+      "@typescript-eslint/explicit-function-return-type": "off",
       quotes: ["error", "double"],
       semi: ["error", "always"],
       "eol-last": ["error", "always"],
