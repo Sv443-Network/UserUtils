@@ -36,6 +36,8 @@ View the documentation of previous major releases:
 - **DOM:**
     - [`SelectorObserver`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [`getUnsafeWindow()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - [`isDomLoaded()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#isdomloaded) - check if the DOM has finished loading and can be queried and modified
+    - [`onDomLoad()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
     - [`addParent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#addparent) - add a parent element around another element
     - [`addGlobalStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#addglobalstyle) - add a global style to the page
     - [`preloadImages()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#preloadimages) - preload images into the browser cache for faster loading later on

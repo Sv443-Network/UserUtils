@@ -3,6 +3,10 @@
  * This module contains various functions for working with the DOM - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dom)
  */
 
+/** Whether the DOM has finished loading */
+let domReady = false;
+document.addEventListener("DOMContentLoaded", () => domReady = true);
+
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
  */
@@ -310,4 +314,29 @@ export function probeElementStyle<
 
   setTimeout(() => el.remove(), 1);
   return result;
+}
+
+/** Returns whether or not the DOM has finished loading */
+export function isDomLoaded(): boolean {
+  return domReady;
+}
+
+/**
+ * Executes a callback and/or resolves the returned Promise when the DOM has finished loading.  
+ * Immediately executes/resolves if the DOM is already loaded.
+ * @param cb Callback to execute when the DOM has finished loading
+ * @returns Returns a Promise that resolves when the DOM has finished loading
+ */
+export function onDomLoad(cb?: () => void): Promise<void> {
+  return new Promise((res) => {
+    if(domReady) {
+      cb?.();
+      res();
+    }
+    else
+      document.addEventListener("DOMContentLoaded", () => {
+        cb?.();
+        res();
+      });
+  });
 }
