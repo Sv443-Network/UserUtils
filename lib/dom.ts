@@ -279,6 +279,7 @@ export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(eleme
  * @param probeStyle Function to probe the element's style. First argument is the element's style object from [`window.getComputedStyle()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle), second argument is the element itself
  * @param element The element to probe, or a function that creates and returns the element - should not be added to the DOM prior to calling this function! - all probe elements will have the class `_uu_probe_element` added to them
  * @param hideOffscreen Whether to hide the element offscreen, enabled by default - disable if you want to probe the position style properties of the element
+ * @param parentElement The parent element to append the probe element to, defaults to `document.body`
  * @returns The value returned by the `probeElement` function
  */
 export function probeElementStyle<
@@ -288,6 +289,7 @@ export function probeElementStyle<
   probeStyle: (style: CSSStyleDeclaration, element: TElem) => TValue,
   element?: TElem | (() => TElem),
   hideOffscreen = true,
+  parentElement = document.body,
 ): TValue {
   const el = element
     ? typeof element === "function" ? element() : element
@@ -301,7 +303,7 @@ export function probeElementStyle<
   }
 
   el.classList.add("_uu_probe_element");
-  document.body.appendChild(el);
+  parentElement.appendChild(el);
 
   const style = window.getComputedStyle(el);
   const result = probeStyle(style, el);
