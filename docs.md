@@ -28,6 +28,8 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
   - [**DOM:**](#dom)
     - [`SelectorObserver`](#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
     - [`getUnsafeWindow()`](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - [`isDomLoaded()`](#isdomloaded) - check if the DOM has finished loading and can be queried and modified
+    - [`onDomLoad()`](#ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
     - [`addParent()`](#addparent) - add a parent element around another element
     - [`addGlobalStyle()`](#addglobalstyle) - add a global style to the page
     - [`preloadImages()`](#preloadimages) - preload images into the browser cache for faster loading later on
@@ -444,6 +446,65 @@ const mouseEvent = new MouseEvent("mousemove", {
 document.body.dispatchEvent(mouseEvent);
 ```
 </details>
+
+<br>
+
+### isDomLoaded()
+Signature:  
+```ts
+isDomLoaded(): boolean
+```
+  
+Returns whether or not the DOM has finished loading and can be queried, manipulated, interacted with, etc.  
+  
+As long as the library is loaded immediately on page load, this function will always return the correct value, even if your runtime is executed after the DOM has finished loading (like when using `@run-at document-end`).  
+Just make sure to not lazy-load the library, evaluate it on-demand, or anything else that would delay the execution.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { isDomLoaded } from "@sv443-network/userutils";
+
+console.log(isDomLoaded()); // false
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log(isDomLoaded()); // true
+});
+```
+</details>
+
+<br>
+
+### onDomLoad()
+Signature:  
+```ts
+onDomLoad(cb?: () => void): Promise<void>
+```
+  
+Executes a callback and/or resolves the returned Promise when the DOM has finished loading.  
+Immediately executes/resolves if the DOM is already loaded.  
+  
+This alleviates the problem of the `DOMContentLoaded` event only being fired once and if you missed it, you're out of luck and can't really be certain.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { onDomLoad } from "@sv443-network/userutils";
+
+// callback gets executed at basically the same time as the `console.log("DOM loaded!")` below:
+onDomLoad(() => {
+  console.log("DOM has finished loading.");
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("DOM loaded!");
+
+  // immediately resolves because the DOM is already loaded:
+  await onDomLoad();
+
+  console.log("DOM has finished loading.");
+});
+```
 
 <br>
 
