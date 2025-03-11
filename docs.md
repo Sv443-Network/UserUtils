@@ -869,34 +869,60 @@ probeElementStyle<
   probeStyle: (style: CSSStyleDeclaration, element: TElem) => TValue,
   element?: TElem | (() => TElem),
   hideOffscreen = true,
+  parentElement = document.body,
 ): TValue
 ```
   
 Uses the provided element or the element returned by the provided function to probe its [computed style](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle) properties.  
-This might be useful for resolving the value behind a CSS variable, to get the default styles like the browser's default font size, etc.  
-This function can only be called after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+This might be useful for resolving the value behind a CSS variable, to get the default styles like the browser's font size, etc.  
+  
+⚠️ This function can only be called after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
 The `probeStyle` function will be called with the computed style object and the element as arguments.  
 Whatever it returns, will also be the return value of this function.  
   
 `element` can be either an `HTMLElement` instance or a function that returns an `HTMLElement` instance.  
-It will default to a `<span>` element if not provided.  
+It will default to a basically empty `<span>` element if not provided.  
 All elements will have the class `_uu_probe_element` added to them. You can add your own CSS to suit your needs.  
   
 If `hideOffscreen` is set to true (default), the element will be moved offscreen to prevent it from being visible.  
 Set it to false if you want to probe the style props `position`, `left`, `top` and `zIndex`.  
   
+The `parentElement` parameter can be set to any element in the DOM and is where the probed element will be appended to.  
+By default it will be appended to the `<body>`.  
+  
+When using TypeScript, the generic `TValue` can be used to specify the type of the value that the `probeStyle` function will return, however it will also be inferred from the return value of the `probeStyle` function.  
+  
 <details><summary><b>Example - click to view</b></summary>
 
+This example assumes that the style and script are available on the same page at startup (as if included in the `<head>`).  
+  
+Style:
+```css
+:root {
+  /* This is the variable we want to probe: */
+  --my-cool-color: #f70;
+
+  /* The more involved it gets, the more useful the probing becomes, for example to solve more complex equations: */
+  --my-var: calc(var(--user-defined-var, var(--fallback-var, 1)) * var(--factor, 1));
+}
+
+._uu_probe_element {
+  /*
+    In here, some custom global overrides can be set for the probe element, to make some properties have a known
+    default value, to "unlock" other properties that are otherwise not accessible, or not to interfere with the
+    other elements on the page and their style requirements.
+  */
+}
+```
+  
+Script:
 ```ts
 import { probeElementStyle } from "@sv443-network/userutils";
 
 document.addEventListener("DOMContentLoaded", run);
 
 function run() {
-  // set a CSS variable and probe it:
-  document.documentElement.style.setProperty("--my-cool-color", "rgb(255, 127, 0)");
-
   /**
    * Probe on interval to wait until the value exists and has "settled"  
    * Not really important for this example, but can be useful on pages with lots of loaded in or constantly changing scripts and styles
@@ -912,7 +938,7 @@ function run() {
       () => {
         // create a new element but don't add it to the DOM:
         const elem = document.createElement("span");
-        // specify the CSS variable here, so it will be resolved by the CSS engine and can be probed:
+        // specify the CSS variable here, so it will be resolved by the CSS engine:
         elem.style.backgroundColor = "var(--my-cool-color, #000)"; // default to black to keep the loop going until the color is resolved
         return elem;
       },
