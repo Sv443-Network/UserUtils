@@ -54,6 +54,8 @@ View the documentation of previous major releases:
     - [`mapRange()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#maprange) - map a number from one range to the same spot in another range
     - [`randRange()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#randrange) - generate a random number between a min and max boundary
     - [`digitCount()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#digitcount) - calculate the amount of digits in a number
+    - [`roundFixed()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#roundfixed) - round a floating-point number at the given amount of decimals, or to the given power of 10
+    - [`bitSetHas()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#bitsethas) - check if a bit is set in a [bitset](https://www.geeksforgeeks.org/cpp-bitset-and-its-application/)
 - **Misc:**
     - [`DataStore`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
