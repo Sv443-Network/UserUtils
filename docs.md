@@ -46,6 +46,8 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
     - [`randRange()`](#randrange) - generate a random number between a min and max boundary
     - [`digitCount()`](#digitcount) - calculate the amount of digits in a number
+    - [`roundFixed()`](#roundfixed) - round a floating-point number at the given amount of decimals, or to the given power of 10
+    - [`bitSetHas()`](#bitsethas) - check if a bit is set in a [bitset](https://www.geeksforgeeks.org/cpp-bitset-and-its-application/)
   - [**Misc:**](#misc)
     - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
@@ -1149,12 +1151,15 @@ benchmark(true);  // Generated 100k in 461ms
 ### digitCount()
 Signature:  
 ```ts
-digitCount(num: number | Stringifiable): number
+digitCount(num: number | Stringifiable, withDecimals = true): number
 ```
   
-Calculates and returns the amount of digits in the given number.  
+Calculates and returns the amount of digits in the given number (floating point or integer).  
 If it isn't a number already, the value will be converted by being passed to `String()` and then `Number()` before the calculation.  
-Returns `NaN` if the number is invalid and `Infinity` if the number is too large to be represented as a regular number.
+  
+Returns `NaN` if the number is invalid or `Infinity` if the number is too large to be represented as a regular number.  
+  
+If `withDecimals` is set to false, the decimal point and everything after it will be ignored.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1176,6 +1181,71 @@ digitCount(num5); // NaN (because hex conversion has to be done through parseInt
 digitCount(num6); // 17
 ```
 
+</details>
+
+<br>
+
+### roundFixed()
+Signature:  
+```ts
+roundFixed(num: number, fractionDigits: number): number
+```
+  
+Rounds a number to a fixed amount of decimal places.  
+Supports negative `fractionDigits` to round to the given power of 10.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { roundFixed } from "@sv443-network/userutils";
+
+roundFixed(234.567, -2); // 200
+roundFixed(234.567, -1); // 230
+roundFixed(234.567, 0);  // 235
+roundFixed(234.567, 1);  // 234.6
+roundFixed(234.567, 2);  // 234.57
+roundFixed(234.567, 3);  // 234.567
+roundFixed(234.567, 4);  // 234.567
+```
+</details>
+
+<br>
+
+### bitSetHas()
+Signature:  
+```ts
+bitSetHas<TType extends number | bigint>(bitSet: TType, checkVal: TType): boolean
+```
+  
+Checks if the `checkVal` bit is set in the given bit set.  
+The bit set and the value to check can be either a number or a bigint, but both have to be of the same type.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { bitSetHas } from "@sv443-network/userutils";
+
+// the two vertically adjacent bits are tested for:
+bitSetHas(
+  0b1110,
+  0b0010,
+); // true
+
+bitSetHas(
+  0b1110,
+  0b0001,
+); // false
+
+// with TS enums (or JS maps):
+enum MyEnum {
+  A = 1, B = 2, C = 4,
+  D = 8, E = 16, F = 32,
+}
+
+const myBitSet = MyEnum.A | MyEnum.B;
+bitSetHas(myBitSet, MyEnum.B); // true
+bitSetHas(myBitSet, MyEnum.F); // false
+```
 </details>
 
 <br><br>

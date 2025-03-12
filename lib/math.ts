@@ -95,16 +95,78 @@ export function randRange(...args: (number | boolean | undefined)[]): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/** Calculates the amount of digits in the given number - the given number or string will be passed to the `Number()` constructor. Returns NaN if the number is invalid. */
-export function digitCount(num: number | Stringifiable): number {
+/**
+ * Calculates the amount of digits in the given number - the given number or string will be passed to the `Number()` constructor.  
+ * Returns NaN if the number is invalid.  
+ * @param num The number to count the digits of
+ * @param withDecimals Whether to count the decimal places as well (defaults to true)
+ * @example ```ts
+ * digitCount();         // NaN
+ * digitCount(0);        // 1
+ * digitCount(123);      // 3
+ * digitCount(123.456);  // 6
+ * digitCount(Infinity); // Infinity
+ * ```
+ */
+export function digitCount(num: number | Stringifiable, withDecimals = true): number {
   num = Number((!["string", "number"].includes(typeof num)) ? String(num) : num);
 
   if(typeof num === "number" && isNaN(num))
     return NaN;
 
-  return num === 0
+  const [intPart, decPart] = num.toString().split(".");
+
+  const intDigits = intPart === "0"
     ? 1
-    : Math.floor(
-      Math.log10(Math.abs(Number(num))) + 1
-    );
+    : Math.floor(Math.log10(Math.abs(Number(intPart))) + 1);
+  const decDigits = withDecimals && decPart
+    ? decPart.length
+    : 0;
+
+  return intDigits + decDigits;
+}
+
+/**
+ * Rounds {@linkcode num} to a fixed amount of decimal places, specified by {@linkcode fractionDigits} (supports negative values to round to the nearest power of 10).
+ * @example ```ts
+ * roundFixed(234.567, -2); // 200
+ * roundFixed(234.567, -1); // 230
+ * roundFixed(234.567, 0);  // 235
+ * roundFixed(234.567, 1);  // 234.6
+ * roundFixed(234.567, 2);  // 234.57
+ * roundFixed(234.567, 3);  // 234.567
+ * ```
+ */
+export function roundFixed(num: number, fractionDigits: number): number {
+  const scale = 10 ** fractionDigits;
+  return Math.round(num * scale) / scale;
+}
+
+/**
+ * Checks if the {@linkcode bitSet} has the {@linkcode checkVal} set
+ * @example ```ts
+ * // the two vertically adjacent bits are tested for:
+ * bitSetHas(
+ *   0b1110,
+ *   0b0010,
+ * ); // true
+ * 
+ * bitSetHas(
+ *   0b1110,
+ *   0b0001,
+ * ); // false
+ * 
+ * // with TS enums (or JS maps):
+ * enum MyEnum {
+ *   A = 1, B = 2, C = 4,
+ *   D = 8, E = 16, F = 32,
+ * }
+ * 
+ * const myBitSet = MyEnum.A | MyEnum.B;
+ * bitSetHas(myBitSet, MyEnum.B); // true
+ * bitSetHas(myBitSet, MyEnum.F); // false
+ * ```
+ */
+export function bitSetHas<TType extends number | bigint>(bitSet: TType, checkVal: TType): boolean {
+  return (bitSet & checkVal) === checkVal;
 }
