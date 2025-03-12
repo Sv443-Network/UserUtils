@@ -484,7 +484,7 @@ onDomLoad(cb?: () => void): Promise<void>
 Executes a callback and/or resolves the returned Promise when the DOM has finished loading.  
 Immediately executes/resolves if the DOM is already loaded.  
   
-This alleviates the problem of the `DOMContentLoaded` event only being fired once and if you missed it, you're out of luck and can't really be certain.  
+This alleviates the problem of the [`DOMContentLoaded` event](https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event) only being fired once and if you missed it, you can't really be certain and have to fall back to something like [`document.readyState === "complete"`](https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState#value), which could happen at a much later point in time than `DOMContentLoaded`.
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -505,6 +505,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("DOM has finished loading.");
 });
 ```
+</details>
 
 <br>
 
@@ -630,7 +631,7 @@ interceptEvent(
 ): void
 ```
   
-Intercepts all events dispatched on the `eventObject` and prevents the listeners from being called as long as the predicate function returns a truthy value.  
+Intercepts all listeners for the given event dispatched on the `eventObject`, by preventing the listeners from being called as long as the predicate function returns a truthy value.  
 If no predicate is specified, all events will be discarded.  
 Calling this function will set the `Error.stackTraceLimit` to 100 (if it's not already higher) to ensure the stack trace is preserved.  
   
@@ -664,13 +665,13 @@ interceptWindowEvent(
 ): void
 ```
   
-Intercepts all events dispatched on the `window` object and prevents the listeners from being called as long as the predicate function returns a truthy value.  
+Intercepts all listeners for the given event dispatched on the `unsafeWindow` (GM only, with `@grant unsafeWindow`) or `window` object, by preventing all listeners from being called as long as the predicate function returns a truthy value.  
 If no predicate is specified, all events will be discarded.  
-This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` (or falls back to regular `window`).  
+This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` or `window`, depending on availability.  
   
-⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
-⚠️ In order to have the best chance at intercepting events, the directive `@grant unsafeWindow` should be set.  
-⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw an error.  
+⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached after this function is called.*  
+⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context, or in more restrictive browsers or userscript extensions (like FireMonkey). In that case, calling this function will throw an error.  
+⚠️ In order to have the best chance at intercepting events in a userscript, the directive `@grant unsafeWindow` should be set.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -678,8 +679,14 @@ This is essentially the same as [`interceptEvent()`](#interceptevent), but autom
 import { interceptWindowEvent } from "@sv443-network/userutils";
 
 // prevent the pesky "Are you sure you want to leave this page?" popup
-// as no predicate is specified, all events will be discarded by default
+// because no predicate is specified, all events will be discarded
 interceptWindowEvent("beforeunload");
+
+
+// discard all context menu commands that are not within `#my-element`:
+interceptWindowEvent("contextmenu", (event) =>
+  event.target instanceof HTMLElement && !event.target.closest("#my-element")
+);
 ```
 </details>
 
@@ -691,8 +698,10 @@ Signature:
 isScrollable(element: Element): { horizontal: boolean, vertical: boolean }
 ```
   
-Checks if an element has a horizontal or vertical scroll bar.  
-This uses the computed style of the element, so it will also work if the element is hidden.  
+Checks if an element has horizontal or vertical scroll bars.  
+This uses the computed style of the element, so it has a high chance of working even if the element is hidden.  
+  
+⚠️ The element needs to be mounted in the DOM so the CSS engine evaluates it, otherwise no scroll bars can be detected.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -712,10 +721,13 @@ console.log("Element has a vertical scroll bar:", vertical);
 ### observeElementProp()
 Signature:  
 ```ts
-observeElementProp(
-  element: Element,
-  property: string,
-  callback: (oldValue: any, newValue: any) => void
+observeElementProp<
+  TElem extends Element = HTMLElement,
+  TPropKey extends keyof TElem = keyof TElem,
+> (
+  element: TElem,
+  property: TPropKey,
+  callback: (oldVal: TElem[TPropKey], newVal: TElem[TPropKey]) => void
 ): void
 ```
   
@@ -1186,20 +1198,22 @@ The class' internal methods are all declared as protected, so you can extend thi
 If you have multiple DataStore instances and you want to be able to easily and safely export and import their data, take a look at the [DataStoreSerializer](#datastoreserializer) class.  
 It combines the data of multiple DataStore instances into a single object that can be exported and imported as a whole by the end user.  
   
+For an extensive example, see below the methods section.  
+  
 ⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects (containing functions, symbols, etc.) will either throw an error on load and save or cause otherwise unexpected behavior. Properties with a value of `undefined` will be removed from the data prior to saving it, so use `null` instead.  
 ⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required if the `storageMethod` is left as the default (`"GM"`)  
   
 The options object has the following properties:
 | Property | Description |
 | :-- | :-- |
-| `id` | A unique internal identification string for this instance. If two DataStores share the same ID, they will overwrite each other's data, so it is recommended that you use a prefix that is unique to your project. |
+| `id` | A unique internal identification string for this instance. If two DataStores share the same ID, they will overwrite each other's data. |
 | `defaultData` | The default data to use if no data is saved in persistent storage yet. Until the data is loaded from persistent storage, this will be the data returned by `getData()`. For TypeScript, the type of the data passed here is what will be used for all other methods of the instance. |
-| `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. Never decrement this number or skip numbers. |
-| `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version that the functions can migrate to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
+| `formatVersion` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will be run consecutively. *Never decrement this number!* |
+| `migrations?` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version number that the function migrates to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
 | `migrateIds?` | (Optional) A string or array of strings that migrate from one or more old IDs to the ID set in the constructor. If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data. The ID migration will be done once per session in the call to [`loadData()`](#datastoreloaddata). |
 | `storageMethod?` | (Optional) The location where data is stored. Can be `"GM"` (default), `"localStorage"` or `"sessionStorage"`. If you want to store the data in a different way, you can override the methods in your own subclass. |
-| `encodeData?` | (Optional, but required when `decodeData` is set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
-| `decodeData?` | (Optional, but required when `encodeData` is set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
+| `encodeData?` | (Optional, but required when `decodeData` is also set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
+| `decodeData?` | (Optional, but required when `encodeData` is also set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
 
 <br>
 
