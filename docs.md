@@ -98,6 +98,11 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`ValueGen`](#valuegen) - a "generator" value that allows for super flexible value typing and declaration
     - [`StringGen`](#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
     - [`ListWithLength`](#listwithlength) - represents an array or object with a numeric `length`, `count` or `size` property
+  - [**Custom Error classes**](#error-classes)
+    - [`UUError`](#uuerror) - base class for all custom UserUtils errors - has a custom `date` prop set to the time of creation
+    - [`ChecksumMismatchError`](#checksummismatcherror) - thrown when a string of data doesn't match its checksum
+    - [`DataMigrationError`](#datamigrationerror) - thrown when a data migration fails
+    - [`PlatformError`](#platformerror) - thrown when a function is called in an unsupported environment
 
 <br><br>
 
@@ -638,7 +643,7 @@ If no predicate is specified, all events will be discarded.
 Calling this function will set the `Error.stackTraceLimit` to 100 (if it's not already higher) to ensure the stack trace is preserved.  
   
 ⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
-⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw an error.  
+⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw a [`PlatformError`](#platformerror).  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -1329,7 +1334,7 @@ This is why you should either immediately repopulate the cache and persistent st
 #### `DataStore.runMigrations()`
 Signature: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
 Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
-If `resetOnError` is set to `false`, the migration will be aborted if an error is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
+If `resetOnError` is set to `false`, the migration will be aborted and a [`DataMigrationError`](#datamigrationerror) is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
 
 <br>
 
@@ -1500,9 +1505,9 @@ Serializes all DataStore instances passed in the constructor and returns the ser
 #### `DataStoreSerializer.deserialize()`
 Signature: `deserialize(data: string): Promise<void>`  
 Deserializes the given string that was created with `serialize()` and imports the contained data each DataStore instance.  
-In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.
+In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.  
   
-If `ensureIntegrity` is set to `true` and the checksum doesn't match, an error will be thrown.  
+If `ensureIntegrity` is set to `true` and the checksum doesn't match, a [`ChecksumMismatchError`](#checksummismatcherror) will be thrown.  
 If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
 If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
 If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
@@ -3541,6 +3546,38 @@ getSize([...iter]); // 1
 ```
 </details>
 
+<br><br>
+
+## Error classes:
+UserUtils has some custom error classes that make it easier to handle specific types of errors.  
+All of them extend the built-in `Error` class and have a `date` property that contains the date and time when the error was created.  
+These classes are intended to be used by the library, but if you find them useful, you can import them and throw them in your own code as well.  
+  
+<br>
+
+### UUError
+Base class for all UserUtils errors.  
+Extends from the built-in `Error` class.  
+Has the custom property `date` that holds the date and time when the error was created.
+
+<br>
+
+### ChecksumMismatchError
+Thrown when a checksum verification fails.  
+Extends from the `UUError` class.
+
+<br>
+
+### DataMigrationError
+Thrown when a data migration fails.  
+Extends from the `UUError` class.
+
+<br>
+
+### PlatformError
+Thrown when a platform-specific error occurs, like when a browser API call fails, or the browser doesn't support a feature at all.  
+Extends from the `UUError` class.
+
 <br><br><br><br>
 
 <!-- #region Footer -->
@@ -3550,3 +3587,5 @@ Made with ❤️ by [Sv443](https://github.com/Sv443)
 If you like this library, please consider [supporting development](https://github.com/sponsors/Sv443)
 
 </div>
+
+<br><br><br><br>

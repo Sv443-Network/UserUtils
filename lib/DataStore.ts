@@ -3,6 +3,7 @@
  * This module contains the DataStore class, which is a general purpose, sync and async persistent JSON database - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastore)
  */
 
+import { MigrationError } from "./errors.js";
 import type { Prettify } from "./types.js";
 
 //#region types
@@ -271,9 +272,7 @@ export class DataStore<TData extends object = object> {
         }
         catch(err) {
           if(!resetOnError)
-            throw new Error(`Error while running migration function for format version '${fmtVer}'`);
-
-          console.error(`Error while running migration function for format version '${fmtVer}' - resetting to the default value.`, err);
+            throw new MigrationError(`Error while running migration function for format version '${fmtVer}'`, { cause: err });
 
           await this.saveDefaultData();
           return this.getData();

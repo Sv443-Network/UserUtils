@@ -109,6 +109,11 @@ View the documentation of previous major releases:
     - [`ValueGen`](./docs.md#valuegen) - a "generator" value that allows for super flexible value typing and declaration
     - [`StringGen`](./docs.md#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
     - [`ListWithLength`](./docs.md#listwithlength) - represents an array or object with a numeric `length`, `count` or `size` property
+  - [**Custom Error classes**](./docs.md#error-classes)
+    - [`UUError`](./docs.md#uuerror) - base class for all custom UserUtils errors - has a custom `date` prop set to the time of creation
+    - [`ChecksumMismatchError`](./docs.md#checksummismatcherror) - thrown when a string of data doesn't match its checksum
+    - [`DataMigrationError`](./docs.md#datamigrationerror) - thrown when a data migration fails
+    - [`PlatformError`](./docs.md#platformerror) - thrown when a function is called in an unsupported environment
 
 <br><br>
 

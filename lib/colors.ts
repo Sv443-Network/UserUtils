@@ -70,11 +70,11 @@ export function darkenColor(color: string, percent: number, upperCase = false): 
   else if(color.startsWith("rgb")) {
     const rgbValues = color.match(/\d+(\.\d+)?/g)?.map(Number);
     if(!rgbValues)
-      throw new Error("Invalid RGB/RGBA color format");
+      throw new TypeError("Invalid RGB/RGBA color format");
     [r, g, b, a] = rgbValues as [number, number, number, number?];
   }
   else
-    throw new Error("Unsupported color format");
+    throw new TypeError("Unsupported color format");
 
   [r, g, b] = darkenRgb(r, g, b, percent);
 
@@ -85,5 +85,5 @@ export function darkenColor(color: string, percent: number, upperCase = false): 
   else if(color.startsWith("rgb"))
     return `rgb(${r}, ${g}, ${b})`;
   else
-    throw new Error("Unsupported color format");
+    throw new TypeError("Unsupported color format");
 }

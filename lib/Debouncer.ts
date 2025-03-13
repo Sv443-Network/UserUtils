@@ -159,7 +159,7 @@ export class Debouncer<TFunc extends AnyFunc> extends NanoEmitter<DebouncerEvent
 
       break;
     default:
-      throw new Error(`Invalid debouncer type: ${this.type}`);
+      throw new TypeError(`Invalid debouncer type: ${this.type}`);
     }
   }
 }
