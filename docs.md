@@ -101,7 +101,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
   - [**Custom Error classes**](#error-classes)
     - [`UUError`](#uuerror) - base class for all custom UserUtils errors - has a custom `date` prop set to the time of creation
     - [`ChecksumMismatchError`](#checksummismatcherror) - thrown when a string of data doesn't match its checksum
-    - [`DataMigrationError`](#datamigrationerror) - thrown when a data migration fails
+    - [`MigrationError`](#migrationerror) - thrown when a data migration fails
     - [`PlatformError`](#platformerror) - thrown when a function is called in an unsupported environment
 
 <br><br>
@@ -1334,7 +1334,7 @@ This is why you should either immediately repopulate the cache and persistent st
 #### `DataStore.runMigrations()`
 Signature: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
 Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
-If `resetOnError` is set to `false`, the migration will be aborted and a [`DataMigrationError`](#datamigrationerror) is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
+If `resetOnError` is set to `false`, the migration will be aborted and a [`MigrationError`](#migrationerror) is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
 
 <br>
 
@@ -3568,7 +3568,7 @@ Extends from the `UUError` class.
 
 <br>
 
-### DataMigrationError
+### MigrationError
 Thrown when a data migration fails.  
 Extends from the `UUError` class.
 

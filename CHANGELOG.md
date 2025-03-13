@@ -11,7 +11,7 @@
 - 905fea4: Added function `onDomLoad()` to call a callback and/or resolve a Promise when the DOM is loaded, even retroactively
 - 4264154: Added function `bitSetHas()` to check if a given value is present in a [bitset](https://www.geeksforgeeks.org/cpp-bitset-and-its-application/)
 - bf55335: Replaced a bunch of generic `Error`s with the new custom error class instances
-- bf55335: Added custom error classes `ChecksumMismatchError`, `DataMigrationError` and `PlatformError`, extending from the base class `UUError`
+- bf55335: Added custom error classes `ChecksumMismatchError`, `MigrationError` and `PlatformError`, extending from the base class `UUError`
   The base class has the additional property `date` which is the time of the error creation
 
 ### Patch Changes

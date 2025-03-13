@@ -109,7 +109,7 @@ View the documentation of previous major releases:
 - **Custom Error classes:**
     - [`UUError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#uuerror) - base class for all custom UserUtils errors - has a custom `date` prop set to the time of creation
     - [`ChecksumMismatchError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#checksummismatcherror) - thrown when a string of data doesn't match its checksum
-    - [`DataMigrationError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datamigrationerror) - thrown when a data migration fails
+    - [`MigrationError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#migrationerror) - thrown when a data migration fails
     - [`PlatformError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#platformerror) - thrown when a function is called in an unsupported environment
 
 <br><br>

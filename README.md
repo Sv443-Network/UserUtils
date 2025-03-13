@@ -112,7 +112,7 @@ View the documentation of previous major releases:
   - [**Custom Error classes**](./docs.md#error-classes)
     - [`UUError`](./docs.md#uuerror) - base class for all custom UserUtils errors - has a custom `date` prop set to the time of creation
     - [`ChecksumMismatchError`](./docs.md#checksummismatcherror) - thrown when a string of data doesn't match its checksum
-    - [`DataMigrationError`](./docs.md#datamigrationerror) - thrown when a data migration fails
+    - [`MigrationError`](./docs.md#migrationerror) - thrown when a data migration fails
     - [`PlatformError`](./docs.md#platformerror) - thrown when a function is called in an unsupported environment
 
 <br><br>
