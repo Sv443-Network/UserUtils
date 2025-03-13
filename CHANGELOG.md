@@ -1,5 +1,24 @@
 # @sv443-network/userutils
 
+## 9.2.0
+
+### Minor Changes
+
+- 905fea4: Added function `isDomLoaded()` to check if the DOM is queryable, regardless of `@run-at` setting
+- 4264154: Added parameter `withDecimals` to `digitCount()` (true by default)
+- 4264154: Added function `roundFixed()` to round a floating-point number to the given amount of decimals. Can also round to the given power of 10.
+- 7e492cf: Added `probeElementStyle()` to probe the computed style of a temporary element, allowing to resolve CSS variables and default style values, etc.
+- 905fea4: Added function `onDomLoad()` to call a callback and/or resolve a Promise when the DOM is loaded, even retroactively
+- 4264154: Added function `bitSetHas()` to check if a given value is present in a [bitset](https://www.geeksforgeeks.org/cpp-bitset-and-its-application/)
+- bf55335: Replaced a bunch of generic `Error`s with the new custom error class instances
+- bf55335: Added custom error classes `ChecksumMismatchError`, `DataMigrationError` and `PlatformError`, extending from the base class `UUError`
+  The base class has the additional property `date` which is the time of the error creation
+
+### Patch Changes
+
+- 157dacb: Fixed example code in tsdoc comments of translation functions
+- 4264154: Fixed `digitCount()` not counting decimals by default
+
 ## 9.1.0
 
 ### Minor Changes
