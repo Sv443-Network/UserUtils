@@ -71,13 +71,13 @@ export class DataStoreSerializer {
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serialize(useEncoding: boolean, stringified: true): Promise<string>;
+  public async serialize(useEncoding?: boolean, stringified?: true): Promise<string>;
   /**
    * Serializes the data stores into a string.  
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serialize(useEncoding: boolean, stringified: false): Promise<SerializedDataStore[]>;
+  public async serialize(useEncoding?: boolean, stringified?: false): Promise<SerializedDataStore[]>;
   /**
    * Serializes the data stores into a string.  
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
