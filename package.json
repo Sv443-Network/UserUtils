@@ -1,7 +1,7 @@
 {
   "name": "@sv443-network/userutils",
   "libName": "UserUtils",
-  "version": "9.2.0",
+  "version": "9.2.1",
   "description": "General purpose DOM/GreaseMonkey library that allows you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more",
   "main": "dist/index.js",
   "module": "dist/index.js",

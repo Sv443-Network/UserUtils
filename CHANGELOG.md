@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.2.1
+
+### Patch Changes
+
+- 24dad2b: Fixed TS type for `DataStoreSerializer.serialize()`
+
 ## 9.2.0
 
 ### Minor Changes
