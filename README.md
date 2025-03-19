@@ -77,6 +77,7 @@ View the documentation of previous major releases:
     - [`consumeGen()`](./docs.md#consumegen) - consumes a ValueGen and returns the value
     - [`consumeStringGen()`](./docs.md#consumestringgen) - consumes a StringGen and returns the string
     - [`getListLength()`](./docs.md#getlistlength) - get the length of any object with a numeric `length`, `count` or `size` property
+    - [`purifyObj()`](./docs.md#purifyobj) - removes the prototype chain (all default properties like `toString`, `__proto__`, etc.) from an object
   - [**Arrays:**](./docs.md#arrays)
     - [`randomItem()`](./docs.md#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](./docs.md#randomitemindex) - returns a tuple of a random item and its index from an array

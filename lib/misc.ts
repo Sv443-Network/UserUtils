@@ -123,7 +123,7 @@ export async function consumeGen<TValueType>(valGen: ValueGen<TValueType>): Prom
   return await (typeof valGen === "function"
     ? (valGen as (() => Promise<TValueType> | TValueType))()
     : valGen
-  )as TValueType;
+  ) as TValueType;
 }
 
 /**
@@ -164,4 +164,13 @@ export function getListLength(obj: ListWithLength, zeroOnInvalid = true): number
         : zeroOnInvalid
           ? 0
           : NaN;
+}
+
+/**
+ * Turns the passed object into a "pure" object without a prototype chain, meaning it won't have any default properties like `toString`, `__proto__`, `__defineGetter__`, etc.  
+ * This makes the object immune to prototype pollution attacks and allows for cleaner object literals, at the cost of being harder to work with in some cases.  
+ * It also effectively transforms a `Stringifiable` value into one that will throw a TypeError when stringified instead of defaulting to `[object Object]`
+ */
+export function purifyObj<TObj extends object>(obj: TObj): TObj {
+  return Object.assign(Object.create(null), obj);
 }

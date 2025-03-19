@@ -66,6 +66,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`consumeGen()`](#consumegen) - consumes a ValueGen and returns the value
     - [`consumeStringGen()`](#consumestringgen) - consumes a StringGen and returns the string
     - [`getListLength()`](#getlistlength) - get the length of any object with a numeric `length`, `count` or `size` property
+    - [`purifyObj()`](#purifyobj) - removes the prototype chain (all default properties like `toString`, `__proto__`, etc.) from an object
   - [**Arrays:**](#arrays)
     - [`randomItem()`](#randomitem) - returns a random item from an array
     - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
@@ -2624,6 +2625,42 @@ getListLength({ foo: "bar" }, false); // NaN
 ```
 </details>
 
+<br>
+
+### purifyObj()
+Signature:  
+```ts
+purifyObj<TObj extends object>(obj: TObj): TObj
+```
+  
+Turns the passed object into a "pure" object without a prototype chain, meaning it won't have any default properties like `toString`, `__proto__`, `__defineGetter__`, etc.  
+This could be useful to prevent prototype pollution attacks or to clean up object literals, at the cost of being harder to work with in some cases.  
+It also effectively transforms a [`Stringifiable`](#stringifiable) value into one that will throw a TypeError when stringified instead of defaulting to `[object Object]`  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { purifyObj } from "@sv443-network/userutils";
+
+const impureObj = {
+  foo: "bar",
+};
+
+console.log(impureObj.toString);         // [Function: toString]
+console.log(impureObj.__proto__);        // { ... }
+console.log(impureObj.__defineGetter__); // [Function: __defineGetter__]
+console.log(`${impureObj}`);             // "[object Object]"
+
+
+const pureObj = purifyObj(impureObj);
+
+console.log(pureObj.toString);         // undefined
+console.log(pureObj.__proto__);        // undefined
+console.log(pureObj.__defineGetter__); // undefined
+console.log(`${pureObj}`);             // TypeError: Cannot convert object to string
+```
+</details>
+
 <br><br>
 
 <!-- #region Arrays -->
@@ -3317,6 +3354,8 @@ This type describes any value that either is a string itself or can be converted
 To be considered stringifiable, the object needs to have a `toString()` method that returns a string.  
 Most primitives have this method, but something like undefined or null does not.  
 Having this method allows not just explicit conversion by using `.toString()`, but also implicit conversion by passing it into the `String()` constructor or interpolating it in a template literal string.  
+  
+To make an object explicitly *not stringifiable* (so it throws an error when being converted to a string), you can pass it to [`purifyObj()`](#purifyobj) to remove its prototype chain, including the `toString()` method.  
   
 <details><summary><b>Example - click to view</b></summary>
 
