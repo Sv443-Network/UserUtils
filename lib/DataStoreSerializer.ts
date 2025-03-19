@@ -11,7 +11,7 @@ import type { DataStore } from "./DataStore.js";
 export type DataStoreSerializerOptions = {
   /** Whether to add a checksum to the exported data */
   addChecksum?: boolean;
-  /** Whether to ensure the integrity of the data when importing it (unless the checksum property doesn't exist) */
+  /** Whether to ensure the integrity of the data when importing it by throwing an error (doesn't throw when the checksum property doesn't exist) */
   ensureIntegrity?: boolean;
 };
 
@@ -25,7 +25,7 @@ export type SerializedDataStore = {
   formatVersion: number;
   /** Whether the data is encoded */
   encoded: boolean;
-  /** The checksum of the data - key is not present for data without a checksum */
+  /** The checksum of the data - key is not present when `addChecksum` is `false` */
   checksum?: string;
 };
 
@@ -67,26 +67,36 @@ export class DataStoreSerializer {
   }
 
   /**
-   * Serializes the data stores into a string.  
+   * Serializes only a subset of the data stores into a string.  
+   * @param stores An array of store IDs or functions that take a store ID and return a boolean
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serialize(useEncoding?: boolean, stringified?: true): Promise<string>;
+  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: true): Promise<string>;
   /**
-   * Serializes the data stores into a string.  
+   * Serializes only a subset of the data stores into a string.  
+   * @param stores An array of store IDs or functions that take a store ID and return a boolean
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serialize(useEncoding?: boolean, stringified?: false): Promise<SerializedDataStore[]>;
+  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: false): Promise<SerializedDataStore[]>;
   /**
-   * Serializes the data stores into a string.  
+   * Serializes only a subset of the data stores into a string.  
+   * @param stores An array of store IDs or functions that take a store ID and return a boolean
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serialize(useEncoding = true, stringified = true): Promise<string | SerializedDataStore[]> {
+  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>;
+  /**
+   * Serializes only a subset of the data stores into a string.  
+   * @param stores An array of store IDs or functions that take a store ID and return a boolean
+   * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
+   * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
+   */
+  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding = true, stringified = true): Promise<string | SerializedDataStore[]> {
     const serData: SerializedDataStore[] = [];
 
-    for(const storeInst of this.stores) {
+    for(const storeInst of this.stores.filter(s => typeof stores === "function" ? stores(s.id) : stores.includes(s.id))) {
       const data = useEncoding && storeInst.encodingEnabled()
         ? await storeInst.encodeData(JSON.stringify(storeInst.getData()))
         : JSON.stringify(storeInst.getData());
@@ -106,16 +116,37 @@ export class DataStoreSerializer {
   }
 
   /**
-   * Deserializes the data exported via {@linkcode serialize()} and imports it into the DataStore instances.  
+   * Serializes the data stores into a string.  
+   * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
+   * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
+   */
+  public async serialize(useEncoding?: boolean, stringified?: true): Promise<string>;
+  /**
+   * Serializes the data stores into a string.  
+   * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
+   * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
+   */
+  public async serialize(useEncoding?: boolean, stringified?: false): Promise<SerializedDataStore[]>;
+  /**
+   * Serializes the data stores into a string.  
+   * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
+   * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
+   */
+  public async serialize(useEncoding = true, stringified = true): Promise<string | SerializedDataStore[]> {
+    return this.serializePartial(this.stores.map(s => s.id), useEncoding, stringified);
+  }
+
+  /**
+   * Deserializes the data exported via {@linkcode serialize()} and imports only a subset into the DataStore instances.  
    * Also triggers the migration process if the data format has changed.
    */
-  public async deserialize(serializedData: string | SerializedDataStore[]): Promise<void> {
-    const deserStores: SerializedDataStore[] = typeof serializedData === "string" ? JSON.parse(serializedData) : serializedData;
+  public async deserializePartial(stores: string[] | ((id: string) => boolean), data: string | SerializedDataStore[]): Promise<void> {
+    const deserStores: SerializedDataStore[] = typeof data === "string" ? JSON.parse(data) : data;
 
     if(!Array.isArray(deserStores) || !deserStores.every(DataStoreSerializer.isSerializedDataStore))
       throw new TypeError("Invalid serialized data format! Expected an array of SerializedDataStore objects.");
 
-    for(const storeData of deserStores) {
+    for(const storeData of deserStores.filter(s => typeof stores === "function" ? stores(s.id) : stores.includes(s.id))) {
       const storeInst = this.stores.find(s => s.id === storeData.id);
       if(!storeInst)
         throw new Error(`DataStore instance with ID "${storeData.id}" not found! Make sure to provide it in the DataStoreSerializer constructor.`);
@@ -135,6 +166,14 @@ export class DataStoreSerializer {
       else
         await storeInst.setData(JSON.parse(decodedData));
     }
+  }
+
+  /**
+   * Deserializes the data exported via {@linkcode serialize()} and imports the data into all matching DataStore instances.  
+   * Also triggers the migration process if the data format has changed.
+   */
+  public async deserialize(data: string | SerializedDataStore[]): Promise<void> {
+    return this.deserializePartial(this.stores.map(s => s.id), data);
   }
 
   /**

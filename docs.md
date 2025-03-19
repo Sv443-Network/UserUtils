@@ -1481,8 +1481,13 @@ The options object has the following properties:
 
 ### Methods:
 #### `DataStoreSerializer.serialize()`
-Signature: `serialize(): Promise<string>`  
-Serializes all DataStore instances passed in the constructor and returns the serialized data as a JSON string.  
+Signature: `serialize(useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>`  
+Serializes all DataStore instances passed in the constructor and returns the serialized data as a JSON string by deafault.  
+If `useEncoding` is set to `true` (default), the data will be encoded using the `encodeData` function set on the DataStore instance.  
+If `stringified` is set to `true` (default), the serialized data will be returned as a stringified JSON array, otherwise the unencoded objects will be returned in an array.  
+  
+If you need a partial export, use the method [`DataStoreSerializer.serializePartial()`](#datastoreserializerserializepartial) instead.  
+  
 <details><summary>Click to view the structure of the returned data.</summary>  
 
 ```jsonc
@@ -1495,7 +1500,11 @@ Serializes all DataStore instances passed in the constructor and returns the ser
     "checksum": "420deadbeef69",                    // property will be missing if addChecksum is set to false
   },
   {
-    // ...
+    "id": "bar-data",
+    "data": "{\"foo\":\"hello\",\"bar\":\"world\"}", // for unencoded stores, the data will be a stringified JSON object
+    "formatVersion": 1,
+    "encoded": false,
+    "checksum": "69beefdead420"
   }
 ]
 ```
@@ -1503,16 +1512,49 @@ Serializes all DataStore instances passed in the constructor and returns the ser
 
 <br>
 
+#### `DataStoreSerializer.serializePartial()`
+Signature: `serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>`  
+Serializes only the DataStore instances that have an ID that is included in the `stores` array.  
+  
+The `stores` argument can be an array containing the IDs of the DataStore instances, or a function that takes each ID as an argument and returns a boolean, indicating whether the store should be serialized.  
+If `useEncoding` is set to `true` (default), the data will be encoded using the `encodeData` function set on the DataStore instance.  
+If `stringified` is set to `true` (default), the serialized data will be returned as a stringified JSON array, otherwise the unencoded objects will be returned in an array.  
+  
+For more information or to export all DataStore instances, refer to the method [`DataStoreSerializer.serialize()`](#datastoreserializerserialize)
+
+<br>
+
 #### `DataStoreSerializer.deserialize()`
-Signature: `deserialize(data: string): Promise<void>`  
-Deserializes the given string that was created with `serialize()` and imports the contained data each DataStore instance.  
+Signature: `deserialize(data: string | SerializedDataStore[]): Promise<void>`  
+Deserializes the given string or array of serialized DataStores that was created with `serialize()` or `serializePartial()` and imports the contained data into each matching DataStore instance.  
 In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.  
+  
+The `data` parameter can be the data as a string or an array of serialized DataStores, as returned by the `serialize()` or `serializePartial()` methods.  
   
 If `ensureIntegrity` is set to `true` and the checksum doesn't match, a [`ChecksumMismatchError`](#checksummismatcherror) will be thrown.  
 If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
 If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
 If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
   
+For only importing a subset of the serialized data, use the method [`DataStoreSerializer.deserializePartial()`](#datastoreserializerdeserializepartial) instead.
+
+<br>
+
+#### `DataStoreSerializer.deserializePartial()`
+Signature: `deserializePartial(stores: string[] | ((id: string) => boolean), data: string | SerializedDataStore[]): Promise<void>`  
+Deserializes only the DataStore instances that have an ID that is included in the `stores` array.  
+In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.  
+  
+The `stores` parameter can be an array containing the IDs of the DataStore instances, or a function that takes each ID as an argument and returns a boolean, indicating whether the store should be deserialized.  
+The `data` parameter can be the data as a string or an array of serialized DataStores, as returned by the `serialize()` or `serializePartial()` methods.  
+  
+If `ensureIntegrity` is set to `true` and the checksum doesn't match, a [`ChecksumMismatchError`](#checksummismatcherror) will be thrown.  
+If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
+If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
+If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
+  
+If you want to import all serialized data, refer to the method [`DataStoreSerializer.deserialize()`](#datastoreserializerdeserialize)
+
 <br>
 
 #### `DataStoreSerializer.loadStoresData()`
@@ -1649,6 +1691,14 @@ async function importMyDataPls() {
 async function resetMyDataPls() {
   // reset the data of all stores in both the cache and the persistent storage
   await serializer.resetStoresData();
+}
+
+async function exportOnlyFoo() {
+  // with the `serializePartial()` method, you can export only the data of specific stores:
+  const serializedExample1 = await serializer.serializePartial(["foo-data"]);
+
+  // or using a matcher function:
+  const serializedExample2 = await serializer.serializePartial((id) => id.startsWith("foo"));
 }
 ```
 </details>
