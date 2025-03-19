@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 9.3.0
+
+### Minor Changes
+
+- 89d7970: Added `DataStoreSerializer` methods `serializePartial()` and `deserializePartial()` for partial data exports and imports
+- 5d71770: Added function `purifyObj()` to remove an object's prototype chain (i.e. omit all inherited properties like `toString`, `__proto__`, etc.)
+
 ## 9.2.1
 
 ### Patch Changes
