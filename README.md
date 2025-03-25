@@ -63,6 +63,7 @@ View the documentation of previous major releases:
     - [`DataStore`](./docs.md#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](./docs.md#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
     - [`Dialog`](./docs.md#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - [`Mixins`](./docs.md#mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
     - [`NanoEmitter`](./docs.md#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
     - [`Debouncer`](./docs.md#debouncer) - class for debouncing function calls with a given timeout
     - [`debounce()`](./docs.md#debounce) - function wrapper for the Debouncer class for easier usage

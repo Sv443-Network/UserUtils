@@ -14,6 +14,7 @@ export * from "./dom.js";
 export * from "./errors.js";
 export * from "./math.js";
 export * from "./misc.js";
+export * from "./Mixins.js";
 export * from "./NanoEmitter.js";
 export * from "./SelectorObserver.js";
 export * from "./translation.js";
