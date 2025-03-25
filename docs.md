@@ -1924,7 +1924,7 @@ Doesn't return the mixin functions themselves.
 import { Mixins } from "@sv443-network/userutils";
 
 
-const mathMixins = new Mixins<{
+const myMixins = new Mixins<{
   foo: (val: number) => number;
   bar: (v: string, ctx: { barGlobal: number }) => string;
 }>();
@@ -1939,21 +1939,21 @@ export function calcFoo(fooVal: number) {
   // 2. / 2 (critical prio)
   // 3. + 1 (added first)
   // 4. * 2 (added second)
-  return mathMixins.use("foo", fooVal ** 2);
+  return myMixins.use("foo", fooVal ** 2);
 }
 
 // mixin from source 1:
-mathMixins.add("foo", (val) => {
+myMixins.add("foo", (val) => {
   return val + 1;
 });
 
 // mixin from source 2:
-mathMixins.add("foo", (val) => {
+myMixins.add("foo", (val) => {
   return val * 2;
 });
 
 // mixin from source 3 with critical priority:
-mathMixins.add("foo", (val) => {
+myMixins.add("foo", (val) => {
   return val / 2;
 }, {
   // use highest possible priority (highly discouraged unless it's absolutely necessary):
@@ -1970,16 +1970,16 @@ export function getBar(barVal: string) {
   // order of operations:
   // 1. barVal + "-" + barGlobal (highest priority & has stopPropagation)
   // result: "Hello-1337"
-  return mathMixins.use("bar", barVal, { barGlobal });
+  return myMixins.use("bar", barVal, { barGlobal });
 }
 
 // mixin from source 1:
-mathMixins.add("bar", (val) => {
+myMixins.add("bar", (val) => {
   return val + " this is ignored";
 });
 
 // mixin from source 2:
-mathMixins.add("bar", (val, ctx) => {
+myMixins.add("bar", (val, ctx) => {
   return val + "-" + ctx.barGlobal;
 }, {
   priority: 1,
