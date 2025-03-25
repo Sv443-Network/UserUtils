@@ -52,6 +52,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
     - [`Dialog`](#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - [`Mixins`](#mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
     - [`NanoEmitter`](#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
     - [`Debouncer`](#debouncer) - class for debouncing function calls with a given timeout
     - [`debounce()`](#debounce) - function wrapper for the Debouncer class for easier usage
@@ -1861,6 +1862,129 @@ fooDialog.on("open", () => {
 });
 
 fooDialog.open();
+```
+</details>
+
+<br>
+
+### Mixins
+Signature:  
+```ts
+new Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => any>>(defaultConfigOverrides?: Partial<MixinConfig>): Mixins<TMixinMap>
+```
+  
+A class that provides a way to apply multiple mixin functions to any value, which is a convenient way of letting multiple sources modify the same value in a controlled way.  
+  
+This could be used for a plugin system, for example, where multiple plugins can modify the same object or value.  
+Another more day-to-day example would be a configuration object that is modified by multiple sources with different and varying priorities and conditions.  
+  
+The `TMixinMap` generic is used to define the mixin functions that can be applied to the value.  
+It needs to be an object where the keys are the mixin names and the values are functions that take the value to be modified as the first argument and an optional context object as the second argument and returns the modified value.  
+**Important:** the argument and return type need to be the same, otherwise TypeScript will get confused.  
+  
+The default configuration object can be overridden by passing an object with the same properties as the default configuration object.  
+Unless overridden in the [`resolve()`](#mixinsresolve) method, the default configuration object will be used.  
+If no value is provided, the priority will default to 0.  
+  
+The properties of the MixinConfig object are:
+| Property | Description |
+| :-- | :-- |
+| `priority: number` | The priority of the mixin function. Higher numbers will be applied first. Negative values are also allowed. Defaults to 0. |
+| `stopPropagation: boolean` | If set to `true`, the mixin function will prevent all upcoming mixin functions from being called. Defaults to `false`. |
+| `signal: AbortSignal` | An optional AbortSignal that can be used to stop applying the mixin function. |
+  
+### Methods:
+#### `Mixins.resolve()`
+Signature: `resolve(mixinKey: string, inputValue: any, inputCtx?: any): TArg`  
+Applies all mixin functions that were registered with [`add()`](#mixinsadd) for the given mixin key to resolve the input value.  
+Goes in order of highest to lowest priority and returns the resolved value, which is of the same type as the input value.  
+If no mixin functions are registered for the given key, the input value will be returned unchanged.  
+
+<br>
+
+#### `Mixins.add()`
+Signature: `add(mixinKey: string, mixinFn: (arg: any, ctx?: any) => any, config?: Partial<MixinConfig>): () => void`  
+Registers a mixin function for the given key.  
+The function will be called with the input value (possibly modified by previous mixins) and possibly a context object.  
+When a value for the context parameter is defined in the main generic of the `Mixins` class, the ctx parameter will be required. Otherwise it should always be unspecified.  
+Returns a function that can be called to remove the mixin function from the list of registered mixins.
+
+<br>
+
+#### `Mixins.list()`
+Signature: `list(): Array<{ key: string; } & MixinConfig>`  
+Returns an array of objects that contain the mixin keys and their configuration objects.  
+Doesn't return the mixin functions themselves.
+
+<br>
+
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { Mixins } from "@sv443-network/userutils";
+
+
+const mathMixins = new Mixins<{
+  foo: (val: number) => number;
+  bar: (v: string, ctx: { barGlobal: number }) => string;
+}>();
+
+
+// foo:
+
+// internal function:
+export function calcFoo(fooVal: number) {
+  // order of operations:
+  // 1. fooVal ** 2
+  // 2. / 2 (critical prio)
+  // 3. + 1 (added first)
+  // 4. * 2 (added second)
+  return mathMixins.use("foo", fooVal ** 2);
+}
+
+// mixin from source 1:
+mathMixins.add("foo", (val) => {
+  return val + 1;
+});
+
+// mixin from source 2:
+mathMixins.add("foo", (val) => {
+  return val * 2;
+});
+
+// mixin from source 3 with critical priority:
+mathMixins.add("foo", (val) => {
+  return val / 2;
+}, {
+  // use highest possible priority (highly discouraged unless it's absolutely necessary):
+  priority: Number.MAX_SAFE_INTEGER,
+});
+
+
+// bar:
+
+const barGlobal = 1337;
+
+// internal function:
+export function getBar(barVal: string) {
+  // order of operations:
+  // 1. barVal + "-" + barGlobal (highest priority & has stopPropagation)
+  // result: "Hello-1337"
+  return mathMixins.use("bar", barVal, { barGlobal });
+}
+
+// mixin from source 1:
+mathMixins.add("bar", (val) => {
+  return val + " this is ignored";
+});
+
+// mixin from source 2:
+mathMixins.add("bar", (val, ctx) => {
+  return val + "-" + ctx.barGlobal;
+}, {
+  priority: 1,
+  stopPropagation: true,
+});
 ```
 </details>
 

@@ -60,6 +60,7 @@ View the documentation of previous major releases:
     - [`DataStore`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
     - [`DataStoreSerializer`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
     - [`Dialog`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - [`Mixins`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
     - [`NanoEmitter`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
     - [`Debouncer`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debouncer) - class for debouncing function calls with a given timeout
     - [`debounce()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#debounce) - function wrapper for the Debouncer class for easier usage
