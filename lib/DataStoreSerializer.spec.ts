@@ -39,6 +39,7 @@ describe("DataStoreSerializer", () => {
 
   it("Serialization", async () => {
     const ser = new DataStoreSerializer(getStores());
+    await ser.loadStoresData();
 
     const full = await ser.serialize();
     expect(full).toEqual(`[{"id":"dss-test-1","data":"{\\"a\\":1,\\"b\\":2}","formatVersion":1,"encoded":false,"checksum":"43258cff783fe7036d8a43033f830adfc60ec037382473548ac742b888292777"},{"id":"dss-test-2","data":"q1ZKVrIy1FFKUbIyqgUA","formatVersion":1,"encoded":true,"checksum":"b1020c3faac493009494fa622f701b831657c11ea53f8c8236f0689089c7e2d3"}]`);
@@ -75,12 +76,12 @@ describe("DataStoreSerializer", () => {
     expect(store2.getData().c).toBe(1);
 
     await ser.resetStoresData();
-    await ser.deserializePartial(["dss-test-1"], `[{"id":"dss-test-1","data":"{\\"a\\":421,\\"b\\":421}","formatVersion":1,"encoded":false}, {"id":"dss-test-2","data":"{\\"c\\":421,\\"d\\":421}","formatVersion":1,"encoded":false}]`);
+    await ser.deserializePartial(["dss-test-1"], `[{"id":"dss-test-1","data":"{\\"a\\":421,\\"b\\":421}","checksum":"ad33b8f6a1d18c781a80390496b1b7dfaf56d73cf25a9497cb156ba83214357d","formatVersion":1,"encoded":false}, {"id":"dss-test-2","data":"{\\"c\\":421,\\"d\\":421}","formatVersion":1,"encoded":false}]`);
     expect(store1.getData().a).toBe(421);
     expect(store2.getData().c).toBe(1);
 
     await ser.resetStoresData();
-    await ser.deserializePartial(["dss-test-2"], `[{"id":"dss-test-1","data":"{\\"a\\":422,\\"b\\":422}","formatVersion":1,"encoded":false}, {"id":"dss-test-2","data":"{\\"c\\":422,\\"d\\":422}","formatVersion":1,"encoded":false}]`);
+    await ser.deserializePartial(["dss-test-2"], `[{"id":"dss-test-1","data":"{\\"a\\":422,\\"b\\":422}","formatVersion":1,"encoded":false}, {"id":"dss-test-2","data":"{\\"c\\":422,\\"d\\":422}","checksum":"ab1d18cf13554369cea6bb517a9034e3d6548f19a40d176b16ac95c8e02d65bb","formatVersion":1,"encoded":false}]`);
     expect(store1.getData().a).toBe(1);
     expect(store2.getData().c).toBe(422);
 

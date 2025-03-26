@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { randomItem, randomItemIndex, randomizeArray } from "./array.js";
+import { randomItem, randomItemIndex, randomizeArray, takeRandomItem } from "./array.js";
 
 //#region randomItem
 describe("array/randomItem", () => {
@@ -34,6 +34,26 @@ describe("array/randomItemIndex", () => {
 
   it("Returns undefined for an empty array", () => {
     expect(randomItemIndex([])).toEqual([undefined, undefined]);
+  });
+});
+
+//#region takeRandomItem
+describe("array/takeRandomItem", () => {
+  it("Returns a random item and removes it from the array", () => {
+    const arr = [1, 2];
+
+    const itm = takeRandomItem(arr);
+    expect(arr).not.toContain(itm);
+
+    takeRandomItem(arr);
+
+    const itm2 = takeRandomItem(arr);
+    expect(itm2).toBeUndefined();
+    expect(arr).toHaveLength(0);
+  });
+
+  it("Returns undefined for an empty array", () => {
+    expect(takeRandomItem([])).toBeUndefined();
   });
 });
 

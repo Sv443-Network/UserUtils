@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Debouncer } from "./Debouncer.js";
+import { debounce, Debouncer } from "./Debouncer.js";
 import { pauseFor } from "./misc.js";
 
 describe("Debouncer", () => {
@@ -21,6 +21,7 @@ describe("Debouncer", () => {
     for(let i = 0; i < 2; i++) {
       for(let j = 0; j < 6; j++) {
         deb.call(i, j);
+        expect(deb.isTimeoutActive()).toBe(true);
         await pauseFor(50);
       }
       await pauseFor(300);
@@ -70,6 +71,30 @@ describe("Debouncer", () => {
     expect(avg + 10).toBeGreaterThanOrEqual(minDeltaT);
   });
 
+  //#region modify props & listeners
+  it("Modify props and listeners", async () => {
+    const deb = new Debouncer(200);
+
+    expect(deb.getTimeout()).toBe(200);
+    deb.setTimeout(10);
+    expect(deb.getTimeout()).toBe(10);
+
+    expect(deb.getType()).toBe("immediate");
+    deb.setType("idle");
+    expect(deb.getType()).toBe("idle");
+
+    const l = () => {};
+    deb.addListener(l);
+    deb.addListener(() => {});
+    expect(deb.getListeners()).toHaveLength(2);
+
+    deb.removeListener(l);
+    expect(deb.getListeners()).toHaveLength(1);
+
+    deb.removeAllListeners();
+    expect(deb.getListeners()).toHaveLength(0);
+  });
+
   //#region all methods
   // TODO:FIXME:
   it.skip("All methods", async () => {
@@ -89,14 +114,8 @@ describe("Debouncer", () => {
     expect(callAmt).toBe(1);
     expect(evtCallAmt).toBe(0);
 
-    expect(deb.getTimeout()).toBe(200);
     deb.setTimeout(10);
     expect(deb.getTimeout()).toBe(10);
-
-    expect(deb.getType()).toBe("immediate");
-    deb.setType("idle");
-    expect(deb.getType()).toBe("idle");
-    deb.setType("immediate");
 
     const callPaused = (v?: number): Promise<void> => {
       deb.call(v);
@@ -123,6 +142,31 @@ describe("Debouncer", () => {
     deb.removeAllListeners();
     await callPaused();
     expect(callAmt).toEqual(evtCallAmt + 1); // evtCallAmt is always behind by 1
+  });
+
+  //#region errors
+  it("Errors", () => {
+    try {
+      // @ts-expect-error
+      const deb = new Debouncer(200, "invalid");
+      deb.call();
+    }
+    catch(e) {
+      expect(e).toBeInstanceOf(TypeError);
+    }
+  });
+
+  //#region debounce function
+  it("Debounce function", async () => {
+    let callAmt = 0;
+    const callFn = debounce(() => ++callAmt, 200);
+
+    for(let i = 0; i < 4; i++) {
+      callFn();
+      await pauseFor(25);
+    }
+
+    expect(callAmt).toBe(1);
   });
 });
   
