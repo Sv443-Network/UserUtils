@@ -132,7 +132,7 @@ export class Mixins<
    * If no priority is specified, it will be calculated via the protected method {@linkcode calcPriority()} based on the constructor configuration, or fall back to the default priority.
    * @param mixinKey The key to identify the mixin function.
    * @param mixinFn The function to be called to apply the mixin. The first argument is the input value, the second argument is the context object (if any).
-   * @param config Configuration object to customize the mixin behavior.
+   * @param config Configuration object to customize the mixin behavior, or just the priority if a number is passed.
    * @returns Returns a cleanup function, to be called when this mixin is no longer needed.
    */
   public add<
@@ -142,14 +142,14 @@ export class Mixins<
   >(
     mixinKey: TKey,
     mixinFn: (arg: TArg, ...ctx: TCtx extends undefined ? [void] : [TCtx]) => ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> | Awaited<ReturnType<TMixinMap[TKey]>> : ReturnType<TMixinMap[TKey]>,
-    config: Partial<MixinConfig> = purifyObj({}),
+    config: Partial<MixinConfig> | number = purifyObj({}),
   ): () => void {
-    const calcPrio = this.calcPriority(mixinKey, config);
+    const calcPrio = typeof config === "number" ? config : this.calcPriority(mixinKey, config);
     const mixin = purifyObj({
       ...this.defaultMixinCfg,
       key: mixinKey as string,
       fn: mixinFn,
-      ...config,
+      ...(typeof config === "object" ? config : {}),
       ...(typeof calcPrio === "number" && !isNaN(calcPrio) ? { priority: calcPrio } : {}),
     }) as MixinObj<TArg, TCtx>;
     this.mixins.push(mixin);
@@ -157,7 +157,8 @@ export class Mixins<
     const rem = (): void => {
       this.mixins = this.mixins.filter((m) => m !== mixin);
     };
-    config.signal?.addEventListener("abort", rem, { once: true });
+    if(mixin.signal)
+      mixin.signal.addEventListener("abort", rem, { once: true });
 
     return rem;
   }
@@ -182,7 +183,7 @@ export class Mixins<
     ...inputCtx: TCtx extends undefined ? [void] : [TCtx]
   ): ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> : ReturnType<TMixinMap[TKey]> {
     const mixins = this.mixins.filter((m) => m.key === mixinKey);
-    const sortedMixins = mixins.sort((a, b) => a.priority - b.priority);
+    const sortedMixins = [...mixins].sort((a, b) => b.priority - a.priority);
     let result = inputValue;
 
     // start resolving synchronously:

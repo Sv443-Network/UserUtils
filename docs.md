@@ -1962,17 +1962,13 @@ const myMixins = new Mixins<{
 
 // register mixin functions:
 
-// source 1 (priority 0, index 0):
-myMixins.add("myValue", (val, { myFactor }) => val * myFactor);
+myMixins.add("myValue", (val, { myFactor }) => val * myFactor); // source 1 (priority 0, index 0)
 
 // myValue returns a Promise in the constructor generic parameter above, so mixin functions can be either sync or async:
-// source 2 (priority 0, index 1):
-myMixins.add("myValue", (val) => Promise.resolve(val + 1));
+myMixins.add("myValue", (val) => Promise.resolve(val + 1)); // source 2 (priority 0, index 1)
 
-// source 3 (priority 1):
-myMixins.add("myValue", (val) => val * 2, {
-  priority: 1,
-});
+// when passing a number instead of the object, the default config will be used and the number will be treated as the priority:
+myMixins.add("myValue", (val) => val * 2, 1); // source 3 (priority 1)
 
 // apply mixins and transform the input value:
 
