@@ -86,6 +86,11 @@ export class Debouncer<TFunc extends AnyFunc> extends NanoEmitter<DebouncerEvent
     this.listeners = [];
   }
 
+  /** Returns all registered listeners */
+  public getListeners(): TFunc[] {
+    return this.listeners;
+  }
+
   //#region timeout
 
   /** Sets the timeout for the debouncer */

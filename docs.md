@@ -2323,6 +2323,12 @@ If the timeout is active, the call will be queued until it either gets overridde
 
 <br>
 
+#### `Debouncer.getListeners()`
+Signature: `getListeners(): ((...args: TArgs[]) => void | unknown)[]`  
+Returns an array of all registered listener functions.
+
+<br>
+
 #### `Debouncer.setTimeout()`  
 Signature: `setTimeout(timeout: number): void`  
 Changes the timeout for the debouncer.
