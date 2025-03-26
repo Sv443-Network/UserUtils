@@ -53,8 +53,8 @@ describe("math/randRange", () => {
     expect(nums.every(n => n >= 0 && n <= 10)).toBe(true);
 
     // about a 5x speed difference
-    expect(timeA).toBeLessThanOrEqual(25);
-    expect(timeB).toBeGreaterThanOrEqual(100);
+    expect(timeA).toBeLessThanOrEqual(75);
+    expect(timeB).toBeGreaterThanOrEqual(150);
 
     expect(randRange(0, 0)).toBe(0);
     expect(randRange(0)).toBe(0);

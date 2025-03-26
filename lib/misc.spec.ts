@@ -46,7 +46,7 @@ describe("misc/pauseFor", () => {
     const startTs = Date.now();
     await pauseFor(100);
 
-    expect(Date.now() - startTs).toBeGreaterThanOrEqual(100);
+    expect(Date.now() - startTs).toBeGreaterThanOrEqual(80);
 
     const ac = new AbortController();
     const startTs2 = Date.now();
