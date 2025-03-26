@@ -63,6 +63,7 @@ const config = [
         ignoreRestSiblings: true,
         args: "after-used",
         argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
       }],
       "no-unused-vars": "off",
       "@typescript-eslint/ban-ts-comment": "off",

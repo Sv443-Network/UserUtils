@@ -6,14 +6,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { purifyObj } from "./misc.js";
+import type { Prettify } from "./types.js";
 
-/** Full mixin object as it is stored in the instance's mixin array. */
-export type MixinObj<TArg, TCtx> = {
-  /** The public identifier key (purpose) of the mixin */
-  key: string;
+/** Full mixin object (either sync or async), as it is stored in the instance's mixin array. */
+export type MixinObj<TArg, TCtx> = Prettify<
+  | MixinObjSync<TArg, TCtx>
+  | MixinObjAsync<TArg, TCtx>
+>;
+
+/** Asynchronous mixin object, as it is stored in the instance's mixin array. */
+export type MixinObjSync<TArg, TCtx> = Prettify<{
   /** The mixin function */
   fn: (arg: TArg, ctx?: TCtx) => TArg;
-} & MixinConfig;
+} & MixinObjBase>;
+
+/** Synchronous mixin object, as it is stored in the instance's mixin array. */
+export type MixinObjAsync<TArg, TCtx> = Prettify<{
+  /** The mixin function */
+  fn: (arg: TArg, ctx?: TCtx) => TArg | Promise<TArg>;
+} & MixinObjBase>;
+
+/** Base type for mixin objects */
+type MixinObjBase = Prettify<{
+  /** The public identifier key (purpose) of the mixin */
+  key: string;
+} & MixinConfig>;
 
 /** Configuration object for a mixin function */
 export type MixinConfig = {
@@ -50,7 +67,8 @@ export type MixinsConstructorConfig = {
  * const { abort: removeAllMixins } = ac;
  * 
  * const mathMixins = new Mixins<{
- *   foo: (val: number, ctx: { baz: string }) => number;
+ *   // supports sync and async functions:
+ *   foo: (val: number, ctx: { baz: string }) => Promise<number>;
  *   // first argument and return value have to be of the same type:
  *   bar: (val: bigint) => bigint;
  *   // ...
@@ -61,25 +79,28 @@ export type MixinsConstructorConfig = {
  * });
  * 
  * // will be applied last due to base priority of 0:
- * mathMixins.add("foo", (val, ctx) => val * 2 + ctx.baz.length);
+ * mathMixins.add("foo", (val, ctx) => Promise.resolve(val * 2 + ctx.baz.length));
  * // will be applied second due to manually set priority of 1:
  * mathMixins.add("foo", (val) => val + 1, { priority: 1 });
  * // will be applied first, even though the above ones were called first, because of the auto-incrementing priority of 2:
  * mathMixins.add("foo", (val) => val / 2);
  * 
- * const result = mathMixins.resolve("foo", 10, { baz: "my length is 15" });
+ * const result = await mathMixins.resolve("foo", 10, { baz: "this has a length of 23" });
  * // order of application:
  * // input value: 10
  * // 10 / 2 = 5
  * // 5 + 1 = 6
- * // 6 * 2 + 15 = 27
- * // result = 27
+ * // 6 * 2 + 23 = 35
+ * // result = 35
  * 
  * // removes all mixins added without a `signal` property:
  * removeAllMixins();
  * ```
  */
-export class Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => any>> {
+export class Mixins<
+  TMixinMap extends Record<string, (arg: any, ctx?: any) => any>,
+  TMixinKey extends Extract<keyof TMixinMap, string> = Extract<keyof TMixinMap, string>,
+> {
   /** List of all registered mixins */
   protected mixins: MixinObj<any, any>[] = [];
 
@@ -87,13 +108,13 @@ export class Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => an
   protected readonly defaultMixinCfg: MixinConfig;
 
   /** Whether the priorities should auto-increment if not specified */
-  protected readonly aiPriorityEnabled: boolean;
+  protected readonly autoIncPrioEnabled: boolean;
   /** The current auto-increment priority counter */
-  protected aiPriorityCounter = new Map<string, number>();
+  protected autoIncPrioCounter = new Map<TMixinKey, number>();
 
   /**
    * Creates a new Mixins instance.
-   * @param config Configuration object to customize the mixin behavior.
+   * @param config Configuration object to customize the behavior.
    */
   constructor(config: Partial<MixinsConstructorConfig> = {}) {
     this.defaultMixinCfg = purifyObj({
@@ -101,7 +122,7 @@ export class Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => an
       stopPropagation: config.defaultStopPropagation ?? false,
       signal: config.defaultSignal,
     });
-    this.aiPriorityEnabled = config.autoIncrementPriority ?? false;
+    this.autoIncPrioEnabled = config.autoIncrementPriority ?? false;
   }
 
   //#region public
@@ -115,12 +136,12 @@ export class Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => an
    * @returns Returns a cleanup function, to be called when this mixin is no longer needed.
    */
   public add<
-    TMixinKey extends string,
-    TArg extends Parameters<TMixinMap[TMixinKey]>[0],
-    TCtx extends Parameters<TMixinMap[TMixinKey]>[1],
+    TKey extends TMixinKey,
+    TArg extends Parameters<TMixinMap[TKey]>[0],
+    TCtx extends Parameters<TMixinMap[TKey]>[1],
   >(
-    mixinKey: TMixinKey,
-    mixinFn: (arg: TArg, ...ctx: TCtx extends undefined ? [void] : [TCtx]) => TArg,
+    mixinKey: TKey,
+    mixinFn: (arg: TArg, ...ctx: TCtx extends undefined ? [void] : [TCtx]) => ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> | Awaited<ReturnType<TMixinMap[TKey]>> : ReturnType<TMixinMap[TKey]>,
     config: Partial<MixinConfig> = purifyObj({}),
   ): () => void {
     const calcPrio = this.calcPriority(mixinKey, config);
@@ -133,12 +154,12 @@ export class Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => an
     }) as MixinObj<TArg, TCtx>;
     this.mixins.push(mixin);
 
-    const clean = (): void => {
+    const rem = (): void => {
       this.mixins = this.mixins.filter((m) => m !== mixin);
     };
-    config.signal?.addEventListener("abort", clean, { once: true });
+    config.signal?.addEventListener("abort", rem, { once: true });
 
-    return clean;
+    return rem;
   }
 
   /** Returns a list of all added mixins with their keys and configuration objects, but not their functions */
@@ -152,52 +173,71 @@ export class Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => an
    * @returns The modified value after all mixins have been applied.
    */
   public resolve<
-    TMixinKey extends keyof TMixinMap,
-    TArg extends Parameters<TMixinMap[TMixinKey]>[0],
-    TCtx extends Parameters<TMixinMap[TMixinKey]>[1],
+    TKey extends TMixinKey,
+    TArg extends Parameters<TMixinMap[TKey]>[0],
+    TCtx extends Parameters<TMixinMap[TKey]>[1],
   >(
-    mixinKey: TMixinKey,
+    mixinKey: TKey,
     inputValue: TArg,
     ...inputCtx: TCtx extends undefined ? [void] : [TCtx]
-  ): TArg {
+  ): ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> : ReturnType<TMixinMap[TKey]> {
     const mixins = this.mixins.filter((m) => m.key === mixinKey);
     const sortedMixins = mixins.sort((a, b) => a.priority - b.priority);
     let result = inputValue;
-    for(const mixin of sortedMixins) {
+
+    // start resolving synchronously:
+    for(let i = 0; i < sortedMixins.length; i++) {
+      const mixin = sortedMixins[i]!;
       result = mixin.fn(result, ...inputCtx);
-      if(mixin.stopPropagation)
+      if(result as unknown instanceof Promise) {
+        // if one of the mixins is async, switch to async resolution:
+        return (async () => {
+          result = await result;
+          if(mixin.stopPropagation)
+            return result;
+          for(let j = i + 1; j < sortedMixins.length; j++) {
+            const mixin = sortedMixins[j]!;
+            result = await mixin.fn(result, ...inputCtx);
+            if(mixin.stopPropagation)
+              break;
+          }
+          return result;
+        })() as ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> : never;
+      }
+      else if(mixin.stopPropagation)
         break;
     }
+
     return result;
   }
 
   //#region protected
 
   /** Calculates the priority for a mixin based on the given configuration and the current auto-increment state of the instance */
-  protected calcPriority(mixinKey: string, config: Partial<MixinConfig>): number | undefined {
+  protected calcPriority(mixinKey: TMixinKey, config: Partial<MixinConfig>): number | undefined {
     // if prio specified, skip calculation
     if(config.priority !== undefined)
       return undefined;
 
     // if a-i disabled, use default prio
-    if(!this.aiPriorityEnabled)
+    if(!this.autoIncPrioEnabled)
       return config.priority ?? this.defaultMixinCfg.priority;
 
     // initialize a-i map to default prio
-    if(!this.aiPriorityCounter.has(mixinKey))
-      this.aiPriorityCounter.set(mixinKey, this.defaultMixinCfg.priority);
+    if(!this.autoIncPrioCounter.has(mixinKey))
+      this.autoIncPrioCounter.set(mixinKey, this.defaultMixinCfg.priority);
 
     // increment a-i prio until unique
-    let prio = this.aiPriorityCounter.get(mixinKey)!;
+    let prio = this.autoIncPrioCounter.get(mixinKey)!;
     while(this.mixins.some((m) => m.key === mixinKey && m.priority === prio))
       prio++;
-    this.aiPriorityCounter.set(mixinKey, prio + 1);
+    this.autoIncPrioCounter.set(mixinKey, prio + 1);
 
     return prio;
   }
 
   /** Removes all mixins with the given key */
-  protected removeAll<TMixinKey extends keyof TMixinMap>(mixinKey: TMixinKey): void {
+  protected removeAll(mixinKey: TMixinKey): void {
     this.mixins.filter((m) => m.key === mixinKey);
     this.mixins = this.mixins.filter((m) => m.key !== mixinKey);
   }
