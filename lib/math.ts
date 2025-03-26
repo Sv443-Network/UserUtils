@@ -28,6 +28,10 @@ export function mapRange(value: number, range1min: number, range1max: number, ra
  * For example, you can map the value 2 in the range of 0-5 to the range of 0-10 and you'd get a 4 as a result.
  */
 export function mapRange(value: number, range1max: number, range2max: number): number;
+/**
+ * Transforms the value parameter from one numerical range to another.  
+ * For example, you can map the value 2 in the range of 0-5 to the range of 0-10 and you'd get a 4 as a result.
+ */
 export function mapRange(value: number, range1min: number, range1max: number, range2min?: number, range2max?: number): number {
   if(typeof range2min === "undefined" || typeof range2max === "undefined") {
     range2max = range1max;

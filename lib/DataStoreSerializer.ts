@@ -146,7 +146,7 @@ export class DataStoreSerializer {
   public async deserializePartial(stores: StoreFilter, data: string | SerializedDataStore[]): Promise<void> {
     const deserStores: SerializedDataStore[] = typeof data === "string" ? JSON.parse(data) : data;
 
-    if(!Array.isArray(deserStores) || !deserStores.every(DataStoreSerializer.isSerializedDataStore))
+    if(!Array.isArray(deserStores) || !deserStores.every(DataStoreSerializer.isSerializedDataStoreObj))
       throw new TypeError("Invalid serialized data format! Expected an array of SerializedDataStore objects.");
 
     for(const storeData of deserStores.filter(s => typeof stores === "function" ? stores(s.id) : stores.includes(s.id))) {
@@ -216,8 +216,13 @@ export class DataStoreSerializer {
     );
   }
 
+  /** Checks if a given value is an array of SerializedDataStore objects */
+  public static isSerializedDataStoreObjArray(obj: unknown): obj is SerializedDataStore[] {
+    return Array.isArray(obj) && obj.every((o) => typeof o === "object" && o !== null && "id" in o && "data" in o && "formatVersion" in o && "encoded" in o);
+  }
+
   /** Checks if a given value is a SerializedDataStore object */
-  public static isSerializedDataStore(obj: unknown): obj is SerializedDataStore {
+  public static isSerializedDataStoreObj(obj: unknown): obj is SerializedDataStore {
     return typeof obj === "object" && obj !== null && "id" in obj && "data" in obj && "formatVersion" in obj && "encoded" in obj;
   }
 

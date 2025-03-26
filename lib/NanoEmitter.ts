@@ -48,12 +48,12 @@ export class NanoEmitter<TEvtMap extends EventsMap = DefaultEvents> {
       let unsub: Unsubscribe | undefined;
 
       const onceProxy = ((...args: Parameters<TEvtMap[TKey]>) => {
-        unsub!();
         cb?.(...args);
+        unsub?.();
         resolve(args);
       }) as TEvtMap[TKey];
 
-      unsub = this.on(event, onceProxy);
+      unsub = this.events.on(event, onceProxy);
     });
   }
 
