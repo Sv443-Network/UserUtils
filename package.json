@@ -37,8 +37,7 @@
     "test-gm-serve": "node --import tsx ./test/TestPage/server.mts",
     "test-gm-dev": "cd test/TestScript && pnpm dev",
     "test-gm": "concurrently \"pnpm test-gm-serve\" \"pnpm test-gm-dev\"",
-    "test": "vitest",
-    "test-dev": "vitest --watch"
+    "test": "vitest --passWithNoTests"
   },
   "repository": {
     "type": "git",
