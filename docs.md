@@ -1870,32 +1870,38 @@ fooDialog.open();
 ### Mixins
 Signature:  
 ```ts
-new Mixins<TMixinMap extends Record<string, (arg: any, ctx?: any) => any>>(defaultConfigOverrides?: Partial<MixinConfig>): Mixins<TMixinMap>
+new Mixins<
+  TMixinMap extends Record<string, (arg: any, ctx?: any) => any>,
+>(
+  config?: Partial<MixinsConstructorConfig>,
+)
 ```
   
 A class that provides a way to apply multiple mixin functions to any value, which is a convenient way of letting multiple sources modify the same value in a controlled way.  
   
-This could be used for a plugin system, for example, where multiple plugins can modify the same object or value.  
-Another more day-to-day example would be a configuration object that is modified by multiple sources with different and varying priorities and conditions.  
+In a day-to-day example, this class could be used to manage a configuration object that is modified by multiple sources with different and varying priorities, conditions and availability.  
+This could be used for a plugin system, for example, where multiple plugins are allowed to modify the same object or value, with much more control about how they override or get combined with each other.  
   
-The `TMixinMap` generic is used to define the mixin functions that can be applied to the value.  
+It gives you utmost flexibility, as you can either use the default order and apply changes from all sources, or you can tweak the priority and stop propagation at any point in the chain.  
+This class might be too "barebones" for some use cases, but it can be easily extended to fit your needs, like constraining the priority to a certain range, reserving certain priorities or keys, or adding more complex conditions for stopping the propagation. The world is your oyster.  
+  
+The `TMixinMap` template generic is used to define the mixin functions that can be applied to the value.  
 It needs to be an object where the keys are the mixin names and the values are functions that take the value to be modified as the first argument and an optional context object as the second argument and returns the modified value.  
-**Important:** the argument and return type need to be the same, otherwise TypeScript will get confused.  
+**Important:** the first argument and return type need to be the same. Also, if a context object is defined, it must be passed as the third argument in the [`resolve()`](#mixinsresolve) method.  
   
-The default configuration object can be overridden by passing an object with the same properties as the default configuration object.  
-Unless overridden in the [`resolve()`](#mixinsresolve) method, the default configuration object will be used.  
-If no value is provided, the priority will default to 0.  
-  
-The properties of the MixinConfig object are:
+The properties of the `MixinsConstructorConfig` object in the constructor are:
 | Property | Description |
 | :-- | :-- |
-| `priority: number` | The priority of the mixin function. Higher numbers will be applied first. Negative values are also allowed. Defaults to 0. |
-| `stopPropagation: boolean` | If set to `true`, the mixin function will prevent all upcoming mixin functions from being called. Defaults to `false`. |
-| `signal: AbortSignal` | An optional AbortSignal that can be used to stop applying the mixin function. |
-  
+| `autoIncrementPriority?` | If true, when no priority is specified, an auto-incrementing integer priority will be used (unique per mixin key). Defaults to `false`. |
+| `defaultPriority?` | The default priority for mixins that do not specify one. Defaults to `0`. |
+| `defaultStopPropagation?` | The default `stopPropagation` value for mixins that do not specify one. Defaults to `false`. |
+| `defaultSignal?` | The default `AbortSignal` for mixins that do not specify one. Defaults to `undefined`. |
+
+<br>
+
 ### Methods:
 #### `Mixins.resolve()`
-Signature: `resolve(mixinKey: string, inputValue: any, inputCtx?: any): TArg`  
+Signature: `resolve<TArg extends any, TCtx extends any>(mixinKey: string, inputValue: TArg, inputCtx?: TCtx): TArg`  
 Applies all mixin functions that were registered with [`add()`](#mixinsadd) for the given mixin key to resolve the input value.  
 Goes in order of highest to lowest priority and returns the resolved value, which is of the same type as the input value.  
 If no mixin functions are registered for the given key, the input value will be returned unchanged.  
@@ -1903,11 +1909,23 @@ If no mixin functions are registered for the given key, the input value will be 
 <br>
 
 #### `Mixins.add()`
-Signature: `add(mixinKey: string, mixinFn: (arg: any, ctx?: any) => any, config?: Partial<MixinConfig>): () => void`  
+Signature: `add<TArg extends any, TCtx extends any>(mixinKey: string, mixinFn: (arg: TArg, ctx?: TCtx) => TArg, config?: Partial<MixinConfig>): () => void`  
 Registers a mixin function for the given key.  
 The function will be called with the input value (possibly modified by previous mixins) and possibly a context object.  
 When a value for the context parameter is defined in the main generic of the `Mixins` class, the ctx parameter will be required. Otherwise it should always be unspecified.  
-Returns a function that can be called to remove the mixin function from the list of registered mixins.
+  
+Returns a function that can be called to remove the mixin function from the list of registered mixins.  
+This is an alternative to providing a `signal` property in the config object, which allows for removing many different mixins from multiple instances with the same `AbortSignal`.  
+  
+To stop a mixin chain at any point, add a mixin with the desired priority and a function that just returns the input value without modifying it and with the `stopPropagation` property set to `true`.  
+For example, if you need to stop the chain *after* the mixins with the priorities 0, but *before* 1, use the priority 0.5 for the stopping mixin.
+  
+The properties of the `MixinConfig` object are:
+| Property | Description |
+| :-- | :-- |
+| `priority?` | The higher, the earlier the mixin will be applied. Supports floating-point and negative numbers too. 0 by default. |
+| `stopPropagation?` | If true, no further mixins will be applied after this one. |
+| `signal?` | If set, the mixin will only be applied if the given signal is not yet aborted. Allows for better orchestration than with the cleanup functions returned by `add()` in some cases. |
 
 <br>
 
@@ -1923,36 +1941,38 @@ Doesn't return the mixin functions themselves.
 ```ts
 import { Mixins } from "@sv443-network/userutils";
 
+const ac = new AbortController();
+// if removeAllMixins() is called, all mixins will be removed from the myMixins instance:
+const { abort: removeAllMixins } = ac;
 
+// create Mixins instance with auto-incrementing priority:
 const myMixins = new Mixins<{
   foo: (val: number) => number;
-  bar: (v: string, ctx: { barGlobal: number }) => string;
-}>();
+  bar: (v: string, ctx: { baz: number }) => string;
+}>({
+  autoIncrementPriority: true,
+  defaultSignal: ac.signal,
+});
 
 
 // foo:
 
-// internal function:
-export function calcFoo(fooVal: number) {
+// main function:
+function calcFoo(val: number) {
   // order of operations:
-  // 1. fooVal ** 2
-  // 2. / 2 (critical prio)
-  // 3. + 1 (added first)
-  // 4. * 2 (added second)
-  return myMixins.use("foo", fooVal ** 2);
+  // 1. val ** 2   (this function)
+  // 2. val / 2    (source 2 mixin)
+  // 3. val * 2    (source 3 mixin)
+  // 4. val + 1    (source 1 mixin)
+  return myMixins.resolve("foo", val ** 2);
 }
 
-// mixin from source 1:
+// mixin from source 1 (priority 0):
 myMixins.add("foo", (val) => {
   return val + 1;
 });
 
-// mixin from source 2:
-myMixins.add("foo", (val) => {
-  return val * 2;
-});
-
-// mixin from source 3 with critical priority:
+// mixin from source 2 (highest possible priority):
 myMixins.add("foo", (val) => {
   return val / 2;
 }, {
@@ -1960,31 +1980,39 @@ myMixins.add("foo", (val) => {
   priority: Number.MAX_SAFE_INTEGER,
 });
 
+// mixin from source 3 (priority 1):
+myMixins.add("foo", (val) => {
+  return val * 2;
+});
+
+getFoo(10); // 10 ** 2 / 2 * 2 + 1 = 101
+
 
 // bar:
 
-const barGlobal = 1337;
+// some global variable that will be provided as context to the mixin:
+export let baz = 1337;
 
-// internal function:
-export function getBar(barVal: string) {
+// main function:
+function getBar(barVal: string) {
   // order of operations:
-  // 1. barVal + "-" + barGlobal (highest priority & has stopPropagation)
+  // 1. barVal + "-" + baz   (source 2 mixin, highest priority & stopPropagation)
   // result: "Hello-1337"
-  return myMixins.use("bar", barVal, { barGlobal });
+
+  // context object is mandatory because of the generic type at `new Mixins<...>()`:
+  return myMixins.resolve("bar", barVal, { baz });
 }
 
-// mixin from source 1:
-myMixins.add("bar", (val) => {
-  return val + " this is ignored";
-});
+// mixin from source 1 (priority 0):
+myMixins.add("bar", (val) => `*this will never be applied* ${val}`);
 
-// mixin from source 2:
-myMixins.add("bar", (val, ctx) => {
-  return val + "-" + ctx.barGlobal;
-}, {
+// mixin from source 2 (priority 1 & stopPropagation):
+myMixins.add("bar", (val, ctx) => `${val}-${ctx.baz}`, {
   priority: 1,
   stopPropagation: true,
 });
+
+getBar(); // "Hello-1337"
 ```
 </details>
 
@@ -1993,7 +2021,7 @@ myMixins.add("bar", (val, ctx) => {
 ### NanoEmitter
 Signature:  
 ```ts
-new NanoEmitter<TEventMap = EventsMap>(options?: NanoEmitterOptions): NanoEmitter<TEventMap>
+new NanoEmitter<TEventMap = EventsMap>(options?: NanoEmitterOptions)
 ```  
   
 A class that provides a minimalistic event emitter with a tiny footprint powered by [nanoevents.](https://npmjs.com/package/nanoevents)  
