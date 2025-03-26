@@ -36,8 +36,6 @@ export function autoPlural(term: Stringifiable, num: number | ListWithLength, pl
     return `${term}${n === 1 ? "" : "s"}`;
   case "-ies":
     return `${String(term).slice(0, -1)}${n === 1 ? "y" : "ies"}`;
-  default:
-    return String(term);
   }
 }
 

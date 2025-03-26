@@ -307,12 +307,10 @@ function getFallbackLanguage(): string | undefined {
  * @param args A tuple containing the regular expression to match and the transform function to call if the pattern is found in a translation string
  */
 function addTransform<TTrKey extends string = string>(transform: TransformTuple<TTrKey>): void {
-  const [pattern, fn] = transform;
+  const [regex, fn] = transform;
   valTransforms.push({
     fn: fn as TransformFn,
-    regex: typeof pattern === "string"
-      ? new RegExp(pattern, "gm")
-      : pattern
+    regex,
   });
 }
 
@@ -321,15 +319,11 @@ function addTransform<TTrKey extends string = string>(transform: TransformTuple<
  * @param patternOrFn A reference to the regular expression of the transform function, a string matching the original pattern, or a reference to the transform function to delete
  * @returns Returns true if the transform function was found and deleted, false if it wasn't found
  */
-function deleteTransform(patternOrFn: RegExp | string | TransformFn): boolean {
+function deleteTransform(patternOrFn: RegExp | TransformFn): boolean {
   const idx = valTransforms.findIndex((t) =>
     typeof patternOrFn === "function"
       ? t.fn === patternOrFn
-      : (
-        typeof patternOrFn === "string"
-          ? t.regex.source === patternOrFn
-          : t.regex === patternOrFn
-      )
+      : t.regex === patternOrFn
   );
   if(idx !== -1) {
     valTransforms.splice(idx, 1);
