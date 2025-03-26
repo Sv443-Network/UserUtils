@@ -9,12 +9,14 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 <br>
 
+[![tree shaking support badge](https://badgen.net/bundlephobia/tree-shaking/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
 [![minified bundle size badge](https://badgen.net/bundlephobia/min/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
 [![minified and gzipped bundle size badge](https://badgen.net/bundlephobia/minzip/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
-[![tree shaking support badge](https://badgen.net/bundlephobia/tree-shaking/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+![code coverage percentage](https://img.shields.io/coverallsCoverage/github/Sv443-Network/UserUtils?branch=main)
 
 [![github stargazers badge](https://badgen.net/github/stars/Sv443-Network/UserUtils?icon=github)](https://github.com/Sv443-Network/UserUtils/stargazers)
 [![discord server badge](https://badgen.net/discord/online-members/aBH4uRG?icon=discord)](https://dc.sv443.net/)
+[![Support development on Github Sponsors](https://img.shields.io/github/sponsors/Sv443)](https://github.com/sponsors/Sv443)
 
 <br>
 
