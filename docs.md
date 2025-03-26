@@ -1914,6 +1914,10 @@ Registers a mixin function for the given key.
 The function will be called with the input value (possibly modified by previous mixins) and possibly a context object.  
 When a value for the context parameter is defined in the main generic of the `Mixins` class, the ctx parameter will be required. Otherwise it should always be unspecified.  
   
+Mixins with the highest priority will be applied first. If two or more mixins share the exact same priority, they will be executed in order of registration (first come, first serve).  
+If a mixin has `stopPropagation` set, the chain will immediately stop after it has finished and the value resolution will end there.  
+To conditionally apply mixins (enable/disable them), you can switch between returning the input value (effectively disabled) and the modified value based on a condition supplied by the context object.  
+  
 Returns a function that can be called to remove the mixin function from the list of registered mixins.  
 This is an alternative to providing a `signal` property in the config object, which allows for removing many different mixins from multiple instances with the same `AbortSignal`.  
   
@@ -1936,7 +1940,45 @@ Doesn't return the mixin functions themselves.
 
 <br>
 
-<details><summary><b>Example - click to view</b></summary>
+<details><summary><b>Simple Example - click to view</b></summary>
+
+```ts
+import { Mixins } from "@sv443-network/userutils";
+
+// create Mixins instance:
+const myMixins = new Mixins<{
+  /** Here is a perfect place to describe what your value does and give ideas on how to modify it */
+  myValue: (val: number, ctx: { myFactor: number }) => number;
+}>();
+
+// register mixin functions:
+
+// source 1 (priority 0, index 0):
+myMixins.add("myValue", (val, { myFactor }) => val * myFactor);
+
+// source 2 (priority 0, index 1):
+myMixins.add("myValue", (val) => val + 1);
+
+// source 3 (priority 1):
+myMixins.add("myValue", (val) => val * 2, {
+  priority: 1,
+});
+
+// apply mixins and transform the input value:
+
+const result = myMixins.resolve("myValue", 10, { myFactor: 0.75 });
+// order of operations:
+// 1. inputVal = 10
+// 2. 10 * 2 = 20     (source 3 mixin)
+// 3. 20 * 0.75 = 15  (source 1 mixin)
+// 4. 15 + 1 = 16     (source 2 mixin)
+// result = 16
+```
+</details>
+
+<br>
+
+<details><summary><b>Advanced Example - click to view</b></summary>
 
 ```ts
 import { Mixins } from "@sv443-network/userutils";
@@ -1947,8 +1989,21 @@ const { abort: removeAllMixins } = ac;
 
 // create Mixins instance with auto-incrementing priority:
 const myMixins = new Mixins<{
+  /** Here is a perfect place to describe what your value does and give ideas on how to modify it */
   foo: (val: number) => number;
+  /** It is especially useful to document your mixins in an environment with user submitted mods/plugins */
   bar: (v: string, ctx: { baz: number }) => string;
+  /**
+   * In this example, to calculate the gravity of the player character in a game engine, mods could interject and modify the gravity value.  
+   * In this JSDoc comment, you should explain the default value, the general range of values and the effect of the value on the game.  
+   * You should also explain the context object and its properties.
+   */
+  playerGravity: (val: number, ctx: { base: 1.575 }) => number;
+  /**
+   * All JS types can be passed, not just JSON-serializable types, so you can also use mixins to modify an object.  
+   * Also, you are able to pass complex objects in the context parameter to allow for more advanced modifications and multidirectional data flow.
+   */
+  playerProps: (val: PlayerProps, ctx: { player: Player, lobby: Lobby, currentTick: bigint, pauseGame: () => void }) => PlayerProps;
 }>({
   autoIncrementPriority: true,
   defaultSignal: ac.signal,
@@ -1960,10 +2015,10 @@ const myMixins = new Mixins<{
 // main function:
 function calcFoo(val: number) {
   // order of operations:
-  // 1. val ** 2   (this function)
-  // 2. val / 2    (source 2 mixin)
-  // 3. val * 2    (source 3 mixin)
-  // 4. val + 1    (source 1 mixin)
+  // 1. val = val ** 2
+  // 2. val / 2   (source 2 mixin)
+  // 3. val * 2   (source 3 mixin)
+  // 4. val + 1   (source 1 mixin)
   return myMixins.resolve("foo", val ** 2);
 }
 
@@ -1991,28 +2046,54 @@ getFoo(10); // 10 ** 2 / 2 * 2 + 1 = 101
 // bar:
 
 // some global variable that will be provided as context to the mixin:
-export let baz = 1337;
+var baz = 1337;
 
 // main function:
-function getBar(barVal: string) {
+function getBar(val: string) {
   // order of operations:
-  // 1. barVal + "-" + baz   (source 2 mixin, highest priority & stopPropagation)
+  // 1. val             (source 2 mixin)
+  // 2. `${val}-${baz}` (source 3 mixin with stopPropagation)
+  // 3. (skipped)       (source 1 mixin)
   // result: "Hello-1337"
 
   // context object is mandatory because of the generic type at `new Mixins<...>()`:
-  return myMixins.resolve("bar", barVal, { baz });
+  return myMixins.resolve("bar", val, { baz });
 }
 
 // mixin from source 1 (priority 0):
 myMixins.add("bar", (val) => `*this will never be applied* ${val}`);
 
-// mixin from source 2 (priority 1 & stopPropagation):
-myMixins.add("bar", (val, ctx) => `${val}-${ctx.baz}`, {
+// mixin from source 2 (priority 1):
+// while baz is >= 1000, this mixin is practically disabled:
+myMixins.add("bar", (val, ctx) => {
+  if(ctx.baz < 1000)
+    return `${val} < 1000`;
+  // disable this mixin if baz >= 1000 by returning the unmodified input value:
+  return val;
+}, {
   priority: 1,
-  stopPropagation: true,
 });
 
-getBar(); // "Hello-1337"
+const acBarSrc3 = new AbortController();
+const { abort: removeBarSrc3 } = acBarSrc3;
+
+// mixin from source 3 (priority 0.5 & stopPropagation):
+myMixins.add("bar", (val, ctx) => {
+  return `${val}-${ctx.baz}`;
+}, {
+  priority: 0.5,
+  stopPropagation: true,
+  signal: acBarSrc3.signal,
+});
+
+getBar("Hello"); // "Hello-1337"
+
+// remove source 3 from "bar" mixins:
+removeBarSrc3();
+
+// only source 2 is left:
+baz = 999;
+getBar("Hello"); // "Hello < 1000"
 ```
 </details>
 
