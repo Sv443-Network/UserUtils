@@ -62,6 +62,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.11",
     "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.23.0",
     "@testing-library/dom": "^10.4.0",
     "@types/express": "^4.17.21",
     "@types/greasemonkey": "^4.0.7",
