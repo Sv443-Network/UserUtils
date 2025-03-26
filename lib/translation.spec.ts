@@ -25,8 +25,9 @@ describe("Translation", () => {
     expect(tr.for("de", "hello")).toBe("Hallo");
     expect(tr.for("de", "goodbye")).toBe("Goodbye");
 
-    tr.deleteTranslations("de");
+    expect(tr.deleteTranslations("de")).toBe(true);
     expect(tr.for("de", "hello")).toBe("Hello");
+    expect(tr.deleteTranslations("de")).toBe(false);
 
     tr.setFallbackLanguage();
     expect(tr.for("de", "hello")).toBe("hello");
@@ -60,7 +61,11 @@ describe("Translation", () => {
     expect(tr.for("en", "templateLiteral", { name: "Jeff" })).toBe("Hello, Jeff");
     expect(tr.for("en", "templateLiteral", { toString: () => "Jeff" })).toBe("Hello, Jeff");
 
-    tr.deleteTransform(tr.transforms.percent[0]);
+    expect(tr.deleteTransform(tr.transforms.percent[0])).toBe(true);
     expect(tr.for("en", "percent", "Jeff")).toBe("Hello, %1");
+    expect(tr.deleteTransform(tr.transforms.percent[0])).toBe(false);
+
+    tr.deleteTransform(tr.transforms.templateLiteral[1]);
+    expect(tr.for("en", "templateLiteral", "Jeff")).toBe("Hello, ${name}");
   });
 });
