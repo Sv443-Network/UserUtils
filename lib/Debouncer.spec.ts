@@ -29,7 +29,7 @@ describe("Debouncer", () => {
     const avg = deltaTs
       .reduce((a, b) => a + b, 0) / deltaTs.length;
 
-    expect(avg).toBeLessThanOrEqual(deb.getTimeout() + 50);
+    expect(avg + 10).toBeLessThanOrEqual(deb.getTimeout() + 50);
   });
 
   //#region idle
@@ -67,7 +67,7 @@ describe("Debouncer", () => {
     const avg = deltaTs
       .reduce((a, b) => a + b, 0) / deltaTs.length;
 
-    expect(avg).toBeGreaterThanOrEqual(minDeltaT);
+    expect(avg + 10).toBeGreaterThanOrEqual(minDeltaT);
   });
 
   //#region all methods

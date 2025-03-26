@@ -57,4 +57,13 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm test
+        run: npm test-coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov-report/
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
