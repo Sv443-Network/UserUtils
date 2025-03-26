@@ -53,15 +53,15 @@ export function addGlobalStyle(style: string): HTMLStyleElement {
 
 /**
  * Preloads an array of image URLs so they can be loaded instantly from the browser cache later on
- * @param rejects If set to `true`, the returned PromiseSettledResults will contain rejections for any of the images that failed to load
+ * @param rejects If set to `true`, the returned PromiseSettledResults will contain rejections for any of the images that failed to load. Is set to `false` by default.
  * @returns Returns an array of `PromiseSettledResult` - each resolved result will contain the loaded image element, while each rejected result will contain an `ErrorEvent`
  */
 export function preloadImages(srcUrls: string[], rejects = false): Promise<PromiseSettledResult<HTMLImageElement>[]> {
   const promises = srcUrls.map(src => new Promise<HTMLImageElement>((res, rej) => {
     const image = new Image();
-    image.src = src;
     image.addEventListener("load", () => res(image));
     image.addEventListener("error", (evt) => rejects && rej(evt));
+    image.src = src;
   }));
 
   return Promise.allSettled(promises);
@@ -76,7 +76,8 @@ export function preloadImages(srcUrls: string[], rejects = false): Promise<Promi
  */
 export function openInNewTab(href: string, background?: boolean, additionalProps?: Partial<HTMLAnchorElement>): void {
   try {
-    GM.openInTab?.(href, background);
+    if(typeof window.GM === "object")
+      GM.openInTab(href, background);
   }
   catch {
     const openElem = document.createElement("a");
@@ -117,7 +118,7 @@ export function interceptEvent<
   predicate: (event: TPredicateEvt) => boolean = () => true,
 ): void {
   // @ts-ignore
-  if(GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
+  if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
     throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript runs in.");
 
   // default is 25 on FF so this should hopefully be more than enough
