@@ -37,7 +37,8 @@
     "test-gm-serve": "node --import tsx ./test/TestPage/server.mts",
     "test-gm-dev": "cd test/TestScript && pnpm dev",
     "test-gm": "concurrently \"pnpm test-gm-serve\" \"pnpm test-gm-dev\"",
-    "test": "vitest --passWithNoTests"
+    "test": "vitest --passWithNoTests",
+    "test-coverage": "vitest --passWithNoTests --coverage"
   },
   "repository": {
     "type": "git",
@@ -71,6 +72,7 @@
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "@typescript-eslint/utils": "^8.21.0",
+    "@vitest/coverage-v8": "^3.0.9",
     "concurrently": "^8.2.2",
     "eslint": "^9.18.0",
     "express": "^4.21.2",
