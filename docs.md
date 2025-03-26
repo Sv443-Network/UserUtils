@@ -1901,18 +1901,26 @@ The properties of the `MixinsConstructorConfig` object in the constructor are:
 
 ### Methods:
 #### `Mixins.resolve()`
-Signature: `resolve<TArg extends any, TCtx extends any>(mixinKey: string, inputValue: TArg, inputCtx?: TCtx): TArg`  
-Applies all mixin functions that were registered with [`add()`](#mixinsadd) for the given mixin key to resolve the input value.  
-Goes in order of highest to lowest priority and returns the resolved value, which is of the same type as the input value.  
+Signature: `resolve<TArg extends any, TCtx extends any>(mixinKey: string, inputValue: TArg, inputCtx?: TCtx): TArg | Promise<TArg>`  
+Applies all mixin functions that were registered with [`add()`](#mixinsadd) for the given mixin key to transform the input value.  
+Goes in order of highest to lowest priority and returns the transformed value, which has to be of the same type as the input value.  
 If no mixin functions are registered for the given key, the input value will be returned unchanged.  
+  
+If some of the mixins are async (return a Promise), the `resolve()` method will also return a Promise that resolves to the final value.  
+If a mixin is defined as async but none of the registered functions for it return a Promise in [`add()`](#mixinsadd), the returned value will *not* be a Promise. With `await`, this doesn't matter, but the `.then()` method will not work in this case and will need an explicit wrapping in `Promise.resolve()`.  
 
 <br>
 
 #### `Mixins.add()`
-Signature: `add<TArg extends any, TCtx extends any>(mixinKey: string, mixinFn: (arg: TArg, ctx?: TCtx) => TArg, config?: Partial<MixinConfig>): () => void`  
+Signature: `add<TArg extends any, TCtx extends any>(mixinKey: string, mixinFn: (arg: TArg, ctx?: TCtx) => TArg | Promise<TArg>, config?: Partial<MixinConfig>): () => void`  
 Registers a mixin function for the given key.  
 The function will be called with the input value (possibly modified by previous mixins) and possibly a context object.  
 When a value for the context parameter is defined in the main generic of the `Mixins` class, the ctx parameter will be required. Otherwise it should always be unspecified.  
+  
+If the mixin function is async, it should return a Promise that resolves to the modified value.  
+It will also cause the [`resolve()`](#mixinsresolve) method to return a Promise that resolves to the final value.  
+In TypeScript, it is extremely important to mark the return type of the function as a Promise in the constructor's generic parameter if the function can potentially be async.  
+It doesn't have to necessarily return an async value, but marking it as such means there is a possibility of it.  
   
 Mixins with the highest priority will be applied first. If two or more mixins share the exact same priority, they will be executed in order of registration (first come, first serve).  
 If a mixin has `stopPropagation` set, the chain will immediately stop after it has finished and the value resolution will end there.  
@@ -1948,7 +1956,8 @@ import { Mixins } from "@sv443-network/userutils";
 // create Mixins instance:
 const myMixins = new Mixins<{
   /** Here is a perfect place to describe what your value does and give ideas on how to modify it */
-  myValue: (val: number, ctx: { myFactor: number }) => number;
+  myValue: (val: number, ctx: { myFactor: number }) => Promise<number>;
+  // ^ if a function is declared as returning a Promise<T>, the Mixins.add() method will accept functions that return either T or Promise<T>
 }>();
 
 // register mixin functions:
@@ -1956,8 +1965,9 @@ const myMixins = new Mixins<{
 // source 1 (priority 0, index 0):
 myMixins.add("myValue", (val, { myFactor }) => val * myFactor);
 
+// myValue returns a Promise in the constructor generic parameter above, so mixin functions can be either sync or async:
 // source 2 (priority 0, index 1):
-myMixins.add("myValue", (val) => val + 1);
+myMixins.add("myValue", (val) => Promise.resolve(val + 1));
 
 // source 3 (priority 1):
 myMixins.add("myValue", (val) => val * 2, {
@@ -1966,7 +1976,8 @@ myMixins.add("myValue", (val) => val * 2, {
 
 // apply mixins and transform the input value:
 
-const result = myMixins.resolve("myValue", 10, { myFactor: 0.75 });
+// since some of the mixin functions are async, the result will be a Promise:
+const result = await myMixins.resolve("myValue", 10, { myFactor: 0.75 });
 // order of operations:
 // 1. inputVal = 10
 // 2. 10 * 2 = 20     (source 3 mixin)
@@ -1992,7 +2003,7 @@ const myMixins = new Mixins<{
   /** Here is a perfect place to describe what your value does and give ideas on how to modify it */
   foo: (val: number) => number;
   /** It is especially useful to document your mixins in an environment with user submitted mods/plugins */
-  bar: (v: string, ctx: { baz: number }) => string;
+  bar: (v: string, ctx: { baz: number }) => Promise<string>;
   /**
    * In this example, to calculate the gravity of the player character in a game engine, mods could interject and modify the gravity value.  
    * In this JSDoc comment, you should explain the default value, the general range of values and the effect of the value on the game.  
@@ -2049,7 +2060,7 @@ getFoo(10); // 10 ** 2 / 2 * 2 + 1 = 101
 var baz = 1337;
 
 // main function:
-function getBar(val: string) {
+async function getBar(val: string) {
   // order of operations:
   // 1. val             (source 2 mixin)
   // 2. `${val}-${baz}` (source 3 mixin with stopPropagation)
@@ -2057,7 +2068,8 @@ function getBar(val: string) {
   // result: "Hello-1337"
 
   // context object is mandatory because of the generic type at `new Mixins<...>()`:
-  return myMixins.resolve("bar", val, { baz });
+  // also, resolve returns a Promise because the mixin function signature is async:
+  return await myMixins.resolve("bar", val, { baz });
 }
 
 // mixin from source 1 (priority 0):
@@ -2078,22 +2090,26 @@ const acBarSrc3 = new AbortController();
 const { abort: removeBarSrc3 } = acBarSrc3;
 
 // mixin from source 3 (priority 0.5 & stopPropagation):
-myMixins.add("bar", (val, ctx) => {
-  return `${val}-${ctx.baz}`;
-}, {
+myMixins.add("bar", (val, ctx) => new Promise((resolve) => {
+  // async mixin chains allow for lazy-loading and other async operations:
+  setTimeout(() => {
+    resolve(`${val}-${ctx.baz}`);
+  }, 1000);
+}), {
   priority: 0.5,
   stopPropagation: true,
   signal: acBarSrc3.signal,
 });
 
-getBar("Hello"); // "Hello-1337"
+// applies source 2 (practically disabled) and source 3:
+await getBar("Hello"); // "Hello-1337"
 
-// remove source 3 from "bar" mixins:
+// remove source 3 from "bar" mixins and set baz < 1000:
 removeBarSrc3();
+baz = 999;
 
 // only source 2 is left:
-baz = 999;
-getBar("Hello"); // "Hello < 1000"
+await getBar("Hello"); // "Hello < 1000"
 ```
 </details>
 
