@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptEvent, isDomLoaded, observeElementProp, preloadImages, probeElementStyle, setInnerHtmlUnsafe } from "./dom.js";
+import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptEvent, isDomLoaded, isScrollable, observeElementProp, openInNewTab, preloadImages, probeElementStyle, setInnerHtmlUnsafe } from "./dom.js";
 
 //#region getUnsafeWindow
 describe("dom/getUnsafeWindow", () => {
@@ -51,8 +51,25 @@ describe.skip("dom/preloadImages", () => {
 });
 
 //#region openInNewTab
-describe.skip("dom/openInNewTab", () => {
-  // obviously cant test this
+describe("dom/openInNewTab", () => {
+  it("Via GM.openInTab", () => {
+    let link = "", bg;
+    // @ts-expect-error
+    window.GM = {
+      openInTab(href: string, background?: boolean) {
+        link = href;
+        bg = background;
+      }
+    };
+
+    openInNewTab("https://example.org", true);
+
+    expect(link).toBe("https://example.org");
+    expect(bg).toBe(true);
+
+    // @ts-expect-error
+    delete window.GM;
+  });
 });
 
 //#region interceptEvent

@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { tr } from "./translation.js";
+import { tr, TrKeys } from "./translation.js";
 
 describe("Translation", () => {
   //#region base
   it("Base translation", () => {
-    tr.addTranslations("en", {
+    const trEn = {
       hello: "Hello",
       goodbye: "Goodbye",
-    });
+      nested: {
+        foo: {
+          bar: "Baz",
+        },
+      },
+    } as const;
+    tr.addTranslations("en", trEn);
     tr.addTranslations("de", {
       hello: "Hallo",
     });
@@ -28,8 +34,11 @@ describe("Translation", () => {
     expect(tr.getTranslations("en")?.hello).toBe("Hello");
     expect(tr.getTranslations("de")?.hello).toBeUndefined();
 
-    const t = tr.use("en");
+    const t = tr.use<TrKeys<typeof trEn>>("en");
     expect(t("hello")).toBe("Hello");
+
+    expect(t("nested.foo.bar")).toBe("Baz");
+    expect(tr.hasKey("en", "nested.foo.bar")).toBe(true);
   });
 
   //#region transforms

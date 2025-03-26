@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { Mixins } from "./Mixins.js";
 
 describe("Mixins", () => {
+  //#region base
   it("Base resolution", () => {
     const mixins = new Mixins<{
       foo: (v: number, ctx: { a: number }) => number;
@@ -18,8 +19,12 @@ describe("Mixins", () => {
     // result: 0b0001 = 1
 
     expect(mixins.resolve("foo", 0b1100, { a: 0b0100 })).toBe(1);
+
+    expect(mixins.list()).toHaveLength(3);
+    expect(mixins.list().every(m => m.key === "foo")).toBe(true);
   });
 
+  //#region priority
   it("Priority resolution", () => {
     const mixins = new Mixins<{
       foo: (v: number) => number;
@@ -40,6 +45,7 @@ describe("Mixins", () => {
     expect(mixins.resolve("foo", 100)).toBe(32);
   });
 
+  //#region sync/async & cleanup
   it("Sync/async resolution & cleanup", async () => {
     const acAll = new AbortController();
 
@@ -57,12 +63,14 @@ describe("Mixins", () => {
       await new Promise((r) => setTimeout(r, 50));
       return v + 2;
     });
+    const rem4 = mixins.add("foo", async (v) => v); // 4 (prio 0, index 3)
 
     const res1 = mixins.resolve("foo", 100);
     expect(res1).toBeInstanceOf(Promise);
     expect(await res1).toBe(10002);
 
     rem3();
+    rem4();
 
     const res2 = mixins.resolve("foo", 100);
     expect(res2).not.toBeInstanceOf(Promise);

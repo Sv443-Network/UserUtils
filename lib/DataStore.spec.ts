@@ -13,16 +13,22 @@ class TestDataStore<TData extends object = object> extends DataStore<TData> {
 }
 
 describe("DataStore", () => {
+  //#region base
   it("Basic usage", async () => {
     const store = new DataStore({
       id: "test-1",
       defaultData: { a: 1, b: 2 },
       formatVersion: 1,
-      storageMethod: "sessionStorage",
+      storageMethod: "localStorage",
+      encodeData: (d) => d,
+      decodeData: (d) => d,
     });
 
     // should equal defaultData:
     expect(store.getData().a).toBe(1);
+
+    // deepCopy should return a new object:
+    expect(store.getData(true) === store.getData(true)).toBe(false);
 
     await store.loadData();
 
@@ -41,12 +47,13 @@ describe("DataStore", () => {
     await store.loadData();
     expect(store.getData().a).toBe(1);
 
-    expect(store.encodingEnabled()).toBe(false);
+    expect(store.encodingEnabled()).toBe(true);
 
     // restore initial state:
     await store.deleteData();
   });
 
+  //#region encoding
   it("Works with encoding", async () => {
     const store = new DataStore({
       id: "test-2",
@@ -66,8 +73,12 @@ describe("DataStore", () => {
     expect(store.getData()).toEqual({ a: 2, b: 2 });
 
     expect(store.encodingEnabled()).toBe(true);
+
+    // restore initial state:
+    await store.deleteData();
   });
 
+  //#region data & ID migrations
   it("Data and ID migrations work", async () => {
     const firstStore = new DataStore({
       id: "test-3",
@@ -126,5 +137,86 @@ describe("DataStore", () => {
 
     expect(await thirdStore.test_getValue("_uucfgver-test-3", "")).toBe("");
     expect(await thirdStore.test_getValue("_uucfgver-test-4", "")).toBe("");
+
+    // restore initial state:
+    await firstStore.deleteData();
+    await secondStore.deleteData();
+    await thirdStore.deleteData();
+  });
+
+  //#region migration error
+  it("Migration error", async () => {
+    const store1 = new DataStore({
+      id: "test-migration-error",
+      defaultData: { a: 1, b: 2 },
+      formatVersion: 1,
+      storageMethod: "localStorage",
+    });
+
+    await store1.loadData();
+
+    const store2 = new DataStore({
+      id: "test-migration-error",
+      defaultData: { a: 5, b: 5, c: 5 },
+      formatVersion: 2,
+      storageMethod: "localStorage",
+      migrations: {
+        2: (_oldData: typeof store1["defaultData"]) => {
+          throw new Error("Some error in the migration function");
+        },
+      },
+    });
+
+    // should reset to defaultData, because of the migration error:
+    await store2.loadData();
+
+    expect(store2.getData().a).toBe(5);
+    expect(store2.getData().b).toBe(5);
+    expect(store2.getData().c).toBe(5);
+  });
+
+  //#region invalid persistent data
+  it("Invalid persistent data", async () => {
+    const store1 = new TestDataStore({
+      id: "test-6",
+      defaultData: { a: 1, b: 2 },
+      formatVersion: 1,
+      storageMethod: "sessionStorage",
+    });
+
+    await store1.loadData();
+    await store1.setData({ ...store1.getData(), a: 2 });
+
+    await store1.test_setValue(`_uucfg-${store1.id}`, "invalid");
+
+    // should reset to defaultData:
+    await store1.loadData();
+
+    expect(store1.getData().a).toBe(1);
+    expect(store1.getData().b).toBe(2);
+
+    // @ts-expect-error
+    window.GM = {
+      getValue: async () => 1337,
+      setValue: async () => undefined,
+    }
+
+    const store2 = new TestDataStore({
+      id: "test-7",
+      defaultData: { a: 1, b: 2 },
+      formatVersion: 1,
+      storageMethod: "GM",
+    });
+
+    await store1.setData({ ...store1.getData(), a: 2 });
+
+    // invalid type number should reset to defaultData:
+    await store2.loadData();
+
+    expect(store2.getData().a).toBe(1);
+    expect(store2.getData().b).toBe(2);
+
+    // @ts-expect-error
+    delete window.GM;
   });
 });
