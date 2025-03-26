@@ -1559,8 +1559,9 @@ If you want to import all serialized data, refer to the method [`DataStoreSerial
 <br>
 
 #### `DataStoreSerializer.loadStoresData()`
-Signature: `loadStoresData(): PromiseSettledResult<{ id: string, data: object }>[];`  
-Loads the persistent data of the DataStore instances into the in-memory cache of each DataStore instance.  
+Signature: `loadStoresData(stores?: string[] | ((id: string) => boolean)): PromiseSettledResult<{ id: string, data: object }>[];`  
+Loads the persistent data of the DataStore instances with IDs matching the `stores` parameter into the in-memory cache of each DataStore instance.  
+If no stores are specified, all stores will be loaded.  
 Also triggers the migration process if the data format has changed.  
 See the [`DataStore.loadData()`](#datastoreloaddata) method for more information.  
   
@@ -1590,16 +1591,18 @@ See the [`DataStore.loadData()`](#datastoreloaddata) method for more information
 <br>
 
 #### `DataStoreSerializer.resetStoresData()`
-Signature: `resetStoresData(): PromiseSettledResult[];`  
-Resets the persistent data of the DataStore instances to their default values.  
+Signature: `resetStoresData(stores?: string[] | ((id: string) => boolean)): PromiseSettledResult[];`  
+Resets the persistent data of the DataStore instances with IDs matching the `stores` parameter to their default values.  
+If no stores are specified, all stores will be reset.  
 This affects both the in-memory cache and the persistent storage.  
 Any call to `serialize()` will then use the value of `options.defaultData` of the respective DataStore instance.  
 
 <br>
 
 #### `DataStoreSerializer.deleteStoresData()`
-Signature: `deleteStoresData(): PromiseSettledResult[];`  
-Deletes the persistent data of the DataStore instances from the set storage method.  
+Signature: `deleteStoresData(stores?: string[] | ((id: string) => boolean)): PromiseSettledResult[];`  
+Deletes the persistent data of the DataStore instances with IDs matching the `stores` parameter from the set storage method.  
+If no stores are specified, all stores' persistent data will be deleted.  
 Leaves the in-memory cache of the DataStore instances untouched.  
 Any call to `setData()` on the instances will recreate their own persistent storage data.
 
