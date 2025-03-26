@@ -26,6 +26,7 @@ const config = [
       "**/dev/**/*",
       "**/test.ts",
       "test/**/*",
+      "**/*.spec.ts",
     ],
   }, ...compat.extends(
     "eslint:recommended",
