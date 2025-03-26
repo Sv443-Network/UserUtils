@@ -9,9 +9,9 @@ import { ChecksumMismatchError } from "./errors.js";
 import type { DataStore } from "./DataStore.js";
 
 export type DataStoreSerializerOptions = {
-  /** Whether to add a checksum to the exported data */
+  /** Whether to add a checksum to the exported data. Defaults to `true` */
   addChecksum?: boolean;
-  /** Whether to ensure the integrity of the data when importing it by throwing an error (doesn't throw when the checksum property doesn't exist) */
+  /** Whether to ensure the integrity of the data when importing it by throwing an error (doesn't throw when the checksum property doesn't exist). Defaults to `true` */
   ensureIntegrity?: boolean;
 };
 
@@ -36,6 +36,9 @@ export type LoadStoresDataResult = {
   /** The in-memory data object */
   data: object;
 }
+
+/** A filter for selecting data stores */
+export type StoreFilter = string[] | ((id: string) => boolean);
 
 /**
  * Allows for easy serialization and deserialization of multiple DataStore instances.  
@@ -72,28 +75,28 @@ export class DataStoreSerializer {
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: true): Promise<string>;
+  public async serializePartial(stores: StoreFilter, useEncoding?: boolean, stringified?: true): Promise<string>;
   /**
    * Serializes only a subset of the data stores into a string.  
    * @param stores An array of store IDs or functions that take a store ID and return a boolean
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: false): Promise<SerializedDataStore[]>;
+  public async serializePartial(stores: StoreFilter, useEncoding?: boolean, stringified?: false): Promise<SerializedDataStore[]>;
   /**
    * Serializes only a subset of the data stores into a string.  
    * @param stores An array of store IDs or functions that take a store ID and return a boolean
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>;
+  public async serializePartial(stores: StoreFilter, useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>;
   /**
    * Serializes only a subset of the data stores into a string.  
    * @param stores An array of store IDs or functions that take a store ID and return a boolean
    * @param useEncoding Whether to encode the data using each DataStore's `encodeData()` method
    * @param stringified Whether to return the result as a string or as an array of `SerializedDataStore` objects
    */
-  public async serializePartial(stores: string[] | ((id: string) => boolean), useEncoding = true, stringified = true): Promise<string | SerializedDataStore[]> {
+  public async serializePartial(stores: StoreFilter, useEncoding = true, stringified = true): Promise<string | SerializedDataStore[]> {
     const serData: SerializedDataStore[] = [];
 
     for(const storeInst of this.stores.filter(s => typeof stores === "function" ? stores(s.id) : stores.includes(s.id))) {
@@ -140,7 +143,7 @@ export class DataStoreSerializer {
    * Deserializes the data exported via {@linkcode serialize()} and imports only a subset into the DataStore instances.  
    * Also triggers the migration process if the data format has changed.
    */
-  public async deserializePartial(stores: string[] | ((id: string) => boolean), data: string | SerializedDataStore[]): Promise<void> {
+  public async deserializePartial(stores: StoreFilter, data: string | SerializedDataStore[]): Promise<void> {
     const deserStores: SerializedDataStore[] = typeof data === "string" ? JSON.parse(data) : data;
 
     if(!Array.isArray(deserStores) || !deserStores.every(DataStoreSerializer.isSerializedDataStore))
@@ -179,32 +182,47 @@ export class DataStoreSerializer {
   /**
    * Loads the persistent data of the DataStore instances into the in-memory cache.  
    * Also triggers the migration process if the data format has changed.
+   * @param stores An array of store IDs or a function that takes the store IDs and returns a boolean - if omitted, all stores will be loaded
    * @returns Returns a PromiseSettledResult array with the results of each DataStore instance in the format `{ id: string, data: object }`
    */
-  public async loadStoresData(): Promise<PromiseSettledResult<LoadStoresDataResult>[]> {
-    return Promise.allSettled(this.stores.map(
-      async store => ({
-        id: store.id,
-        data: await store.loadData(),
-      })
-    ));
+  public async loadStoresData(stores?: StoreFilter): Promise<PromiseSettledResult<LoadStoresDataResult>[]> {
+    return Promise.allSettled(
+      this.getStoresFiltered(stores)
+        .map(async (store) => ({
+          id: store.id,
+          data: await store.loadData(),
+        })),
+    );
   }
 
-  /** Resets the persistent data of the DataStore instances to their default values. */
-  public async resetStoresData(): Promise<PromiseSettledResult<void>[]> {
-    return Promise.allSettled(this.stores.map(store => store.saveDefaultData()));
+  /**
+   * Resets the persistent and in-memory data of the DataStore instances to their default values.
+   * @param stores An array of store IDs or a function that takes the store IDs and returns a boolean - if omitted, all stores will be affected
+   */
+  public async resetStoresData(stores?: StoreFilter): Promise<PromiseSettledResult<void>[]> {
+    return Promise.allSettled(
+      this.getStoresFiltered(stores).map(store => store.saveDefaultData()),
+    );
   }
 
   /**
    * Deletes the persistent data of the DataStore instances.  
-   * Leaves the in-memory data untouched.
+   * Leaves the in-memory data untouched.  
+   * @param stores An array of store IDs or a function that takes the store IDs and returns a boolean - if omitted, all stores will be affected
    */
-  public async deleteStoresData(): Promise<PromiseSettledResult<void>[]> {
-    return Promise.allSettled(this.stores.map(store => store.deleteData()));
+  public async deleteStoresData(stores?: StoreFilter): Promise<PromiseSettledResult<void>[]> {
+    return Promise.allSettled(
+      this.getStoresFiltered(stores).map(store => store.deleteData()),
+    );
   }
 
   /** Checks if a given value is a SerializedDataStore object */
   public static isSerializedDataStore(obj: unknown): obj is SerializedDataStore {
     return typeof obj === "object" && obj !== null && "id" in obj && "data" in obj && "formatVersion" in obj && "encoded" in obj;
+  }
+
+  /** Returns the DataStore instances whose IDs match the provided array or function */
+  protected getStoresFiltered(stores?: StoreFilter): DataStore[] {
+    return this.stores.filter(s => typeof stores === "undefined" ? true : Array.isArray(stores) ? stores.includes(s.id) : stores(s.id));
   }
 }
