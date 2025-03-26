@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { autoPlural, consumeGen, consumeStringGen, fetchAdvanced, getListLength, insertValues, pauseFor, purifyObj } from "./misc.js";
+import { randomId } from "./crypto.js";
 
 //#region autoPlural
 describe("misc/autoPlural", () => {
@@ -71,6 +72,15 @@ describe("misc/fetchAdvanced", () => {
       expect(e).toBeUndefined();
     }
   });
+
+  it("Throws error on invalid resource", async () => {
+    try {
+      const res = await fetchAdvanced("invalid-url");
+    }
+    catch(e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+  });
 });
 
 //#region consumeGen
@@ -94,6 +104,7 @@ describe("misc/consumeStringGen", () => {
     expect(await consumeStringGen("a")).toBe("a");
     expect(await consumeStringGen(() => "b")).toBe("b");
     expect(await consumeStringGen(() => Promise.resolve("c"))).toBe("c");
+    expect(await consumeStringGen({ toString: () => "d" })).toBe("d");
   });
 });
 
@@ -112,7 +123,9 @@ describe("misc/getListLength", () => {
     expect(getListLength({ count: 3 })).toBe(3);
 
     // @ts-expect-error
-    expect(getListLength({})).toThrow(TypeError);
+    expect(getListLength({}, true)).toBe(0);
+    // @ts-expect-error
+    expect(getListLength({}, false)).toBe(NaN);
   });
 });
 

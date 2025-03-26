@@ -4,7 +4,7 @@ import { bitSetHas, clamp, digitCount, mapRange, randRange, roundFixed } from ".
 //#region clamp
 describe("math/clamp", () => {
   it("Clamps a value between min and max", () => {
-    expect(clamp(5, 0, 10)).toBe(5);
+    expect(clamp(5, 10)).toBe(5);
     expect(clamp(-5, 0, 10)).toBe(0);
     expect(clamp(15, 0, 10)).toBe(10);
     expect(clamp(Number.MAX_SAFE_INTEGER, 0, Infinity)).toBe(Number.MAX_SAFE_INTEGER);
