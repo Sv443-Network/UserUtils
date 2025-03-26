@@ -123,7 +123,7 @@ export class Debouncer<TFunc extends AnyFunc> extends NanoEmitter<DebouncerEvent
     const cl = (...a: Parameters<TFunc>): void => {
       this.queuedCall = undefined;
       this.emit("call", ...a);
-      this.listeners.forEach((l) => l.apply(this, a));
+      this.listeners.forEach((l) => l.call(this, ...a));
     };
 
     /** Sets a timeout that will call the latest queued call and then set another timeout if there was a queued call */
