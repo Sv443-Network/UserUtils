@@ -2775,6 +2775,8 @@ Note that this makes the function call take longer, but the generated IDs will h
 If `randomCase` is set to true (which it is by default), the generated ID will contain both upper and lower case letters.  
 This randomization is also affected by the `enhancedEntropy` setting, unless there are no alphabetic characters in the output in which case it will be skipped.  
   
+Throws a RangeError if the length is less than 1 or the radix is less than 2 or greater than 36.  
+  
 ⚠️ This is not suitable for generating anything related to cryptography! Use [SubtleCrypto's `generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that instead.  
   
 <details><summary><b>Example - click to view</b></summary>
