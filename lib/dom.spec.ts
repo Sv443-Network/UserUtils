@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptEvent, isDomLoaded, isScrollable, observeElementProp, openInNewTab, preloadImages, probeElementStyle, setInnerHtmlUnsafe } from "./dom.js";
+import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptWindowEvent, isDomLoaded, observeElementProp, onDomLoad, openInNewTab, preloadImages, probeElementStyle, setInnerHtmlUnsafe } from "./dom.js";
+import { PlatformError } from "./errors.js";
 
 //#region getUnsafeWindow
 describe("dom/getUnsafeWindow", () => {
@@ -68,47 +69,48 @@ describe("dom/openInNewTab", () => {
     expect(bg).toBe(true);
 
     // @ts-expect-error
+    window.GM = {
+      openInTab(_href: string, _background?: boolean) {
+        throw new Error("Error");
+      }
+    }
+
+    openInNewTab("https://example.org", true);
+    expect(document.querySelector(".userutils-open-in-new-tab")).not.toBeNull();
+
+    // @ts-expect-error
     delete window.GM;
-  });
-});
-
-//#region interceptEvent
-describe("dom/interceptEvent", () => {
-  it("Intercepts an event", () => {
-    const el = document.createElement("div");
-    el.id = "test-intercept";
-    document.body.appendChild(el);
-    
-    let clickedTimes = 0;
-
-    el.addEventListener("click", () => ++clickedTimes);
-    interceptEvent(el, "click", () => true);
-    el.addEventListener("click", () => ++clickedTimes);
-
-    el.click();
-
-    expect(clickedTimes).toBe(1);
-
-    document.body.removeChild(el);
   });
 });
 
 //#region interceptWindowEvent
 describe("dom/interceptWindowEvent", () => {
   it("Intercepts a window event", () => {
-    let clickedTimes = 0;
-
-    const inc = () => clickedTimes++;
+    let amount = 0;
+    const inc = () => amount++;
 
     window.addEventListener("foo", inc);
-    interceptEvent(window, "foo", () => true);
+    Error.stackTraceLimit = NaN;
+    // @ts-expect-error
+    interceptWindowEvent("foo", () => true);
     window.addEventListener("foo", inc);
 
     window.dispatchEvent(new Event("foo"));
 
-    expect(clickedTimes).toBe(1);
+    expect(amount).toBe(1);
 
     window.removeEventListener("foo", inc);
+  });
+
+  it("Throws when GM platform is FireMonkey", () => {
+    // @ts-expect-error
+    window.GM = { info: { scriptHandler: "FireMonkey" } };
+
+    // @ts-expect-error
+    expect(() => interceptWindowEvent("foo", () => true)).toThrow(PlatformError);
+
+    // @ts-expect-error
+    delete window.GM;
   });
 });
 
@@ -150,12 +152,21 @@ describe("dom/getSiblingsFrame", () => {
     expect(getSiblingsFrame(cntrEl, 3, "center-top", true).map(e => e.id)).toEqual(["e4", "e5", "e6"]);
     expect(getSiblingsFrame(cntrEl, 4, "center-top", true).map(e => e.id)).toEqual(["e4", "e5", "e6", "e7"]);
     expect(getSiblingsFrame(cntrEl, 4, "center-bottom", true).map(e => e.id)).toEqual(["e3", "e4", "e5", "e6"]);
+    // @ts-expect-error
+    expect(getSiblingsFrame(cntrEl, 2, "invalid")).toHaveLength(0);
   });
 });
 
 //#region setInnerHtmlUnsafe
 describe("dom/setInnerHtmlUnsafe", () => {
   it("Sets inner HTML", () => {
+    // @ts-expect-error
+    window.trustedTypes = {
+      createPolicy: (_name: string, opts: { createHTML: (html: string) => string }) => ({
+        createHTML: opts.createHTML,
+      }),
+    };
+
     const el = document.createElement("div");
     setInnerHtmlUnsafe(el, "<div>foo</div>");
 
@@ -195,17 +206,20 @@ describe.skip("dom/probeElementStyle", () => {
   });
 });
 
-const initialState = document.readyState;
+//#region onDomLoad & isDomLoaded
+describe("dom/onDomLoad", () => {
+  it("Resolves when the DOM is loaded", async () => {
+    let cb = false;
+    const res = onDomLoad(() => cb = true);
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+    await res;
 
-//#region isDomLoaded
-describe.skip("dom/isDomLoaded", () => {
-  it("Returns the correct state", () => {
-    // doesn't work cause the lib isn't loaded before DOMContentLoaded
-    expect(isDomLoaded()).toBe(initialState === "complete");
+    expect(cb).toBe(true);
+    expect(isDomLoaded()).toBe(true);
+
+    cb = false;
+    onDomLoad(() => cb = true);
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+    expect(cb).toBe(true);
   });
-});
-
-//#region onDomLoad
-describe.skip("dom/onDomLoad", () => {
-  // see above
 });

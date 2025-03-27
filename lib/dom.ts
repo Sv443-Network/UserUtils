@@ -99,7 +99,11 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
     openElem.click();
 
     // schedule removal after the click event has been processed
-    setTimeout(openElem.remove, 0);
+    setTimeout(() => {
+      try {
+        openElem.remove();
+      } catch {}
+    }, 0);
   }
 }
 
