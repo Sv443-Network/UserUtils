@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "src/**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": true,
+  }
+}

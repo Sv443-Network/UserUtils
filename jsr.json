@@ -1,20 +1,20 @@
 {
   "$schema": "https://jsr.io/schema/config-file.v1.json",
   "name": "@sv443-network/userutils",
-  "version": "8.3.0",
+  "version": "0.0.1-invalid",
   "exports": "./lib/index.ts",
   "publish": {
     "include": [
-      "lib/**/*.ts",
-      "dist/index.js",
-      "dist/index.cjs",
-      "dist/index.global.js",
-      "dist/index.umd.js",
-      "dist/lib/**/*",
+      "lib/**/*.(ts|mts|js|mjs|json|css)",
+      "dist/index.(js|mjs|cjs|global.js|umd.js)",
+      "dist/lib/*.d.ts",
       "package.json",
       "README.md",
       "CHANGELOG.md",
       "LICENSE.txt"
+    ],
+    "exclude": [
+      "**/*.spec.ts"
     ]
   }
 }

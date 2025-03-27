@@ -18,5 +18,13 @@
     "strict": true,
     "useDefineForClassFields": true
   },
-  "exclude": ["**/*.js", "dist/**", "tools/**", "test/**", "**/test.ts"]
+  "exclude": [
+    "**/*.js",
+    "dist/**",
+    "tools/**",
+    "test/**",
+    "**/test.ts",
+    "**/*.spec.ts",
+    "vitest.config.ts"
+  ]
 }

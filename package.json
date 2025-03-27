@@ -93,7 +93,7 @@
     "/dist/index.umd.js",
     "/dist/lib/**.d.ts",
     "/package.json",
-    "/README-summary.md",
+    "/README.md",
     "/CHANGELOG.md",
     "/LICENSE.txt"
   ]
