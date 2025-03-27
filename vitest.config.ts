@@ -13,7 +13,7 @@ export default defineConfig({
         "lib/index.ts",
         "lib/types.ts",
       ],
-      reporter: ["text", "text-summary", "html", "lcov"],
+      reporter: ["text", "text-summary", "lcov"],
     },
     include: ["lib/**/*.spec.ts"],
     environment: "jsdom",
