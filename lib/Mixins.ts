@@ -110,7 +110,7 @@ export class Mixins<
   /** Whether the priorities should auto-increment if not specified */
   protected readonly autoIncPrioEnabled: boolean;
   /** The current auto-increment priority counter */
-  protected autoIncPrioCounter = new Map<TMixinKey, number>();
+  protected autoIncPrioCounter: Map<TMixinKey, number> = new Map<TMixinKey, number>();
 
   /**
    * Creates a new Mixins instance.
