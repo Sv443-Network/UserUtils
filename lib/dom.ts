@@ -102,7 +102,10 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
     setTimeout(() => {
       try {
         openElem.remove();
-      } catch {}
+      }
+      catch {
+        void 0;
+      }
     }, 0);
   }
 }
