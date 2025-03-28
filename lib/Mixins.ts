@@ -44,7 +44,12 @@ export type MixinConfig = {
 
 /** Configuration object for the Mixins class */
 export type MixinsConstructorConfig = {
-  /** If true, when no priority is specified, an auto-incrementing integer priority will be used (unique per mixin key). Defaults to false. */
+  /**
+   * If true, when no priority is specified, an auto-incrementing integer priority will be used, starting at `defaultPriority` or 0 (unique per mixin key). Defaults to false.  
+   * If a priority value is already used, it will be incremented until a unique value is found.  
+   * This is useful to ensure that mixins are applied in the order they were added, even if they don't specify a priority.  
+   * It also allows for a finer level of interjection when the priority is a floating point number.
+   */
   autoIncrementPriority: boolean;
   /** The default priority for mixins that do not specify one. Defaults to 0. */
   defaultPriority: number;

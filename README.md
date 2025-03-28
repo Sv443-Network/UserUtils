@@ -3,7 +3,7 @@
 <!-- #region Description -->
 ## UserUtils
 General purpose DOM/GreaseMonkey library that allows you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more.  
-Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require`  
+Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require` or `<script>`  
 The library works in any DOM environment with or without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
@@ -11,14 +11,14 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 <br>
 
-[![tree shaking support badge](https://badgen.net/bundlephobia/tree-shaking/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
-[![minified bundle size badge](https://badgen.net/bundlephobia/min/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
-[![minified and gzipped bundle size badge](https://badgen.net/bundlephobia/minzip/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
-![code coverage percentage](https://img.shields.io/coverallsCoverage/github/Sv443-Network/UserUtils?branch=main)
+[![Tree shaking support badge](https://badgen.net/bundlephobia/tree-shaking/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+[![Code coverage percentage badge](https://img.shields.io/coverallsCoverage/github/Sv443-Network/UserUtils?branch=main)](https://coveralls.io/github/Sv443-Network/UserUtils)
+[![Minified bundle size badge](https://badgen.net/bundlephobia/min/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+[![Minified and gzipped bundle size badge](https://badgen.net/bundlephobia/minzip/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
 
-[![github stargazers badge](https://badgen.net/github/stars/Sv443-Network/UserUtils?icon=github)](https://github.com/Sv443-Network/UserUtils/stargazers)
-[![discord server badge](https://badgen.net/discord/online-members/aBH4uRG?icon=discord)](https://dc.sv443.net/)
-[![Support development on Github Sponsors](https://img.shields.io/github/sponsors/Sv443)](https://github.com/sponsors/Sv443)
+[![Discord server badge](https://badgen.net/discord/online-members/aBH4uRG?icon=discord)](https://dc.sv443.net/)
+[![Github stargazers badge](https://badgen.net/github/stars/Sv443-Network/UserUtils?icon=github)](https://github.com/Sv443-Network/UserUtils/stargazers)
+[![Support development on Github Sponsors badge](https://img.shields.io/github/sponsors/Sv443?icon=github)](https://github.com/sponsors/Sv443)
 
 <sup>
 View the documentation of previous major releases:
