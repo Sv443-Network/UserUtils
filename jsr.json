@@ -5,8 +5,12 @@
   "exports": "./lib/index.ts",
   "publish": {
     "include": [
-      "lib/**/*.(ts|mts|js|mjs|json|css)",
-      "dist/index.(js|mjs|cjs|global.js|umd.js)",
+      "lib/**/*.ts",
+      "dist/index.js",
+      "dist/index.mjs",
+      "dist/index.cjs",
+      "dist/index.global.js",
+      "dist/index.umd.js",
       "dist/lib/*.d.ts",
       "package.json",
       "README.md",
