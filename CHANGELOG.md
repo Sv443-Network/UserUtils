@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.4.1
+
+### Patch Changes
+
+- bb40243: Fixed includes for JSR
+
 ## 9.4.0
 
 ### Minor Changes
