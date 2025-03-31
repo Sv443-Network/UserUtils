@@ -21,14 +21,22 @@ If you like using this library, please consider [supporting the development ❤�
 [![Support development on Github Sponsors badge](https://img.shields.io/github/sponsors/Sv443?icon=github)](https://github.com/sponsors/Sv443)
 
 <sup>
-View the documentation of previous major releases:
+
+View the documentation of previous releases:  
 </sup>
 <sub>
-
+<a href="https://github.com/Sv443-Network/UserUtils/blob/v8.0.0/README.md" title="View docs for major version 8.0.0" rel="noopener noreferrer">v8</a><sup><a title="View docs for minor version 8.4.0" href="https://github.com/Sv443-Network/UserUtils/blob/v8.4.0/README.md" rel="noopener noreferrer">.4.0</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v7.0.0/README.md" title="View docs for major version 7.0.0" rel="noopener noreferrer">v7</a><sup><a href="https://github.com/Sv443-Network/UserUtils/blob/v7.3.0/README.md" title="View docs for minor version 7.3.0" rel="noopener noreferrer">.3.0</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v6.0.0/README.md" title="View docs for major version 6.0.0" rel="noopener noreferrer">v6</a><sup><a href="[6.3.0](https://github.com/Sv443-Network/UserUtils/blob/v6.3.0/README.md)" title="View docs for minor version 6.3.0" rel="noopener noreferrer">.3.0</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v5.0.0/README.md" title="View docs for major version 5.0.0" rel="noopener noreferrer">v5</a><sup><a href="https://github.com/Sv443-Network/UserUtils/blob/v5.0.1/README.md" title="View docs for patch version 5.0.1" rel="noopener noreferrer">.0.1</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v4.0.0/README.md" title="View docs for major version 4.0.0" rel="noopener noreferrer">v4</a><sup><a href="https://github.com/Sv443-Network/UserUtils/blob/v4.2.1/README.md" title="View docs for patch version 4.2.1" rel="noopener noreferrer">.2.1</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md" title="View docs for major version 3.0.0" rel="noopener noreferrer">v3<sup>.0.0</sup></a>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v2.0.0/README.md" title="View docs for major version 2.0.0" rel="noopener noreferrer">v2</a><sup><a href="https://github.com/Sv443-Network/UserUtils/blob/v2.0.1/README.md" title="View docs for patch version 2.0.1" rel="noopener noreferrer">.0.1</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v1.0.0/README.md" title="View docs for major version 1.0.0" rel="noopener noreferrer">v1</a><sup><a href="https://github.com/Sv443-Network/UserUtils/blob/v1.2.0/README.md" title="View docs for minor version 1.2.0" rel="noopener noreferrer">.2.0</a></sup>
+• <a href="https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md" title="View docs for patch version 0.5.3" rel="noopener noreferrer">v0<sup>.5.3</sup></a>
 <!-- <a href="https://github.com/Sv443-Network/UserUtils/blob/vX.0.0/docs.md" rel="noopener noreferrer">X.0.0</a>, -->
-<a href="https://github.com/Sv443-Network/UserUtils/blob/v8.0.0/README.md" rel="noopener noreferrer">8.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v7.0.0/README.md" rel="noopener noreferrer">7.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v6.0.0/README.md" rel="noopener noreferrer">6.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v5.0.0/README.md" rel="noopener noreferrer">5.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v4.0.0/README.md" rel="noopener noreferrer">4.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v3.0.0/README.md" rel="noopener noreferrer">3.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v2.0.0/README.md" rel="noopener noreferrer">2.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v1.0.0/README.md" rel="noopener noreferrer">1.0.0</a>, <a href="https://github.com/Sv443-Network/UserUtils/blob/v0.5.3/README.md" rel="noopener noreferrer">0.5.3</a>
-
 </sub>
+
 </div>
 <br>
 
