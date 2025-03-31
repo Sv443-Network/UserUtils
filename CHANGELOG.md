@@ -1,5 +1,18 @@
 # @sv443-network/userutils
 
+## 9.4.0
+
+### Minor Changes
+
+- 5075831: Added `Mixins` class for allowing multiple sources to modify values in a controlled way
+- 99dedfd: Added unit tests
+- 7530fd0: Added `Debouncer.getListeners()` method to get an array of all listener functions
+- 48306da: Added `stores` filter parameter to the `DataStoreSerializer` methods `loadStoresData()`, `resetStoresData()` and `deleteStoresData()`
+
+### Patch Changes
+
+- f6a68c7: Fixed error when calling `interceptEvent()` in a non-GM environment
+
 ## 9.3.0
 
 ### Minor Changes
