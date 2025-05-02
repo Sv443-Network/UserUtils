@@ -1,12 +1,18 @@
 # UserUtils Documentation
+General purpose DOM/GreaseMonkey library that allows you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more.  
+Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bundler and global declaration via `@require` or `<script>`  
+The library works in any DOM environment with or without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
+  
+You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
+If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
 
 <!-- #region Preamble -->
 ## Preamble:
-This library is written in TypeScript and contains builtin TypeScript declarations, but it will also work in plain JavaScript after removing the `: type` annotations.  
+This library is written in TypeScript and contains builtin TypeScript declarations, but it will also work in plain JavaScript after removing the `: type` annotations in the example code snippets.  
   
-Each feature has example code that can be expanded by clicking on the text "Example - click to view".  
+Each feature's example code snippet can be expanded by clicking on the text "Example - click to view".  
 The signatures and examples are written in TypeScript and use ESM import syntax to show you which types need to be provided and will be returned.  
 The library itself supports importing an ESM, CommonJS or global variable definition bundle, depending on your use case.  
   
