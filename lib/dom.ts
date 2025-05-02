@@ -5,9 +5,7 @@
 
 import { PlatformError } from "./errors.js";
 
-/** Whether the DOM has finished loading */
-let domReady = false;
-document.addEventListener("DOMContentLoaded", () => domReady = true);
+//#region unsafeWindow
 
 /**
  * Returns `unsafeWindow` if the `@grant unsafeWindow` is given, otherwise falls back to the regular `window`
@@ -21,6 +19,8 @@ export function getUnsafeWindow(): Window {
     return window;
   }
 }
+
+//#region addParent
 
 /**
  * Adds a parent container around the provided element
@@ -38,6 +38,8 @@ export function addParent<TElem extends Element, TParentElem extends Element>(el
   return newParent;
 }
 
+//#region addGlobalStyle
+
 /**
  * Adds global CSS style in the form of a `<style>` element in the document's `<head>`  
  * This needs to be run after the `DOMContentLoaded` event has fired on the document object (or instantly if `@run-at document-end` is used).
@@ -51,6 +53,8 @@ export function addGlobalStyle(style: string): HTMLStyleElement {
   return styleElem;
 }
 
+//#region preloadImages
+
 /**
  * Preloads an array of image URLs so they can be loaded instantly from the browser cache later on
  * @param rejects If set to `true`, the returned PromiseSettledResults will contain rejections for any of the images that failed to load. Is set to `false` by default.
@@ -59,13 +63,15 @@ export function addGlobalStyle(style: string): HTMLStyleElement {
 export function preloadImages(srcUrls: string[], rejects = false): Promise<PromiseSettledResult<HTMLImageElement>[]> {
   const promises = srcUrls.map(src => new Promise<HTMLImageElement>((res, rej) => {
     const image = new Image();
-    image.addEventListener("load", () => res(image));
-    image.addEventListener("error", (evt) => rejects && rej(evt));
+    image.addEventListener("load", () => res(image), { once: true });
+    image.addEventListener("error", (evt) => rejects && rej(evt), { once: true });
     image.src = src;
   }));
 
   return Promise.allSettled(promises);
 }
+
+//#region openInNewTab
 
 /**
  * Tries to use `GM.openInTab` to open the given URL in a new tab, otherwise if the grant is not given, creates an invisible anchor element and clicks it.  
@@ -110,6 +116,8 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
   }
 }
 
+//#region interceptEvent
+
 /**
  * Intercepts the specified event on the passed object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
  * If no predicate is specified, all events will be discarded.  
@@ -150,6 +158,8 @@ export function interceptEvent<
   })(eventObject.__proto__.addEventListener);
 }
 
+//#region interceptWindowEvent
+
 /**
  * Intercepts the specified event on the window object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
  * If no predicate is specified, all events will be discarded.  
@@ -163,6 +173,8 @@ export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
   return interceptEvent(getUnsafeWindow(), eventName, predicate);
 }
 
+//#region isScrollable
+
 /** Checks if an element is scrollable in the horizontal and vertical directions */
 export function isScrollable(element: Element): Record<"vertical" | "horizontal", boolean> {
   const { overflowX, overflowY } = getComputedStyle(element);
@@ -171,6 +183,8 @@ export function isScrollable(element: Element): Record<"vertical" | "horizontal"
     horizontal: (overflowX === "scroll" || overflowX === "auto") && element.scrollWidth > element.clientWidth,
   };
 }
+
+//#region observeElementProp
 
 /**
  * Executes the callback when the passed element's property changes.  
@@ -214,6 +228,8 @@ export function observeElementProp<
     });
   }
 }
+
+//#region getSiblingsFrame
 
 /**
  * Returns a "frame" of the closest siblings of the {@linkcode refElement}, based on the passed amount of siblings and {@linkcode refElementAlignment}
@@ -264,6 +280,8 @@ export function getSiblingsFrame<
   return [] as TSibling[];
 }
 
+//#region setInnerHtmlUnsafe
+
 let ttPolicy: { createHTML: (html: string) => string } | undefined;
 
 /**
@@ -286,6 +304,8 @@ export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(eleme
 
   return element;
 }
+
+//#region probeElementStyle
 
 /**
  * Creates an invisible temporary element to probe its rendered style.  
@@ -326,10 +346,17 @@ export function probeElementStyle<
   return result;
 }
 
+//#region isDomLoaded
+
+let domReady = false;
+document.addEventListener("DOMContentLoaded", () => domReady = true, { once: true });
+
 /** Returns whether or not the DOM has finished loading */
 export function isDomLoaded(): boolean {
   return domReady;
 }
+
+//#region onDomLoad
 
 /**
  * Executes a callback and/or resolves the returned Promise when the DOM has finished loading.  
@@ -347,6 +374,6 @@ export function onDomLoad(cb?: () => void): Promise<void> {
       document.addEventListener("DOMContentLoaded", () => {
         cb?.();
         res();
-      });
+      }, { once: true });
   });
 }
