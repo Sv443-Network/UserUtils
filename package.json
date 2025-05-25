@@ -58,6 +58,7 @@
   },
   "homepage": "https://github.com/Sv443-Network/UserUtils",
   "dependencies": {
+    "@sv443-network/coreutils": "0.0.1",
     "nanoevents": "^9.1.0"
   },
   "devDependencies": {

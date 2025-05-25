@@ -5,6 +5,7 @@
 
 export * from "./Dialog.js";
 export * from "./dom.js";
-export * from "./errors.js";
+export * from "./error.js";
 export * from "./Mixins.js";
 export * from "./SelectorObserver.js";
+export * from "@sv443-network/coreutils";

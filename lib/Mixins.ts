@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { purifyObj, type Prettify } from "@sv443-network/coreutils";
+import { pureObj, type Prettify } from "@sv443-network/coreutils";
 
 /** Full mixin object (either sync or async), as it is stored in the instance's mixin array. */
 export type MixinObj<TArg, TCtx> = Prettify<
@@ -121,7 +121,7 @@ export class Mixins<
    * @param config Configuration object to customize the behavior.
    */
   constructor(config: Partial<MixinsConstructorConfig> = {}) {
-    this.defaultMixinCfg = purifyObj({
+    this.defaultMixinCfg = pureObj({
       priority: config.defaultPriority ?? 0,
       stopPropagation: config.defaultStopPropagation ?? false,
       signal: config.defaultSignal,
@@ -146,10 +146,10 @@ export class Mixins<
   >(
     mixinKey: TKey,
     mixinFn: (arg: TArg, ...ctx: TCtx extends undefined ? [void] : [TCtx]) => ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> | Awaited<ReturnType<TMixinMap[TKey]>> : ReturnType<TMixinMap[TKey]>,
-    config: Partial<MixinConfig> | number = purifyObj({}),
+    config: Partial<MixinConfig> | number = pureObj({}),
   ): () => void {
     const calcPrio = typeof config === "number" ? config : this.calcPriority(mixinKey, config);
-    const mixin = purifyObj({
+    const mixin = pureObj({
       ...this.defaultMixinCfg,
       key: mixinKey as string,
       fn: mixinFn,

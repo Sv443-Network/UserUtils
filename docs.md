@@ -2335,7 +2335,7 @@ Returns an array of all registered listener functions.
 
 <br>
 
-#### `Debouncer.setTimeout()`  
+#### `Debouncer.setTimeout()`
 Signature: `setTimeout(timeout: number): void`  
 Changes the timeout for the debouncer.
 
