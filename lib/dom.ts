@@ -132,18 +132,16 @@ export function interceptEvent<
   eventName: Parameters<TEvtObj["addEventListener"]>[0],
   predicate: (event: TPredicateEvt) => boolean = () => true,
 ): void {
-  // @ts-ignore
+  // @ts-expect-error
   if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
     throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript is forced to run in.");
 
   // default is 25 on FF so this should hopefully be more than enough
-  // @ts-ignore
-  Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100);
-  if(isNaN(Error.stackTraceLimit))
+  if(isNaN(Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100)))
     Error.stackTraceLimit = 100;
 
   (function(original: typeof eventObject.addEventListener) {
-    // @ts-ignore
+    // @ts-expect-error
     eventObject.__proto__.addEventListener = function(...args: Parameters<typeof eventObject.addEventListener>) {
       const origListener = typeof args[1] === "function" ? args[1] : args[1]?.handleEvent ?? (() => void 0);
       args[1] = function(...a) {
@@ -154,7 +152,7 @@ export function interceptEvent<
       };
       original.apply(this, args);
     };
-    // @ts-ignore
+    // @ts-expect-error
   })(eventObject.__proto__.addEventListener);
 }
 
@@ -209,20 +207,18 @@ export function observeElementProp<
     const descriptor = Object.getOwnPropertyDescriptor(elementPrototype, property);
     Object.defineProperty(element, property, {
       get: function() {
-        // @ts-ignore
+        // @ts-expect-error
         // eslint-disable-next-line prefer-rest-params
         return descriptor?.get?.apply(this, arguments);
       },
       set: function() {
         const oldValue = this[property];
-        // @ts-ignore
+        // @ts-expect-error
         // eslint-disable-next-line prefer-rest-params
         descriptor?.set?.apply(this, arguments);
         const newValue = this[property];
-        if(typeof callback === "function") {
-          // @ts-ignore
+        if(typeof callback === "function")
           callback.bind(this, oldValue, newValue);
-        }
         return newValue;
       }
     });
@@ -292,9 +288,9 @@ let ttPolicy: { createHTML: (html: string) => string } | undefined;
  * - ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities!
  */
 export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(element: TElement, html: string): TElement {
-  // @ts-ignore
+  // @ts-expect-error
   if(!ttPolicy && typeof window?.trustedTypes?.createPolicy === "function") {
-    // @ts-ignore
+    // @ts-expect-error
     ttPolicy = window.trustedTypes.createPolicy("_uu_set_innerhtml_unsafe", {
       createHTML: (unsafeHtml: string) => unsafeHtml,
     });

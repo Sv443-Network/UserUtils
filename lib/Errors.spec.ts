@@ -1,6 +1,6 @@
 
 import { describe, expect, it } from "vitest";
-import { PlatformError } from "./errors.js";
+import { PlatformError } from "./Errors.js";
 
 describe("Errors", () => {
   it("All class instances have the date property", () => {
