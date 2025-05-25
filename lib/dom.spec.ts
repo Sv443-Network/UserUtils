@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptWindowEvent, isDomLoaded, observeElementProp, onDomLoad, openInNewTab, preloadImages, probeElementStyle, setInnerHtmlUnsafe } from "./dom.js";
-import { PlatformError } from "./errors.js";
+import { PlatformError } from "./Errors.js";
 
 //#region getUnsafeWindow
 describe("dom/getUnsafeWindow", () => {

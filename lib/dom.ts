@@ -3,7 +3,7 @@
  * This module contains various functions for working with the DOM - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dom)
  */
 
-import { PlatformError } from "./errors.js";
+import { PlatformError } from "./Errors.js";
 
 //#region unsafeWindow
 
@@ -134,7 +134,7 @@ export function interceptEvent<
 ): void {
   // @ts-ignore
   if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
-    throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript runs in.");
+    throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript is forced to run in.");
 
   // default is 25 on FF so this should hopefully be more than enough
   // @ts-ignore
