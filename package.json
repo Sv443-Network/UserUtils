@@ -1,7 +1,7 @@
 {
   "name": "@sv443-network/userutils",
   "libName": "UserUtils",
-  "version": "10.0.0",
+  "version": "10.0.0-alpha.0",
   "description": "General purpose DOM/GreaseMonkey library that allows you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -32,7 +32,7 @@
     "update-jsr-version": "node --import tsx ./tools/update-jsr-version.mts",
     "publish-package": "changeset publish",
     "publish-package-jsr": "pnpm update-jsr-version && npx jsr publish --allow-dirty",
-    "check-jsr": "npx jsr publish --allow-dirty --dry-run",
+    "check-jsr": "pnpm update-jsr-version && npx jsr publish --allow-dirty --dry-run",
     "change": "changeset",
     "test-gm-serve": "node --import tsx ./test/TestPage/server.mts",
     "test-gm-dev": "cd test/TestScript && pnpm dev",
