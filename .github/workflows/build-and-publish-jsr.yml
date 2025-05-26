@@ -56,7 +56,7 @@ jobs:
         run: pnpm i
 
       - name: Build package
-        run: pnpm build-all
+        run: pnpm build
 
       - name: Publish on JSR
         run: pnpm publish-package-jsr

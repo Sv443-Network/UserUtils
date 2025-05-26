@@ -62,7 +62,7 @@ jobs:
         run: pnpm i
 
       - name: Build package
-        run: pnpm build-all
+        run: pnpm build
 
       - name: Create artifact
         uses: actions/upload-artifact@v4
