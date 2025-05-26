@@ -21,7 +21,7 @@ jobs:
     env:
       CI: "true"
       STORE_PATH: ""
-      PNPM_VERSION: 9
+      PNPM_VERSION: 10
       RETENTION_DAYS: 2
 
     steps:
