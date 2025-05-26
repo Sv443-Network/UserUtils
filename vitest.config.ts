@@ -8,8 +8,9 @@ export default defineConfig({
       include: ["lib/**/*.ts"],
       exclude: [
         "lib/**/*.spec.ts",
-        "lib/Dialog.ts", // DOM-only features can't be tested for now cause they aren't rendered
-        "lib/SelectorObserver.ts", // ^
+        "lib/dom.ts",              // partially tested, but since some features can just never be tested, exclude the file from report
+        "lib/Dialog.ts",           // DOM-only features can't be tested for now cause they aren't properly rendered, just mounted into a pseudo-DOM
+        "lib/SelectorObserver.ts", // same here ^
         "lib/errors.ts",
         "lib/index.ts",
       ],
