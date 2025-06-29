@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.4.3
+
+### Patch Changes
+
+- 528e09c: Fix `can't convert trArgs[0] to string` error
+
 ## 9.4.2
 
 ### Patch Changes
