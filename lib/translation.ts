@@ -388,8 +388,16 @@ const templateLiteralTransform: TransformTuple<string> = [
       }
     };
 
+    let notStringifiable = false;
+    try {
+      String(trArgs[0]);
+    }
+    catch {
+      notStringifiable = true;
+    }
+
     /** Whether the first args parameter is an object that doesn't implement a custom `toString` method */
-    const isArgsObject = trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && String(trArgs[0]).startsWith("[object");
+    const isArgsObject = trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && (notStringifiable || String(trArgs[0]).startsWith("[object"));
 
     if(isArgsObject && eachKeyInTrString(Object.keys(trArgs[0]!)))
       namedMapping();
