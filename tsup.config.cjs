@@ -58,21 +58,8 @@ export default defineConfig((cliOpts) => ([
     ...getBaseConfig(cliOpts),
     format: ["umd"],
     minify: false,
-    plugins: [createUmdWrapper({ libraryName: clientName, external: [] })],
-  },
-  {
-    ...getBaseConfig(cliOpts),
-    entry: {
-      [clientName]: "lib/index.ts",
-    },
-    minify: false,
     target: "es6",
-    format: ["umd"],
-    outputExtension: {
-      js: "browser.js",
-    },
-    outDir: "dist",
-    esbuildPlugins: [umdWrapper({ libraryName: clientName, external: "inherit" })],
+    plugins: [createUmdWrapper({ libraryName: clientName, external: [] })],
     onSuccess: "tsc --emitDeclarationOnly --declaration --outDir dist && node --import tsx ./tools/fix-dts.mts",
   },
 ]));
