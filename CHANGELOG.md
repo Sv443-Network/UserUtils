@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.4.2
+
+### Patch Changes
+
+- 7f67cfb: Fixed compatibility for translations with multiple transform function matches
+
 ## 9.4.1
 
 ### Patch Changes
