@@ -199,7 +199,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 <br>
 
-- If you're using a linter like ESLint, it might complain about the global variable `UserUtils` not being defined. To fix this, add the following to your ESLint configuration file:
+- If you're using a linter like ESLint, it might complain about the global variable `UserUtils` not being defined. To fix this, add the following to your ESLint configuration file:  
+  
   ```json
   "globals": {
       "UserUtils": "readonly"

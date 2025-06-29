@@ -171,6 +171,7 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 <br>
 
 - Then, access the functions on the global variable `UserUtils`:
+
     ```ts
     UserUtils.addGlobalStyle("body { background-color: red; }");
 
@@ -183,6 +184,7 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 <br>
 
 - If you're using TypeScript and it complains about the missing global variable `UserUtils`, install the library using the package manager of your choice and add the following inside any `.ts` file that is included in the final build:  
+
     ```ts
     declare const UserUtils: typeof import("@sv443-network/userutils");
 
@@ -195,7 +197,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 <br>
 
-- If you're using a linter like ESLint, it might complain about the global variable `UserUtils` not being defined. To fix this, add the following to your ESLint configuration file:
+- If you're using a linter like ESLint, it might complain about the global variable `UserUtils` not being defined. To fix this, add the following to your ESLint configuration file:  
+
     ```json
     "globals": {
         "UserUtils": "readonly"

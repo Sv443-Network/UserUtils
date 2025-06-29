@@ -3,9 +3,8 @@
  * This module contains the SelectorObserver class, allowing you to register listeners that get called whenever the element(s) behind a selector exist in the DOM - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#selectorobserver)
  */
 
-import { Debouncer, debounce, type DebouncerType } from "./Debouncer.js";
+import { Debouncer, debounce, type DebouncerType, type Prettify } from "@sv443-network/coreutils";
 import { isDomLoaded } from "./dom.js";
-import type { Prettify } from "./types.js";
 
 void ["type only", Debouncer];
 
