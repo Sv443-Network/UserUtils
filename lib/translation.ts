@@ -110,7 +110,7 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
       const matches: RegExpExecArray[] = [];
       let execRes: RegExpExecArray | null;
       while((execRes = re.exec(trValue)) !== null) {
-        if(matches.some(m => m[0] === execRes?.[0]))
+        if(matches.some(m => m[0] === execRes?.[0] && m.index === execRes?.index))
           break;
         matches.push(execRes);
       }
