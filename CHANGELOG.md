@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 9.4.4
+
+### Patch Changes
+
+- 59011c1: Remove package.json engines field
+
 ## 9.4.3
 
 ### Patch Changes
