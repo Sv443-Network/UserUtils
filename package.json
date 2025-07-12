@@ -14,11 +14,6 @@
       "import": "./dist/index.js"
     }
   },
-  "engines": {
-    "pnpm": ">=9",
-    "npm": "please-use-pnpm",
-    "yarn": "please-use-pnpm"
-  },
   "type": "module",
   "scripts": {
     "lint": "eslint . && tsc --noEmit",
