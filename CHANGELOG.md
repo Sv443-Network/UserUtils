@@ -1,5 +1,12 @@
 # @sv443-network/userutils
 
+## 9.4.4
+
+### Patch Changes
+
+- e8846b5: Fixed infinite recursion in `translate()` when using `setFallbackLanguage()`
+- 59011c1: Removed package.json engines field
+
 ## 9.4.3
 
 ### Patch Changes
