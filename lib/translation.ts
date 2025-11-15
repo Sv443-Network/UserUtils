@@ -93,7 +93,7 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
   const trObj = trans[language];
 
   if(typeof language !== "string" || language.length === 0 || typeof trObj !== "object" || trObj === null)
-    return fallbackLang ? translate(fallbackLang, key, ...trArgs) : key;
+    return fallbackLang && language !== fallbackLang ? translate(fallbackLang, key, ...trArgs) : key;
 
   /** Apply all transforms that match the translation string */
   const transformTrVal = (trKey: TTrKey, trValue: string): string => {
@@ -148,7 +148,7 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
     return transformTrVal(key, value);
 
   // default to fallbackLang or translation key
-  return fallbackLang
+  return fallbackLang && language !== fallbackLang
     ? translate(fallbackLang, key, ...trArgs)
     : key;
 }

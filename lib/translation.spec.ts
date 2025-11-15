@@ -42,6 +42,19 @@ describe("Translation", () => {
     expect(tr.hasKey("en", "nested.foo.bar")).toBe(true);
   });
 
+  it("Doesn't infinitely recurse", () => {
+    tr.addTranslations("en", {
+      hello: "Hello",
+    });
+    tr.addTranslations("de", {
+      hello: "Hallo",
+    });
+
+    tr.setFallbackLanguage("en");
+
+    expect(tr.for("de", "nonexistent.key")).toBe("nonexistent.key");
+  });
+
   //#region transforms
   it("Transforms", () => {
     tr.addTranslations("en", {
