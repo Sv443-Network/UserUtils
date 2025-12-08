@@ -1,5 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { Mixins } from "./Mixins.js";
+import { Mixins, type MixinsConstructorConfig } from "./Mixins.js";
+
+class TestMixins<
+  TMixinMap extends Record<string, (arg: any, ctx?: any) => any>,
+  TMixinKey extends Extract<keyof TMixinMap, string> = Extract<keyof TMixinMap, string>,
+> extends Mixins<TMixinMap, TMixinKey> {
+  constructor(config: Partial<MixinsConstructorConfig> = {}) {
+    super(config);
+  }
+
+  public test_removeAll(key: TMixinKey) {
+    return this.removeAll(key);
+  }
+}
 
 describe("Mixins", () => {
   //#region base
@@ -87,5 +100,22 @@ describe("Mixins", () => {
     const res4 = mixins.resolve("foo", 100);
     expect(res4).not.toBeInstanceOf(Promise);
     expect(res4).toBe(100);
+  });
+
+  //#region removeAll
+  it("removeAll()", () => {
+    const mixins = new TestMixins<{
+      foo: (v: number) => number;
+        }>({ autoIncrementPriority: true });
+
+    mixins.add("foo", (v) => v + 1);
+    mixins.add("foo", (v) => v + 2);
+    mixins.add("foo", (v) => v + 3);
+
+    expect(mixins.list()).toHaveLength(3);
+
+    mixins.test_removeAll("foo");
+
+    expect(mixins.list()).toHaveLength(0);
   });
 });

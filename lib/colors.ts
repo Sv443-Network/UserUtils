@@ -48,7 +48,7 @@ export function lightenColor(color: string, percent: number, upperCase = false):
 /**
  * Darkens a CSS color value (in #HEX, rgb() or rgba() format) by a given percentage.  
  * Will not exceed the maximum range (00-FF or 0-255).
- * @returns Returns the new color value in the same format as the input
+ * @returns Returns the new color value in the same format as the input.
  * @throws Throws if the color format is invalid or not supported
  */
 export function darkenColor(color: string, percent: number, upperCase = false): string {

@@ -59,6 +59,11 @@ describe("math/randRange", () => {
     expect(randRange(0, 0)).toBe(0);
     expect(randRange(0)).toBe(0);
   });
+
+  it("Handles edge cases", () => {
+    // @ts-expect-error
+    expect(() => randRange("foo")).toThrow(TypeError);
+  });
 });
 
 //#region digitCount

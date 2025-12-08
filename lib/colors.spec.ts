@@ -45,7 +45,7 @@ describe("colors/rgbToHex", () => {
 
   it("Works as expected with invalid input", () => {
     expect(rgbToHex(0, 0, 0, 0)).toBe("#000000");
-    //@ts-ignore
+    //@ts-expect-error
     expect(rgbToHex(NaN, "ello", 0, -1)).toBe("#nannan0000");
   });
 });
@@ -65,5 +65,10 @@ describe("colors/darkenColor", () => {
   it("Darkens a color by a given percentage", () => {
     // since both functions are the exact same but with a different sign, only one test is needed:
     expect(darkenColor("#1affe3", 50)).toBe(lightenColor("#1affe3", -50));
+  });
+
+  it("Throws on invalid color formats", () => {
+    expect(() => darkenColor("invalid-color", 50)).toThrow(TypeError);
+    expect(() => darkenColor("hsl(120, 100%, 50%)", 50)).toThrow(TypeError);
   });
 });
