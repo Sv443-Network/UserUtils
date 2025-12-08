@@ -5,7 +5,6 @@
     "target": "ES2016",
     "outDir": "dist/out",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
     "rootDir": ".",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
