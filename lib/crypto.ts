@@ -46,6 +46,7 @@ function ab2str(buf: ArrayBuffer): string {
 
 /** Converts a base64-encoded string to an ArrayBuffer representation of its bytes */
 function str2ab(str: string): ArrayBuffer {
+  // @ts-expect-error some sort of type environment collision happening here
   return Uint8Array.from(getUnsafeWindow().atob(str), c => c.charCodeAt(0));
 }
 
@@ -59,6 +60,7 @@ export async function computeHash(input: string | ArrayBuffer, algorithm = "SHA-
   let data: ArrayBuffer;
   if(typeof input === "string") {
     const encoder = new TextEncoder();
+    // @ts-expect-error some sort of type environment collision happening here
     data = encoder.encode(input);
   }
   else
