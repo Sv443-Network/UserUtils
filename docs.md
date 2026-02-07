@@ -4,7 +4,11 @@ Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bun
 The library works in any DOM environment with or without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
-If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
+If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)  
+  
+> [!NOTE]  
+> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> They are still re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.
 
 <br>
 
@@ -30,89 +34,161 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
 <!-- #region Features -->
 ## Table of Contents:
 - [**Preamble** (info about the documentation)](#preamble)
-- [**Features**](#features)
+- [**UserUtils Features**](#features)
   - [**DOM:**](#dom)
-    - [`SelectorObserver`](#selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
-    - [`getUnsafeWindow()`](#getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - [`isDomLoaded()`](#isdomloaded) - check if the DOM has finished loading and can be queried and modified
-    - [`onDomLoad()`](#ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
-    - [`addParent()`](#addparent) - add a parent element around another element
-    - [`addGlobalStyle()`](#addglobalstyle) - add a global style to the page
-    - [`preloadImages()`](#preloadimages) - preload images into the browser cache for faster loading later on
-    - [`openInNewTab()`](#openinnewtab) - open a link in a new tab
-    - [`interceptEvent()`](#interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-    - [`interceptWindowEvent()`](#interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-    - [`isScrollable()`](#isscrollable) - check if an element has a horizontal or vertical scroll bar
-    - [`observeElementProp()`](#observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
-    - [`getSiblingsFrame()`](#getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
-    - [`setInnerHtmlUnsafe()`](#setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
-    - [`probeElementStyle()`](#probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
-  - [**Math:**](#math)
-    - [`clamp()`](#clamp) - constrain a number between a min and max value
-    - [`mapRange()`](#maprange) - map a number from one range to the same spot in another range
-    - [`randRange()`](#randrange) - generate a random number between a min and max boundary
-    - [`digitCount()`](#digitcount) - calculate the amount of digits in a number
-    - [`roundFixed()`](#roundfixed) - round a floating-point number at the given amount of decimals, or to the given power of 10
-    - [`bitSetHas()`](#bitsethas) - check if a bit is set in a [bitset](https://www.geeksforgeeks.org/cpp-bitset-and-its-application/)
+    - 🟧 [`Dialog`](#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - 🟧 [`SelectorObserver`](#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
+    - 🟣 [`getUnsafeWindow()`](#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - 🟣 [`isDomLoaded()`](#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
+    - 🟣 [`onDomLoad()`](#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
+    - 🟣 [`addParent()`](#function-addparent) - add a parent element around another element
+    - 🟣 [`addGlobalStyle()`](#function-addglobalstyle) - add a global style to the page
+    - 🟣 [`preloadImages()`](#function-preloadimages) - preload images into the browser cache for faster loading later on
+    - 🟣 [`openInNewTab()`](#function-openinnewtab) - open a link in a new tab
+    - 🟣 [`interceptEvent()`](#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+    - 🟣 [`interceptWindowEvent()`](#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+    - 🟣 [`isScrollable()`](#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
+    - 🟣 [`observeElementProp()`](#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - 🟣 [`getSiblingsFrame()`](#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+    - 🟣 [`setInnerHtmlUnsafe()`](#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+    - 🟣 [`probeElementStyle()`](#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
   - [**Misc:**](#misc)
-    - [`DataStore`](#datastore) - class that manages a hybrid sync & async persistent JSON database, including data migration
-    - [`DataStoreSerializer`](#datastoreserializer) - class for importing & exporting data of multiple DataStore instances, including compression, checksumming and running migrations
-    - [`Dialog`](#dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
-    - [`Mixins`](#mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
-    - [`NanoEmitter`](#nanoemitter) - tiny event emitter class with a focus on performance and simplicity (based on [nanoevents](https://npmjs.com/package/nanoevents))
-    - [`Debouncer`](#debouncer) - class for debouncing function calls with a given timeout
-    - [`debounce()`](#debounce) - function wrapper for the Debouncer class for easier usage
-    - [`autoPlural()`](#autoplural) - automatically pluralize a string
-    - [`pauseFor()`](#pausefor) - pause the execution of a function for a given amount of time
-    - [`fetchAdvanced()`](#fetchadvanced) - wrapper around the fetch API with a timeout option
-    - [`insertValues()`](#insertvalues) - insert values into a string at specified placeholders
-    - [`compress()`](#compress) - compress a string with Gzip or Deflate
-    - [`decompress()`](#decompress) - decompress a previously compressed string
-    - [`computeHash()`](#computehash) - compute the hash / checksum of a string or ArrayBuffer
-    - [`randomId()`](#randomid) - generate a random ID of a given length and radix
-    - [`consumeGen()`](#consumegen) - consumes a ValueGen and returns the value
-    - [`consumeStringGen()`](#consumestringgen) - consumes a StringGen and returns the string
-    - [`getListLength()`](#getlistlength) - get the length of any object with a numeric `length`, `count` or `size` property
-    - [`purifyObj()`](#purifyobj) - removes the prototype chain (all default properties like `toString`, `__proto__`, etc.) from an object
-  - [**Arrays:**](#arrays)
-    - [`randomItem()`](#randomitem) - returns a random item from an array
-    - [`randomItemIndex()`](#randomitemindex) - returns a tuple of a random item and its index from an array
-    - [`takeRandomItem()`](#takerandomitem) - returns a random item from an array and mutates it to remove the item
-    - [`randomizeArray()`](#randomizearray) - returns a copy of the array with its items in a random order
+    - 🟧 [`GMStorageEngine`](#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
+    - 🟧 [`Mixins`](#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
   - [**Translation:**](#translation)
-    - [`tr.for()`](#trfor) - translates a key for the specified language
-    - [`tr.use()`](#truse) - creates a translation function for the specified language
-    - [`tr.hasKey()`](#trhaskey) - checks if a key exists in the given language
-    - [`tr.addTranslations()`](#traddtranslations) - add a flat or recursive translation object for a language
-    - [`tr.getTranslations()`](#trgettranslations) - returns the translation object for a language
-    - [`tr.deleteTranslations()`](#trdeletetranslations) - delete the translation object for a language
-    - [`tr.setFallbackLanguage()`](#trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
-    - [`tr.getFallbackLanguage()`](#trgetfallbacklanguage) - returns the fallback language
-    - [`tr.addTransform()`](#traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
-    - [`tr.deleteTransform()`](#trdeletetransform) - removes a transform function
-    - [`tr.transforms`](#trtransforms) - predefined transform functions for quickly adding custom argument insertion
-    - [`TrKeys`](#trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
-  - [**Colors:**](#colors)
-    - [`hexToRgb()`](#hextorgb) - convert a hex color string to an RGB or RGBA value tuple
-    - [`rgbToHex()`](#rgbtohex) - convert RGB or RGBA values to a hex color string
-    - [`lightenColor()`](#lightencolor) - lighten a CSS color string (hex, rgb or rgba) by a given percentage
-    - [`darkenColor()`](#darkencolor) - darken a CSS color string (hex, rgb or rgba) by a given percentage
-  - [**Utility types for TypeScript:**](#utility-types)
-    - [`Stringifiable`](#stringifiable) - any value that is a string or can be converted to one (implicitly or explicitly)
-    - [`NonEmptyArray`](#nonemptyarray) - any array that should have at least one item
-    - [`NonEmptyString`](#nonemptystring) - any string that should have at least one character
-    - [`LooseUnion`](#looseunion) - a union that gives autocomplete in the IDE but also allows any other value of the same type
-    - [`Prettify`](#prettify) - expands a complex type into a more readable format while keeping functionality the same
-    - [`ValueGen`](#valuegen) - a "generator" value that allows for super flexible value typing and declaration
-    - [`StringGen`](#stringgen) - a "generator" string that allows for super flexible string typing and declaration, including enhanced support for unions
-    - [`ListWithLength`](#listwithlength) - represents an array or object with a numeric `length`, `count` or `size` property
+    - 🟣 [`tr.for()`](#function-trfor) - translates a key for the specified language
+    - 🟣 [`tr.use()`](#function-truse) - creates a translation function for the specified language
+    - 🟣 [`tr.hasKey()`](#function-trhaskey) - checks if a key exists in the given language
+    - 🟣 [`tr.addTranslations()`](#function-traddtranslations) - add a flat or recursive translation object for a language
+    - 🟣 [`tr.getTranslations()`](#function-trgettranslations) - returns the translation object for a language
+    - 🟣 [`tr.deleteTranslations()`](#function-trdeletetranslations) - delete the translation object for a language
+    - 🟣 [`tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
+    - 🟣 [`tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
+    - 🟣 [`tr.addTransform()`](#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+    - 🟣 [`tr.deleteTransform()`](#function-trdeletetransform) - removes a transform function
+    - ⬜ [`tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - 🔷 [`TrKeys`](#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
   - [**Custom Error classes**](#error-classes)
-    - [`UUError`](#uuerror) - base class for all custom UserUtils errors - has a custom `date` prop set to the time of creation
-    - [`ChecksumMismatchError`](#checksummismatcherror) - thrown when a string of data doesn't match its checksum
-    - [`MigrationError`](#migrationerror) - thrown when a data migration fails
-    - [`PlatformError`](#platformerror) - thrown when a function is called in an unsupported environment
+    - 🟧 [`PlatformError`](#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
+- [**CoreUtils Features** (re-exported for backwards compatibility)](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#table-of-contents)
+  - [**Array:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#array)
+    - 🟣 [`function randomItem()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomitem) - Returns a random item from the given array
+    - 🟣 [`function randomItemIndex()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomitemindex) - Returns a random array item and index as a tuple
+    - 🟣 [`function randomizeArray()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomizearray) - Returns a new array with the items in random order
+    - 🟣 [`function takeRandomItem()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-takerandomitem) - Returns a random array item and mutates the array to remove it
+    - 🟣 [`function takeRandomItemIndex()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomitemindex) - Returns a random array item and index as a tuple and mutates the array to remove it
+    - 🔷 [`type NonEmptyArray`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nonemptyarray) - Non-empty array type
+  - [**Colors:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#colors)
+    - 🟣 [`function darkenColor()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-darkencolor) - Darkens the given color by the given percentage
+    - 🟣 [`function hexToRgb()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-hextorgb) - Converts a hex color string to an RGB object
+    - 🟣 [`function lightenColor()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-lightencolor) - Lightens the given color by the given percentage
+    - 🟣 [`function rgbToHex()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-rgbtohex) - Converts an RGB object to a hex color string
+  - [**Crypto:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#crypto)
+    - 🟣 [`function abtoa()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-abtoa) - Converts an ArrayBuffer to a string
+    - 🟣 [`function atoab()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-atoab) - Converts a string to an ArrayBuffer
+    - 🟣 [`function compress()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-compress) - Compresses the given string using the given algorithm and encoding
+    - 🟣 [`function decompress()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-decompress) - Decompresses the given string using the given algorithm and encoding
+    - 🟣 [`function computeHash()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-computehash) - Computes a string's hash using the given algorithm
+    - 🟣 [`function randomId()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomid) - Generates a random ID of the given length
+  - [**DataStore:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) - Cross-platform, general-purpose, sync/async hybrid, JSON-serializable database infrastructure:
+    - 🟧 [`class DataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) - The main class for the data store
+      - 🔷 [`type DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions) - Options for the data store
+      - 🔷 [`type DataMigrationsDict`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datamigrationsdict) - Dictionary of data migration functions
+      - 🔷 [`type DataStoreData`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoredata) - The type of the serializable data
+    - 🟧 [`class DataStoreSerializer`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastoreserializer) - Serializes and deserializes data for multiple DataStore instances
+      - 🔷 [`type DataStoreSerializerOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreserializeroptions) - Options for the DataStoreSerializer
+      - 🔷 [`type LoadStoresDataResult`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-loadstoresdataresult) - Result of calling [`loadStoresData()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastoreserializer-loadstoresdata)
+      - 🔷 [`type SerializedDataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-serializeddatastore) - Meta object and serialized data of a DataStore instance
+      - 🔷 [`type StoreFilter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-storefilter) - Filter for selecting data stores
+    - 🟧 [`class DataStoreEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastoreengine) - Base class for DataStore storage engines, which handle the data storage
+      - 🔷 [`type DataStoreEngineDSOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreenginedsoptions) - Reduced version of [`DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions)
+    - [Storage Engines:](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#storage-engines)
+      - 🟧 [`class BrowserStorageEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-browserstorageengine) - Storage engine for browser environments (localStorage, sessionStorage)
+        - 🔷 [`type BrowserStorageEngineOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#browserstorageengineoptions) - Options for the browser storage engine
+      - 🟧 [`class FileStorageEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-FileStorageEngine) - File-based storage engine for Node.js and Deno
+        - 🔷 [`type FileStorageEngineOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#FileStorageEngineoptions) - Options for the file storage engine
+  - [**Debouncer:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#debouncer)
+    - 🟣 [`function debounce()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-debounce) - Function wrapper for the [`Debouncer` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-debouncer)
+    - 🟧 [`class Debouncer`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-debouncer) - Class that manages listeners whose calls are rate-limited
+      - 🔷 [`type DebouncerType`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-debouncertype) - The triggering type for the debouncer
+      - 🔷 [`type DebouncedFunction`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-debouncedfunction) - Function type that is returned by the [`debounce()` function](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-debounce)
+      - 🔷 [`type DebouncerEventMap`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-debouncereventmap) - Event map type for the [`Debouncer` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-debouncer)
+  - [**Errors:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#errors)
+    - 🟧 [`class DatedError`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datederror) - Base error class with a `date` property
+      - 🟧 [`class ChecksumMismatchError`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-checksummismatcherror) - Error thrown when two checksums don't match
+      - 🟧 [`class CustomError`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-customerror) - Custom error with a configurable name for one-off situations
+      - 🟧 [`class MigrationError`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-migrationerror) - Error thrown in a failed data migration
+      - 🟧 [`class ValidationError`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-validationerror) - Error while validating data
+  - [**Math:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#math)
+    - 🟣 [`function bitSetHas()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-bitsethas) - Checks if a bit is set in a bitset
+    - 🟣 [`function clamp()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-clamp) - Clamps a number between a given range
+    - 🟣 [`function digitCount()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-digitcount) - Returns the number of digits in a number
+    - 🟣 [`function formatNumber()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-formatnumber) - Formats a number to a string using the given locale and format identifier
+      - 🔷 [`type NumberFormat`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-numberformat) - Number format identifier
+    - 🟣 [`function mapRange()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-maprange) - Maps a number from one range to another
+    - 🟣 [`function overflowVal()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-overflowVal) - Makes sure a number is in a range by over- & underflowing it
+    - 🟣 [`function randRange()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randrange) - Returns a random number in the given range
+    - 🟣 [`function roundFixed()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-roundfixed) - Rounds the given number to the given number of decimal places
+    - 🟣 [`function valsWithin()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-valswithin) - Checks if the given numbers are within a certain range of each other
+  - [**Misc:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#misc)
+    - 🟣 [`function consumeGen()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-consumegen) - Consumes a [`ValueGen` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-valuegen)
+      - 🔷 [`type ValueGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-valuegen) - A value that can be either type T, or a sync or async function that returns T
+    - 🟣 [`function consumeStringGen()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-consumestringgen) - Consumes a [`StringGen` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringgen)
+      - 🔷 [`type StringGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringgen) - A value that can be either of type string, or a sync or async function that returns a string
+    - 🟣 [`function fetchAdvanced()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-fetchadvanced) - Wrapper around [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with options like a timeout
+      - 🔷 [`type FetchAdvancedOpts`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-fetchadvancedopts) - Options for the [`fetchAdvanced()` function](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-fetchadvanced)
+    - 🟣 [`function getListLength()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-getlistlength) - Returns the length of a [`ListLike` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-listlike)
+    - 🟣 [`function pauseFor()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-pausefor) - Pauses async execution for the given amount of time
+    - 🟣 [`function pureObj()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-pureobj) - Applies an object's props to a null object (object without prototype chain) or just returns a new null object
+    - 🟣 [`function setImmediateInterval()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-setimmediateinterval) - Like `setInterval()`, but instantly calls the callback and supports passing an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal)
+    - 🟣 [`function setImmediateTimeoutLoop()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-setimmediatetimeoutloop) - Like a recursive `setTimeout()` loop, but instantly calls the callback and supports passing an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal)
+    - 🟣 [`function scheduleExit()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-scheduleexit) - Schedules a process exit after the next event loop tick, to allow operations like IO writes to finish.
+    - 🟣 [`function getCallStack()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-getcallstack) - Returns the current call stack, starting at the caller of this function.
+  - [**NanoEmitter:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#nanoemitter)
+    - 🟧 [`class NanoEmitter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter) - Simple, lightweight event emitter class that can be used in both FP and OOP, inspired by [`EventEmitter` from `node:events`](https://nodejs.org/api/events.html#class-eventemitter), based on [`nanoevents`](https://npmjs.com/package/nanoevents)
+      - 🔷 [`type NanoEmitterOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nanoemitteroptions) - Options for the [`NanoEmitter` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter)
+  - [**Text:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#text)
+    - 🟣 [`function autoPlural()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-autoplural) - Turns the given term into its plural form, depending on the given number or list length
+    - 🟣 [`function capitalize()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-capitalize) - Capitalizes the first letter of the given string
+    - 🟣 [`function createProgressBar()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-createprogressbar) - Creates a progress bar string with the given percentage and length
+      - ⬜ [`const defaultPbChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#const-defaultpbchars) - Default characters for the progress bar
+      - 🔷 [`type ProgressBarChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-progressbarchars) - Type for the progress bar characters object
+    - 🟣 [`function joinArrayReadable()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-joinarrayreadable) - Joins the given array into a string, using the given separators and last separator
+    - 🟣 [`function secsToTimeStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-secstotimestr) - Turns the given number of seconds into a string in the format `(hh:)mm:ss` with intelligent zero-padding
+    - 🟣 [`function truncStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-truncstr) - Truncates the given string to the given length
+  <!-- - *[**TieredCache:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#tieredcache)
+    - 🟧 *[`class TieredCache`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-tieredcache) - A multi-tier cache that uses multiple storage engines with different expiration times
+      - 🔷 *[`type TieredCacheOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tieredcacheoptions) - Options for the [`TieredCache` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-tieredcache)
+      - 🔷 *[`type TieredCachePropagateTierOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tieredcachestaleoptions) - Entry propagation options for each tier
+      - 🔷 *[`type TieredCacheStaleOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tieredcachepropagatetieroptions) - Entry staleness options for each tier
+      - 🔷 *[`type TieredCacheTierOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tieredcachetieroptions) - Options for each tier of a [`TieredCache` instance](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-tieredcache)
+  - *[**Translate:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#translate)
+    - 🟧 *[`class Translate`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-translate) - JSON-based translation system supporting transformation hooks, value injection, nested objects, etc.
+    - 🔷 *[`type TransformFn`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-transformfn) - The type of the transformation hook functions
+    - 🔷 *[`type TransformFnProps`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-transformfnprops) - The properties passed to the transformation functions
+    - 🔷 *[`type TranslateOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-translateoptions) - The options for the [`Translate` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-translate)
+    - 🔷 *[`type TrKeys`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-trkeys) - Generic type that gives you a union of keys from the passed [`TrObject` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-trobject)
+    - 🔷 *[`type TrObject`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-trobject) - The translation object for a specific language -->
+  - [**Misc. Types:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#types)
+    - 🔷 [`type LooseUnion`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-looseunion) - A union type that allows for autocomplete suggestions as well as substitutions of the same type
+    - 🔷 [`type ListLike`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-listlike) - Any value with a quantifiable `length`, `count` or `size` property
+    - 🔷 [`type Newable`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-newable) - Any class reference that can be instantiated with `new`
+    - 🔷 [`type NonEmptyArray`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nonemptyarray) - Non-empty array type
+    - 🔷 [`type NonEmptyString`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nonemptystring) - String type with at least one character
+    - 🔷 [`type NumberFormat`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-numberformat) - Number format identifier
+    - 🔷 [`type Prettify`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-prettify) - Makes the structure of a type more readable by fully expanding it (recursively)
+    - 🔷 [`type SerializableVal`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-serializableval) - Any value that can be serialized to JSON
+    - 🔷 [`type StringGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringgen) - A value that can be either of type string, or a sync or async function that returns a string
+    - 🔷 [`type ValueGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-valuegen) - A value that can be either the generic type T, or a sync or async function that returns T
+    - 🔷 [`type Stringifiable`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringifiable) - Any value that can be implicitly converted to a string
 
-<br><br>
+> [!NOTE]  
+> 🟣 = function  
+> 🟧 = class  
+> 🔷 = type  
+> ⬜ = const
+
+<br><br><br>
 
 <!-- #region Features -->
 ## Features:
@@ -122,16 +198,240 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
 <!-- #region DOM -->
 ## DOM:
 
-### SelectorObserver
-Signatures:  
+### `class Dialog`
+Signature:
 ```ts
-// using an Element instance:
-new SelectorObserver(baseElement: Element, options?: SelectorObserverOptions)
-// using selector string:
-new SelectorObserver(baseElementSelector: string, options?: SelectorObserverOptions)
+class Dialog extends NanoEmitter;
 ```
+  
+Usage:
+```ts
+const dialog = new Dialog(options: DialogOptions);
+```
+  
+A class that creates a customizable modal dialog with a title (optional), body and footer (optional).  
+There are tons of options for customization, like changing the close behavior, translating strings and more.  
+  
+To see all available options, refer to [the `DialogOptions` type.](#type-dialogoptions)  
+  
+- ⚠️ Each instance should have a unique ID, else the elements will conflict with each other in the DOM.
+  
+<details><summary><b>Example - click to view</b></summary>
 
-A class that manages listeners that are called when elements at given selectors are found in the DOM.  
+```ts
+import { Dialog } from "@sv443-network/userutils";
+
+const myDialog = new Dialog({
+  id: "my-unique-dialog-id",
+  width: 450,
+  height: 250,
+  closeOnBgClick: true,
+  closeOnEscPress: true,
+  destroyOnClose: false,
+  unmountOnClose: false,
+  small: true,
+  verticalAlign: "top",
+  renderHeader: () => {
+    const header = document.createElement("div");
+    header.textContent = "My Custom Dialog";
+    return header;
+  },
+  renderBody: () => {
+    const body = document.createElement("div");
+    body.textContent = "This is the body of the dialog.";
+    return body;
+  },
+  renderFooter: () => {
+    const footer = document.createElement("div");
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", () => myDialog.close());
+    footer.appendChild(closeButton);
+    return footer;
+  },
+});
+
+// register some event listeners:
+myDialog.on("open", () => {
+  console.log("Dialog opened!");
+});
+
+myDialog.on("close", () => {
+  console.log("Dialog closed!");
+});
+
+myDialog.on("destroy", () => {
+  console.log("Dialog destroyed!");
+});
+
+// open the dialog:
+await myDialog.open();
+
+// pause async execution until the dialog is closed:
+await myDialog.once("close");
+
+// destroy the dialog when done:
+myDialog.destroy();
+```
+</details>
+
+<br>
+
+### Events
+The Dialog class inherits from [`NanoEmitter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter), so you can use all of its inherited methods to listen to the following events:
+| Event | Arguments | Description |
+| :-- | :-- | :-- |
+| `close` | - | Emitted just **after** the dialog is closed |
+| `open` | - | Emitted just **after** the dialog is opened |
+| `render` | - | Emitted just **after** the dialog contents are rendered | |
+| `clear` | - | Emitted just **after** the dialog contents are cleared | |
+| `destroy` | - | Emitted just **after** the dialog is destroyed and **
+
+<br>
+
+### Methods
+
+### `Dialog.mount()`
+Signature:
+```ts
+public async mount(): Promise<HTMLElement | void>;
+```
+  
+Call after DOMContentLoaded to pre-render the dialog and invisibly mount it in the DOM.  
+
+<br>
+
+### `Dialog.unmount()`
+Signature:
+```ts
+public unmount(): void;
+```
+  
+Closes the dialog and clears all its contents (unmounts elements from the DOM) in preparation for a new rendering call.
+
+<br>
+
+### `Dialog.remount()`
+Signature:
+```ts
+public async remount(): Promise<void>;
+```
+  
+Clears the DOM of the dialog and then renders it again.  
+This can be used to call the rendering functions again to update the dialog contents.
+
+<br>
+
+### `Dialog.open()`
+Signature:
+```ts
+public async open(e?: MouseEvent | KeyboardEvent): Promise<HTMLElement | void>;
+```
+  
+Opens the dialog - also mounts it if it hasn't been mounted yet.  
+Prevents default action and immediate propagation of the passed event.
+
+<br>
+
+### `Dialog.close()`
+Signature:
+```ts
+public close(e?: MouseEvent | KeyboardEvent): void;
+```
+  
+Closes the dialog - prevents default action and immediate propagation of the passed event.
+
+<br>
+
+### `Dialog.isOpen()`
+Signature:
+```ts
+public isOpen(): boolean;
+```
+  
+Returns true if the dialog is currently open.
+
+<br>
+
+### `Dialog.isMounted()`
+Signature:
+```ts
+public isMounted(): boolean;
+```
+  
+Returns true if the dialog is currently mounted.
+
+<br>
+
+### `Dialog.destroy()`
+Signature:
+```ts
+public destroy(): void;
+```
+  
+Clears the DOM of the dialog and removes all event listeners.
+
+<br>
+
+### `Dialog.getCurrentDialogId()`
+Signature:
+```ts
+public static getCurrentDialogId(): string | null;
+```
+  
+Returns the ID of the top-most dialog (the dialog that has been opened last).
+
+<br>
+
+### `Dialog.getOpenDialogs()`
+Signature:
+```ts
+public static getOpenDialogs(): string[];
+```
+  
+Returns the IDs of all currently open dialogs, top-most first.
+
+<br>
+
+### Types
+
+### `type DialogOptions`
+The options object for the [`Dialog` class.](#class-dialog)  
+These are the properties:
+| Property | Type | Description |
+| :-- | :-- | :-- |
+| `id` | `string` | ID that gets added to child element IDs - has to be unique and conform to HTML ID naming rules! |
+| `width` | `number` | Target and max width of the dialog in pixels |
+| `height` | `number` | Target and max height of the dialog in pixels |
+| `closeOnBgClick?` | `boolean \| undefined` | Whether the dialog should close when the background is clicked - defaults to true |
+| `closeOnEscPress?` | `boolean \| undefined` | Whether the dialog should close when the escape key is pressed - defaults to true |
+| `destroyOnClose?` | `boolean \| undefined` | Whether the dialog should be destroyed when it's closed - defaults to false |
+| `unmountOnClose?` | `boolean \| undefined` | Whether the dialog should be unmounted when it's closed - defaults to true - superseded by destroyOnClose |
+| `removeListenersOnDestroy?` | `boolean \| undefined` | Whether all listeners should be removed when the dialog is destroyed - defaults to true |
+| `small?` | `boolean \| undefined` | Whether the dialog should have a smaller overall appearance - defaults to false |
+| `verticalAlign?` | `"top" \| "center" \| "bottom" \| undefined` | Where to align or anchor the dialog vertically - defaults to "center" |
+| `strings?` | `Partial<typeof defaultStrings> \| undefined` | Strings used in the dialog (used for translations) - defaults to the default English strings exported as `defaultStrings` |
+| `dialogCss?` | `string \| undefined` | CSS to apply to the dialog - defaults to the exported constant `defaultDialogCss` |
+| `renderBody` | `() => HTMLElement \| Promise<HTMLElement>` | Called to render the body of the dialog |
+| `renderHeader?` | `(() => HTMLElement \| Promise<HTMLElement>) \| undefined` | Called to render the header of the dialog - leave undefined for a blank header |
+| `renderFooter?` | `(() => HTMLElement \| Promise<HTMLElement>) \| undefined` | Called to render the footer of the dialog - leave undefined for no footer |
+| `renderCloseBtn?` | `(() => HTMLElement \| Promise<HTMLElement>) \| undefined` | Called to render the close button of the dialog - leave undefined for no close button |
+
+<br><br>
+
+### `class SelectorObserver`
+Signature:
+```ts
+class SelectorObserver;
+```
+  
+Usage:
+```ts
+new SelectorObserver(baseElement: Element, options?: SelectorObserverConstructorOptions);
+new SelectorObserver(baseElementSelector: string, options?: SelectorObserverConstructorOptions);
+```
+  
+A class that manages listeners that are called when elements at given CSS selectors are found in the DOM.  
 It is useful for userscripts that need to wait for elements to be added to the DOM at an indeterminate point in time before they can be interacted with.  
 By default, it uses the MutationObserver API to observe for any element changes, and as such is highly customizable, but can also be configured to run on a fixed interval.  
   
@@ -143,103 +443,9 @@ The `options` parameter is optional and will be passed to the MutationObserver t
 The MutationObserver options present by default are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
 For example, if you want to trigger the listeners when certain attributes change, pass `{ attributeFilter: ["class", "data-my-attribute"] }`  
   
-Additionally, there are the following extra options:
-- `disableOnNoListeners` - whether to disable the SelectorObserver when there are no listeners left (defaults to false)
-- `enableOnAddListener` - whether to enable the SelectorObserver when a new listener is added (defaults to true)
-- `defaultDebounce` - if set to a number, this debounce will be applied to every listener that doesn't have a custom debounce set (defaults to 0)
-- `defaultDebounceType` - can be set to "immediate" (default), to call the function on the very first call and subsequent times after the given debounce time passed, or "idle", to let through the very last call, after the debounce time passed with no subsequent calls - [see `Debouncer` for more info and a diagram](#debouncer)
-- `checkInterval` - if set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored
+⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.  
   
-⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.
-
-<br>
-
-### Methods:
-#### `SelectorObserver.addListener()`
-Signature: `SelectorObserver.addListener<TElement = HTMLElement>(selector: string, options: SelectorListenerOptions): void`  
-Adds a listener (specified in `options.listener`) for the given selector that will be called once the selector exists in the DOM. It will be passed the element(s) that match the selector as the only argument.  
-The listener will be called immediately if the selector already exists in the DOM.  
-
-> `options.listener` is the only required property of the `options` object.  
-> It is a function that will be called once the selector exists in the DOM.  
-> It will be passed the found element or NodeList of elements, depending on if `options.all` is set to true or false.
-  
-> If `options.all` is set to true, querySelectorAll() will be used instead and the listener will be passed a `NodeList` of matching elements.  
-> This will also include elements that were already found in a previous listener call.  
-> If set to false (default), querySelector() will be used and only the first matching element will be returned.
-  
-> If `options.continuous` is set to true, this listener will not be deregistered after it was called once (defaults to false).  
->   
-> ⚠️ You should keep usage of this option to a minimum, as it will cause this listener to be called every time the selector is *checked for and found* and this can stack up quite quickly.  
-> ⚠️ You should try to only use this option on SelectorObserver instances that are scoped really low in the DOM tree to prevent as many selector checks as possible from being triggered.  
-> ⚠️ I also recommend always setting a debounce time (see constructor or below) if you use this option.
-  
-> If `options.debounce` is set to a number above 0, this listener will be debounced by that amount of milliseconds (defaults to 0).  
-> E.g. if the debounce time is set to 200 and the selector is found twice within 100ms, only the last call of this listener will be executed.
-
-> `options.debounceType` is set to "immediate" by default, which means the listener will be called immediately and then debounced on subsequent calls.  
-> If set to "idle", the SelectorObserver will wait until the debounce time has passed with no new calls and then calls the listener with the latest element(s) found.  
-> See the [Debouncer](#debouncer) class for a better explanation.
-  
-> When using TypeScript, the generic `TElement` can be used to specify the type of the element(s) that this listener will return.  
-> It will default to HTMLElement if left undefined.
-  
-<br>
-
-#### `SelectorObserver.enable()`
-Signature: `SelectorObserver.enable(immediatelyCheckSelectors?: boolean): boolean`  
-Enables the observation of the child elements for the first time or if it was disabled before.  
-`immediatelyCheckSelectors` is set to true by default, which means all previously registered selectors will be checked. Set to false to only check them on the first detected mutation.  
-Returns true if the observation was enabled, false if it was already enabled or the passed `baseElementSelector` couldn't be found.  
-  
-<br>
-
-#### `SelectorObserver.disable()`
-Signature: `SelectorObserver.disable(): void`  
-Disables the observation of the child elements.  
-If selectors are currently being checked, the current selector will be finished before disabling.  
-  
-<br>
-
-#### `SelectorObserver.isEnabled()`
-Signature: `SelectorObserver.isEnabled(): boolean`  
-Returns whether the observation of the child elements is currently enabled.  
-  
-<br>
-
-#### `SelectorObserver.clearListeners()`
-Signature: `SelectorObserver.clearListeners(): void`  
-Removes all listeners for all selectors.  
-  
-<br>
-
-#### `SelectorObserver.removeAllListeners()`
-Signature: `SelectorObserver.removeAllListeners(selector: string): boolean`  
-Removes all listeners for the given selector.  
-  
-<br>
-
-#### `SelectorObserver.removeListener()`
-Signature: `SelectorObserver.removeListener(selector: string, options: SelectorListenerOptions): boolean`  
-Removes a specific listener for the given selector and options.  
-  
-<br>
-
-#### `SelectorObserver.getAllListeners()`
-Signature: `SelectorObserver.getAllListeners(): Map<string, SelectorListenerOptions[]>`  
-Returns a Map of all selectors and their listeners.  
-  
-<br>
-
-#### `SelectorObserver.getListeners()`
-Signature: `SelectorObserver.getListeners(selector: string): SelectorListenerOptions[] | undefined`  
-Returns all listeners for the given selector or undefined if there are none.  
-
-<br>
-
-<details><summary><b>Examples - click to view</b></summary>
-
-#### Basic Signature:
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { SelectorObserver } from "@sv443-network/userutils";
@@ -265,24 +471,12 @@ document.addEventListener("DOMContentLoaded", () => {
     attributeFilter: ["class", "style", "data-whatever"],
     // debounce all listeners by 100ms unless specified otherwise:
     defaultDebounce: 100,
-    // "immediate" means listeners are called immediately and use the debounce as a timeout between subsequent calls - see the Debouncer class for a better explanation
     defaultDebounceType: "immediate",
-    // other settings from the MutationObserver API can be set here too - see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options
   });
 
   barObserver.addListener("#my-element", {
     listener: (element) => {
       console.log("Element's attributes changed:", element);
-    },
-  });
-
-  barObserver.addListener("#my-other-element", {
-    // set the debounce higher than provided by the defaultDebounce property:
-    debounce: 250,
-    // change the type for this specific listener:
-    debounceType: "idle",
-    listener: (element) => {
-      console.log("Other element's attributes changed:", element);
     },
   });
 
@@ -310,138 +504,149 @@ document.addEventListener("DOMContentLoaded", () => {
     // remove the listener after the event "something" was dispatched:
     unsubscribe();
   });
-
-
-  // use a different element as the base:
-
-  const myElement = document.querySelector("#my-element");
-  if(myElement) {
-    const quxObserver = new SelectorObserver(myElement);
-
-    quxObserver.addListener("#my-child-element", {
-      listener: (element) => {
-        console.log("Child element found:", element);
-      },
-    });
-
-    quxObserver.enable();
-  }
-});
-```
-
-<br>
-
-#### Get and remove listeners:
-
-```ts
-import { SelectorObserver } from "@sv443-network/userutils";
-
-document.addEventListener("DOMContentLoaded", () => {
-  const observer = new SelectorObserver(document.body);
-
-  observer.addListener("#my-element-foo", {
-    continuous: true,
-    listener: (element) => {
-      console.log("Element found:", element);
-    },
-  });
-
-  observer.addListener("#my-element-bar", {
-    listener: (element) => {
-      console.log("Element found again:", element);
-    },
-  });
-
-  observer.enable();
-
-
-  // get all listeners:
-
-  console.log(observer.getAllListeners());
-  // Map(2) {
-  //   '#my-element-foo' => [ { listener: [Function: listener] } ],
-  //   '#my-element-bar' => [ { listener: [Function: listener] } ]
-  // }
-
-
-  // get listeners for a specific selector:
-
-  console.log(observer.getListeners("#my-element-foo"));
-  // [ { listener: [Function: listener], continuous: true } ]
-
-
-  // remove all listeners for a specific selector:
-
-  observer.removeAllListeners("#my-element-foo");
-  console.log(observer.getAllListeners());
-  // Map(1) {
-  //   '#my-element-bar' => [ { listener: [Function: listener] } ]
-  // }
-});
-```
-
-<br>
-
-#### Chaining:
-
-```ts
-import { SelectorObserver } from "@sv443-network/userutils";
-import type { SelectorObserverOptions } from "@sv443-network/userutils";
-
-// apply a default debounce to all SelectorObserver instances:
-const defaultOptions: SelectorObserverOptions = {
-  defaultDebounce: 100,
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  // initialize generic observer that in turn initializes "sub-observers":
-  const fooObserver = new SelectorObserver(document.body, {
-    ...defaultOptions,
-    // define any other specific options here
-  });
-
-  const myElementSelector = "#my-element";
-
-  // this relatively expensive listener (as it is in the full <body> scope) will only fire once:
-  fooObserver.addListener(myElementSelector, {
-    listener: (element) => {
-      // only enable barObserver once its baseElement exists:
-      barObserver.enable();
-    },
-  });
-
-  // barObserver is created at the same time as fooObserver, but only enabled once #my-element exists
-  const barObserver = new SelectorObserver(element, {
-    ...defaultOptions,
-    // define any other specific options here
-  });
-
-  // this selector will be checked for immediately after `enable()` is called
-  // and on each subsequent mutation because `continuous` is set to true.
-  // however it is much less expensive as it is scoped to a lower element which will receive less DOM updates
-  barObserver.addListener(".my-child-element", {
-    all: true,
-    continuous: true,
-    listener: (elements) => {
-      console.log("Child elements found:", elements);
-    },
-  });
-
-  // immediately enable fooObserver as the <body> is available as soon as "DOMContentLoaded" fires:
-  fooObserver.enable();
 });
 ```
 </details>
 
 <br>
 
-### getUnsafeWindow()
-Signature:  
+### Methods
+
+### `SelectorObserver.addListener()`
+Signature:
 ```ts
-getUnsafeWindow(): Window
+public addListener<TElem extends Element = HTMLElement>(
+  selector: string,
+  options: SelectorListenerOptions<TElem>
+): UnsubscribeFunction;
 ```
   
-Returns the unsafeWindow object or falls back to the regular window object if the `@grant unsafeWindow` is not given.  
+Starts observing the children of the base element for changes to the given `selector` according to the set `options`.  
+Returns a function that can be called to remove this listener.  
+  
+The `options` object has the following properties:
+| Property | Type | Description |
+| :-- | :-- | :-- |
+| `listener` | `(element: TElem) => void` or `(elements: NodeListOf<TElem>) => void` | Gets called whenever the selector is found in the DOM |
+| `all?` | `boolean \| undefined` | Whether to use `querySelectorAll()` instead - defaults to false |
+| `continuous?` | `boolean \| undefined` | Whether to call the listener continuously instead of just once - defaults to false |
+| `debounce?` | `number \| undefined` | Whether to debounce the listener to reduce calls - set undefined or <=0 to disable (default) |
+| `debounceType?` | `DebouncerType \| undefined` | The edge type of the debouncer - defaults to "immediate" |
+
+<br>
+
+### `SelectorObserver.enable()`
+Signature:
+```ts
+public enable(immediatelyCheckSelectors?: boolean): boolean;
+```
+  
+Enables or reenables the observation of the child elements.  
+`immediatelyCheckSelectors` defaults to true, which means all previously registered selectors will be checked.  
+Returns true when the observation was enabled, false otherwise (e.g. when the base element wasn't found).
+
+<br>
+
+### `SelectorObserver.disable()`
+Signature:
+```ts
+public disable(): void;
+```
+  
+Disables the observation of the child elements.
+
+<br>
+
+### `SelectorObserver.isEnabled()`
+Signature:
+```ts
+public isEnabled(): boolean;
+```
+  
+Returns whether the observation of the child elements is currently enabled.
+
+<br>
+
+### `SelectorObserver.clearListeners()`
+Signature:
+```ts
+public clearListeners(): void;
+```
+  
+Removes all listeners that have been registered with `addListener()`.
+
+<br>
+
+### `SelectorObserver.removeAllListeners()`
+Signature:
+```ts
+public removeAllListeners(selector: string): boolean;
+```
+  
+Removes all listeners for the given `selector`.  
+Returns true when all listeners for the associated selector were found and removed, false otherwise.
+
+<br>
+
+### `SelectorObserver.removeListener()`
+Signature:
+```ts
+public removeListener(selector: string, options: SelectorListenerOptions): boolean;
+```
+  
+Removes a single listener for the given `selector` and `options`.  
+Returns true when the listener was found and removed, false otherwise.
+
+<br>
+
+### `SelectorObserver.getAllListeners()`
+Signature:
+```ts
+public getAllListeners(): Map<string, SelectorListenerOptions<HTMLElement>[]>;
+```
+  
+Returns all listeners that have been registered with `addListener()`.
+
+<br>
+
+### `SelectorObserver.getListeners()`
+Signature:
+```ts
+public getListeners(selector: string): SelectorListenerOptions<HTMLElement>[] | undefined;
+```
+  
+Returns all listeners for the given `selector` or undefined if there are none.
+
+<br>
+
+### Types
+
+### `type SelectorObserverConstructorOptions`
+Options object passed to the [`SelectorObserver` constructor.](#class-selectorobserver)  
+Extends [`MutationObserverInit`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) with the following additional properties:
+| Property | Type | Description |
+| :-- | :-- | :-- |
+| `defaultDebounce?` | `number \| undefined` | If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set |
+| `defaultDebounceType?` | `DebouncerType \| undefined` | If set, applies this debounce edge type to all listeners that don't have their own set - defaults to "immediate" |
+| `disableOnNoListeners?` | `boolean \| undefined` | Whether to disable the observer when no listeners are present - defaults to false |
+| `enableOnAddListener?` | `boolean \| undefined` | Whether to ensure the observer is enabled when a new listener is added - defaults to true |
+| `checkInterval?` | `number \| undefined` | If set to a number, the checks will be run on interval instead of on mutation events - all MutationObserverInit props will be ignored |
+
+<br>
+
+### `type SelectorListenerOptions`
+Options object passed to [`SelectorObserver.addListener()`](#selectorobserveraddlistener).  
+See the table in that section for more details.
+
+<br><br>
+
+### `function getUnsafeWindow`
+Signature:
+```ts
+function getUnsafeWindow(): Window;
+```
+  
+Returns the `unsafeWindow` object or falls back to the regular `window` object if the `@grant unsafeWindow` is not given.  
 Userscripts are sandboxed and do not have access to the regular window object, so this function is useful for websites that reject some events that were dispatched by the userscript, or userscripts that need to interact with other userscripts, and more.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -462,18 +667,17 @@ document.body.dispatchEvent(mouseEvent);
 ```
 </details>
 
-<br>
+<br><br>
 
-### isDomLoaded()
-Signature:  
+### `function isDomLoaded`
+Signature:
 ```ts
-isDomLoaded(): boolean
+function isDomLoaded(): boolean;
 ```
   
-Returns whether or not the DOM has finished loading and can be queried, manipulated, interacted with, etc.  
+Returns whether or not the DOM has finished loading and can be queried and modified.  
   
 As long as the library is loaded immediately on page load, this function will always return the correct value, even if your runtime is executed after the DOM has finished loading (like when using `@run-at document-end`).  
-Just make sure to not lazy-load the library, evaluate it on-demand, or anything else that would delay the execution.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -488,25 +692,22 @@ document.addEventListener("DOMContentLoaded", () => {
 ```
 </details>
 
-<br>
+<br><br>
 
-### onDomLoad()
-Signature:  
+### `function onDomLoad`
+Signature:
 ```ts
-onDomLoad(cb?: () => void): Promise<void>
+function onDomLoad(cb?: () => void): Promise<void>;
 ```
   
 Executes a callback and/or resolves the returned Promise when the DOM has finished loading.  
 Immediately executes/resolves if the DOM is already loaded.  
-  
-This alleviates the problem of the [`DOMContentLoaded` event](https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event) only being fired once and if you missed it, you can't really be certain and have to fall back to something like [`document.readyState === "complete"`](https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState#value), which could happen at a much later point in time than `DOMContentLoaded`.
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { onDomLoad } from "@sv443-network/userutils";
 
-// callback gets executed at basically the same time as the `console.log("DOM loaded!")` below:
 onDomLoad(() => {
   console.log("DOM has finished loading.");
 });
@@ -522,15 +723,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 ```
 </details>
 
-<br>
+<br><br>
 
-### addParent()
-Signature:  
+### `function addParent`
+Signature:
 ```ts
-addParent(element: Element, newParent: Element): Element
+function addParent<TElem extends Element, TParentElem extends Element>(
+  element: TElem,
+  newParent: TParentElem
+): TParentElem;
 ```
   
-Adds a parent element around the passed `element` and returns the new parent.  
+Adds a parent container around the provided element and returns the new parent element.  
 Previously registered event listeners are kept intact.  
   
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
@@ -540,7 +744,6 @@ Previously registered event listeners are kept intact.
 ```ts
 import { addParent } from "@sv443-network/userutils";
 
-// add an <a> around an element
 const element = document.querySelector("#element");
 const newParent = document.createElement("a");
 newParent.href = "https://example.org/";
@@ -549,16 +752,17 @@ addParent(element, newParent);
 ```
 </details>
 
-<br>
+<br><br>
 
-### addGlobalStyle()
-Signature:  
+### `function addGlobalStyle`
+Signature:
 ```ts
-addGlobalStyle(css: string): HTMLStyleElement
+function addGlobalStyle(style: string): HTMLStyleElement;
 ```
   
-Adds a global style to the page in form of a `<style>` element that's inserted into the `<head>`.  
-Returns the style element that was just created.  
+Adds global CSS style in the form of a `<style>` element in the document's `<head>`.  
+Returns the created style element.  
+  
 ⚠️ This function needs to be run after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -576,17 +780,17 @@ document.addEventListener("DOMContentLoaded", () => {
 ```
 </details>
 
-<br>
+<br><br>
 
-### preloadImages()
-Signature:  
+### `function preloadImages`
+Signature:
 ```ts
-preloadImages(urls: string[], rejects?: boolean): Promise<Array<PromiseSettledResult<HTMLImageElement>>>
+function preloadImages(srcUrls: string[], rejects?: boolean): Promise<PromiseSettledResult<HTMLImageElement>[]>;
 ```
   
-Preloads images into browser cache by creating an invisible `<img>` element for each URL passed.  
-The images will be loaded in parallel and the returned Promise will only resolve once all images have been loaded.  
-The resulting PromiseSettledResult array will contain the image elements if resolved, or an ErrorEvent if rejected, but only if `rejects` is set to true.  
+Preloads an array of image URLs so they can be loaded instantly from the browser cache later on.  
+The `rejects` parameter defaults to false. If set to true, the returned PromiseSettledResults will contain rejections for any of the images that failed to load.  
+Each resolved result will contain the loaded image element, while each rejected result will contain an `ErrorEvent`.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -600,26 +804,23 @@ preloadImages([
 ], true)
   .then((results) => {
     console.log("Images preloaded. Results:", results);
-  })
-  .catch((results) => {
-    console.error("Couldn't preload all images. Results:", results);
   });
 ```
 </details>
 
-<br>
+<br><br>
 
-### openInNewTab()
-Signature:  
+### `function openInNewTab`
+Signature:
 ```ts
-openInNewTab(url: string, background?: boolean, additionalProps?: Partial<HTMLAnchorElement>): void
+function openInNewTab(href: string, background?: boolean, additionalProps?: Partial<HTMLAnchorElement>): void;
 ```
   
-Tries to use `GM.openInTab` to open the given URL in a new tab, or as a fallback if the grant is not given, creates an invisible anchor element and clicks it.  
+Tries to use `GM.openInTab` to open the given URL in a new tab, otherwise if the grant is not given, creates an invisible anchor element and clicks it.  
 If `background` is set to true, the tab will be opened in the background. Leave `undefined` to use the browser's default behavior.  
 If `additionalProps` is set and `GM.openInTab` is not available, the given properties will be added or overwritten on the created anchor element.  
   
-⚠️ You should add the `@grant GM.openInTab` directive, otherwise only the fallback behavior will be used and the warning below is extra important:  
+⚠️ You should add the `@grant GM.openInTab` directive, otherwise only the fallback behavior will be used.  
 ⚠️ For the fallback to work, this function needs to be run in response to a user interaction event, else the browser might reject it.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -628,30 +829,32 @@ If `additionalProps` is set and `GM.openInTab` is not available, the given prope
 import { openInNewTab } from "@sv443-network/userutils";
 
 document.querySelector("#my-button").addEventListener("click", () => {
-  // open in background:
   openInNewTab("https://example.org/", true);
 });
 ```
 </details>
 
-<br>
+<br><br>
 
-### interceptEvent()
-Signature:  
+### `function interceptEvent`
+Signature:
 ```ts
-interceptEvent(
-  eventObject: EventTarget,
-  eventName: string,
-  predicate?: (event: Event) => boolean
-): void
+function interceptEvent<
+  TEvtObj extends EventTarget,
+  TPredicateEvt extends Event,
+>(
+  eventObject: TEvtObj,
+  eventName: Parameters<TEvtObj["addEventListener"]>[0],
+  predicate?: (event: TPredicateEvt) => boolean
+): void;
 ```
   
-Intercepts all listeners for the given event dispatched on the `eventObject`, by preventing the listeners from being called as long as the predicate function returns a truthy value.  
+Intercepts the specified event on the passed object and prevents it from being called if the called `predicate` function returns a truthy value.  
 If no predicate is specified, all events will be discarded.  
-Calling this function will set the `Error.stackTraceLimit` to 100 (if it's not already higher) to ensure the stack trace is preserved.  
+Calling this function will set `Error.stackTraceLimit = 100` (if not already higher) to ensure the stack trace is preserved.  
   
-⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached* after this function is called.  
-⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw a [`PlatformError`](#platformerror).  
+⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
+⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context (like it does in FireMonkey). In that case, calling this function will throw a [`PlatformError`](#class-platformerror).  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -669,23 +872,22 @@ interceptEvent(document.body, "click", (event) => {
 ```
 </details>
 
-<br>
+<br><br>
 
-### interceptWindowEvent()
-Signature:  
+### `function interceptWindowEvent`
+Signature:
 ```ts
-interceptWindowEvent(
-  eventName: string,
-  predicate?: (event: Event) => boolean
-): void
+function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
+  eventName: TEvtKey,
+  predicate?: (event: WindowEventMap[TEvtKey]) => boolean
+): void;
 ```
   
-Intercepts all listeners for the given event dispatched on the `unsafeWindow` (GM only, with `@grant unsafeWindow`) or `window` object, by preventing all listeners from being called as long as the predicate function returns a truthy value.  
+Intercepts the specified event on the `unsafeWindow` (if available) or `window` object and prevents it from being called if the called `predicate` function returns a truthy value.  
 If no predicate is specified, all events will be discarded.  
-This is essentially the same as [`interceptEvent()`](#interceptevent), but automatically uses the `unsafeWindow` or `window`, depending on availability.  
+This is essentially the same as [`interceptEvent()`](#function-interceptevent), but automatically uses the `unsafeWindow` or `window`, depending on availability.  
   
-⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are *attached after this function is called.*  
-⚠️ Due to this function modifying the `addEventListener` prototype, it might break execution of the page's main script if the userscript is running in an isolated context, or in more restrictive browsers or userscript extensions (like FireMonkey). In that case, calling this function will throw an error.  
+⚠️ This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
 ⚠️ In order to have the best chance at intercepting events in a userscript, the directive `@grant unsafeWindow` should be set.  
   
 <details><summary><b>Example - click to view</b></summary>
@@ -693,28 +895,26 @@ This is essentially the same as [`interceptEvent()`](#interceptevent), but autom
 ```ts
 import { interceptWindowEvent } from "@sv443-network/userutils";
 
-// prevent the pesky "Are you sure you want to leave this page?" popup
-// because no predicate is specified, all events will be discarded
+// prevent the "Are you sure you want to leave this page?" popup:
 interceptWindowEvent("beforeunload");
 
-
-// discard all context menu commands that are not within `#my-element`:
+// discard all context menu commands that are not within #my-element:
 interceptWindowEvent("contextmenu", (event) =>
   event.target instanceof HTMLElement && !event.target.closest("#my-element")
 );
 ```
 </details>
 
-<br>
+<br><br>
 
-### isScrollable()
-Signature:  
+### `function isScrollable`
+Signature:
 ```ts
-isScrollable(element: Element): { horizontal: boolean, vertical: boolean }
+function isScrollable(element: Element): Record<"vertical" | "horizontal", boolean>;
 ```
   
-Checks if an element has horizontal or vertical scroll bars.  
-This uses the computed style of the element, so it has a high chance of working even if the element is hidden.  
+Checks if an element has a horizontal or vertical scroll bar.  
+Uses the computed style of the element, so it has a high chance of working even if the element is hidden.  
   
 ⚠️ The element needs to be mounted in the DOM so the CSS engine evaluates it, otherwise no scroll bars can be detected.  
   
@@ -731,24 +931,24 @@ console.log("Element has a vertical scroll bar:", vertical);
 ```
 </details>
 
-<br>
+<br><br>
 
-### observeElementProp()
-Signature:  
+### `function observeElementProp`
+Signature:
 ```ts
-observeElementProp<
+function observeElementProp<
   TElem extends Element = HTMLElement,
   TPropKey extends keyof TElem = keyof TElem,
-> (
+>(
   element: TElem,
   property: TPropKey,
   callback: (oldVal: TElem[TPropKey], newVal: TElem[TPropKey]) => void
-): void
+): void;
 ```
   
-This function observes changes to the given property of a given element.  
-While regular HTML attributes can be observed using a MutationObserver, this is not always possible for properties that are assigned on the JS object.  
-This function shims the setter of the provided property and calls the callback function whenever it is changed through any means.  
+Executes the callback when the passed element's property changes.  
+Contrary to an element's attributes, properties can usually not be observed with a MutationObserver.  
+This function shims the getter and setter of the property to invoke the callback.  
   
 When using TypeScript, the types for `element`, `property` and the arguments for `callback` will be automatically inferred.  
   
@@ -759,58 +959,32 @@ import { observeElementProp } from "@sv443-network/userutils";
 
 const myInput = document.querySelector("input#my-input");
 
-let value = 0;
-
-setInterval(() => {
-  value += 1;
-  myInput.value = String(value);
-}, 1000);
-
-
-const observer = new MutationObserver((mutations) => {
-  // will never be called:
-  console.log("MutationObserver mutation:", mutations);
-});
-
-// one would think this should work, but "value" is a JS object *property*, not a DOM *attribute*
-observer.observe(myInput, {
-  attributes: true,
-  attributeFilter: ["value"],
-});
-
-
 observeElementProp(myInput, "value", (oldValue, newValue) => {
-  // will be called every time the value changes:
   console.log("Value changed from", oldValue, "to", newValue);
 });
 ```
 </details>
 
-<br>
+<br><br>
 
-### getSiblingsFrame()
-Signature:  
+### `function getSiblingsFrame`
+Signature:
 ```ts
-getSiblingsFrame<
-  TSiblingType extends Element = HTMLElement
-> (
+function getSiblingsFrame<TSibling extends Element = HTMLElement>(
   refElement: Element,
   siblingAmount: number,
-  refElementAlignment: "center-top" | "center-bottom" | "top" | "bottom" = "center-top",
-  includeRef = true
-): TSiblingType[]
+  refElementAlignment?: "center-top" | "center-bottom" | "top" | "bottom",
+  includeRef?: boolean
+): TSibling[];
 ```
-Returns a "frame" of the closest siblings of the reference element, based on the passed amount of siblings and element alignment.  
-The returned type is an array of `HTMLElement` by default but can be changed by specifying the `TSiblingType` generic in TypeScript.  
+  
+Returns a "frame" of the closest siblings of the `refElement`, based on the passed amount of siblings and `refElementAlignment`.  
   
 These are the parameters:
-- The `refElement` parameter is the reference element to return the relative closest siblings from.
-- The `siblingAmount` parameter is the amount of siblings to return in total (including or excluding the `refElement` based on the `includeRef` parameter).
-- The `refElementAlignment` parameter can be set to `center-top` (default), `center-bottom`, `top`, or `bottom`, which will determine where the relative location of the provided `refElement` is in the returned array.  
-  `center-top` (default) will try to keep the `refElement` in the center of the returned array, but can shift around by one element. In those cases it will prefer the top spot.  
-  Same goes for `center-bottom` in reverse.  
-  `top` will keep the `refElement` at the top of the returned array, and `bottom` will keep it at the bottom.
-- If `includeRef` is set to `true` (default), the provided `refElement` will be included in the returned array at its corresponding position.
+- `refElement` - The reference element to return the relative closest siblings from.
+- `siblingAmount` - The amount of siblings to return in total.
+- `refElementAlignment` - Can be set to `center-top` (default), `center-bottom`, `top`, or `bottom`, which will determine where the relative location of the provided `refElement` is in the returned array.
+- `includeRef` - If set to `true` (default), the provided `refElement` will be included in the returned array at its corresponding position.
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -828,108 +1002,29 @@ const refElement = document.querySelector("#ref");
 //     <div>6</div>
 // </div>
 
-// ref element aligned to the top of the frame's center positions and included in the result:
-const siblingsFoo = getSiblingsFrame(refElement, 4, "center-top", true);
-// <div>1</div>
-// <div>2</div>        ◄──┐
-// <div id="ref">3</div>  │ returned         <(ref is here because refElementAlignment = "center-top")
-// <div>4</div>           │ frame
-// <div>5</div>        ◄──┘
-// <div>6</div>
-
-// ref element aligned to the bottom of the frame's center positions and included in the result:
-const siblingsBar = getSiblingsFrame(refElement, 4, "center-bottom", true);
-// <div>1</div>        ◄──┐
-// <div>2</div>           │ returned
-// <div id="ref">3</div>  │ frame            <(ref is here because refElementAlignment = "center-bottom")
-// <div>4</div>        ◄──┘
-// <div>5</div>
-// <div>6</div>
-
-// ref element aligned to the bottom of the frame's center positions, but excluded from the result:
-const siblingsBaz = getSiblingsFrame(refElement, 3, "center-bottom", false);
-// <div>1</div>        ◄──┐
-// <div>2</div>        ◄──┘ returned...
-// <div id="ref">3</div>                     <(skipped because includeRef = false)
-// <div>4</div>        ◄─── ...frame
-// <div>5</div>
-// <div>6</div>
-
-// ref element aligned to the top of the frame, but excluded from the result:
-const siblingsQux = getSiblingsFrame(refElement, 3, "top", false);
-// <div>1</div>
-// <div>2</div>
-// <div id="ref">3</div>                     <(skipped because includeRef = false)
-// <div>4</div>        ◄──┐ returned
-// <div>5</div>           │ frame
-// <div>6</div>        ◄──┘
-
-// ref element aligned to the top of the frame, but this time included in the result:
-const siblingsQuux = getSiblingsFrame(refElement, 3, "top", true);
-// <div>1</div>
-// <div>2</div>
-// <div id="ref">3</div>  ◄──┐ returned      <(not skipped because includeRef = true)
-// <div>4</div>              │ frame
-// <div>5</div>           ◄──┘
-// <div>6</div>
-```
-
-Example without a max boundary:
-
-```ts
-const refElement = document.querySelector("#ref");
-// ^ structure of the elements:
-// <div id="parent">
-//     <div>1</div>
-//     <div>2</div>
-//     <div id="ref">3</div>
-//     <div>4</div>
-//     <div>5</div>
-//     <div>6</div>
-//     <div>7</div>
-//     <div>8</div>
-// </div>
-
-// get all elements above and include the reference element:
-const allAbove = getSiblingsFrame(refElement, Infinity, "bottom", true);
-// <div>1</div>          ◄──┐ returned
-// <div>2</div>             │ frame
-// <div id="ref">3</div> ◄──┘
-// <div>4</div>
-// <div>5</div>
-// <div>6</div>
-// <div>7</div>
-// <div>8</div>
-
-// get all elements below and exclude the reference element:
-const allBelowExcl = getSiblingsFrame(refElement, Infinity, "top", false);
-// <div>1</div>
-// <div>2</div>
-// <div id="ref">3</div>
-// <div>4</div>          ◄──┐
-// <div>5</div>             │ returned
-// <div>6</div>             │ frame
-// <div>7</div>             │
-// <div>8</div>          ◄──┘
+// ref element aligned to the top, included in the result:
+const siblings = getSiblingsFrame(refElement, 3, "top", true);
+// [<div id="ref">3</div>, <div>4</div>, <div>5</div>]
 ```
 </details>
 
-<br>
+<br><br>
 
-### setInnerHtmlUnsafe()
-Signature:  
+### `function setInnerHtmlUnsafe`
+Signature:
 ```ts
-setInnerHtmlUnsafe(element: Element, html: string): Element
+function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(
+  element: TElement,
+  html: string
+): TElement;
 ```
   
 Sets the innerHTML property of the provided element ***without any sanitization or validation.***  
-Makes use of the [Trusted Types API](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) to trick the browser into thinking the HTML is safe.  
-Use this function if the page makes use of the CSP directive `require-trusted-types-for 'script'` and throws a "This document requires 'TrustedHTML' assignment" error on Chromium-based browsers.  
-If the browser doesn't support Trusted Types, this function will fall back to regular assignment via `innerHTML`.  
+Uses a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) on Chromium-based browsers to trick the browser into thinking the HTML is safe.  
+Returns the element that was passed for chaining.  
   
-⚠️ This function does not perform any sanitization, it only tricks the browser into thinking the HTML is safe and should thus be used with utmost caution, as it can easily cause XSS vulnerabilities!  
-A much better way of doing this is by using the [DOMPurify](https://github.com/cure53/DOMPurify#what-about-dompurify-and-trusted-types) library to create your own Trusted Types policy that *actually* sanitizes the HTML and prevents (most) XSS attack vectors.  
-You can also [find more info here](https://web.dev/articles/trusted-types#library) or see [this real world example.](https://github.com/Sv443/BetterYTM/blob/06da598/src/utils/dom.ts#L245)  
+⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities when used with untrusted input!  
+⚠️ Only use this function when absolutely necessary, prefer using `element.textContent = "foo"` or other safer alternatives like the [DOMPurify library](https://github.com/cure53/DOMPurify) whenever possible.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -937,327 +1032,54 @@ You can also [find more info here](https://web.dev/articles/trusted-types#librar
 import { setInnerHtmlUnsafe } from "@sv443-network/userutils";
 
 const myElement = document.querySelector("#my-element");
-setInnerHtmlUnsafe(myElement, "<img src='https://picsum.photos/100/100' />");   // hardcoded value, so no XSS risk
-
-const myXssElement = document.querySelector("#my-xss-element");
-const userModifiableVariable = `<img onerror="alert('XSS!')" src="invalid" />`; // let's pretend this came from user input
-setInnerHtmlUnsafe(myXssElement, userModifiableVariable);                       // <- uses a user-modifiable variable, so big XSS risk!
-```
-</details>
-
-<br>
-
-### probeElementStyle()
-Signature:  
-```ts
-probeElementStyle<
-  TValue,
-  TElem extends HTMLElement = HTMLSpanElement,
-> (
-  probeStyle: (style: CSSStyleDeclaration, element: TElem) => TValue,
-  element?: TElem | (() => TElem),
-  hideOffscreen = true,
-  parentElement = document.body,
-): TValue
-```
-  
-Uses the provided element or the element returned by the provided function to probe its [computed style](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle) properties.  
-This might be useful for resolving the value behind a CSS variable, to get the default styles like the browser's font size, etc.  
-  
-⚠️ This function can only be called after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
-  
-The `probeStyle` function will be called with the computed style object and the element as arguments.  
-Whatever it returns, will also be the return value of this function.  
-  
-`element` can be either an `HTMLElement` instance or a function that returns an `HTMLElement` instance.  
-It will default to a basically empty `<span>` element if not provided.  
-All elements will have the class `_uu_probe_element` added to them. You can add your own CSS to suit your needs.  
-  
-If `hideOffscreen` is set to true (default), the element will be moved offscreen to prevent it from being visible.  
-Set it to false if you want to probe the style props `position`, `left`, `top` and `zIndex`.  
-  
-The `parentElement` parameter can be set to any element in the DOM and is where the probed element will be appended to.  
-By default it will be appended to the `<body>`.  
-  
-When using TypeScript, the generic `TValue` can be used to specify the type of the value that the `probeStyle` function will return, however it will also be inferred from the return value of the `probeStyle` function.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-This example assumes that the style and script are available on the same page at startup (as if included in the `<head>`).  
-  
-Style:
-```css
-:root {
-  /* This is the variable we want to probe: */
-  --my-cool-color: #f70;
-
-  /* The more involved it gets, the more useful the probing becomes, for example to solve more complex equations: */
-  --my-var: calc(var(--user-defined-var, var(--fallback-var, 1)) * var(--factor, 1));
-}
-
-._uu_probe_element {
-  /*
-    In here, some custom global overrides can be set for the probe element, to make some properties have a known
-    default value, to "unlock" other properties that are otherwise not accessible, or not to interfere with the
-    other elements on the page and their style requirements.
-  */
-}
-```
-  
-Script:
-```ts
-import { probeElementStyle } from "@sv443-network/userutils";
-
-document.addEventListener("DOMContentLoaded", run);
-
-function run() {
-  /**
-   * Probe on interval to wait until the value exists and has "settled"  
-   * Not really important for this example, but can be useful on pages with lots of loaded in or constantly changing scripts and styles
-   */
-  const tryResolveCol = (i = 0) => new Promise<string>((res, rej) => {
-    if(i > 100) // give up after ~10 seconds
-      return rej(new Error("Could not resolve color after 100 tries"));
-
-    // probedCol will be automatically typed as string:
-    const probedCol = probeElementStyle(
-      // probe the `style.backgroundColor` property:
-      (style, _element) => style.backgroundColor,
-      () => {
-        // create a new element but don't add it to the DOM:
-        const elem = document.createElement("span");
-        // specify the CSS variable here, so it will be resolved by the CSS engine:
-        elem.style.backgroundColor = "var(--my-cool-color, #000)"; // default to black to keep the loop going until the color is resolved
-        return elem;
-      },
-      true,
-    );
-
-    // wait for the color to exist and not be white or black (again, might only be useful in some cases):
-    if(probedCol.length === 0 || probedCol.match(/^rgba?\((?:(?:255,\s?255,\s?255)|(?:0,\s?0,\s?0))/) || probedCol.match(/^#(?:fff(?:fff)?|000(?:000)?)/))
-      return setTimeout(async () => res(await tryResolveCol(++i)), 100); // try again every 100ms
-
-    return res(probedCol);
-  });
-
-  try {
-    const color = await tryResolveCol();
-    console.log("Resolved:", color); // "Resolved: rgb(255, 127, 0)"
-  }
-  catch(err) {
-    console.error(err);
-  }
-}
+setInnerHtmlUnsafe(myElement, "<img src='https://picsum.photos/100/100' />");
 ```
 </details>
 
 <br><br>
 
-<!-- #region Math -->
-## Math:
-
-### clamp()
-Signatures:  
+### `function probeElementStyle`
+Signature:
 ```ts
-// with min:
-clamp(num: number, min: number, max: number): number
-// without min:
-clamp(num: number, max: number): number
+function probeElementStyle<
+  TValue,
+  TElem extends HTMLElement = HTMLSpanElement,
+>(
+  probeStyle: (style: CSSStyleDeclaration, element: TElem) => TValue,
+  element?: TElem | (() => TElem),
+  hideOffscreen?: boolean,
+  parentElement?: HTMLElement
+): TValue;
 ```
   
-Clamps a number between a min and max boundary (inclusive).  
-If only the `num` and `max` arguments are passed, the `min` boundary will be set to 0.  
+Creates an invisible temporary element to probe its rendered [computed style](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle).  
+This might be useful for resolving the value behind a CSS variable, getting the browser's default font size, etc.  
+  
+⚠️ This function can only be called after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired).  
+  
+- `probeStyle` - Function to probe the element's style. First argument is the element's style object, second argument is the element itself.
+- `element` - The element to probe, or a function that creates and returns the element. All probe elements will have the class `_uu_probe_element` added. Defaults to a `<span>` element.
+- `hideOffscreen` - Whether to hide the element offscreen (default: true). Disable if you want to probe position style properties.
+- `parentElement` - The parent element to append the probe element to (default: `document.body`).
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { clamp } from "@sv443-network/userutils";
+import { probeElementStyle } from "@sv443-network/userutils";
 
-clamp(7, 0, 10);     // 7
-clamp(7, 10);        // 7 (equivalent to the above)
-clamp(-1, 10);       // 0
-clamp(5, -5, 0);     // 0
-clamp(99999, 0, 10); // 10
+document.addEventListener("DOMContentLoaded", () => {
+  const probedCol = probeElementStyle(
+    (style) => style.backgroundColor,
+    () => {
+      const elem = document.createElement("span");
+      elem.style.backgroundColor = "var(--my-cool-color, #000)";
+      return elem;
+    },
+    true,
+  );
 
-// use Infinity to clamp without a min or max boundary:
-clamp(Number.MAX_SAFE_INTEGER, Infinity);     // 9007199254740991
-clamp(Number.MIN_SAFE_INTEGER, -Infinity, 0); // -9007199254740991
-```
-</details>
-
-<br>
-
-### mapRange()
-Signatures:  
-```ts
-// with min arguments:
-mapRange(value: number, range1min: number, range1max: number, range2min: number, range2max: number): number
-// without min arguments:
-mapRange(value: number, range1max: number, range2max: number): number
-```
-  
-Maps a number from one range to the spot it would be in another range.  
-If only the `max` arguments are passed, the function will set the `min` for both ranges to 0.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { mapRange } from "@sv443-network/userutils";
-
-mapRange(5, 0, 10, 0, 100); // 50
-mapRange(5, 0, 10, 0, 50);  // 25
-mapRange(5, 10, 50);        // 25
-
-// to calculate a percentage from arbitrary values, use 0 and 100 as the second range
-// for example, if 4 files of a total of 13 were downloaded:
-mapRange(4, 0, 13, 0, 100); // 30.76923076923077
-```
-</details>
-
-<br>
-
-### randRange()
-Signatures:  
-```ts
-// with min:
-randRange(min: number, max: number, enhancedEntropy?: boolean): number
-// without min:
-randRange(max: number, enhancedEntropy?: boolean): number
-```
-  
-Returns a random number between `min` and `max` (inclusive).  
-If only one argument is passed, it will be used as the `max` value and `min` will be set to 0.  
-  
-If `enhancedEntropy` is set to true (false by default), the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) is used for generating the random numbers.  
-Note that this makes the function call take longer, but the generated IDs will have a higher entropy.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { randRange } from "@sv443-network/userutils";
-
-randRange(0, 10);       // 4
-randRange(10, 20);      // 17
-randRange(10);          // 7
-randRange(0, 10, true); // 4 (the devil is in the details)
-
-
-function benchmark(enhancedEntropy: boolean) {
-  const timestamp = Date.now();
-  for(let i = 0; i < 100_000; i++)
-    randRange(0, 100, enhancedEntropy);
-  console.log(`Generated 100k in ${Date.now() - timestamp}ms`)
-}
-
-// using Math.random():
-benchmark(false); // Generated 100k in 90ms
-
-// using crypto.getRandomValues():
-benchmark(true);  // Generated 100k in 461ms
-
-// about a 5x slowdown, but the generated numbers are more entropic
-```
-</details>
-
-<br>
-
-### digitCount()
-Signature:  
-```ts
-digitCount(num: number | Stringifiable, withDecimals = true): number
-```
-  
-Calculates and returns the amount of digits in the given number (floating point or integer).  
-If it isn't a number already, the value will be converted by being passed to `String()` and then `Number()` before the calculation.  
-  
-Returns `NaN` if the number is invalid or `Infinity` if the number is too large to be represented as a regular number.  
-  
-If `withDecimals` is set to false, the decimal point and everything after it will be ignored.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { digitCount } from "@sv443-network/userutils";
-
-const num1 = 123;
-const num2 = 123456789;
-const num3 = "  123456789    ";
-const num4 = Number.MAX_SAFE_INTEGER;
-const num5 = "a123b456c789d";
-const num6 = parseInt("0x123456789abcdef", 16);
-
-digitCount(num1); // 3
-digitCount(num2); // 9
-digitCount(num3); // 9
-digitCount(num4); // 16
-digitCount(num5); // NaN (because hex conversion has to be done through parseInt(str, 16)), like below:
-digitCount(num6); // 17
-```
-
-</details>
-
-<br>
-
-### roundFixed()
-Signature:  
-```ts
-roundFixed(num: number, fractionDigits: number): number
-```
-  
-Rounds a number to a fixed amount of decimal places.  
-Supports negative `fractionDigits` to round to the given power of 10.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { roundFixed } from "@sv443-network/userutils";
-
-roundFixed(234.567, -2); // 200
-roundFixed(234.567, -1); // 230
-roundFixed(234.567, 0);  // 235
-roundFixed(234.567, 1);  // 234.6
-roundFixed(234.567, 2);  // 234.57
-roundFixed(234.567, 3);  // 234.567
-roundFixed(234.567, 4);  // 234.567
-```
-</details>
-
-<br>
-
-### bitSetHas()
-Signature:  
-```ts
-bitSetHas<TType extends number | bigint>(bitSet: TType, checkVal: TType): boolean
-```
-  
-Checks if the `checkVal` bit is set in the given bit set.  
-The bit set and the value to check can be either a number or a bigint, but both have to be of the same type.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { bitSetHas } from "@sv443-network/userutils";
-
-// the two vertically adjacent bits are tested for:
-bitSetHas(
-  0b1110,
-  0b0010,
-); // true
-
-bitSetHas(
-  0b1110,
-  0b0001,
-); // false
-
-// with TS enums (or JS maps):
-enum MyEnum {
-  A = 1, B = 2, C = 4,
-  D = 8, E = 16, F = 32,
-}
-
-const myBitSet = MyEnum.A | MyEnum.B;
-bitSetHas(myBitSet, MyEnum.B); // true
-bitSetHas(myBitSet, MyEnum.F); // false
+  console.log("Resolved:", probedCol);
+});
 ```
 </details>
 
@@ -1266,1874 +1088,256 @@ bitSetHas(myBitSet, MyEnum.F); // false
 <!-- #region Misc -->
 ## Misc:
 
-### DataStore
-Signature:  
+### `class GMStorageEngine`
+Signature:
 ```ts
-new DataStore(options: DataStoreOptions)
+class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngine<TData>;
 ```
   
-A class that manages a sync & async JSON database that is persistently saved to and loaded from GM storage, localStorage or sessionStorage.  
-Supports automatic migration of outdated data formats via configured migration functions.  
-You may create as many instances as you like as long as they have different IDs.  
+Usage:
+```ts
+const engine = new GMStorageEngine(options?: GMStorageEngineOptions);
+```
   
-The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality, like changing the location where all data is stored.  
+Storage engine for the [`DataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) class that uses GreaseMonkey's `GM.getValue` and `GM.setValue` functions.  
+Refer to the [DataStore documentation](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) for more information on how to use DataStore and storage engines.  
   
-If you have multiple DataStore instances and you want to be able to easily and safely export and import their data, take a look at the [DataStoreSerializer](#datastoreserializer) class.  
-It combines the data of multiple DataStore instances into a single object that can be exported and imported as a whole by the end user.  
+- ⚠️ Requires the grants `GM.getValue`, `GM.setValue`, `GM.deleteValue`, and `GM.listValues` in your userscript metadata.
+- ⚠️ Don't reuse engine instances, always create a new one for each DataStore instance.
   
-**For an extensive example, see below the "methods" section.**  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { DataStore } from "@sv443-network/coreutils";
+import { GMStorageEngine } from "@sv443-network/userutils";
+
+const myStore = new DataStore({
+  id: "my-data",
+  defaultData: { foo: "bar" },
+  formatVersion: 1,
+  storageEngine: new GMStorageEngine(),
+});
+
+await myStore.loadData();
+console.log(myStore.getData()); // { foo: "bar" }
+```
+</details>
+
+<br>
+
+### Methods
+
+### `GMStorageEngine.getValue()`
+Signature:
+```ts
+public async getValue<TValue extends SerializableVal = string>(name: string, defaultValue: TValue): Promise<string | TValue>;
+```
   
-⚠️ The data is stored as a JSON string, so only JSON-compatible data can be used. Circular structures and complex objects (containing functions, symbols, etc.) will either throw an error on load and save or cause otherwise unexpected behavior. Properties with a value of `undefined` will be removed from the data prior to saving it, so use `null` instead if you need to preserve the property key.  
-⚠️ The directives `@grant GM.getValue` and `@grant GM.setValue` are required if the `storageMethod` is left as the default (`"GM"`)  
+Fetches a value from persistent GM storage.
+
+<br>
+
+### `GMStorageEngine.setValue()`
+Signature:
+```ts
+public async setValue<TValue extends SerializableVal = string>(name: string, value: TValue): Promise<void>;
+```
   
-The options object has the following properties:
+Sets a value in persistent GM storage.
+
+<br>
+
+### `GMStorageEngine.deleteValue()`
+Signature:
+```ts
+public async deleteValue(name: string): Promise<void>;
+```
+  
+Deletes a value from persistent GM storage.
+
+<br>
+
+### `GMStorageEngine.deleteStorage()`
+Signature:
+```ts
+public async deleteStorage(): Promise<void>;
+```
+  
+Deletes all values from the GM storage.
+
+<br>
+
+### Types
+
+### `type GMStorageEngineOptions`
+Options for the [`GMStorageEngine` class.](#class-gmstorageengine)
 | Property | Type | Description |
 | :-- | :-- | :-- |
-| `id` | `string` | A unique internal identification string or namespace for this instance. If two DataStores share the same ID, they will overwrite each other's data. |
-| `defaultData` | `object` | The default data to use if no data is saved in persistent storage yet or it has been deleted. Until the data is loaded from persistent storage, this will be what `getData()` returns. In TypeScript, all other methods will infer the type of the data from this property, unless overridden in the generic parameter. |
-| `formatVersion` | `number` | An incremental version of the data format. If the format of the data is changed in any way, this number should be incremented, in which case all necessary functions of the migrations dictionary will run consecutively until the latest version is reached. Integer numbers are recommended, but not necessary. ***Never decrease the value of this number!*** |
-| `migrations?` | `object` | (Optional) A dictionary of functions that can be used to migrate data from older versions of the data to newer ones. The keys of the dictionary should be the format version number that the function migrates to, from the previous whole integer value. The values should be functions that take the data in the old format and return the data in the new format. The functions will be run in order from the oldest to the newest version. If the current format version is not in the dictionary, no migrations will be run. |
-| `migrateIds?` | `string \| string[]` | (Optional) A string or array of strings that migrate from one or more old IDs to the ID set in the constructor. If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data. The ID migration will be done once per session in the call to [`loadData()`](#datastoreloaddata). |
-| `storageMethod?` | `"GM" \| "localStorage" \| "sessionStorage"` | (Optional) The location where data is stored. Defaults to `"GM"`. If you want to store the data in a different way, you can override the methods in your own subclass. |
-| `encodeData?` | `(data: string) => string` | (Optional, but required when `decodeData` is also set) Function that encodes the data before saving - you can use [compress()](#compress) here to save space at the cost of a little bit of performance |
-| `decodeData?` | `(data: string) => string` | (Optional, but required when `encodeData` is also set) Function that decodes the data when loading - you can use [decompress()](#decompress) here to decode data that was previously compressed with [compress()](#compress) |
+| `dataStoreOptions?` | `DataStoreEngineDSOptions<DataStoreData> \| undefined` | Specifies the necessary options for storing data - ⚠️ Only specify this if you are using this instance standalone! The parent DataStore will set this automatically. |
 
-<br>
+<br><br>
 
-### Methods:
-#### `DataStore.loadData()`
-Signature: `loadData(): Promise<TData>`  
-Asynchronously loads the data from persistent storage and returns it.  
-If no data was saved in persistent storage before, the value of `options.defaultData` will be returned and also written to persistent storage before resolving.  
-If the `options.migrateIds` property is present and this is the first time calling this function in this session, the data will be migrated from the old ID(s) to the current one.  
-Then, if the `formatVersion` of the saved data is lower than the current one and the `options.migrations` property is present, the instance will try to migrate the data to the latest format before resolving, updating the in-memory cache and persistent storage.  
-
-<br>
-
-#### `DataStore.getData()`
-Signature: `getData(): TData`  
-Synchronously returns the current data that is stored in the internal cache.  
-If no data was loaded from persistent storage yet using `loadData()`, the value of `options.defaultData` will be returned.
-
-<br>
-
-#### `DataStore.setData()`
-Signature: `setData(data: TData): Promise<void>`  
-Writes the given data synchronously to the internal cache and asynchronously to persistent storage.
-
-<br>
-
-#### `DataStore.saveDefaultData()`
-Signature: `saveDefaultData(): Promise<void>`  
-Writes the default data given in `options.defaultData` synchronously to the internal cache and asynchronously to persistent storage.
-
-<br>
-
-#### `DataStore.deleteData()`
-Signature: `deleteData(): Promise<void>`  
-Fully deletes the data from persistent storage only.  
-The internal cache will be left untouched, so any subsequent calls to `getData()` will return the data that was last loaded.  
-If `loadData()` or `setData()` are called after this, the persistent storage will be populated with the value of `options.defaultData` again.  
-This is why you should either immediately repopulate the cache and persistent storage or the page should probably be reloaded or closed after this method is called.  
-⚠️ If you want to use this method, the additional directive `@grant GM.deleteValue` is required.
-
-<br>
-
-#### `DataStore.runMigrations()`
-Signature: `runMigrations(oldData: any, oldFmtVer: number, resetOnError?: boolean): Promise<TData>`  
-Runs all necessary migration functions to migrate the given `oldData` to the latest format.  
-If `resetOnError` is set to `false`, the migration will be aborted and a [`MigrationError`](#migrationerror) is thrown and no data will be committed. If it is set to `true` (default) and an error is encountered, it will be suppressed and the `defaultData` will be saved to persistent storage and returned.
-
-<br>
-
-#### `DataStore.migrateId()`
-Signature: `migrateId(oldIds: string | string[]): Promise<void>`  
-Tries to migrate the currently saved persistent data from one or more old IDs to the ID set in the constructor.  
-If no data exist for the old ID(s), nothing will be done, but some time may still pass trying to fetch the non-existent data.  
-Instead of calling this manually, consider setting the `migrateIds` property in the constructor to automatically migrate the data once per session in the call to `loadData()`, unless you know that you need to migrate the ID(s) manually.
-
-<br>
-
-#### `DataStore.encodingEnabled()`
-Signature: `encodingEnabled(): boolean`  
-Returns `true` if both `options.encodeData` and `options.decodeData` are set, else `false`.  
-Uses TypeScript's type guard notation for easier use in conditional statements.
-
-<br>
-
-<details><summary><b>Example - click to view</b></summary>
-
+### `class Mixins`
+Signature:
 ```ts
-import { DataStore, compress, decompress } from "@sv443-network/userutils";
-
-/** Example: Userscript configuration data */
-interface MyConfig {
-  foo: string;
-  bar: number;
-  baz: string;
-  qux: string;
-}
-
-/** Default data returned by getData() calls until setData() is used and also fallback data if something goes wrong */
-const defaultData: MyConfig = {
-  foo: "hello",
-  bar: 42,
-  baz: "xyz",
-  qux: "something",
-};
-/** If any properties are added to, removed from, or renamed in the MyConfig type, increment this number */
-const formatVersion = 2;
-/** These are functions that migrate outdated data to the latest format - make sure a function exists for every previously used formatVersion and that no numbers are skipped! */
-const migrations = {
-  // migrate from format version 0 to 1
-  1: (oldData: Record<string, unknown>) => {
-    return {
-      foo: oldData.foo,
-      bar: oldData.bar,
-      baz: "world",
-    };
-  },
-  // asynchronously migrate from format version 1 to 2
-  2: async (oldData: Record<string, unknown>) => {
-    // using arbitrary async operations for the new format:
-    const qux = await grabQuxDataAsync();
-    return {
-      foo: oldData.foo,
-      bar: oldData.bar,
-      baz: oldData.baz,
-      qux,
-    };
-  },
-};
-
-// You probably want to export this instance (or helper functions) so you can use it anywhere in your script:
-export const manager = new DataStore({
-  /** A unique ID for this instance */
-  id: "my-userscript-config",
-  /** Default, initial and fallback data */
-  defaultData,
-  /** The current version of the data format - should be a whole number that is only ever incremented */
-  formatVersion,
-  /** Data format migration functions called when the formatVersion is increased */
-  migrations,
-  /** If the data was saved under different ID(s) before, providing them here will make sure the data is migrated to the current ID when `loadData()` is called */
-  migrateIds: ["my-data", "config"],
-  /**
-   * Where the data should be stored.  
-   * For example, you could use `"sessionStorage"` to make the data be automatically deleted after the browser session is finished, or use `"localStorage"` if you don't have access to GM storage for some reason.
-   */
-  storageMethod: "localStorage",
-
-  // Compression example:
-  // Adding the following will save space at the cost of a little bit of performance (only for the initial loading and every time new data is saved)
-  // Feel free to use your own functions here, as long as they take in the stringified JSON and return another string, either synchronously or asynchronously
-  // Either both of these properties or none of them should be set
-
-  /** Compresses the data using the "deflate" algorithm and digests it as a string */
-  encodeData: (data) => compress(data, "deflate", "string"),
-  /** Decompresses the "deflate" encoded data as a string */
-  decodeData: (data) => decompress(data, "deflate", "string"),
-});
-
-/** Entrypoint of the userscript */
-async function init() {
-  // wait for the data to be loaded from persistent storage
-  // if no data was saved in persistent storage before or getData() is called before loadData(), the value of options.defaultData will be returned
-  // if the previously saved data needs to be migrated to a newer version, it will happen inside this function call
-  const configData = await manager.loadData();
-
-  console.log(configData.foo); // "hello"
-
-  // update the data
-  configData.foo = "world";
-  configData.bar = 123;
-
-  // save the updated data - synchronously to the cache and asynchronously to persistent storage
-  manager.saveData(configData).then(() => {
-    console.log("Data saved to persistent storage!");
-  });
-
-  // the internal cache is updated synchronously, so the updated data can be accessed before the Promise resolves:
-  console.log(manager.getData().foo); // "world"
-}
-
-init();
-```
-</details>
-
-<br>
-
-### DataStoreSerializer
-Signature:  
-```ts
-new DataStoreSerializer(stores: DataStore[], options?: DataStoreSerializerOptions)
-```
-
-A class that manages serializing and deserializing (exporting and importing) one to infinite DataStore instances.  
-The serialized data is a JSON string that can be saved to a file, copied to the clipboard, or stored in any other way.  
-Each DataStore instance's settings like data encoding are respected and saved next to the exported data.  
-Also, by default a checksum is calculated and importing data with a mismatching checksum will throw an error.  
-  
-The class' internal methods are all declared as protected, so you can extend this class and override them if you need to add your own functionality.  
-  
-⚠️ Needs to run in a secure context (HTTPS) due to the use of the SubtleCrypto API.  
-  
-The options object has the following properties:  
-| Property | Description |
-| :-- | :-- |
-| `addChecksum?` | (Optional) If set to `true` (default), a SHA-256 checksum will be calculated and saved with the serialized data. If set to `false`, no checksum will be calculated and saved. |
-| `ensureIntegrity?` | (Optional) If set to `true` (default), the checksum will be checked when importing data and an error will be thrown if it doesn't match. If set to `false`, the checksum will not be checked and no error will be thrown. If no checksum property exists on the imported data (for example because it wasn't enabled in a previous data format version), the checksum check will be skipped regardless of this setting. |
-
-<br>
-
-### Methods:
-#### `DataStoreSerializer.serialize()`
-Signature: `serialize(useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>`  
-Serializes all DataStore instances passed in the constructor and returns the serialized data as a JSON string by deafault.  
-If `useEncoding` is set to `true` (default), the data will be encoded using the `encodeData` function set on the DataStore instance.  
-If `stringified` is set to `true` (default), the serialized data will be returned as a stringified JSON array, otherwise the unencoded objects will be returned in an array.  
-  
-If you need a partial export, use the method [`DataStoreSerializer.serializePartial()`](#datastoreserializerserializepartial) instead.  
-  
-<details><summary>Click to view the structure of the returned data.</summary>  
-
-```jsonc
-[
-  {
-    "id": "foo-data",                               // the ID property given to the DataStore instance
-    "data": "eJyrVkrKTFeyUkrOKM1LLy1WqgUAMvAF6g==", // serialized data (may be compressed / encoded or not)
-    "formatVersion": 2,                             // the format version of the data
-    "encoded": true,                                // only set to true if both encodeData and decodeData are set in the DataStore instance
-    "checksum": "420deadbeef69",                    // property will be missing if addChecksum is set to false
-  },
-  {
-    "id": "bar-data",
-    "data": "{\"foo\":\"hello\",\"bar\":\"world\"}", // for unencoded stores, the data will be a stringified JSON object
-    "formatVersion": 1,
-    "encoded": false,
-    "checksum": "69beefdead420"
-  }
-]
-```
-</details>  
-
-<br>
-
-#### `DataStoreSerializer.serializePartial()`
-Signature: `serializePartial(stores: string[] | ((id: string) => boolean), useEncoding?: boolean, stringified?: boolean): Promise<string | SerializedDataStore[]>`  
-Serializes only the DataStore instances that have an ID that is included in the `stores` array.  
-  
-The `stores` argument can be an array containing the IDs of the DataStore instances, or a function that takes each ID as an argument and returns a boolean, indicating whether the store should be serialized.  
-If `useEncoding` is set to `true` (default), the data will be encoded using the `encodeData` function set on the DataStore instance.  
-If `stringified` is set to `true` (default), the serialized data will be returned as a stringified JSON array, otherwise the unencoded objects will be returned in an array.  
-  
-For more information or to export all DataStore instances, refer to the method [`DataStoreSerializer.serialize()`](#datastoreserializerserialize)
-
-<br>
-
-#### `DataStoreSerializer.deserialize()`
-Signature: `deserialize(data: string | SerializedDataStore[]): Promise<void>`  
-Deserializes the given string or array of serialized DataStores that was created with `serialize()` or `serializePartial()` and imports the contained data into each matching DataStore instance.  
-In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.  
-  
-The `data` parameter can be the data as a string or an array of serialized DataStores, as returned by the `serialize()` or `serializePartial()` methods.  
-  
-If `ensureIntegrity` is set to `true` and the checksum doesn't match, a [`ChecksumMismatchError`](#checksummismatcherror) will be thrown.  
-If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
-If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
-If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
-  
-For only importing a subset of the serialized data, use the method [`DataStoreSerializer.deserializePartial()`](#datastoreserializerdeserializepartial) instead.
-
-<br>
-
-#### `DataStoreSerializer.deserializePartial()`
-Signature: `deserializePartial(stores: string[] | ((id: string) => boolean), data: string | SerializedDataStore[]): Promise<void>`  
-Deserializes only the DataStore instances that have an ID that is included in the `stores` array.  
-In the process of importing the data, the migrations will be run, if the `formatVersion` property is lower than the one set on the DataStore instance.  
-  
-The `stores` parameter can be an array containing the IDs of the DataStore instances, or a function that takes each ID as an argument and returns a boolean, indicating whether the store should be deserialized.  
-The `data` parameter can be the data as a string or an array of serialized DataStores, as returned by the `serialize()` or `serializePartial()` methods.  
-  
-If `ensureIntegrity` is set to `true` and the checksum doesn't match, a [`ChecksumMismatchError`](#checksummismatcherror) will be thrown.  
-If `ensureIntegrity` is set to `false`, the checksum check will be skipped entirely.  
-If the `checksum` property is missing on the imported data, the checksum check will also be skipped.  
-If `encoded` is set to `true`, the data will be decoded using the `decodeData` function set on the DataStore instance.  
-  
-If you want to import all serialized data, refer to the method [`DataStoreSerializer.deserialize()`](#datastoreserializerdeserialize)
-
-<br>
-
-#### `DataStoreSerializer.loadStoresData()`
-Signature: `loadStoresData(stores?: string[] | ((id: string) => boolean)): PromiseSettledResult<{ id: string, data: object }>[];`  
-Loads the persistent data of the DataStore instances with IDs matching the `stores` parameter into the in-memory cache of each DataStore instance.  
-If no stores are specified, all stores will be loaded.  
-Also triggers the migration process if the data format has changed.  
-See the [`DataStore.loadData()`](#datastoreloaddata) method for more information.  
-  
-<details><summary>Click to view the structure of the returned data.</summary>  
-
-```jsonc
-[
-  {
-    "status": "fulfilled",
-    "value": {
-      "id": "foo-data",
-      "data": {
-        "foo": "hello",
-        "bar": "world"
-      }
-    }
-  },
-  {
-    "status": "rejected",
-    "reason": "Checksum mismatch for DataStore with ID \"bar-data\"!\nExpected: 69beefdead420\nHas: abcdef42"
-  }
-]
-```
-
-</details>
-
-<br>
-
-#### `DataStoreSerializer.resetStoresData()`
-Signature: `resetStoresData(stores?: string[] | ((id: string) => boolean)): PromiseSettledResult[];`  
-Resets the persistent data of the DataStore instances with IDs matching the `stores` parameter to their default values.  
-If no stores are specified, all stores will be reset.  
-This affects both the in-memory cache and the persistent storage.  
-Any call to `serialize()` will then use the value of `options.defaultData` of the respective DataStore instance.  
-
-<br>
-
-#### `DataStoreSerializer.deleteStoresData()`
-Signature: `deleteStoresData(stores?: string[] | ((id: string) => boolean)): PromiseSettledResult[];`  
-Deletes the persistent data of the DataStore instances with IDs matching the `stores` parameter from the set storage method.  
-If no stores are specified, all stores' persistent data will be deleted.  
-Leaves the in-memory cache of the DataStore instances untouched.  
-Any call to `setData()` on the instances will recreate their own persistent storage data.
-
-<br>
-
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { DataStore, DataStoreSerializer, compress, decompress } from "@sv443-network/userutils";
-
-/** This store doesn't have migrations to run and also has no encodeData and decodeData functions */
-const fooStore = new DataStore({
-  id: "foo-data",
-  defaultData: {
-    foo: "hello",
-  },
-  formatVersion: 1,
-});
-
-/** This store has migrations to run and also has encodeData and decodeData functions */
-const barStore = new DataStore({
-  id: "bar-data",
-  defaultData: {
-    foo: "hello",
-  },
-  formatVersion: 2,
-  migrations: {
-    2: (oldData) => ({
-      ...oldData,
-      bar: "world",
-    }),
-  },
-  encodeData: (data) => compress(data, "deflate", "string"),
-  decodeData: (data) => decompress(data, "deflate", "string"),
-});
-
-const serializer = new DataStoreSerializer([fooStore, barStore], {
-  addChecksum: true,
-  ensureIntegrity: true,
-});
-
-async function exportMyDataPls() {
-  // first, make sure the persistent data of all stores is loaded into their caches:
-  await serializer.loadStoresData();
-
-  // now serialize the data:
-  const serializedData = await serializer.serialize();
-  // create a file and download it:
-  const blob = new Blob([serializedData], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `data_export-${new Date().toISOString()}.json`;
-  a.click();
-  a.remove();
-
-  // `serialize()` exports a stringified object that looks similar to this:
-  // [
-  //   {
-  //     "id": "foo-data",
-  //     "data": "{\"foo\":\"hello\"}", // not compressed or encoded because encodeData and decodeData are not set
-  //     "formatVersion": 1,
-  //     "encoded": false,
-  //     "checksum": "420deadbeef69"
-  //   },
-  //   {
-  //     "id": "bar-data",
-  //     "data": "eJyrVkrKTFeyUkrOKM1LLy1WqgUAMvAF6g==", // compressed because encodeData and decodeData are set
-  //     "formatVersion": 2,
-  //     "encoded": true,
-  //     "checksum": "69beefdead420"
-  //   }
-  // ]
-}
-
-async function importMyDataPls() {
-  // grab the data from the file by using the system file picker or a text field or something similar
-  const data = await getDataFromSomewhere();
-
-  try {
-    // import the data and run migrations if necessary
-    await serializer.deserialize(data);
-  }
-  catch(err) {
-    console.error(err);
-    alert(`Data import failed: ${err}`);
-  }
-}
-
-async function resetMyDataPls() {
-  // reset the data of all stores in both the cache and the persistent storage
-  await serializer.resetStoresData();
-}
-
-async function exportOnlyFoo() {
-  // with the `serializePartial()` method, you can export only the data of specific stores:
-  const serializedExample1 = await serializer.serializePartial(["foo-data"]);
-
-  // or using a matcher function:
-  const serializedExample2 = await serializer.serializePartial((id) => id.startsWith("foo"));
-}
-```
-</details>
-
-<br>
-
-### Dialog
-Signature:  
-```ts
-new Dialog(options: DialogOptions)
-```  
-  
-A class that creates a customizable modal dialog with a title (optional), body and footer (optional).  
-There are tons of options for customization, like changing the close behavior, translating strings and more.  
-  
-The options object has the following properties:  
-| Property | Description |
-| :-- | :-- |
-| `id: string` | A unique internal identification string for this instance. If two Dialogs share the same ID, they will overwrite each other. |
-| `width: number` | The target and maximum width of the dialog in pixels. |
-| `height: number` | The target and maximum height of the dialog in pixels. |
-| `renderBody: () => HTMLElement \| Promise<HTMLElement>` | Called to render the body of the dialog. |
-| `renderHeader?: () => HTMLElement \| Promise<HTMLElement>` | (Optional) Called to render the header of the dialog. Leave undefined for a blank header. |
-| `renderFooter?: () => HTMLElement \| Promise<HTMLElement>` | (Optional) Called to render the footer of the dialog. Leave undefined for no footer. |
-| `closeOnBgClick?: boolean` | (Optional) Whether the dialog should close when the background is clicked. Defaults to `true`. |
-| `closeOnEscPress?: boolean` | (Optional) Whether the dialog should close when the escape key is pressed. Defaults to `true`. |
-| `destroyOnClose?: boolean` | (Optional) Whether the dialog should be destroyed when it's closed. Defaults to `false`. |
-| `unmountOnClose?: boolean` | (Optional) Whether the dialog should be unmounted when it's closed. Defaults to `true`. Superseded by `destroyOnClose`. |
-| `removeListenersOnDestroy?: boolean` | (Optional) Whether all NanoEmitter listeners should be removed when the dialog is destroyed. Defaults to `true`. |
-| `small?: boolean` | (Optional) Whether the dialog should have a smaller overall appearance. Defaults to `false`. |
-| `verticalAlign?: "top" \| "center" \| "bottom"` | (Optional) Where to align or anchor the dialog vertically. Defaults to `"center"`. |
-| `strings?: Partial<typeof defaultStrings>` | (Optional) Strings used in the dialog (used for translations). Defaults to the default English strings (importable with the name `defaultStrings`). |
-| `dialogCss?: string` | (Optional) CSS to apply to the dialog. Defaults to the default (importable with the name `defaultDialogCss`). |
-
-<br>
-
-### Events:
-The Dialog class inherits from [`NanoEmitter`](#nanoemitter), so you can use all of its inherited methods to listen to the following events:
-| Event | Arguments | Description |
-| :-- | :-- | :-- |
-| `open` | `void` | Emitted after the dialog is opened. |
-| `close` | `void` | Emitted after the dialog is closed. |
-| `render` | `void` | Emitted after the dialog contents are rendered. |
-| `clear` | `void` | Emitted after the dialog contents are cleared. |
-| `destroy` | `void` | Emitted **after** the dialog is destroyed and **before** all listeners are removed. |
-
-<br>
-
-### Methods:
-#### `Dialog.open()`
-Signature: `open(): Promise<void>`  
-Opens the dialog.  
-If the dialog is not mounted yet, it will be mounted before opening.  
-
-<br>
-
-#### `Dialog.close()`
-Signature: `close(): void`  
-Closes the dialog.  
-If `options.destroyOnClose` is set to `true`, [`Dialog.destroy()`](#dialogdestroy) will be called immediately after closing.
-
-<br>
-
-#### `Dialog.mount()`
-Signature: `mount(): Promise<void>`  
-Mounts the dialog to the DOM by calling the render functions provided in the options object.  
-After calling, the dialog will exist in the DOM but will be invisible until [`Dialog.open()`](#dialogopen) is called.  
-Call this before opening the dialog to avoid a rendering delay.  
-
-<br>
-
-#### `Dialog.unmount()`
-Signature: `unmount(): void`  
-Closes the dialog first if it's open, then removes it from the DOM.  
-
-<br>
-
-#### `Dialog.remount()`
-Signature: `remount(): Promise<void>`  
-Unmounts and mounts the dialog again.  
-The render functions in the options object will be called again.  
-May cause a flickering effect due to the rendering delay.  
-
-<br>
-
-#### `Dialog.isOpen()`
-Signature: `isOpen(): boolean`  
-Returns `true` if the dialog is open, else `false`.  
-
-<br>
-
-#### `Dialog.isMounted()`
-Signature: `isMounted(): boolean`  
-Returns `true` if the dialog is mounted, else `false`.  
-
-<br>
-
-#### `Dialog.destroy()`
-Signature: `destroy(): void`  
-Destroys the dialog.  
-Removes all listeners by default and closes and unmounts the dialog.  
-
-<br>
-
-#### `Dialog.getCurrentDialogId()`
-Signature: `static getCurrentDialogId(): string`  
-Static method that returns the ID of the currently open dialog.  
-Needs to be called without creating an instance of the class.  
-
-<br>
-
-#### `Dialog.getOpenDialogs()`
-Signature: `static getOpenDialogs(): string[]`  
-Static method that returns an array of the IDs of all open dialogs.  
-Needs to be called without creating an instance of the class.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { Dialog } from "@sv443-network/userutils";
-
-const fooDialog = new Dialog({
-  id: "foo-dialog",
-  width: 400,
-  height: 300,
-  renderHeader() {
-    const header = document.createElement("div");
-    header.textContent = "This is the header";
-    return header;
-  },
-  renderBody() {
-    const body = document.createElement("div");
-    body.textContent = "This is the body";
-    return body;
-  },
-  renderFooter() {
-    const footer = document.createElement("div");
-    footer.textContent = "This is the footer";
-    return footer;
-  },
-  closeOnBgClick: true,
-  closeOnEscPress: true,
-  destroyOnClose: false,
-  unmountOnClose: true,
-  removeListenersOnDestroy: true,
-  small: false,
-  verticalAlign: "center",
-  strings: {
-    closeDialogTooltip: "Click to close",
-  },
-  dialogCss: getMyCustomDialogCss(),
-});
-
-fooDialog.on("close", () => {
-  console.log("Dialog closed");
-});
-
-fooDialog.on("open", () => {
-  console.log("Currently open dialogs:", Dialog.getOpenDialogs());
-});
-
-fooDialog.open();
-```
-</details>
-
-<br>
-
-### Mixins
-Signature:  
-```ts
-new Mixins<
+class Mixins<
   TMixinMap extends Record<string, (arg: any, ctx?: any) => any>,
->(
-  config?: Partial<MixinsConstructorConfig>,
-)
+  TMixinKey extends Extract<keyof TMixinMap, string> = Extract<keyof TMixinMap, string>,
+>;
 ```
   
-A class that provides a way to apply multiple mixin functions to any value, which is a convenient way of letting multiple sources modify the same value in a controlled way.  
+Usage:
+```ts
+const mixins = new Mixins<TMixinMap>(config?: Partial<MixinsConstructorConfig>);
+```
   
-In a day-to-day example, this class could be used to manage a configuration object that is modified by multiple sources with different and varying priorities, conditions and availability.  
-This could be used for a plugin system, for example, where multiple plugins are allowed to modify the same object or value, with much more control about how they override or get combined with each other.  
+A class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way.  
+Mixins are identified via their string key and can be added with `add()`.  
+When calling `resolve()`, all registered mixin functions with the same key will be applied to the input value in the order of their priority.  
+If a mixin function has its `stopPropagation` flag set, no further mixin functions will be applied after it.  
   
-It gives you utmost flexibility, as you can either use the default order and apply changes from all sources, or you can tweak the priority and stop propagation at any point in the chain.  
-This class might be too "barebones" for some use cases, but it can be easily extended to fit your needs, like constraining the priority to a certain range, reserving certain priorities or keys, or adding more complex conditions for stopping the propagation. The world is your oyster.  
+The `TMixinMap` template generic defines the mixin functions. Keys are the mixin names and values are functions that take the value as the first argument and an optional context object as the second, and return the modified value.  
+**Important:** the first argument and return type need to be the same. Also, if a context object is defined, it must be passed as the third argument in `resolve()`.  
   
-The `TMixinMap` template generic is used to define the mixin functions that can be applied to the value.  
-It needs to be an object where the keys are the mixin names and the values are functions that take the value to be modified as the first argument and an optional context object as the second argument and returns the modified value.  
-**Important:** the first argument and return type need to be the same. Also, if a context object is defined, it must be passed as the third argument in the [`resolve()`](#mixinsresolve) method.  
-  
-The properties of the `MixinsConstructorConfig` object in the constructor are:
-| Property | Description |
-| :-- | :-- |
-| `autoIncrementPriority?` | If true, when no priority is specified, an auto-incrementing integer priority will be used (unique per mixin key). Defaults to `false`. |
-| `defaultPriority?` | The default priority for mixins that do not specify one. Defaults to `0`. |
-| `defaultStopPropagation?` | The default `stopPropagation` value for mixins that do not specify one. Defaults to `false`. |
-| `defaultSignal?` | The default `AbortSignal` for mixins that do not specify one. Defaults to `undefined`. |
-
-<br>
-
-### Methods:
-#### `Mixins.resolve()`
-Signature: `resolve<TArg extends any, TCtx extends any>(mixinKey: string, inputValue: TArg, inputCtx?: TCtx): TArg | Promise<TArg>`  
-Applies all mixin functions that were registered with [`add()`](#mixinsadd) for the given mixin key to transform the input value.  
-Goes in order of highest to lowest priority and returns the transformed value, which has to be of the same type as the input value.  
-If no mixin functions are registered for the given key, the input value will be returned unchanged.  
-  
-If some of the mixins are async (return a Promise), the `resolve()` method will also return a Promise that resolves to the final value.  
-If a mixin is defined as async but none of the registered functions for it return a Promise in [`add()`](#mixinsadd), the returned value will *not* be a Promise. With `await`, this doesn't matter, but the `.then()` method will not work in this case and will need an explicit wrapping in `Promise.resolve()`.  
-
-<br>
-
-#### `Mixins.add()`
-Signature: `add<TArg extends any, TCtx extends any>(mixinKey: string, mixinFn: (arg: TArg, ctx?: TCtx) => TArg | Promise<TArg>, config?: Partial<MixinConfig>): () => void`  
-Registers a mixin function for the given key.  
-The function will be called with the input value (possibly modified by previous mixins) and possibly a context object.  
-When a value for the context parameter is defined in the main generic of the `Mixins` class, the ctx parameter will be required. Otherwise it should always be unspecified.  
-  
-If the mixin function is async, it should return a Promise that resolves to the modified value.  
-It will also cause the [`resolve()`](#mixinsresolve) method to return a Promise that resolves to the final value.  
-In TypeScript, it is extremely important to mark the return type of the function as a Promise in the constructor's generic parameter if the function can potentially be async.  
-It doesn't have to necessarily return an async value, but marking it as such means there is a possibility of it.  
-  
-Mixins with the highest priority will be applied first. If two or more mixins share the exact same priority, they will be executed in order of registration (first come, first serve).  
-If a mixin has `stopPropagation` set, the chain will immediately stop after it has finished and the value resolution will end there.  
-To conditionally apply mixins (enable/disable them), you can switch between returning the input value (effectively disabled) and the modified value based on a condition supplied by the context object.  
-  
-Returns a function that can be called to remove the mixin function from the list of registered mixins.  
-This is an alternative to providing a `signal` property in the config object, which allows for removing many different mixins from multiple instances with the same `AbortSignal`.  
-  
-To stop a mixin chain at any point, add a mixin with the desired priority and a function that just returns the input value without modifying it and with the `stopPropagation` property set to `true`.  
-For example, if you need to stop the chain *after* the mixins with the priorities 0, but *before* 1, use the priority 0.5 for the stopping mixin.
-  
-The properties of the `MixinConfig` object are:
-| Property | Description |
-| :-- | :-- |
-| `priority?` | The higher, the earlier the mixin will be applied. Supports floating-point and negative numbers too. 0 by default. |
-| `stopPropagation?` | If true, no further mixins will be applied after this one. |
-| `signal?` | If set, the mixin will only be applied if the given signal is not yet aborted. Allows for better orchestration than with the cleanup functions returned by `add()` in some cases. |
-
-<br>
-
-#### `Mixins.list()`
-Signature: `list(): Array<{ key: string; } & MixinConfig>`  
-Returns an array of objects that contain the mixin keys and their configuration objects.  
-Doesn't return the mixin functions themselves.
-
-<br>
-
-<details><summary><b>Simple Example - click to view</b></summary>
+<details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { Mixins } from "@sv443-network/userutils";
 
-// create Mixins instance:
 const myMixins = new Mixins<{
-  /** Here is a perfect place to describe what your value does and give ideas on how to modify it */
-  myValue: (val: number, ctx: { myFactor: number }) => Promise<number>;
-  // ^ if a function is declared as returning a Promise<T>, the Mixins.add() method will accept functions that return either T or Promise<T>
-}>();
+  myValue: (val: number, ctx: { factor: number }) => Promise<number>;
+}>({
+  autoIncrementPriority: true,
+});
 
-// register mixin functions:
+myMixins.add("myValue", (val, { factor }) => val * factor);
+myMixins.add("myValue", (val) => Promise.resolve(val + 1));
+myMixins.add("myValue", (val) => val * 2, 1);
 
-myMixins.add("myValue", (val, { myFactor }) => val * myFactor); // source 1 (priority 0, index 0)
-
-// myValue returns a Promise in the constructor generic parameter above, so mixin functions can be either sync or async:
-myMixins.add("myValue", (val) => Promise.resolve(val + 1)); // source 2 (priority 0, index 1)
-
-// when passing a number instead of the object, the default config will be used and the number will be treated as the priority:
-myMixins.add("myValue", (val) => val * 2, 1); // source 3 (priority 1)
-
-// apply mixins and transform the input value:
-
-// since some of the mixin functions are async, the result will be a Promise:
-const result = await myMixins.resolve("myValue", 10, { myFactor: 0.75 });
+const result = await myMixins.resolve("myValue", 10, { factor: 0.75 });
 // order of operations:
-// 1. inputVal = 10
-// 2. 10 * 2 = 20     (source 3 mixin)
-// 3. 20 * 0.75 = 15  (source 1 mixin)
-// 4. 15 + 1 = 16     (source 2 mixin)
+// 1. 10 * 2 = 20     (priority 1)
+// 2. 20 * 0.75 = 15  (priority 0, index 0)
+// 3. 15 + 1 = 16     (priority 0, index 1)
 // result = 16
 ```
 </details>
 
 <br>
 
-<details><summary><b>Advanced Example - click to view</b></summary>
+### Methods
 
+### `Mixins.add()`
+Signature:
 ```ts
-import { Mixins } from "@sv443-network/userutils";
-
-const ac = new AbortController();
-// if removeAllMixins() is called, all mixins will be removed from the myMixins instance:
-const { abort: removeAllMixins } = ac;
-
-// create Mixins instance with auto-incrementing priority:
-const myMixins = new Mixins<{
-  /** Here is a perfect place to describe what your value does and give ideas on how to modify it */
-  foo: (val: number) => number;
-  /** It is especially useful to document your mixins in an environment with user submitted mods/plugins */
-  bar: (v: string, ctx: { baz: number }) => Promise<string>;
-  /**
-   * In this example, to calculate the gravity of the player character in a game engine, mods could interject and modify the gravity value.  
-   * In this JSDoc comment, you should explain the default value, the general range of values and the effect of the value on the game.  
-   * You should also explain the context object and its properties.
-   */
-  playerGravity: (val: number, ctx: { base: 1.575 }) => number;
-  /**
-   * All JS types can be passed, not just JSON-serializable types, so you can also use mixins to modify an object.  
-   * Also, you are able to pass complex objects in the context parameter to allow for more advanced modifications and multidirectional data flow.
-   */
-  playerProps: (val: PlayerProps, ctx: { player: Player, lobby: Lobby, currentTick: bigint, pauseGame: () => void }) => PlayerProps;
-}>({
-  autoIncrementPriority: true,
-  defaultSignal: ac.signal,
-});
-
-
-// foo:
-
-// main function:
-function calcFoo(val: number) {
-  // order of operations:
-  // 1. val = val ** 2
-  // 2. val / 2   (source 2 mixin)
-  // 3. val * 2   (source 3 mixin)
-  // 4. val + 1   (source 1 mixin)
-  return myMixins.resolve("foo", val ** 2);
-}
-
-// mixin from source 1 (priority 0):
-myMixins.add("foo", (val) => {
-  return val + 1;
-});
-
-// mixin from source 2 (highest possible priority):
-myMixins.add("foo", (val) => {
-  return val / 2;
-}, {
-  // use highest possible priority (highly discouraged unless it's absolutely necessary):
-  priority: Number.MAX_SAFE_INTEGER,
-});
-
-// mixin from source 3 (priority 1):
-myMixins.add("foo", (val) => {
-  return val * 2;
-});
-
-getFoo(10); // 10 ** 2 / 2 * 2 + 1 = 101
-
-
-// bar:
-
-// some global variable that will be provided as context to the mixin:
-var baz = 1337;
-
-// main function:
-async function getBar(val: string) {
-  // order of operations:
-  // 1. val             (source 2 mixin)
-  // 2. `${val}-${baz}` (source 3 mixin with stopPropagation)
-  // 3. (skipped)       (source 1 mixin)
-  // result: "Hello-1337"
-
-  // context object is mandatory because of the generic type at `new Mixins<...>()`:
-  // also, resolve returns a Promise because the mixin function signature is async:
-  return await myMixins.resolve("bar", val, { baz });
-}
-
-// mixin from source 1 (priority 0):
-myMixins.add("bar", (val) => `*this will never be applied* ${val}`);
-
-// mixin from source 2 (priority 1):
-// while baz is >= 1000, this mixin is practically disabled:
-myMixins.add("bar", (val, ctx) => {
-  if(ctx.baz < 1000)
-    return `${val} < 1000`;
-  // disable this mixin if baz >= 1000 by returning the unmodified input value:
-  return val;
-}, {
-  priority: 1,
-});
-
-const acBarSrc3 = new AbortController();
-const { abort: removeBarSrc3 } = acBarSrc3;
-
-// mixin from source 3 (priority 0.5 & stopPropagation):
-myMixins.add("bar", (val, ctx) => new Promise((resolve) => {
-  // async mixin chains allow for lazy-loading and other async operations:
-  setTimeout(() => {
-    resolve(`${val}-${ctx.baz}`);
-  }, 1000);
-}), {
-  priority: 0.5,
-  stopPropagation: true,
-  signal: acBarSrc3.signal,
-});
-
-// applies source 2 (practically disabled) and source 3:
-await getBar("Hello"); // "Hello-1337"
-
-// remove source 3 from "bar" mixins and set baz < 1000:
-removeBarSrc3();
-baz = 999;
-
-// only source 2 is left:
-await getBar("Hello"); // "Hello < 1000"
+public add<TKey extends TMixinKey, TArg, TCtx>(
+  mixinKey: TKey,
+  mixinFn: (arg: TArg, ...ctx: TCtx extends undefined ? [void] : [TCtx]) => ReturnType<TMixinMap[TKey]>,
+  config?: Partial<MixinConfig> | number
+): () => void;
 ```
-</details>
+  
+Registers a mixin function for the given key.  
+If a number is passed as `config`, it will be treated as the priority.  
+Returns a cleanup function that removes this mixin when called.  
+  
+Mixins with the highest priority will be applied first. If two or more mixins share the exact same priority, they will be executed in order of registration (first come, first serve).
 
 <br>
 
-### NanoEmitter
-Signature:  
+### `Mixins.resolve()`
+Signature:
 ```ts
-new NanoEmitter<TEventMap = EventsMap>(options?: NanoEmitterOptions)
-```  
-  
-A class that provides a minimalistic event emitter with a tiny footprint powered by [nanoevents.](https://npmjs.com/package/nanoevents)  
-The `TEventMap` generic is used to define the events that can be emitted and listened to.  
-  
-The main intention behind this class is to extend it in your own classes to provide a simple event system directly built into the class.  
-However in a functional environment you can also just create instances for use as standalone event emitters throughout your project.  
-  
-The options object has the following properties:
-| Property | Description |
-| :-- | :-- |
-| `publicEmit?: boolean` | (Optional) If set to true, allows emitting events through the public method `emit()` (`false` by default). |
-  
-### Methods:  
-#### `NanoEmitter.on()`  
-Signature: `on<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
-Registers a listener function for the given event.  
-May be called multiple times for the same event.
-  
-<br>
-
-#### `NanoEmitter.once()`
-Signature: `once<K extends keyof TEventMap>(event: K, listener: TEventMap[K]): void`  
-Registers a listener function for the given event that will only be called once.
-
-<br>
-
-#### `NanoEmitter.emit()`
-Signature: `emit<K extends keyof TEventMap>(event: K, ...args: Parameters<TEventMap[K]>): boolean`  
-Emits an event with the given arguments from outside the class instance if `publicEmit` is set to `true`.  
-If `publicEmit` is set to `true`, this method will return `true` if the event was emitted.  
-If it is set to `false`, it will always return `false` and you will need to use `this.events.emit()` from inside the class instead.
-
-<br>
-
-#### `NanoEmitter.unsubscribeAll()`
-Signature: `unsubscribeAll(): void`  
-Removes all listeners from all events.
-  
-<br>
-  
-<details><summary><b>Object oriented example - click to view</b></summary>
-
-```ts
-import { NanoEmitter } from "@sv443-network/userutils";
-
-// map of events for strong typing - the functions always return void
-interface MyEventMap {
-  foo: (bar: string) => void;
-  baz: (qux: number) => void;
-}
-
-class MyClass extends NanoEmitter<MyEventMap> {
-  constructor() {
-    super({
-      // allow emitting events from outside the class body:
-      publicEmit: true,
-    });
-
-    // the class can also listen to its own events:
-    this.once("baz", (qux) => {
-      console.log("baz event (inside, once):", qux);
-    });
-  }
-
-  public doStuff() {
-    // any call to the public emit() method, even when inside the own class, won't work if publicEmit is set to false:
-    this.emit("foo", "hello");
-    this.emit("baz", 42);
-    this.emit("foo", "world");
-    // this one will always work when used inside the class and functions identically:
-    this.events.emit("baz", 69);
-  }
-}
-
-const myInstance = new MyClass();
-myInstance.doStuff();
-
-// listeners attached with on() can be called multiple times:
-myInstance.on("foo", (bar) => {
-  console.log("foo event (outside):", bar);
-});
-
-// throws a TS error since `events` is protected, but technically still works in JS:
-myInstance.events.emit("foo", "hello");
-
-// only works because publicEmit is set to true:
-myInstance.emit("baz", "hello from the outside");
-
-// remove all listeners:
-myInstance.unsubscribeAll();
+public resolve<TKey extends TMixinKey, TArg, TCtx>(
+  mixinKey: TKey,
+  inputValue: TArg,
+  ...inputCtx: TCtx extends undefined ? [void] : [TCtx]
+): ReturnType<TMixinMap[TKey]>;
 ```
-</details>
+  
+Applies all mixins with the given key to the input value, respecting the priority and stopPropagation settings.  
+If some of the mixins are async, the method will also return a Promise.
 
 <br>
 
-<details><summary><b>Functional example - click to view</b></summary>
-
+### `Mixins.list()`
+Signature:
 ```ts
-import { NanoEmitter } from "@sv443-network/userutils";
-
-// map of events for strong typing - the functions always return void
-interface MyEventMap {
-  foo: (bar: string) => void;
-  baz: (qux: number) => void;
-}
-
-const myEmitter = new NanoEmitter<MyEventMap>({
-  // very important for functional usage - allow emitting events from outside the class body:
-  publicEmit: true,
-});
-
-myEmitter.on("foo", (bar) => {
-  console.log("foo event:", bar);
-});
-
-myEmitter.once("baz", (qux) => {
-  console.log("baz event (once):", qux);
-});
-
-function doStuff() {
-  // only works if publicEmit is set to true
-  myEmitter.emit("foo", "hello");
-  myEmitter.emit("baz", 42);
-  myEmitter.emit("foo", "world");
-  myEmitter.emit("baz", 69);
-
-  myEmitter.emit("foo", "hello from the outside");
-
-  myEmitter.unsubscribeAll();
-}
-
-doStuff();
+public list(): ({ key: string } & MixinConfig)[];
 ```
-</details>
+  
+Returns an array of objects that contain the mixin keys and their configuration objects, but not the mixin functions themselves.
 
 <br>
 
-### Debouncer
-Signature:  
-```ts
-new Debouncer<TArgs = any>(timeout?: number, type?: "immediate" | "idle")
-```
-A class that debounces function calls to prevent them from being executed too often.  
-The debouncer will wait for the specified timeout between calls before executing the registered listener functions.  
-This is especially useful when dealing with events that fire rapidly, like "scroll", "resize", "mousemove", etc.  
-  
-If creating a whole class is too much overhead for your use case, you can also use the standalone function [`debounce()`](#debounce).  
-It works similarly to other debounce implementations like Lodash's `_.debounce()`.  
-  
-If `timeout` is not provided, it will default to 200 milliseconds.  
-If `type` isn't provided, it will default to `"immediate"`.  
-  
-The `type` parameter can be set to `"immediate"` (default and recommended) to let the first call through immediately and then queue the following calls until the timeout is over.  
-  
-If set to `"idle"`, the debouncer will wait until there is a pause of the given timeout length before executing the queued call.  
-Note that this might make the calls be queued up for all eternity if there isn't a long enough gap between them.  
+### Types
 
-See the below diagram for a visual representation of the different types.  
-  
-<details><summary><b>Diagram - click to view</b></summary>
-
-![Debouncer type diagram](./.github/assets/debounce.png)
-
-</details>
-
-<br>
-
-### Events:
-The Debouncer class inherits from [`NanoEmitter`](#nanoemitter), so you can use all of its inherited methods to listen to the following events:
-| Event | Arguments | Description |
+### `type MixinsConstructorConfig`
+Configuration object for the [`Mixins` class.](#class-mixins)
+| Property | Type | Description |
 | :-- | :-- | :-- |
-| `call` | `...TArgs[]`, same as `addListener()` and `call()` | Emitted when the debouncer triggers and calls all listener functions, as an alternative to the callback-based `addListener()` method. |
-| `change` | `timeout: number`, `type: "immediate" \| "idle"` | Emitted when the timeout or type settings were changed. |
+| `autoIncrementPriority` | `boolean` | If true, an auto-incrementing integer priority will be used when none is specified (unique per mixin key). Defaults to false. |
+| `defaultPriority` | `number` | The default priority for mixins that do not specify one. Defaults to 0. |
+| `defaultStopPropagation` | `boolean` | The default `stopPropagation` value. Defaults to false. |
+| `defaultSignal?` | `AbortSignal \| undefined` | The default `AbortSignal` for mixins that do not specify one. |
 
 <br>
 
-### Methods:
-#### `Debouncer.addListener()`
-Signature: `addListener(fn: ((...args: TArgs[]) => void | unknown)): void`  
-Adds a listener function that will be called on timeout.  
-You can attach as many listeners as you want and they will all be called synchronously in the order they were added.
-
-<br>
-
-#### `Debouncer.removeListener()`
-Signature: `removeListener(fn: ((...args: TArgs[]) => void | unknown)): void`  
-Removes the listener with the specified function reference.
-
-<br>
-
-#### `Debouncer.removeAllListeners()`
-Signature: `removeAllListeners(): void`  
-Removes all listeners.
-
-<br>
-
-#### `Debouncer.call()`
-Signature: `call(...args: TArgs[]): void`  
-Use this to call the debouncer with the specified arguments that will be passed to all listener functions registered with `addListener()`.  
-Not every call will trigger the listeners - only when there is no active timeout.  
-If the timeout is active, the call will be queued until it either gets overridden by the next call or the timeout is over.
-
-<br>
-
-#### `Debouncer.getListeners()`
-Signature: `getListeners(): ((...args: TArgs[]) => void | unknown)[]`  
-Returns an array of all registered listener functions.
-
-<br>
-
-#### `Debouncer.setTimeout()`
-Signature: `setTimeout(timeout: number): void`  
-Changes the timeout for the debouncer.
-
-<br>
-
-#### `Debouncer.getTimeout()`
-Signature: `getTimeout(): number`  
-Returns the current timeout.
-
-<br>
-
-#### `Debouncer.isTimeoutActive()`
-Signature: `isTimeoutActive(): boolean`  
-Returns `true` if the timeout is currently active, meaning any call to the `call()` method will be queued.
-
-<br>
-
-#### `Debouncer.setType()`
-Signature: `setType(type: "immediate" | "idle"): void`  
-Changes the edge type for the debouncer.
-
-<br>
-
-#### `Debouncer.getType()`
-Signature: `getType(): "immediate" | "idle"`  
-Returns the current edge type.
-
-<br>
-
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { Debouncer } from "@sv443-network/userutils";
-
-const deb = new Debouncer(); // defaults to 200ms and "immediate"
-
-// register a function to be called when the debouncer triggers
-deb.addListener(onResize);
-
-window.addEventListener("resize", (evt) => {
-  // arguments will be passed along to all registered listeners
-  deb.call(evt);
-});
-
-function onResize(evt: Event) {
-  console.log("Resized to:", window.innerWidth, "x", window.innerHeight);
-
-  // timeout and type can be modified after the fact:
-  deb.setTimeout(500);
-  deb.setType("idle");
-}
-
-// call these from anywhere else to detach the registered listeners:
-
-function removeResizeListener() {
-  deb.removeListener(onResize);
-}
-
-function removeAllListeners() {
-  deb.removeAllListeners();
-}
-
-// or using NanoEmitter's event system:
-
-deb.on("call", (...args) => {
-  console.log("Debounced call executed with:", args);
-});
-
-deb.on("change", (timeout, type) => {
-  console.log("Timeout changed to:", timeout);
-  console.log("Edge type changed to:", type);
-});
-```
-</details>
-
-<br>
-
-### debounce()
-Signature:  
-```ts
-debounce<
-  TFunc extends ((...args: TArgs[]) => void | unknown),
-  TArgs = any
-> (
-  fn: TFunc,
-  timeout?: number,
-  type?: "immediate" | "idle"
-): TFunc & { debouncer: Debouncer }
-```
-  
-A standalone function that debounces a given function to prevent it from being executed too often.  
-The function will wait for the specified timeout between calls before executing the function.  
-This is especially useful when dealing with events that fire rapidly, like "scroll", "resize", "mousemove", etc.  
-  
-This function works in the same way as the [`Debouncer`](#debouncer) class, but is a more convenient wrapper for less complex use cases.  
-Still, you will have access to the created Debouncer instance via the `debouncer` prop on the returned function should you need it.  
-  
-If `timeout` is not provided, it will default to 200 milliseconds.  
-If `type` isn't provided, it will default to `"immediate"`.  
-  
-The `type` parameter can be set to `"immediate"` (default and recommended) to let the first call through immediately and then queue the following calls until the timeout is over.  
-  
-If set to `"idle"`, the debouncer will wait until there is a pause of the given timeout length before executing the queued call.  
-Note that this might make the calls be queued up for all eternity if there isn't a long enough gap between them.  
-
-See the below diagram for a visual representation of the different types.  
-  
-<details><summary><b>Diagram - click to view</b></summary>
-
-![Debouncer type diagram](./.github/assets/debounce.png)
-
-</details>
-
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { debounce } from "@sv443-network/userutils";
-
-// simple example:
-window.addEventListener("resize", debounce((evt) => {
-  console.log("Resized to:", window.innerWidth, "x", window.innerHeight);
-}));
-
-// or if you need access to the Debouncer instance:
-
-function myFunc(iteration: number) {
-  // for the edge type "immediate", iteration 0 and 19 will *always* be called
-  // this is so you can react immediately and always have the latest data at the end
-  console.log(`Call #${iteration} went through!`);
-}
-
-// debouncedFunction can be called at very short intervals but will never let calls through twice within 0.5s:
-const debouncedFunction = debounce(myFunc, 500);
-
-function increaseTimeout() {
-  // instance can be accessed on the function returned by debounce()
-  debouncedFunction.debouncer.setTimeout(debouncedFunction.debouncer.getTimeout() + 100);
-}
-
-// and now call the function a bunch of times with varying intervals:
-
-let i = 0;
-function callFunc() {
-  debouncedFunction(i, Date.now());
-
-  i++;
-  // call the function 20 times with a random interval between 0 and 1s (weighted towards the lower end):
-  if(i < 20)
-    setTimeout(callFunc, Math.floor(1000 * Math.pow(Math.random(), 2.5)));
-}
-
-// same as with Debouncer, you can use NanoEmitter's event system:
-
-debouncedFunction.debouncer.on("call", (...args) => {
-  console.log("Debounced call executed with:", args);
-});
-
-debouncedFunction.debouncer.on("change", (timeout, type) => {
-  console.log("Timeout changed to:", timeout);
-  console.log("Edge type changed to:", type);
-});
-```
-
-</details>
-
-<br>
-
-### autoPlural()
-Signature:  
-```ts
-autoPlural(
-  term: Stringifiable,
-  num: number | Array | NodeList | { length: number } | { count: number } | { size: number },
-  pluralType?: "auto" | "-s" | "-ies"
-): string
-```
-  
-Pluralizes a [Stringifiable value](#stringifiable) if the given number is not 1.  
-If an array or NodeList or object with either a `length`, `count` or `size` property is passed, the amount of contained items will be used.  
-Iterables will not work until converted to an array (with `Array.from()` or `[...iterable]`).  
-  
-If `pluralType` is set to `"auto"` (default), the function will try to guess the correct plural form.  
-If set to `-s`, the string will always be pluralized with an `s`.  
-If set to `-ies`, the string will be pluralized by removing the last character and adding `ies`.  
-If set to anything else, the word will be returned as-is.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { autoPlural } from "@sv443-network/userutils";
-
-autoPlural("red apple", 0); // "red apples"
-autoPlural("red apple", 1); // "red apple"
-autoPlural("red apple", 2); // "red apples"
-
-// The default `pluralType` ("auto") switches suffix when the word ends with y:
-autoPlural("category", 1); // "category"
-autoPlural("category", 2); // "categories"
-
-// Stringifiable objects are also accepted:
-autoPlural({ toString: () => "category" }, 2); // "categories"
-autoPlural(new Map<unknown, unknown>(), 2);    // "[object Map]s"
-
-// The passed `num` object just needs to have a numeric length, count or size property:
-autoPlural("element", document.querySelectorAll("html")); // "element"
-autoPlural("element", document.querySelectorAll("*"));    // "elements"
-
-const items = [1, 2, 3, 4, "foo", "bar"];
-console.log(items.length, autoPlural("item", items)); // "6 items"
-
-// And you can also force pluralization with one or the other if needed:
-autoPlural("category", 1, "-s"); // "category"
-autoPlural("category", 2, "-s"); // "categorys"
-autoPlural("apple", 1, "-ies");  // "apply"
-autoPlural("apple", 2, "-ies");  // "applies"
-```
-</details>
-
-<br>
-
-### pauseFor()
-Signature:  
-```ts
-pauseFor(time: number, abortSignal?: AbortSignal, rejectOnAbort?: boolean): Promise<void>
-```
-  
-Pauses async execution for a given amount of time.  
-If an [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) is passed, the pause will be cut short when the signal is aborted.  
-By default, this will resolve the promise, but you can set `rejectOnAbort` to true to reject it instead.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { pauseFor } from "@sv443-network/userutils";
-
-async function run() {
-  console.log("Hello");
-
-  await pauseFor(3000); // waits for 3 seconds
-
-  console.log("World");
-
-
-  // can also be cut short manually:
-
-  const controller = new AbortController();
-  setTimeout(() => controller.abort(), 1000);
-
-  await pauseFor(2_147_483_647, controller.signal); // (maximum possible timeout)
-
-  console.log("This gets printed after just 1 second");
-}
-```
-</details>
-
-<br>
-
-### fetchAdvanced()
-Signature:  
-```ts
-fetchAdvanced(input: string | Request | URL, options?: {
-  timeout?: number,
-  // any other options from fetch()
-}): Promise<Response>
-```
-  
-A drop-in replacement for the native `fetch()` function that adds a timeout property.  
-The timeout will default to 10 seconds if left undefined. Set it to a negative number to disable the timeout.  
-Pass an [AbortController's signal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to the `signal` property to be able to abort the request manually in addition to the automatic timeout.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { fetchAdvanced } from "@sv443-network/userutils";
-
-const controller = new AbortController();
-
-fetchAdvanced("https://jokeapi.dev/joke/Any?safe-mode&format=json", {
-  // times out after 5 seconds:
-  timeout: 5000,
-  // also accepts any other fetch options like headers and signal:
-  headers: {
-    "Accept": "application/json",
-  },
-  // makes the request abortable:
-  signal: controller.signal,
-}).then(async (response) => {
-  console.log("Fetch data:", await response.json());
-}).catch((err) => {
-  console.error("Fetch error:", err);
-});
-
-// can also be aborted manually before the timeout is reached:
-document.querySelector("button#cancel")?.addEventListener("click", () => {
-  controller.abort();
-});
-```
-</details>
-
-<br>
-
-### insertValues()
-Signature:  
-```ts
-insertValues(input: string, ...values: Stringifiable[]): string
-```
-  
-Inserts values into a string in the format `%n`, where `n` is the number of the value, starting at 1.  
-The values will be stringified using `toString()` (see [Stringifiable](#stringifiable)) before being inserted into the input string.  
-If not enough values are passed, the remaining placeholders will be left untouched.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { insertValues } from "@sv443-network/userutils";
-
-insertValues("Hello, %1!", "World");                        // "Hello, World!"
-insertValues("Hello, %1! My name is %2.", "World", "John"); // "Hello, World! My name is John."
-insertValues("Testing %1", { toString: () => "foo" });      // "Testing foo"
-
-// using an array for the values and not passing enough arguments:
-const values = ["foo", "bar", "baz"];
-insertValues("Testing %1, %2, %3 and %4", ...values); // "Testing foo, bar and baz and %4"
-```
-</details>
-
-<br>
-
-### compress()
-Signatures:  
-```ts
-// return as a base64 string:
-compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "base64"): Promise<string>
-// return as an ArrayBuffer / Uint8Array:
-compress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
-```
-  
-Compresses a string or ArrayBuffer using the specified [compression format](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream/CompressionStream#format). Most browsers should support at least `gzip`, `deflate` and `deflate-raw`.  
-The `outputType` dictates which format the output will be in. It will default to `base64` if left undefined.  
-  
-⚠️ You need to provide the `@grant unsafeWindow` directive if you are using the `base64` output type or you will get a TypeError.  
-⚠️ Not all browsers might support compression. Please check [on this page](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream#browser_compatibility) for compatibility and supported compression formats.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { compress } from "@sv443-network/userutils";
-
-// using gzip:
-
-const fooGz = await compress("Hello, World!", "gzip");
-const barGz = await compress("Hello, World!".repeat(20), "gzip");
-
-// not as efficient with short strings but can save quite a lot of space with larger strings, see the difference between these two:
-console.log(fooGz); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVEEANDDSuwNAAAA"
-console.log(barGz); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVH0GJkcAKOPcmYEAQAA"
-
-// depending on the type of data you might want to use a different compression format like deflate:
-
-const fooDeflate = await compress("Hello, World!", "deflate");
-const barDeflate = await compress("Hello, World!".repeat(20), "deflate");
-
-// again, it's not as efficient initially but gets better with longer inputs:
-console.log(fooDeflate); // "eJzzSM3JyddRCM8vyklRBAAfngRq"
-console.log(barDeflate); // "eJzzSM3JyddRCM8vyklR9BiZHAAIEVg1"
-```
-</details>
-
-<br>
-
-### decompress()
-Signatures:  
-```ts
-// return as a string:
-decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType?: "string"): Promise<string>
-// return as an ArrayBuffer / Uint8Array:
-decompress(input: string | ArrayBuffer, compressionFormat: CompressionFormat, outputType: "arrayBuffer"): Promise<ArrayBuffer>
-```
-  
-Decompresses a base64 string or ArrayBuffer that has been previously [compressed](#compress) using the specified [compression format](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream/CompressionStream#format). Most browsers should support at least `gzip`, `deflate` and `deflate-raw`.  
-The `outputType` dictates which format the output will be in. It will default to `string` if left undefined.  
-  
-⚠️ You need to provide the `@grant unsafeWindow` directive if you are using the `string` output type or you will get a TypeError.  
-⚠️ Not all browsers might support decompression. Please check [on this page](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream#browser_compatibility) for compatibility and supported compression formats.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { compress, decompress } from "@sv443-network/userutils";
-
-const compressed = await compress("Hello, World!".repeat(20), "gzip");
-
-console.log(compressed); // "H4sIAAAAAAAAE/NIzcnJ11EIzy/KSVH0GJkcAKOPcmYEAQAA"
-
-const decompressed = await decompress(compressed, "gzip");
-
-console.log(decompressed); // "Hello, World!" * 20
-```
-</details>
-
-<br>
-
-### computeHash()
-Signature:  
-```ts
-computeHash(input: string | ArrayBuffer, algorithm?: string): Promise<string>
-```
-  
-Computes a hash / checksum of a string or ArrayBuffer using the specified algorithm ("SHA-256" by default).  
-The algorithm must be supported by the [SubtleCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest).  
-  
-⚠️ This function needs to be called in a secure context (HTTPS) due to the use of the SubtleCrypto API.  
-⚠️ If you use this for cryptography, make sure to use a secure algorithm (under no circumstances use SHA-1) and to [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)) your input data.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { computeHash } from "@sv443-network/userutils";
-
-async function run() {
-  const hash1 = await computeHash("Hello, World!");
-  const hash2 = await computeHash("Hello, World!");
-
-  console.log(hash1);           // dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f
-  console.log(hash1 === hash2); // true (same input = same output)
-
-  const hash3 = await computeHash("Hello, world!"); // lowercase "w"
-  console.log(hash3); // 315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3
-}
-
-run();
-```
-</details>
-
-<br>
-
-### randomId()
-Signature:  
-```ts
-randomId(length?: number, radix?: number, enhancedEntropy?: boolean, randomCase?: boolean): string
-```
-  
-Generates a random ID of a given length and [radix (base).](https://en.wikipedia.org/wiki/Radix)  
-  
-The default length is 16 and the default radix is 16 (hexadecimal).  
-You may change the radix to get digits from different numerical systems.  
-Use 2 for binary, 8 for octal, 10 for decimal, 16 for hexadecimal and 36 for alphanumeric.  
-  
-If `enhancedEntropy` is set to true (false by default), the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) is used for generating the random numbers.  
-Note that this makes the function call take longer, but the generated IDs will have a higher entropy.  
-  
-If `randomCase` is set to true (which it is by default), the generated ID will contain both upper and lower case letters.  
-This randomization is also affected by the `enhancedEntropy` setting, unless there are no alphabetic characters in the output in which case it will be skipped.  
-  
-Throws a RangeError if the length is less than 1 or the radix is less than 2 or greater than 36.  
-  
-⚠️ This is not suitable for generating anything related to cryptography! Use [SubtleCrypto's `generateKey()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey) for that instead.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { randomId } from "@sv443-network/userutils";
-
-randomId();                    // "1bda419a73629d4f" (length 16, radix 16)
-randomId(10);                  // "f86cd354a4"       (length 10, radix 16)
-randomId(10, 2);               // "1010001101"       (length 10, radix 2)
-randomId(10, 10);              // "0183428506"       (length 10, radix 10)
-randomId(10, 36, false, true); // "z46jFPa37R"       (length 10, radix 36, random case)
-
-
-function benchmark(enhancedEntropy: boolean, randomCase: boolean) {
-  const timestamp = Date.now();
-  for(let i = 0; i < 10_000; i++)
-    randomId(16, 36, enhancedEntropy, randomCase);
-  console.log(`Generated 10k in ${Date.now() - timestamp}ms`)
-}
-
-// using Math.random():
-benchmark(false, false); // Generated 10k in 239ms
-benchmark(false, true);  // Generated 10k in 248ms
-
-// using crypto.getRandomValues():
-benchmark(true, false);  // Generated 10k in 1076ms
-benchmark(true, true);   // Generated 10k in 1054ms
-
-// 3rd and 4th have a similar time, but in reality the 4th blocks the event loop for much longer
-```
-</details>
-
-<br>
-
-### consumeGen()
-Signature:  
-```ts
-consumeGen(valGen: ValueGen<any>): Promise<any>
-```
-  
-Asynchronously turns a [`ValueGen`](#valuegen) into its final value.  
-ValueGen allows for tons of flexibility in how the value can be obtained. Calling this function will resolve the final value, no matter in what form it was passed.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { consumeGen, type ValueGen } from "@sv443-network/userutils";
-
-async function doSomething(value: ValueGen<number>) {
-  // type gets inferred as `number` because `value` is typed as a `ValueGen<number>` above
-  const finalValue = await consumeGen(value);
-  console.log(finalValue);
-}
-
-// the following are all valid and yield 42:
-doSomething(42);
-doSomething(() => 42);
-doSomething(Promise.resolve(42));
-doSomething(async () => 42);
-
-// throws a TS error:
-doSomething("foo");
-```
-
-</details>
-
-<br>
-
-### consumeStringGen()
-Signature:  
-```ts
-consumeStringGen(strGen: StringGen): Promise<string>
-```
-  
-Asynchronously turns a [`StringGen`](#stringgen) into its final string value.  
-StringGen allows for tons of flexibility in how the string can be obtained. Calling this function will resolve the final string.  
-Optionally you can use the template parameter to define the union of strings that the StringGen should yield.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { consumeStringGen, type StringGen } from "@sv443-network/userutils";
-
-export class MyTextPromptThing {
-  // full flexibility on how the string can be passed to the constructor,
-  // because it can be obtained synchronously or asynchronously,
-  // in string or function form:
-  constructor(private text: StringGen) {}
-
-  /** Shows the prompt dialog */
-  public async showPrompt() {
-    const promptText = await consumeStringGen(this.text);
-    const promptHtml = promptText.trim().replace(/\n/gm, "<br>");
-
-    // ...
-  }
-}
-
-// all valid:
-const myText = "Hello, World!";
-new MyTextPromptThing(myText);
-new MyTextPromptThing(() => myText);
-new MyTextPromptThing(Promise.resolve(myText));
-new MyTextPromptThing(async () => myText);
-
-// throws a TS error:
-new MyTextPromptThing(420);
-```
-
-</details>
-
-<br>
-
-### getListLength()
-Signature:  
-```ts
-getListLength(obj: ListWithLength, zeroOnInvalid?: boolean): number
-```
-  
-Returns the length of the given list-like object (anything with a numeric `length`, `size` or `count` property, like an array, Map or NodeList).  
-Refer to [the ListWithLength type](#listwithlength) for more info.  
-  
-If the object doesn't have any of these properties, it will return 0 by default.  
-Set `zeroOnInvalid` to false to return NaN instead of 0 if the object doesn't have any of the properties.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { getListLength } from "@sv443-network/userutils";
-
-getListLength([1, 2, 3]); // 3
-getListLength("Hello, World!"); // 13
-getListLength(document.querySelectorAll("body")); // 1
-getListLength(new Map([["foo", "bar"], ["baz", "qux"]])); // 2
-getListLength({ size: 42 }); // 42
-
-// returns 0 by default:
-getListLength({ foo: "bar" }); // 0
-
-// can return NaN instead:
-getListLength({ foo: "bar" }, false); // NaN
-```
-</details>
-
-<br>
-
-### purifyObj()
-Signature:  
-```ts
-purifyObj<TObj extends object>(obj: TObj): TObj
-```
-  
-Turns the passed object into a "pure" object without a prototype chain, meaning it won't have any default properties like `toString`, `__proto__`, `__defineGetter__`, etc.  
-This could be useful to prevent prototype pollution attacks or to clean up object literals, at the cost of being harder to work with in some cases.  
-It also effectively transforms a [`Stringifiable`](#stringifiable) value into one that will throw a TypeError when stringified instead of defaulting to `[object Object]`  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { purifyObj } from "@sv443-network/userutils";
-
-const impureObj = {
-  foo: "bar",
-};
-
-console.log(impureObj.toString);         // [Function: toString]
-console.log(impureObj.__proto__);        // { ... }
-console.log(impureObj.__defineGetter__); // [Function: __defineGetter__]
-console.log(`${impureObj}`);             // "[object Object]"
-
-
-const pureObj = purifyObj(impureObj);
-
-console.log(pureObj.toString);         // undefined
-console.log(pureObj.__proto__);        // undefined
-console.log(pureObj.__defineGetter__); // undefined
-console.log(`${pureObj}`);             // TypeError: Cannot convert object to string
-```
-</details>
-
-<br><br>
-
-<!-- #region Arrays -->
-## Arrays:
-
-### randomItem()
-Signature:  
-```ts
-randomItem(array: Array): any
-```
-  
-Returns a random item from an array.  
-Returns undefined if the array is empty.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { randomItem } from "@sv443-network/userutils";
-
-randomItem(["foo", "bar", "baz"]); // "bar"
-randomItem([ ]);                   // undefined
-```
-</details>
-
-<br>
-
-### randomItemIndex()
-Signature:  
-```ts
-randomItemIndex(array: Array): [item: any, index: number]
-```
-  
-Returns a tuple of a random item and its index from an array.  
-If the array is empty, it will return undefined for both values.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { randomItemIndex } from "@sv443-network/userutils";
-
-randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
-randomItemIndex([ ]);                   // [undefined, undefined]
-
-// using array destructuring:
-const [item, index] = randomItemIndex(["foo", "bar", "baz"]); // ["bar", 1]
-// or if you only want the index:
-const [, index] = randomItemIndex(["foo", "bar", "baz"]); // 1
-```
-</details>
-
-<br>
-
-### takeRandomItem()
-Signature:  
-```ts
-takeRandomItem(array: Array): any
-```
-  
-Returns a random item from an array and mutates the array by removing the item.  
-Returns undefined if the array is empty.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { takeRandomItem } from "@sv443-network/userutils";
-
-const arr = ["foo", "bar", "baz"];
-takeRandomItem(arr); // "bar"
-console.log(arr);    // ["foo", "baz"]
-```
-</details>
-
-<br>
-
-### randomizeArray()
-Signature:  
-```ts
-randomizeArray(array: Array): Array
-```
-  
-Returns a copy of an array with its items in a random order.  
-If the array is empty, a new, empty array will be returned.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { randomizeArray } from "@sv443-network/userutils";
-
-const foo = [1, 2, 3, 4, 5, 6];
-
-console.log(randomizeArray(foo)); // [3, 1, 5, 2, 4, 6]
-console.log(randomizeArray(foo)); // [4, 5, 2, 1, 6, 3]
-
-console.log(foo); // [1, 2, 3, 4, 5, 6] - original array is not mutated
-```
-</details>
+### `type MixinConfig`
+Configuration object for an individual mixin function.
+| Property | Type | Description |
+| :-- | :-- | :-- |
+| `priority` | `number` | The higher, the earlier the mixin will be applied. Supports floating-point and negative numbers. Defaults to 0. |
+| `stopPropagation` | `boolean` | If true, no further mixins will be applied after this one. |
+| `signal?` | `AbortSignal \| undefined` | If set, the mixin will only be applied if the given signal is not aborted. |
 
 <br><br>
 
 <!-- #region Translation -->
 ## Translation:
-This is a very lightweight translation function that can be used to translate simple strings.  
-Pluralization is not supported out of the box, but can be achieved manually by adding a suffix to the translation keys. See the example section of [`tr.addTranslations()`](#traddtranslations) for an example on how this might be done.
 
-<br>
-
-### tr.for()
-Signature:  
+### `function tr.for`
+Signature:
 ```ts
-tr.for<TTrKey extends string = string>(language: string, key: TTrKey, ...args: Stringifiable[]): string
+function tr.for<TTrKey extends string = string>(
+  language: string,
+  key: TTrKey,
+  ...args: (Stringifiable | Record<string, Stringifiable>)[]
+): string;
 ```
   
-Returns the translation for a given key in the specified language.  
-If the key does not exist in the current language nor the fallback language set by [`tr.setFallbackLanguage()`](#trsetfallbacklanguage), the key itself will be returned.  
-The `args` parameter is used for argument insertion, provided a transform function was set up via [`tr.addTransform()`](#traddtransform).  
+Returns the translated text for the specified key in the specified language.  
+If the key is not found in the specified previously registered translation, the key itself is returned.  
   
-You should probably prefer to use [`tr.use()`](#truse), as it provides a more convenient way to translate multiple strings without having to repeat the language parameter.  
-  
-The generic `TTrKey` can be used to enforce type safety for the keys.  
-You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
+⚠️ Remember to register a language with `tr.addTranslations()` before using this function, otherwise it will always return the key itself.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
-  hello: "Hello, World!",
-  goodbye: "Goodbye, World!",
-});
-
-tr.addTranslations("de", {
-  hello: "Hallo, Welt!",
-  // goodbye is missing here
-});
+tr.addTranslations("en", { hello: "Hello, World!" });
+tr.addTranslations("de", { hello: "Hallo, Welt!" });
 
 tr.setFallbackLanguage("en");
 
 tr.for("en", "hello"); // "Hello, World!"
 tr.for("de", "hello"); // "Hallo, Welt!"
-
-// these calls fall back to "en":
-tr.for("de", "goodbye");      // "Goodbye, World!"
-tr.for(undefined, "goodbye"); // "Goodbye, World!"
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.use()
-Signature:  
+### `function tr.use`
+Signature:
 ```ts
-tr.use<TTrKey extends string = string>(language: string): (key: TTrKey, ...args: Stringifiable[]) => string
+function tr.use<TTrKey extends string = string>(
+  language: string
+): (key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => string;
 ```
   
-Returns a function that can be used to translate strings in the specified language.  
-This allows you to only specify the language once and then translate multiple strings without having to repeat the language parameter.  
-The returned function works exactly like [`tr.for()`](#trfor), minus the language parameter.  
-  
-The generic `TTrKey` can be used to enforce type safety for the keys.  
-You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
+Creates a translation function for the specified language, allowing you to translate multiple strings without repeating the language parameter.  
+The returned function works exactly like `tr.for()`, minus the language parameter.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -3146,197 +1350,147 @@ const transEn = {
 
 tr.addTranslations("en", transEn);
 
-// to be loaded in from a DataStore or `navigator.language` or similar:
-let currentLanguage = "en";
+const t = tr.use<TrKeys<typeof transEn>>("en");
 
-function greet() {
-  const t = tr.use<TrKeys<typeof transEn>>(currentLanguage);
-
-  // very concise and easy to use:
-  t("hello"); // "Hello, World!"
-}
+t("hello"); // "Hello, World!"
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.hasKey()
-Signature:  
+### `function tr.hasKey`
+Signature:
 ```ts
-tr.hasKey<TTrKey extends string = string>(language: string | undefined, key: TTrKey): boolean
+function tr.hasKey<TTrKey extends string = string>(
+  language?: string,
+  key: TTrKey
+): boolean;
 ```
   
-Returns `true` if the given key exists in the specified language, else `false`.  
-If no language parameter was provided, it will default to the fallback language set by [`tr.setFallbackLanguage()`](#trsetfallbacklanguage).  
-  
-The generic `TTrKey` can be used to enforce type safety for the keys.  
-You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
+Checks if a translation key exists in the specified language or the set fallback language.  
+Returns `false` if the given language was not registered with `tr.addTranslations()`.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
-  hello: "Hello, World!",
-});
+tr.addTranslations("en", { hello: "Hello, World!" });
 
 tr.hasKey("en", "hello");   // true
 tr.hasKey("en", "goodbye"); // false
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.addTranslations()
-Signature:  
+### `function tr.addTranslations`
+Signature:
 ```ts
-tr.addTranslations(language: string, translations: TrObject): void
+function tr.addTranslations(language: string, translations: TrObject): void;
 ```
   
-Registers a translation object for the given language.  
-The translation object should be a key-value pair object where the keys are strings and the values are the translation strings.  
-The object can be flat or infinitely nested, but it may only contain JSON-serializable values.  
-If the object is nested, the keys are joined with a dot (`.`) to form the final key.  
+Registers a new language and its translations. If the language already exists, it will be overwritten.  
+The translations can be a flat key-value object or infinitely nested objects, resulting in a dot-separated key.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-const trEn = {
+tr.addTranslations("en", {
   hello: "Hello, World!",
   nested: {
     key: "This is a nested key",
-    apples_1: "There is 1 apple",
-    apples_n: "There are %1 apples",
   },
-  "foo.bar": "This key isn't nested, it just has a dot",
-} as const;
+});
 
-tr.addTransform(tr.transforms.percent);
-
-tr.addTranslations("en", trEn);
-
-// full type safety and autocomplete
-// LooseUnion is used so there's still autocomplete but you can supply any string as the translation key
-// this can be useful if you have some custom keys that don't adhere to the strict typing, like the pluralization suffix in this case
-const t = tr.use<LooseUnion<TrKeys<typeof trEn>>>("de");
-
-/** Translates a key with pluralization support */
-function tp(key: string, num: number, ...args: Stringifiable[]) {
-  const plSuffix = num === 1 ? "1" : "n";
-  return t(`${key}_${plSuffix}`, ...args);
-}
+const t = tr.use("en");
 
 t("hello");      // "Hello, World!"
 t("nested.key"); // "This is a nested key"
-t("foo.bar");    // "This key isn't nested, it just has a dot"
-
-tp("nested.apples", 1); // "There is 1 apple"
-tp("nested.apples", 5); // "There are 5 apples"
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.getTranslations()
-Signature:  
+### `function tr.getTranslations`
+Signature:
 ```ts
-tr.getTranslations(language: string): TrObject | undefined
+function tr.getTranslations(language?: string): TrObject | undefined;
 ```
   
-Returns the translation object for the given language.  
-If the language does not exist, it will return `undefined`.  
+Returns the translation object for the specified language, or `undefined` if the language is not registered.  
+If no language is provided, defaults to the fallback language.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
-  hello: "Hello, World!",
-});
+tr.addTranslations("en", { hello: "Hello, World!" });
 
 tr.getTranslations("en"); // { hello: "Hello, World!" }
+tr.getTranslations("de"); // undefined
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.deleteTranslations()
-Signature:  
+### `function tr.deleteTranslations`
+Signature:
 ```ts
-tr.deleteTranslations(language: string): boolean
+function tr.deleteTranslations(language: string): boolean;
 ```
   
-Deletes the translation object for the given language.  
-Returns `true` if the object was deleted, or `false` if it couldn't be found.  
+Deletes the translations for the specified language from memory.  
+Returns `true` if the translations were found and deleted, `false` otherwise.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
-  hello: "Hello, World!",
-});
-
-tr.for("en", "hello"); // "Hello, World!"
-
-tr.deleteTranslations("en");
-
-// returns the key itself:
-tr.for("en", "hello"); // "hello"
+tr.addTranslations("en", { hello: "Hello, World!" });
+tr.deleteTranslations("en"); // true
+tr.deleteTranslations("de"); // false
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.setFallbackLanguage()
-Signature:  
+### `function tr.setFallbackLanguage`
+Signature:
 ```ts
-tr.setFallbackLanguage(language: string | undefined): void
+function tr.setFallbackLanguage(fallbackLanguage?: string): void;
 ```
   
-Sets the fallback language to be used when a key is not found.  
-If `undefined` is passed, the fallback language will be disabled (default behavior).  
+Sets the fallback language to use when a translation key is not found in the given language.  
+Pass `undefined` to disable fallbacks and just return the translation key if translations are not found.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr, type TrKeys, type LooseUnion } from "@sv443-network/userutils";
+import { tr } from "@sv443-network/userutils";
 
-const trEn = {
-  hello: "Hello, World!",
-  goodbye: "Goodbye, World!",
-} as const;
-
-const trDe = {
-  hello: "Hallo, Welt!",
-} as const;
-
-tr.addTranslations("en", trEn);
-tr.addTranslations("de", trDe);
+tr.addTranslations("en", { hello: "Hello!", goodbye: "Goodbye!" });
+tr.addTranslations("de", { hello: "Hallo!" });
 
 tr.setFallbackLanguage("en");
 
-// "en" should always have the most up-to-date keys, so it is used for the generic parameter
-// also, LooseUnion is used to enable the use of any string while still giving type safety, in case there's some custom key that doesn't adhere to the strict typing
-const t = tr.use<LooseUnion<TrKeys<typeof trEn>>>("de");
+const t = tr.use("de");
 
-t("hello"); // "Hallo, Welt!"
-// doesn't exist, so falls back to "en":
-t("goodbye"); // "Goodbye, World!"
+t("hello");   // "Hallo!"
+t("goodbye"); // "Goodbye!" (falls back to "en")
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.getFallbackLanguage()
-Signature:  
+### `function tr.getFallbackLanguage`
+Signature:
 ```ts
-tr.getFallbackLanguage(): string | undefined
+function tr.getFallbackLanguage(): string | undefined;
 ```
   
 Returns the currently set fallback language, or `undefined` if no fallback language was set.  
@@ -3354,32 +1508,29 @@ tr.getFallbackLanguage(); // "en"
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.addTransform()
-Signature:  
+### `function tr.addTransform`
+Signature:
 ```ts
-addTransform<TTrKey extends string = string>(transform: [RegExp, TransformFn<TTrKey>]): void
+function tr.addTransform<TTrKey extends string = string>(
+  transform: TransformTuple<TTrKey>
+): void;
 ```
   
-Registers a transformation pattern and function for argument insertion or miscellaneous preprocessing.  
-The transforms will be applied in the order they were added, so you can easily chain multiple transformations.  
+Adds a transform function to the translation system. Transforms are applied after resolving a translation for any language.  
+Use this to enable dynamic values in translations, for example to insert custom values or to denote a section that could be encapsulated by rich text.  
+The `transform` argument is a tuple of `[RegExp, TransformFn]`.  
   
-The pattern should be a regular expression that matches the desired format in the translation strings.  
-The function should return the transformed string synchronously and will be called with a single object parameter that has the following properties:  
+The `TransformFn` receives an object with the following properties:
 | Property | Type | Description |
 | :-- | :-- | :-- |
-| `language` | `string` | The current or fallback language - empty string if both are not set |
-| `matches` | `RegExpExecArray` | All matches as returned by `RegExp.exec()` |
+| `language` | `string` | The current or fallback language |
+| `matches` | `RegExpExecArray[]` | All matches as returned by `RegExp.exec()` |
 | `trKey` | `TTrKey` | The translation key |
-| `trValue` | `string` | The translation value before any transformations |
-| `currentValue` | `string` | The current value, possibly in-between transformations |
-| `trArgs` | `(Stringifiable \| Record<string, Stringifiable>)[]` | The arguments that were passed to the translation function |
-  
-The generic `TTrKey` can be used to enforce type safety for the keys.  
-You can pass the result of the generic type [`TrKeys`](#trkeys) to easily generate a union type of all keys in the given translation object.  
-  
-For more examples, check out the predefined transforms in the file [`lib/translation.ts`](./lib/translation.ts)
+| `trValue` | `string` | Translation value before any transformations |
+| `currentValue` | `string` | Current value, possibly in-between transformations |
+| `trArgs` | `(Stringifiable \| Record<string, Stringifiable>)[]` | Arguments passed to the translation function |
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -3387,147 +1538,91 @@ For more examples, check out the predefined transforms in the file [`lib/transla
 import { tr } from "@sv443-network/userutils";
 
 tr.addTranslations("en", {
-  templateLiteral: "Hello, ${name}!\nYou have ${notifs} notifications.",
-  percent: "Hello, %1!\nYou have %2 notifications.",
-  profanity: "Damn, that's a lot of God damn notifications!",
-  markup: "<c=#ff0000>This is red</c> and <c=#0f0>this is green.</c>",
+  greeting: "Hello, ${name}!",
 });
-
-const t = tr.use("en");
-
-
-// using the templateLiteral transform:
 
 tr.addTransform(tr.transforms.templateLiteral);
 
-// both of these are equivalent:
-t("templateLiteral", { name: "John", notifs: 42 });  // "Hello, John!\nYou have 42 notifications."
-t("templateLiteral", "John", 42);                    // "Hello, John!\nYou have 42 notifications."
+const t = tr.use("en");
 
-// if the first argument is an object and implements toString(), positional insertion will be used:
-t("templateLiteral", { toString: () => "John"}, 42); // "Hello, John!\nYou have 42 notifications."
-
-
-// using the percent transform:
-
-tr.addTransform(tr.transforms.percent);
-
-// objects will be stringified and inserted positionally:
-t("percent", { toString: () => "John" }, 42); // "Hello, John!\nYou have 42 notifications."
-t("percent", {}, {});                         // "Hello, [object Object]!\nYou have [object Object] notifications."
-
-
-// custom transform for a very rudimentary profanity filter:
-
-tr.addTransform([
-  /damn/gmi,
-  ({ trValue }) => trValue.replace(/damn/gm, "darn").replace(/Damn/gm, "Darn"),
-]);
-
-t("profanity"); // "Darn, that's a lot of God darn notifications!"
-
-
-// custom transform for simple markup text coloration using HTML in the format <c=#hex>text</c>:
-
-tr.addTransform([
-  /<c=#((?:[0-9a-f]{3}|[0-9a-f]{6}))>(.*?)<\/c>/gmi,
-  ({ matches }) => `<span style="color: #${matches[1]};">${matches[2] ?? ""}</span>`,
-]);
-
-t("markup"); // "<span style="color: #ff0000;">This is red</span> and <span style="color: #0f0;">this is green.</span>"
+t("greeting", { name: "John" }); // "Hello, John!"
+t("greeting", "John");           // "Hello, John!"
 ```
 </details>
 
-<br>
+<br><br>
 
-### tr.deleteTransform()
-Signature:  
+### `function tr.deleteTransform`
+Signature:
 ```ts
-deleteTransform(patternOrFn: RegExp | string | TransformFn): boolean
+function tr.deleteTransform(patternOrFn: RegExp | TransformFn): boolean;
 ```
   
-Deletes a transformation based on the given pattern or regex or function reference.  
-Returns `true` if the transformation was found and deleted, else `false`.  
-If the given pattern is of type `string`, it will be compared to the regexes' `source` property.  
+Removes a transform function from the list of registered transform functions.  
+Returns `true` if the transform was found and deleted, `false` otherwise.  
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr } from "@sv443-network/userutils";
+import { tr, type TransformTuple } from "@sv443-network/userutils";
 
-const myMarkupTransform = [
-  /<c=#((?:[0-9a-f]{3}|[0-9a-f]{6}))>(.*?)<\/c>/gmi,
-  ({ matches }) => `<span style="color: #${matches[1]};">${matches[2] ?? ""}</span>`,
-] satisfies TransformTuple;
+const myTransform: TransformTuple = [
+  /\$\{([a-zA-Z0-9$_-]+)\}/gm,
+  ({ matches }) => matches[1] ?? "",
+];
 
-tr.addTransform(myMarkupTransform);
-
-// any of these will work:
-tr.deleteTransform(myMarkupTransform[0]);
-tr.deleteTransform(myMarkupTransform[1]);
-tr.deleteTransform("<c=#((?:[0-9a-f]{3}|[0-9a-f]{6}))>(.*?)<\\/c>");
+tr.addTransform(myTransform);
+tr.deleteTransform(myTransform[0]); // true
 ```
 </details>
 
 <br>
 
-### tr.transforms
-This object contains some predefined transformation functions that can be used to quickly set up argument insertion.  
+### `const tr.transforms`
+Predefined transform functions for quickly adding custom argument insertion.  
   
 Currently available transforms:
 | Key | Pattern | Type(s) |
 | :-- | :-- | :-- |
 | `templateLiteral` | `${key}` | Keyed / Positional |
 | `percent` | `%n` | Positional |
-
-For more examples, check out the predefined transforms in the file [`lib/translation.ts`](./lib/translation.ts)
-
+  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
 tr.addTranslations("en", {
-  templateLiteral: "Hello, ${name}!\nYou have ${notifs} notifications.",
-  percent: "Hello, %1!\nYou have %2 notifications.",
+  greeting: "Hello, ${name}! You have ${notifs} notifications.",
+  message: "Hello, %1! You have %2 notifications.",
 });
+
+tr.addTransform(tr.transforms.templateLiteral);
+tr.addTransform(tr.transforms.percent);
 
 const t = tr.use("en");
 
+// templateLiteral supports both keyed and positional:
+t("greeting", { name: "John", notifs: 42 }); // "Hello, John! You have 42 notifications."
+t("greeting", "John", 42);                   // "Hello, John! You have 42 notifications."
 
-// using the templateLiteral transform:
-
-tr.addTransform(tr.transforms.templateLiteral);
-
-// both of these are equivalent:
-t("templateLiteral", { name: "John", notifs: 42 });  // "Hello, John!\nYou have 42 notifications."
-t("templateLiteral", "John", 42);                    // "Hello, John!\nYou have 42 notifications."
-
-// if the first argument is an object and implements toString(), positional insertion will be used:
-t("templateLiteral", { toString: () => "John"}, 42); // "Hello, John!\nYou have 42 notifications."
-
-
-// using the percent transform:
-
-tr.addTransform(tr.transforms.percent);
-
-// objects will be stringified and inserted positionally:
-t("percent", { toString: () => "John" }, 42); // "Hello, John!\nYou have 42 notifications."
-t("percent", {}, {});                         // "Hello, [object Object]!\nYou have [object Object] notifications."
+// percent is positional only:
+t("message", "John", 42); // "Hello, John! You have 42 notifications."
 ```
-
 </details>
 
 <br>
 
-### TrKeys
-Signature:  
+### Types
+
+### `type TrKeys`
+Signature:
 ```ts
-type MyKeys = TrKeys<TrObject>
+type TrKeys<TTrObj, P extends string = "">;
 ```
   
-This type is used to generate a union type of all keys in a given translation object.  
-Nested keys will be joined with a dot (`.`) to form the final key.  
+Generic type that extracts all keys from a flat or recursive translation object into a union type.  
+Nested keys will be joined with a dot (`.`).  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -3539,395 +1634,74 @@ const trEn = {
   nested: {
     key: "This is a nested key",
   },
-  "foo.bar": "This key isn't nested, it just has a dot",
-};
+} as const;
 
 tr.addTranslations("en", trEn);
 
-type MyKeysEn = TrKeys<typeof trEn>; // "hello" | "nested.key" | "foo.bar"
+type MyKeys = TrKeys<typeof trEn>; // "hello" | "nested.key"
 
-// full type safety and autocomplete:
-const t = tr.use<MyKeysEn>("en");
+const t = tr.use<MyKeys>("en");
 ```
 </details>
 
-<!-- #region Colors -->
+<br>
+
+### `type TrObject`
+```ts
+interface TrObject {
+  [key: string]: string | TrObject;
+}
+```
+  
+Translation object to pass to `tr.addTranslations()`.  
+Can be a flat object of identifier keys and translation text values, or an infinitely nestable object containing the same.
+
+<br>
+
+### `type TransformFn`
+```ts
+type TransformFn<TTrKey extends string = string> = (props: TransformFnProps<TTrKey>) => Stringifiable;
+```
+  
+Function that transforms a matched translation string into another string.
+
+<br>
+
+### `type TransformTuple`
+```ts
+type TransformTuple<TTrKey extends string = string> = [RegExp, TransformFn<TTrKey>];
+```
+  
+Transform pattern and function in tuple form, passed to `tr.addTransform()`.
 
 <br><br>
 
-## Colors:
-The color functions are used to manipulate and convert colors in various formats.  
-
-### hexToRgb()
-Signature:  
-```ts
-hexToRgb(hex: string): [red: number, green: number, blue: number, alpha?: number]
-```  
-  
-Converts a hex color string to an RGB or RGBA color tuple array.  
-The values of R, G and B will be in the range of 0-255, while the alpha value will be in the range of 0-1.  
-Accepts the formats `#RRGGBB`, `#RRGGBBAA`, `#RGB` and `#RGBA`, with or without the hash symbol.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { hexToRgb } from "@sv443-network/userutils";
-
-hexToRgb("#aaff85aa"); // [170, 255, 133, 0.6666666666666666]
-hexToRgb("#ff0000");   // [255, 0, 0, undefined]
-hexToRgb("0032ef");    // [0, 50, 239, undefined]
-hexToRgb("#0f0");      // [0, 255, 0, undefined]
-hexToRgb("0f0f");      // [0, 255, 0, 1]
-```
-</details>
-
-<br>
-
-### rgbToHex()
-Signature:  
-```ts
-rgbToHex(red: number, green: number, blue: number, alpha?: number, withHash?: boolean, upperCase?: boolean): string
-```  
-  
-Converts RGB or RGBA color values to a hex color string.  
-The `withHash` parameter determines if the hash symbol should be included in the output (true by default).  
-The `upperCase` parameter determines if the output should be in uppercase (false by default).  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { rgbToHex } from "@sv443-network/userutils";
-
-rgbToHex(255, 0, 0);                        // "#ff0000" (with hash symbol, lowercase)
-rgbToHex(255, 0, 0, 0.5, false);            // "ff000080" (with alpha, no hash symbol, lowercase)
-rgbToHex(255, 0, 0, undefined, true, true); // "#FF0000" (no alpha, with hash symbol, uppercase)
-```
-</details>
-
-<br>
-
-### lightenColor()
-Signature:  
-```ts
-lightenColor(color: string, percent: number, upperCase?: boolean): string
-```  
-  
-Lightens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
-Will not exceed the maximum range (00-FF or 0-255).  
-If the `upperCase` parameter is set to true (default is false), the hex output will be in uppercase.  
-Throws an error if the color format is invalid or not supported.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { lightenColor } from "@sv443-network/userutils";
-
-lightenColor("#ff0000", 20);                // "#ff3333"
-lightenColor("#ff0000", 20, true);          // "#FF3333"
-lightenColor("rgb(0, 255, 0)", 50);       // "rgb(128, 255, 128)"
-lightenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(128, 255, 128, 0.5)"
-```
-</details>
-
-<br>
-
-### darkenColor()
-Signature:  
-```ts
-darkenColor(color: string, percent: number, upperCase?: boolean): string
-```  
-  
-Darkens a CSS color value (in hex, RGB or RGBA format) by a given percentage.  
-Will not exceed the maximum range (00-FF or 0-255).  
-If the `upperCase` parameter is set to true (default is false), the hex output will be in uppercase.  
-Throws an error if the color format is invalid or not supported.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import { darkenColor } from "@sv443-network/userutils";
-
-darkenColor("#ff0000", 20);                // "#cc0000"
-darkenColor("#ff0000", 20, true);          // "#CC0000"
-darkenColor("rgb(0, 255, 0)", 50);       // "rgb(0, 128, 0)"
-darkenColor("rgba(0, 255, 0, 0.5)", 50); // "rgba(0, 128, 0, 0.5)"
-```
-</details>
-
-<br><br>
-
-<!-- #region Utility types -->
-## Utility types:
-UserUtils also offers some utility types that can be used in TypeScript projects.  
-They don't alter the runtime behavior of the code, but they can be used to make the code more readable and to prevent errors.
-
-### Stringifiable
-This type describes any value that either is a string itself or can be converted to a string.  
-To be considered stringifiable, the object needs to have a `toString()` method that returns a string.  
-Most primitives have this method, but something like undefined or null does not.  
-Having this method allows not just explicit conversion by using `.toString()`, but also implicit conversion by passing it into the `String()` constructor or interpolating it in a template literal string.  
-  
-To make an object explicitly *not stringifiable* (so it throws an error when being converted to a string), you can pass it to [`purifyObj()`](#purifyobj) to remove its prototype chain, including the `toString()` method.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import type { Stringifiable } from "@sv443-network/userutils";
-
-function logSomething(value: Stringifiable) {
-  console.log(`Log: ${value}`); // implicit conversion
-}
-
-const fooObject = {
-  toString: () => "hello world",
-};
-
-const barObject = {
-  baz: "",
-};
-
-logSomething("foo");     // "Log: foo"
-logSomething(42);        // "Log: 42"
-logSomething(true);      // "Log: true"
-logSomething(Symbol(1)); // "Log: Symbol(1)"
-logSomething(fooObject); // "Log: hello world"
-logSomething(barObject); // "Log: [object Object]"
-logSomething(new Map()); // "Log: [object Map]"
-
-logSomething(undefined); // Type error
-```
-</details>
-
-<br>
-
-### NonEmptyArray
-Signature:
-```ts
-NonEmptyArray<TItem = unknown>
-```
-  
-This generic type describes an array that has at least one item.  
-Use the generic parameter to specify the type of the items in the array.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import type { NonEmptyArray } from "@sv443-network/userutils";
-
-function logFirstItem(array: NonEmptyArray<string>) {
-  console.log(parseInt(array[0]));
-}
-
-function somethingElse(array: NonEmptyArray) {
-  // array is typed as NonEmptyArray<unknown> when not passing a
-  // generic parameter, so this throws a TS error:
-  console.log(parseInt(array[0])); // Argument of type 'unknown' is not assignable to parameter of type 'string'
-}
-
-logFirstItem(["04abc", "69"]); // 4
-```
-</details>
-
-<br>
-
-### NonEmptyString
-Signature:
-```ts
-NonEmptyString<TString extends string>
-```
-  
-This generic type describes a string that has at least one character.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import type { NonEmptyString } from "@sv443-network/userutils";
-
-function convertToNumber<T extends string>(str: NonEmptyString<T>) {
-  console.log(parseInt(str));
-}
-
-convertToNumber("04abc"); // "4"
-convertToNumber("");      // type error: Argument of type 'string' is not assignable to parameter of type 'never'
-```
-</details>
-
-<br>
-
-### LooseUnion
-Signature:
-```ts
-LooseUnion<TUnion extends string | number | object>
-```
-  
-A generic type that offers autocomplete in the IDE for the passed union but also allows any value of the same type to be passed.  
-Supports unions of strings, numbers and objects.  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import type { LooseUnion } from "@sv443-network/userutils";
-
-function foo(bar: LooseUnion<"a" | "b" | "c">) {
-  console.log(bar);
-}
-
-// when typing the following, autocomplete suggests "a", "b" and "c"
-// foo("
-
-foo("a"); // included in autocomplete, no type error
-foo("");  // *not* included in autocomplete, still no type error
-foo(1);   // type error: Argument of type '1' is not assignable to parameter of type 'LooseUnion<"a" | "b" | "c">'
-```
-</details>
-
-<br>
-
-### Prettify
-Signature:
-```ts
-Prettify<T>
-```
-  
-A generic type that makes TypeScript and your IDE display the type in a more readable way.  
-This is especially useful for types that reference other types or are very complex.  
-It will also make a variable show its type's structure instead of just the type name (see example).  
-  
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import type { Prettify } from "@sv443-network/userutils";
-
-// tooltip shows all constituent types, leaving you to figure it out yourself:
-// type Foo = {
-//   a: number;
-// } & Omit<{
-//   b: string;
-//   c: boolean;
-// }, "c">
-type Foo = {
-  a: number;
-} & Omit<{
-  b: string;
-  c: boolean;
-}, "c">;
-
-// tooltip shows just the type name, making you manually traverse to the type definition:
-// const foo: Foo
-const foo: Foo = {
-  a: 1,
-  b: "2"
-};
-
-// now with Prettify, the tooltips show the actual type structure:
-
-// type Bar = {
-//   a: number;
-//   b: string;
-// }
-type Bar = Prettify<Foo>;
-
-// const bar: {
-//   a: number;
-//   b: string;
-// }
-const bar: Bar = {
-  a: 1,
-  b: "2"
-};
-```
-</details>
-
-<br><br>
-
-### ValueGen
-Signature:
-```ts
-ValueGen<TValueType>
-```
-  
-Describes a value that can be obtained in various ways, including via the type itself, a function that returns the type, a Promise that resolves to the type or either a sync or an async function that returns the type.  
-Use it in the [`consumeGen()`](#consumegen) function to convert the given ValueGen value to the type it represents. Also refer to that function for an example.  
-
-<br><br>
-
-### StringGen
-Signature:
-```ts
-StringGen<TStrUnion>
-```
-  
-Describes a string that can be obtained in various ways, including via a [`Stringifiable`](#stringifiable) value, a function that returns a [`Stringifiable`](#stringifiable) value, a Promise that resolves to a [`Stringifiable`](#stringifiable) value or either a sync or an async function that returns a [`Stringifiable`](#stringifiable) value.  
-Remember that [`Stringifiable`](#stringifiable) is a type that describes a value that either is a string itself or can be converted to a string implicitly using `toString()`, template literal interpolation, or by passing it to `String()`, giving you the utmost flexibility in how the string can be passed.  
-  
-Contrary to [`ValueGen`](#valuegen), this type allows for specifying a union of strings that the StringGen should yield, as long as it is loosely typed as just `string`.  
-Use it in the [`consumeStringGen()`](#consumestringgen) function to convert the given StringGen value to a plain string. Also refer to that function for an example.
-
-<br>
-
-### ListWithLength
-Represents a value that is either an array, NodeList, or any other object that has a numeric `length`, `count` or `size` property.  
-Iterables are not included because they don't have a length property. They need to be converted to an array first using `Array.from()` or `[...iterable]`.  
-
-<details><summary><b>Example - click to view</b></summary>
-
-```ts
-import type { ListWithLength } from "@sv443-network/userutils";
-
-function getSize(list: ListWithLength) {
-  let size = -1;
-  if("length" in list)
-    size = list.length;
-  else if("count" in list)
-    size = list.count;
-  else if("size" in list)
-    size = list.size;
-
-  return size;
-}
-
-getSize([1, 2, 3]); // 3
-getSize(document.querySelectorAll("div")); // 5
-getSize(new Map([["a", 1], ["b", 2]])); // 2
-getSize({ count: 42 }); // 42
-
-// iterables need to be converted:
-const iter = new Map([["a", 1]]).entries();
-getSize([...iter]); // 1
-```
-</details>
-
-<br><br>
-
+<!-- #region Error classes -->
 ## Error classes:
-UserUtils has some custom error classes that make it easier to handle specific types of errors.  
-All of them extend the built-in `Error` class and have a `date` property that contains the date and time when the error was created.  
-These classes are intended to be used by the library, but if you find them useful, you can import them and throw them in your own code as well.  
+
+### `class PlatformError`
+Signature:
+```ts
+class PlatformError extends DatedError;
+```
   
-<br>
+Usage:
+```ts
+throw new PlatformError(message: string, options?: ErrorOptions);
+```
+  
+Thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment.  
+Extends from [`DatedError`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datederror), which has a `date` property that contains the date and time when the error was created.  
+  
+<details><summary><b>Example - click to view</b></summary>
 
-### UUError
-Base class for all UserUtils errors.  
-Extends from the built-in `Error` class.  
-Has the custom property `date` that holds the date and time when the error was created.
+```ts
+import { PlatformError } from "@sv443-network/userutils";
 
-<br>
-
-### ChecksumMismatchError
-Thrown when a checksum verification fails.  
-Extends from the `UUError` class.
-
-<br>
-
-### MigrationError
-Thrown when a data migration fails.  
-Extends from the `UUError` class.
-
-<br>
-
-### PlatformError
-Thrown when a platform-specific error occurs, like when a browser API call fails, or the browser doesn't support a feature at all.  
-Extends from the `UUError` class.
+if(typeof document === "undefined")
+  throw new PlatformError("This feature requires a DOM environment");
+```
+</details>
 
 <br><br><br><br>
 
@@ -3938,5 +1712,3 @@ Made with ❤️ by [Sv443](https://github.com/Sv443)
 If you like this library, please consider [supporting development](https://github.com/sponsors/Sv443)
 
 </div>
-
-<br><br><br><br>
