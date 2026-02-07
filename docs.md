@@ -283,9 +283,9 @@ The Dialog class inherits from [`NanoEmitter`](https://github.com/Sv443-Network/
 | :-- | :-- | :-- |
 | `close` | - | Emitted just **after** the dialog is closed |
 | `open` | - | Emitted just **after** the dialog is opened |
-| `render` | - | Emitted just **after** the dialog contents are rendered | |
-| `clear` | - | Emitted just **after** the dialog contents are cleared | |
-| `destroy` | - | Emitted just **after** the dialog is destroyed and **
+| `render` | - | Emitted just **after** the dialog contents are rendered |
+| `clear` | - | Emitted just **after** the dialog contents are cleared |
+| `destroy` | - | Emitted just **after** the dialog is destroyed and all listeners are removed |
 
 <br>
 
@@ -427,7 +427,9 @@ class SelectorObserver;
   
 Usage:
 ```ts
+// using a valid, mounted Element as the base element:
 new SelectorObserver(baseElement: Element, options?: SelectorObserverConstructorOptions);
+// using a selector string to find the base element when needed:
 new SelectorObserver(baseElementSelector: string, options?: SelectorObserverConstructorOptions);
 ```
   
@@ -436,7 +438,7 @@ It is useful for userscripts that need to wait for elements to be added to the D
 By default, it uses the MutationObserver API to observe for any element changes, and as such is highly customizable, but can also be configured to run on a fixed interval.  
   
 The constructor takes a `baseElement`, which is a parent of the elements you want to observe.  
-If a selector string is passed instead, it will be used to find the element.  
+If a selector string is passed instead, it will be used to find the element as soon as observation is enabled.  
 If you want to observe the entire document, you can pass `document.body` - ⚠️ you should only use this to initialize other SelectorObserver instances, and never run continuous listeners on this instance, as the performance impact can be massive!  
   
 The `options` parameter is optional and will be passed to the MutationObserver that is used internally.  
@@ -1100,6 +1102,7 @@ const engine = new GMStorageEngine(options?: GMStorageEngineOptions);
 ```
   
 Storage engine for the [`DataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) class that uses GreaseMonkey's `GM.getValue` and `GM.setValue` functions.  
+This class can also be used standalone for an abstracted, uniform interface to GM storage, but is primarily intended to be used as a storage engine for DataStore.  
 Refer to the [DataStore documentation](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) for more information on how to use DataStore and storage engines.  
   
 - ⚠️ Requires the grants `GM.getValue`, `GM.setValue`, `GM.deleteValue`, and `GM.listValues` in your userscript metadata.
