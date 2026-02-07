@@ -1,4 +1,5 @@
 import { DataStoreEngine, type DataStoreData, type DataStoreEngineDSOptions, type SerializableVal } from "@sv443-network/coreutils";
+import { PlatformError } from "./Errors.js";
 
 /** Options for the {@linkcode GMStorageEngine} class */
 export type GMStorageEngineOptions = {
@@ -34,6 +35,8 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Fetches a value from persistent storage */
   public async getValue<TValue extends SerializableVal = string>(name: string, defaultValue: TValue): Promise<string | TValue> {
     try {
+      if(typeof GM === "undefined")
+        throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
       const value = await GM.getValue(name, defaultValue);
       return value === undefined ? defaultValue : value;
     }
@@ -46,6 +49,8 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Sets a value in persistent storage */
   public async setValue<TValue extends SerializableVal = string>(name: string, value: TValue): Promise<void> {
     try {
+      if(typeof GM === "undefined")
+        throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
       await GM.setValue(name, value as GM.Value);
     }
     catch(err) {
@@ -57,6 +62,8 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Deletes a value from persistent storage */
   public async deleteValue(name: string): Promise<void> {
     try {
+      if(typeof GM === "undefined")
+        throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
       await GM.deleteValue(name);
     }
     catch(err) {
@@ -68,6 +75,8 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Deletes the file that contains the data of this DataStore. */
   public async deleteStorage(): Promise<void> {
     try {
+      if(typeof GM === "undefined")
+        throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
       const keys = await GM.listValues();
       for(const key of keys) {
         await GM.deleteValue(key);
