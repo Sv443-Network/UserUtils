@@ -36,40 +36,40 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
 - [**Preamble** (info about the documentation)](#preamble)
 - [**UserUtils Features**](#features)
   - [**DOM:**](#dom)
-    - 🟧 [`Dialog`](#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
-    - 🟧 [`SelectorObserver`](#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
-    - 🟣 [`getUnsafeWindow()`](#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - 🟣 [`isDomLoaded()`](#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
-    - 🟣 [`onDomLoad()`](#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
-    - 🟣 [`addParent()`](#function-addparent) - add a parent element around another element
-    - 🟣 [`addGlobalStyle()`](#function-addglobalstyle) - add a global style to the page
-    - 🟣 [`preloadImages()`](#function-preloadimages) - preload images into the browser cache for faster loading later on
-    - 🟣 [`openInNewTab()`](#function-openinnewtab) - open a link in a new tab
-    - 🟣 [`interceptEvent()`](#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-    - 🟣 [`interceptWindowEvent()`](#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-    - 🟣 [`isScrollable()`](#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
-    - 🟣 [`observeElementProp()`](#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
-    - 🟣 [`getSiblingsFrame()`](#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
-    - 🟣 [`setInnerHtmlUnsafe()`](#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
-    - 🟣 [`probeElementStyle()`](#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
+    - 🟧 [`class Dialog`](#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - 🟧 [`class SelectorObserver`](#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
+    - 🟣 [`function getUnsafeWindow()`](#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - 🟣 [`function isDomLoaded()`](#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
+    - 🟣 [`function onDomLoad()`](#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
+    - 🟣 [`function addParent()`](#function-addparent) - add a parent element around another element
+    - 🟣 [`function addGlobalStyle()`](#function-addglobalstyle) - add a global style to the page
+    - 🟣 [`function preloadImages()`](#function-preloadimages) - preload images into the browser cache for faster loading later on
+    - 🟣 [`function openInNewTab()`](#function-openinnewtab) - open a link in a new tab
+    - 🟣 [`function interceptEvent()`](#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+    - 🟣 [`function interceptWindowEvent()`](#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+    - 🟣 [`function isScrollable()`](#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
+    - 🟣 [`function observeElementProp()`](#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - 🟣 [`function getSiblingsFrame()`](#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+    - 🟣 [`function setInnerHtmlUnsafe()`](#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+    - 🟣 [`function probeElementStyle()`](#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
   - [**Misc:**](#misc)
-    - 🟧 [`GMStorageEngine`](#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
-    - 🟧 [`Mixins`](#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+    - 🟧 [`class GMStorageEngine`](#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
+    - 🟧 [`class Mixins`](#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
   - [**Translation:**](#translation)
-    - 🟣 [`tr.for()`](#function-trfor) - translates a key for the specified language
-    - 🟣 [`tr.use()`](#function-truse) - creates a translation function for the specified language
-    - 🟣 [`tr.hasKey()`](#function-trhaskey) - checks if a key exists in the given language
-    - 🟣 [`tr.addTranslations()`](#function-traddtranslations) - add a flat or recursive translation object for a language
-    - 🟣 [`tr.getTranslations()`](#function-trgettranslations) - returns the translation object for a language
-    - 🟣 [`tr.deleteTranslations()`](#function-trdeletetranslations) - delete the translation object for a language
-    - 🟣 [`tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
-    - 🟣 [`tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
-    - 🟣 [`tr.addTransform()`](#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
-    - 🟣 [`tr.deleteTransform()`](#function-trdeletetransform) - removes a transform function
-    - 🟩 [`tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
-    - 🔷 [`TrKeys`](#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
+    - 🟣 [`function tr.for()`](#function-trfor) - translates a key for the specified language
+    - 🟣 [`function tr.use()`](#function-truse) - creates a translation function for the specified language
+    - 🟣 [`function tr.hasKey()`](#function-trhaskey) - checks if a key exists in the given language
+    - 🟣 [`function tr.addTranslations()`](#function-traddtranslations) - add a flat or recursive translation object for a language
+    - 🟣 [`function tr.getTranslations()`](#function-trgettranslations) - returns the translation object for a language
+    - 🟣 [`function tr.deleteTranslations()`](#function-trdeletetranslations) - delete the translation object for a language
+    - 🟣 [`function tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
+    - 🟣 [`function tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
+    - 🟣 [`function tr.addTransform()`](#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+    - 🟣 [`function tr.deleteTransform()`](#function-trdeletetransform) - removes a transform function
+    - 🟩 [`const tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - 🔷 [`type TrKeys`](#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
   - [**Custom Error classes**](#error-classes)
-    - 🟧 [`PlatformError`](#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
+    - 🟧 [`class PlatformError`](#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
 - [**CoreUtils Features** (re-exported for backwards compatibility)](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#table-of-contents)
   - [**Array:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#array)
     - 🟣 [`function randomItem()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomitem) - Returns a random item from the given array
