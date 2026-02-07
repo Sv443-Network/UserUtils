@@ -133,15 +133,17 @@ export function interceptEvent<
   predicate: (event: TPredicateEvt) => boolean = () => true,
 ): void {
   // @ts-expect-error
+  // @ts-expect-error
   if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
     throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript is forced to run in.");
 
   // default is 25 on FF so this should hopefully be more than enough
-  if(isNaN(Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100)))
+  Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100);
+  if(isNaN(Error.stackTraceLimit))
     Error.stackTraceLimit = 100;
 
   (function(original: typeof eventObject.addEventListener) {
-    // @ts-expect-error
+    // @ts-expect-error TS never likes proto fiddling
     eventObject.__proto__.addEventListener = function(...args: Parameters<typeof eventObject.addEventListener>) {
       const origListener = typeof args[1] === "function" ? args[1] : args[1]?.handleEvent ?? (() => void 0);
       args[1] = function(...a) {
@@ -152,7 +154,7 @@ export function interceptEvent<
       };
       original.apply(this, args);
     };
-    // @ts-expect-error
+    // @ts-expect-error same as above
   })(eventObject.__proto__.addEventListener);
 }
 
@@ -207,13 +209,13 @@ export function observeElementProp<
     const descriptor = Object.getOwnPropertyDescriptor(elementPrototype, property);
     Object.defineProperty(element, property, {
       get: function() {
-        // @ts-expect-error
+        // @ts-expect-error generic typing issue
         // eslint-disable-next-line prefer-rest-params
         return descriptor?.get?.apply(this, arguments);
       },
       set: function() {
         const oldValue = this[property];
-        // @ts-expect-error
+        // @ts-expect-error generic typing issue
         // eslint-disable-next-line prefer-rest-params
         descriptor?.set?.apply(this, arguments);
         const newValue = this[property];
@@ -285,12 +287,13 @@ let ttPolicy: { createHTML: (html: string) => string } | undefined;
  * Uses a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) on Chromium-based browsers to trick the browser into thinking the HTML is safe.  
  * Use this if the page makes use of the CSP directive `require-trusted-types-for 'script'` and throws a "This document requires 'TrustedHTML' assignment" error on Chromium-based browsers.  
  *   
- * - ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities!
+ * - ⚠️ This function does not perform any sanitization and should thus be used with utmost caution, as it can easily lead to XSS vulnerabilities when used with untrusted input!
+ * - ⚠️ Only use this function when absolutely necessary, prefer using `element.textContent = "foo"` or other safer alternatives like the [DOMPurify library](https://github.com/cure53/DOMPurify) whenever possible.
  */
 export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(element: TElement, html: string): TElement {
-  // @ts-expect-error
+  // @ts-expect-error TrustedTypes API is not in lib.dom.ts yet
   if(!ttPolicy && typeof window?.trustedTypes?.createPolicy === "function") {
-    // @ts-expect-error
+    // @ts-expect-error see above
     ttPolicy = window.trustedTypes.createPolicy("_uu_set_innerhtml_unsafe", {
       createHTML: (unsafeHtml: string) => unsafeHtml,
     });

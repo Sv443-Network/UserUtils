@@ -13,13 +13,13 @@ export type MixinObj<TArg, TCtx> = Prettify<
   | MixinObjAsync<TArg, TCtx>
 >;
 
-/** Asynchronous mixin object, as it is stored in the instance's mixin array. */
+/** Synchronous mixin object, as it is stored in the instance's mixin array. */
 export type MixinObjSync<TArg, TCtx> = Prettify<{
   /** The mixin function */
   fn: (arg: TArg, ctx?: TCtx) => TArg;
 } & MixinObjBase>;
 
-/** Synchronous mixin object, as it is stored in the instance's mixin array. */
+/** Asynchronous mixin object, as it is stored in the instance's mixin array. */
 export type MixinObjAsync<TArg, TCtx> = Prettify<{
   /** The mixin function */
   fn: (arg: TArg, ctx?: TCtx) => TArg | Promise<TArg>;
@@ -41,7 +41,7 @@ export type MixinConfig = {
   signal?: AbortSignal;
 }
 
-/** Configuration object for the Mixins class */
+/** Configuration object for the {@linkcode Mixins} class */
 export type MixinsConstructorConfig = {
   /**
    * If true, when no priority is specified, an auto-incrementing integer priority will be used, starting at `defaultPriority` or 0 (unique per mixin key). Defaults to false.  
@@ -63,8 +63,8 @@ export type MixinsConstructorConfig = {
 /**
  * The mixin class allows for defining and applying mixin functions to allow multiple sources to modify values in a controlled way.  
  * Mixins are identified via their string key and can be added with {@linkcode add()}  
- * When calling {@linkcode resolve()}, all registered mixin functions with the same key will be applied to the input value in the order of their priority.  
- * If a mixin has the stopPropagation flag set to true, no further mixins will be applied after it.  
+ * When calling {@linkcode resolve()}, all registered mixin functions with the same key will be applied to the input value in the order of their priority, or alternatively the order they were added.  
+ * If a mixin function has its `stopPropagation` flag set to true when being added, no further mixin functions will be applied after it.  
  * @template TMixinMap A map of mixin keys to their respective function signatures. The first argument of the function is the input value, the second argument is an optional context object. If it is defined here, it must be passed as the third argument in {@linkcode resolve()}.
  * @example ```ts
  * const ac = new AbortController();
@@ -175,7 +175,7 @@ export class Mixins<
   /**
    * Applies all mixins with the given key to the input value, respecting the priority and stopPropagation settings.  
    * If additional context is set in the MixinMap, it will need to be passed as the third argument.  
-   * @returns The modified value after all mixins have been applied.
+   * @returns The modified value after all mixins have been applied. The method will return a Promise if at least one of the mixins is async. If all mixins are indicated to be synchronous in TS, but at least one of them turns out to be asynchronous, the return type will be a Promise. With `await`, this will not make a difference, but `.then().catch()` could be affected.
    */
   public resolve<
     TKey extends TMixinKey,
@@ -194,7 +194,7 @@ export class Mixins<
     for(let i = 0; i < sortedMixins.length; i++) {
       const mixin = sortedMixins[i]!;
       result = mixin.fn(result, ...inputCtx);
-      if(result as unknown instanceof Promise) {
+      if((result as unknown) instanceof Promise) {
         // if one of the mixins is async, switch to async resolution:
         return (async () => {
           result = await result;
@@ -241,7 +241,10 @@ export class Mixins<
     return prio;
   }
 
-  /** Removes all mixins with the given key */
+  /**
+   * Removes all mixins with the given key.  
+   * Note: this method is protected to avoid third-party code from removing mixins. If needed, you can extend the Mixins class and expose this method publicly.
+   */
   protected removeAll(mixinKey: TMixinKey): void {
     this.mixins.filter((m) => m.key === mixinKey);
     this.mixins = this.mixins.filter((m) => m.key !== mixinKey);

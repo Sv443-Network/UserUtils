@@ -1,5 +1,24 @@
 # @sv443-network/userutils
 
+## 9.4.4
+
+### Patch Changes
+
+- e8846b5: Fixed infinite recursion in `translate()` when using `setFallbackLanguage()`
+- 59011c1: Removed package.json engines field
+
+## 9.4.3
+
+### Patch Changes
+
+- 528e09c: Fix `can't convert trArgs[0] to string` error
+
+## 9.4.2
+
+### Patch Changes
+
+- 7f67cfb: Fixed compatibility for translations with multiple transform function matches
+
 ## 9.4.1
 
 ### Patch Changes
