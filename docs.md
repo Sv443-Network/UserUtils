@@ -66,7 +66,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - 🟣 [`tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
     - 🟣 [`tr.addTransform()`](#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
     - 🟣 [`tr.deleteTransform()`](#function-trdeletetransform) - removes a transform function
-    - ⬜ [`tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - 🟩 [`tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
     - 🔷 [`TrKeys`](#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
   - [**Custom Error classes**](#error-classes)
     - 🟧 [`PlatformError`](#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
@@ -151,7 +151,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - 🟣 [`function autoPlural()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-autoplural) - Turns the given term into its plural form, depending on the given number or list length
     - 🟣 [`function capitalize()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-capitalize) - Capitalizes the first letter of the given string
     - 🟣 [`function createProgressBar()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-createprogressbar) - Creates a progress bar string with the given percentage and length
-      - ⬜ [`const defaultPbChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#const-defaultpbchars) - Default characters for the progress bar
+      - 🟩 [`const defaultPbChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#const-defaultpbchars) - Default characters for the progress bar
       - 🔷 [`type ProgressBarChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-progressbarchars) - Type for the progress bar characters object
     - 🟣 [`function joinArrayReadable()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-joinarrayreadable) - Joins the given array into a string, using the given separators and last separator
     - 🟣 [`function secsToTimeStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-secstotimestr) - Turns the given number of seconds into a string in the format `(hh:)mm:ss` with intelligent zero-padding
@@ -186,7 +186,7 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
 > 🟣 = function  
 > 🟧 = class  
 > 🔷 = type  
-> ⬜ = const
+> 🟩 = const
 
 <br><br><br>
 
