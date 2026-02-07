@@ -4,11 +4,7 @@ Contains builtin TypeScript declarations. Supports ESM and CJS imports via a bun
 The library works in any DOM environment with or without the [GreaseMonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API), but some features will be unavailable or limited.  
   
 You may want to check out my [template for userscripts in TypeScript](https://github.com/Sv443/Userscript.ts) that you can use to get started quickly. It also includes this library by default.  
-If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)  
-  
-> [!NOTE]  
-> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
-> They are still re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.
+If you like using this library, please consider [supporting the development ❤️](https://github.com/sponsors/Sv443)
 
 <br>
 
@@ -27,7 +23,11 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
 Those will be listed in a section marked by a warning emoji (⚠️) each.  
   
 If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
-For submitting bug reports or feature requests, please use the [GitHub issue tracker.](https://github.com/Sv443-Network/UserUtils/issues)
+For submitting bug reports or feature requests, please use the [GitHub issue tracker.](https://github.com/Sv443-Network/UserUtils/issues)  
+  
+> [!NOTE]  
+> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
 
 <br>
 
@@ -642,7 +642,7 @@ See the table in that section for more details.
 
 <br><br>
 
-### `function getUnsafeWindow`
+### `function getUnsafeWindow()`
 Signature:
 ```ts
 function getUnsafeWindow(): Window;
@@ -671,7 +671,7 @@ document.body.dispatchEvent(mouseEvent);
 
 <br><br>
 
-### `function isDomLoaded`
+### `function isDomLoaded()`
 Signature:
 ```ts
 function isDomLoaded(): boolean;
@@ -696,7 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <br><br>
 
-### `function onDomLoad`
+### `function onDomLoad()`
 Signature:
 ```ts
 function onDomLoad(cb?: () => void): Promise<void>;
@@ -727,7 +727,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 <br><br>
 
-### `function addParent`
+### `function addParent()`
 Signature:
 ```ts
 function addParent<TElem extends Element, TParentElem extends Element>(
@@ -756,7 +756,7 @@ addParent(element, newParent);
 
 <br><br>
 
-### `function addGlobalStyle`
+### `function addGlobalStyle()`
 Signature:
 ```ts
 function addGlobalStyle(style: string): HTMLStyleElement;
@@ -784,7 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <br><br>
 
-### `function preloadImages`
+### `function preloadImages()`
 Signature:
 ```ts
 function preloadImages(srcUrls: string[], rejects?: boolean): Promise<PromiseSettledResult<HTMLImageElement>[]>;
@@ -812,7 +812,7 @@ preloadImages([
 
 <br><br>
 
-### `function openInNewTab`
+### `function openInNewTab()`
 Signature:
 ```ts
 function openInNewTab(href: string, background?: boolean, additionalProps?: Partial<HTMLAnchorElement>): void;
@@ -838,7 +838,7 @@ document.querySelector("#my-button").addEventListener("click", () => {
 
 <br><br>
 
-### `function interceptEvent`
+### `function interceptEvent()`
 Signature:
 ```ts
 function interceptEvent<
@@ -876,7 +876,7 @@ interceptEvent(document.body, "click", (event) => {
 
 <br><br>
 
-### `function interceptWindowEvent`
+### `function interceptWindowEvent()`
 Signature:
 ```ts
 function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
@@ -909,7 +909,7 @@ interceptWindowEvent("contextmenu", (event) =>
 
 <br><br>
 
-### `function isScrollable`
+### `function isScrollable()`
 Signature:
 ```ts
 function isScrollable(element: Element): Record<"vertical" | "horizontal", boolean>;
@@ -935,7 +935,7 @@ console.log("Element has a vertical scroll bar:", vertical);
 
 <br><br>
 
-### `function observeElementProp`
+### `function observeElementProp()`
 Signature:
 ```ts
 function observeElementProp<
@@ -969,7 +969,7 @@ observeElementProp(myInput, "value", (oldValue, newValue) => {
 
 <br><br>
 
-### `function getSiblingsFrame`
+### `function getSiblingsFrame()`
 Signature:
 ```ts
 function getSiblingsFrame<TSibling extends Element = HTMLElement>(
@@ -1012,7 +1012,7 @@ const siblings = getSiblingsFrame(refElement, 3, "top", true);
 
 <br><br>
 
-### `function setInnerHtmlUnsafe`
+### `function setInnerHtmlUnsafe()`
 Signature:
 ```ts
 function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(
@@ -1040,7 +1040,7 @@ setInnerHtmlUnsafe(myElement, "<img src='https://picsum.photos/100/100' />");
 
 <br><br>
 
-### `function probeElementStyle`
+### `function probeElementStyle()`
 Signature:
 ```ts
 function probeElementStyle<
@@ -1299,7 +1299,7 @@ Configuration object for an individual mixin function.
 <!-- #region Translation -->
 ## Translation:
 
-### `function tr.for`
+### `function tr.for()`
 Signature:
 ```ts
 function tr.for<TTrKey extends string = string>(
@@ -1331,7 +1331,7 @@ tr.for("de", "hello"); // "Hallo, Welt!"
 
 <br><br>
 
-### `function tr.use`
+### `function tr.use()`
 Signature:
 ```ts
 function tr.use<TTrKey extends string = string>(
@@ -1361,7 +1361,7 @@ t("hello"); // "Hello, World!"
 
 <br><br>
 
-### `function tr.hasKey`
+### `function tr.hasKey()`
 Signature:
 ```ts
 function tr.hasKey<TTrKey extends string = string>(
@@ -1387,7 +1387,7 @@ tr.hasKey("en", "goodbye"); // false
 
 <br><br>
 
-### `function tr.addTranslations`
+### `function tr.addTranslations()`
 Signature:
 ```ts
 function tr.addTranslations(language: string, translations: TrObject): void;
@@ -1417,7 +1417,7 @@ t("nested.key"); // "This is a nested key"
 
 <br><br>
 
-### `function tr.getTranslations`
+### `function tr.getTranslations()`
 Signature:
 ```ts
 function tr.getTranslations(language?: string): TrObject | undefined;
@@ -1440,7 +1440,7 @@ tr.getTranslations("de"); // undefined
 
 <br><br>
 
-### `function tr.deleteTranslations`
+### `function tr.deleteTranslations()`
 Signature:
 ```ts
 function tr.deleteTranslations(language: string): boolean;
@@ -1462,7 +1462,7 @@ tr.deleteTranslations("de"); // false
 
 <br><br>
 
-### `function tr.setFallbackLanguage`
+### `function tr.setFallbackLanguage()`
 Signature:
 ```ts
 function tr.setFallbackLanguage(fallbackLanguage?: string): void;
@@ -1490,7 +1490,7 @@ t("goodbye"); // "Goodbye!" (falls back to "en")
 
 <br><br>
 
-### `function tr.getFallbackLanguage`
+### `function tr.getFallbackLanguage()`
 Signature:
 ```ts
 function tr.getFallbackLanguage(): string | undefined;
@@ -1513,7 +1513,7 @@ tr.getFallbackLanguage(); // "en"
 
 <br><br>
 
-### `function tr.addTransform`
+### `function tr.addTransform()`
 Signature:
 ```ts
 function tr.addTransform<TTrKey extends string = string>(
@@ -1555,7 +1555,7 @@ t("greeting", "John");           // "Hello, John!"
 
 <br><br>
 
-### `function tr.deleteTransform`
+### `function tr.deleteTransform()`
 Signature:
 ```ts
 function tr.deleteTransform(patternOrFn: RegExp | TransformFn): boolean;

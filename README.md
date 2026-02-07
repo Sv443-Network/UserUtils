@@ -11,10 +11,8 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 
 <br>
 
-[![Tree shaking support badge](https://badgen.net/bundlephobia/tree-shaking/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
 [![Code coverage percentage badge](https://img.shields.io/coverallsCoverage/github/Sv443-Network/UserUtils?branch=main)](https://coveralls.io/github/Sv443-Network/UserUtils)
-[![Minified bundle size badge](https://badgen.net/bundlephobia/min/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
-[![Minified and gzipped bundle size badge](https://badgen.net/bundlephobia/minzip/@sv443-network/userutils)](https://bundlephobia.com/package/@sv443-network/userutils)
+[![Bundle size badge](https://deno.bundlejs.com/badge?q=@sv443-network/userutils@latest)](https://bundlejs.com/?q=%40sv443-network%2Fuserutils%40latest)
 
 [![Discord server badge](https://badgen.net/discord/online-members/aBH4uRG?icon=discord)](https://dc.sv443.net/)
 [![Github stargazers badge](https://badgen.net/github/stars/Sv443-Network/UserUtils?icon=github)](https://github.com/Sv443-Network/UserUtils/stargazers)
@@ -29,7 +27,14 @@ View the documentation of previous major versions:
 
 </sub>
 
+<br>
+
 </div>
+
+> [!NOTE]  
+> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
+
 <br>
 
 <!-- #region Table of Contents -->
