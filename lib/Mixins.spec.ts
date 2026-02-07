@@ -14,15 +14,6 @@ class TestMixins<
   }
 }
 
-class TestMixins<
-  TMixinMap extends Record<string, (arg: any, ctx?: any) => any>,
-  TMixinKey extends Extract<keyof TMixinMap, string> = Extract<keyof TMixinMap, string>,
-> extends Mixins<TMixinMap, TMixinKey> {
-  public removeAll(key: TMixinKey) {
-    super.removeAll(key);
-  }
-}
-
 describe("Mixins", () => {
   //#region base
   it("Base resolution", () => {
@@ -45,7 +36,7 @@ describe("Mixins", () => {
     expect(mixins.list()).toHaveLength(3);
     expect(mixins.list().every(m => m.key === "foo")).toBe(true);
 
-    mixins.removeAll("foo");
+    mixins.test_removeAll("foo");
     expect(mixins.list()).toHaveLength(0);
   });
 

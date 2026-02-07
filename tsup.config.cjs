@@ -1,5 +1,4 @@
 import { defineConfig } from "tsup";
-import umdWrapper from "esbuild-plugin-umd-wrapper";
 import { dependencies } from "./package.json";
 import { createUmdWrapper } from "./tools/umdWrapperPlugin.cjs";
 

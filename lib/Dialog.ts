@@ -163,6 +163,7 @@ export let currentDialogId: string | null = null;
 /** IDs of all currently open dialogs, top-most first */
 export const openDialogs: string[] = [];
 
+/** Default English strings used in the Dialog */
 export const defaultStrings = {
   closeDialogTooltip: "Click to close the dialog",
 };

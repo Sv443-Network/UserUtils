@@ -118,6 +118,13 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
 
 //#region interceptEvent
 
+/** Add stackTraceLimit to ErrorConstructor */
+declare global {
+  interface ErrorConstructor {
+    stackTraceLimit: number;
+  }
+}
+
 /**
  * Intercepts the specified event on the passed object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
  * If no predicate is specified, all events will be discarded.  
@@ -133,14 +140,15 @@ export function interceptEvent<
   predicate: (event: TPredicateEvt) => boolean = () => true,
 ): void {
   // @ts-expect-error
-  // @ts-expect-error
   if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
     throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript is forced to run in.");
 
   // default is 25 on FF so this should hopefully be more than enough
-  Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100);
-  if(isNaN(Error.stackTraceLimit))
-    Error.stackTraceLimit = 100;
+  if("stackTraceLimit" in Error) {
+    Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100);
+    if(isNaN(Error.stackTraceLimit))
+      Error.stackTraceLimit = 100;
+  }
 
   (function(original: typeof eventObject.addEventListener) {
     // @ts-expect-error TS never likes proto fiddling
