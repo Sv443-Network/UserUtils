@@ -1,6 +1,6 @@
 import { defineConfig } from "tsup";
 import { dependencies } from "./package.json";
-import { createUmdWrapper } from "./tools/umdWrapperPlugin.cjs";
+import { createUmdWrapper } from "./tools/umdWrapperPlugin.mjs";
 
 /** @typedef {import('tsup').Options} TsupOpts */
 

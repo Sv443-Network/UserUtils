@@ -17,7 +17,7 @@ export type GMStorageEngineOptions = {
  * - ⚠️ Don't reuse engine instances, always create a new one for each {@linkcode DataStore} instance.
  */
 export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngine<TData> {
-  protected options: GMStorageEngineOptions;// & Required<Pick<GMStorageEngineOptions, "extraPropFoo">>;
+  protected options: GMStorageEngineOptions;
 
   /**
    * Creates an instance of `GMStorageEngine`.  
@@ -35,9 +35,9 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Fetches a value from persistent storage */
   public async getValue<TValue extends SerializableVal = string>(name: string, defaultValue: TValue): Promise<string | TValue> {
     try {
-      if(typeof GM === "undefined")
+      if(!("GM" in globalThis))
         throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
-      const value = await GM.getValue(name, defaultValue);
+      const value = await globalThis.GM.getValue(name, defaultValue);
       return value === undefined ? defaultValue : value;
     }
     catch(err) {
@@ -49,9 +49,9 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Sets a value in persistent storage */
   public async setValue<TValue extends SerializableVal = string>(name: string, value: TValue): Promise<void> {
     try {
-      if(typeof GM === "undefined")
+      if(!("GM" in globalThis))
         throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
-      await GM.setValue(name, value as GM.Value);
+      await globalThis.GM.setValue(name, value as GM.Value);
     }
     catch(err) {
       console.error(`Error setting value for key "${name}":`, err);
@@ -62,9 +62,9 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
   /** Deletes a value from persistent storage */
   public async deleteValue(name: string): Promise<void> {
     try {
-      if(typeof GM === "undefined")
+      if(!("GM" in globalThis))
         throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
-      await GM.deleteValue(name);
+      await globalThis.GM.deleteValue(name);
     }
     catch(err) {
       console.error(`Error deleting value for key "${name}":`, err);
@@ -72,15 +72,14 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
     }
   }
 
-  /** Deletes the file that contains the data of this DataStore. */
+  /** Deletes all values from GM storage. Use with caution! */
   public async deleteStorage(): Promise<void> {
     try {
-      if(typeof GM === "undefined")
+      if(!("GM" in globalThis))
         throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
-      const keys = await GM.listValues();
-      for(const key of keys) {
-        await GM.deleteValue(key);
-      }
+      const keys = await globalThis.GM.listValues();
+      for(const key of keys)
+        await globalThis.GM.deleteValue(key);
     }
     catch(err) {
       console.error("Error deleting storage:", err);

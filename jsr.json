@@ -7,11 +7,9 @@
   },
   "publish": {
     "include": [
-      "./dist/index.cjs",
-      "./dist/index.global.js",
-      "./dist/index.js",
-      "./dist/index.mjs",
-      "./dist/index.umd.js",
+      "./dist/UserUtils.cjs",
+      "./dist/UserUtils.mjs",
+      "./dist/UserUtils.umd.js",
       "./dist/lib/*.d.ts",
       "./lib/**/*.ts",
       "./CHANGELOG.md",

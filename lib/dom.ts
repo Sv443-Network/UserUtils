@@ -64,7 +64,7 @@ export function preloadImages(srcUrls: string[], rejects = false): Promise<Promi
   const promises = srcUrls.map(src => new Promise<HTMLImageElement>((res, rej) => {
     const image = new Image();
     image.addEventListener("load", () => res(image), { once: true });
-    image.addEventListener("error", (evt) => rejects && rej(evt), { once: true });
+    image.addEventListener("error", (evt) => rejects ? rej(evt) : res(image), { once: true });
     image.src = src;
   }));
 
@@ -355,8 +355,8 @@ export function probeElementStyle<
 
 //#region isDomLoaded
 
-let domReady = false;
-document.addEventListener("DOMContentLoaded", () => domReady = true, { once: true });
+let domReady = document.readyState !== "loading";
+!domReady && document.addEventListener("DOMContentLoaded", () => domReady = true, { once: true });
 
 /** Returns whether or not the DOM has finished loading */
 export function isDomLoaded(): boolean {

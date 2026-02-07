@@ -1,7 +1,6 @@
 import { DataStore, type SerializableVal } from "@sv443-network/coreutils";
 import { GMStorageEngine } from "./GMStorageEngine";
 import { describe, expect, it, beforeEach, afterEach } from "vitest"
-import { PlatformError } from "./Errors";
 
 describe("GMStorageEngine", () => {
   beforeEach(() => {

@@ -3,15 +3,15 @@
   "libName": "UserUtils",
   "version": "10.0.0-alpha.0",
   "description": "General purpose DOM/GreaseMonkey library that allows you to register listeners for when CSS selectors exist, intercept events, create persistent & synchronous data stores, modify the DOM more easily and much more",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/UserUtils.umd.js",
+  "module": "dist/UserUtils.mjs",
   "types": "dist/lib/index.d.ts",
   "exports": {
     ".": {
-      "browser": "./dist/index.global.js",
+      "browser": "./dist/UserUtils.umd.js",
       "types": "./dist/lib/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "require": "./dist/UserUtils.cjs",
+      "import": "./dist/UserUtils.mjs"
     }
   },
   "type": "module",
@@ -78,11 +78,9 @@
     "vitest": "3.2.4"
   },
   "files": [
-    "/dist/index.js",
-    "/dist/index.cjs",
-    "/dist/index.mjs",
-    "/dist/index.global.js",
-    "/dist/index.umd.js",
+    "/dist/UserUtils.mjs",
+    "/dist/UserUtils.cjs",
+    "/dist/UserUtils.umd.js",
     "/dist/lib/**.d.ts",
     "/package.json",
     "/README.md",
