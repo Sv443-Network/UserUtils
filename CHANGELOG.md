@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 10.0.1
+
+### Patch Changes
+
+- 4af7d99: Removed global merged interface.
+
 ## 10.0.0
 
 ### Major Changes
