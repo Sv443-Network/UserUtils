@@ -103,7 +103,7 @@ export const umdFooter = `if (typeof module.exports == "object" && typeof export
 export const umdWrapperSetup = build => {
   const { initialOptions } = build;
   const external = initialOptions.external;
-  const content = getUmdBanner(external);
+  const content = getUmdBanner({ libraryName: initialOptions.libraryName, external });
   if (initialOptions.footer) {
     if (initialOptions.footer.js) {
       initialOptions.footer.js += umdFooter;
