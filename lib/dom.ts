@@ -118,13 +118,6 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
 
 //#region interceptEvent
 
-/** Add stackTraceLimit to ErrorConstructor */
-declare global {
-  interface ErrorConstructor {
-    stackTraceLimit: number;
-  }
-}
-
 /**
  * Intercepts the specified event on the passed object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
  * If no predicate is specified, all events will be discarded.  
@@ -145,8 +138,8 @@ export function interceptEvent<
 
   // default is 25 on FF so this should hopefully be more than enough
   if("stackTraceLimit" in Error) {
-    Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 100);
-    if(isNaN(Error.stackTraceLimit))
+    Error.stackTraceLimit = Math.max(Number(Error.stackTraceLimit), 100);
+    if(isNaN(Number(Error.stackTraceLimit)))
       Error.stackTraceLimit = 100;
   }
 
