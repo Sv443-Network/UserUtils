@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 10.0.3
+
+### Patch Changes
+
+- d7d3bea: Fixed decoding step when migrating DataStore data.
+
 ## 10.0.2
 
 ### Patch Changes
