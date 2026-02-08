@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/Sv443-Network/UserUtils",
   "dependencies": {
-    "@sv443-network/coreutils": "3.0.0",
+    "@sv443-network/coreutils": "3.0.1",
     "nanoevents": "9.1.0"
   },
   "devDependencies": {
@@ -86,5 +86,8 @@
     "/README.md",
     "/CHANGELOG.md",
     "/LICENSE.txt"
-  ]
+  ],
+  "publishConfig": {
+    "provenance": true
+  }
 }
