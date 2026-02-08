@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 10.0.4
+
+### Patch Changes
+
+- 13159d8: Updated CoreUtils to fix underlying encoding and decoding inconsistencies.
+
 ## 10.0.3
 
 ### Patch Changes
