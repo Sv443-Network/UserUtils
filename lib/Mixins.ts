@@ -5,8 +5,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { purifyObj } from "./misc.js";
-import type { Prettify } from "./types.js";
+import { pureObj, type Prettify } from "@sv443-network/coreutils";
 
 /** Full mixin object (either sync or async), as it is stored in the instance's mixin array. */
 export type MixinObj<TArg, TCtx> = Prettify<
@@ -46,9 +45,9 @@ export type MixinConfig = {
 export type MixinsConstructorConfig = {
   /**
    * If true, when no priority is specified, an auto-incrementing integer priority will be used, starting at `defaultPriority` or 0 (unique per mixin key). Defaults to false.  
-   * If a priority value is already used, it will be incremented until a unique value is found.  
-   * This is useful to ensure that mixins are applied in the order they were added, even if they don't specify a priority.  
-   * It also allows for a finer level of interjection when the priority is a floating point number.
+   * This means that the first mixin added will have the lowest priority of `defaultPriority`, and the last one will have the highest priority and be applied first.  
+   * If a priority value is already in use, it will be incremented until a unique value is found.  
+   * A finer level of interjection can be achieved by manually setting the priority to a floating point number, while the auto-incrementing priority will always be an integer.
    */
   autoIncrementPriority: boolean;
   /** The default priority for mixins that do not specify one. Defaults to 0. */
@@ -122,7 +121,7 @@ export class Mixins<
    * @param config Configuration object to customize the behavior.
    */
   constructor(config: Partial<MixinsConstructorConfig> = {}) {
-    this.defaultMixinCfg = purifyObj({
+    this.defaultMixinCfg = pureObj({
       priority: config.defaultPriority ?? 0,
       stopPropagation: config.defaultStopPropagation ?? false,
       signal: config.defaultSignal,
@@ -147,10 +146,10 @@ export class Mixins<
   >(
     mixinKey: TKey,
     mixinFn: (arg: TArg, ...ctx: TCtx extends undefined ? [void] : [TCtx]) => ReturnType<TMixinMap[TKey]> extends Promise<any> ? ReturnType<TMixinMap[TKey]> | Awaited<ReturnType<TMixinMap[TKey]>> : ReturnType<TMixinMap[TKey]>,
-    config: Partial<MixinConfig> | number = purifyObj({}),
+    config: Partial<MixinConfig> | number = pureObj({}),
   ): () => void {
     const calcPrio = typeof config === "number" ? config : this.calcPriority(mixinKey, config);
-    const mixin = purifyObj({
+    const mixin = pureObj({
       ...this.defaultMixinCfg,
       key: mixinKey as string,
       fn: mixinFn,

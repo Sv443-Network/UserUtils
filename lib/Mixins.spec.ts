@@ -17,9 +17,9 @@ class TestMixins<
 describe("Mixins", () => {
   //#region base
   it("Base resolution", () => {
-    const mixins = new Mixins<{
-      foo: (v: number, ctx: { a: number }) => number;
-        }>({ autoIncrementPriority: true });
+    const mixins = new TestMixins<{ foo: (v: number, ctx: { a: number }) => number; }>({
+      autoIncrementPriority: true,
+    });
 
     mixins.add("foo", (v) => v ^ 0b0001); // 1 (prio 0)
     mixins.add("foo", (v) => v ^ 0b1000); // 2 (prio 1)
@@ -35,38 +35,38 @@ describe("Mixins", () => {
 
     expect(mixins.list()).toHaveLength(3);
     expect(mixins.list().every(m => m.key === "foo")).toBe(true);
+
+    mixins.test_removeAll("foo");
+    expect(mixins.list()).toHaveLength(0);
   });
 
   //#region priority
   it("Priority resolution", () => {
-    const mixins = new Mixins<{
-      foo: (v: number) => number;
-        }>();
+    const mixins = new Mixins<{ foo: (v: number) => number; }>();
 
     mixins.add("foo", (v) => v / 2, 1); // 2 (prio 1)
-    mixins.add("foo", (v) => Math.round(Math.log(v) * 10), -1); // 4 (prio -1)
-    mixins.add("foo", (v) => Math.pow(v, 2)); // 3 (prio 0)
+    mixins.add("foo", (v) => Math.round(Math.log(v) * 10), -1); // 4 (prio -1, index 0)
+    mixins.add("foo", (v) => v + 2, -1); // 5 (prio -1, index 1)
+    mixins.add("foo", (v) => v ** 2); // 3 (prio 0)
     mixins.add("foo", (v) => Math.sqrt(v), Number.MAX_SAFE_INTEGER); // 1 (prio max)
 
     // input: 100
     // 1: sqrt(100) = 10
     // 2: 10 / 2 = 5
-    // 3: 5 ^ 2 = 25
+    // 3: 5 ** 2 = 25
     // 4: round(log(25) * 10) = round(32.188758248682006) = 32
-    // result: 3
+    // 5: 32 + 2 = 34
 
-    expect(mixins.resolve("foo", 100)).toBe(32);
+    expect(mixins.resolve("foo", 100)).toBe(34);
   });
 
   //#region sync/async & cleanup
   it("Sync/async resolution & cleanup", async () => {
     const acAll = new AbortController();
 
-    const mixins = new Mixins<{
-      foo: (v: number) => Promise<number>;
-        }>({
-          defaultSignal: acAll.signal,
-        });
+    const mixins = new Mixins<{ foo: (v: number) => Promise<number>; }>({
+      defaultSignal: acAll.signal,
+    });
 
     const ac1 = new AbortController();
 
