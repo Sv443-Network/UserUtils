@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 10.0.2
+
+### Patch Changes
+
+- 7348f22: Updated browser bundle from .umd.js to .mjs
+
 ## 10.0.1
 
 ### Patch Changes
