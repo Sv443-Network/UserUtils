@@ -8,7 +8,7 @@
   "types": "dist/lib/index.d.ts",
   "exports": {
     ".": {
-      "browser": "./dist/UserUtils.umd.js",
+      "browser": "./dist/UserUtils.mjs",
       "types": "./dist/lib/index.d.ts",
       "require": "./dist/UserUtils.cjs",
       "import": "./dist/UserUtils.mjs"
