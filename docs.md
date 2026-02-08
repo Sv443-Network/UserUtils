@@ -94,7 +94,6 @@ For submitting bug reports or feature requests, please use the [GitHub issue tra
     - 🟧 [`class DataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) - The main class for the data store
       - 🔷 [`type DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions) - Options for the data store
       - 🔷 [`type DataMigrationsDict`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datamigrationsdict) - Dictionary of data migration functions
-      - 🔷 [`type DataStoreData`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoredata) - The type of the serializable data
     - 🟧 [`class DataStoreSerializer`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastoreserializer) - Serializes and deserializes data for multiple DataStore instances
       - 🔷 [`type DataStoreSerializerOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreserializeroptions) - Options for the DataStoreSerializer
       - 🔷 [`type LoadStoresDataResult`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-loadstoresdataresult) - Result of calling [`loadStoresData()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastoreserializer-loadstoresdata)
@@ -1093,7 +1092,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ### `class GMStorageEngine`
 Signature:
 ```ts
-class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngine<TData>;
+class GMStorageEngine<TData extends object> extends DataStoreEngine<TData>;
 ```
   
 Usage:
@@ -1106,19 +1105,19 @@ This class can also be used standalone for an abstracted, uniform interface to G
 Refer to the [DataStore documentation](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) for more information on how to use DataStore and storage engines.  
   
 - ⚠️ Requires the grants `GM.getValue`, `GM.setValue`, `GM.deleteValue`, and `GM.listValues` in your userscript metadata.
+- ⚠️ To avoid having to specify index signatures for the data type, the template generic `TData` is constrained to `object`. However, only values serializable by `JSON.stringify()` and storable in GM storage (e.g. no functions, symbols, BigInts, etc.) are supported.
 - ⚠️ Don't reuse engine instances, always create a new one for each DataStore instance.
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { DataStore } from "@sv443-network/coreutils";
-import { GMStorageEngine } from "@sv443-network/userutils";
+import { DataStore, GMStorageEngine } from "@sv443-network/userutils";
 
 const myStore = new DataStore({
   id: "my-data",
   defaultData: { foo: "bar" },
   formatVersion: 1,
-  storageEngine: new GMStorageEngine(),
+  engine: new GMStorageEngine(),
 });
 
 await myStore.loadData();
@@ -1176,7 +1175,7 @@ Deletes all values from the GM storage.
 Options for the [`GMStorageEngine` class.](#class-gmstorageengine)
 | Property | Type | Description |
 | :-- | :-- | :-- |
-| `dataStoreOptions?` | `DataStoreEngineDSOptions<DataStoreData> \| undefined` | Specifies the necessary options for storing data - ⚠️ Only specify this if you are using this instance standalone! The parent DataStore will set this automatically. |
+| `dataStoreOptions?` | `DataStoreEngineDSOptions<TData extends object> \| undefined` | Specifies the necessary options for storing data - ⚠️ Only specify this if you are using this instance standalone! The parent DataStore will set this automatically. |
 
 <br><br>
 
