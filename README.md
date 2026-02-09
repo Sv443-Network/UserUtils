@@ -228,8 +228,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   
   Versioned (recommended):
   ```
-  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js
-  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js
+  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js
+  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js
   ```
   Non-versioned (not recommended because it auto-updates):
   ```
@@ -239,8 +239,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
 
 - If you are using this library in a generic DOM environment without access to the GreaseMonkey API, either download the latest release from the [releases page](https://github.com/Sv443-Network/UserUtils/releases) to include in your project or add one of the following tags to the &lt;head&gt;:
   ```html
-  <script src="https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js"></script>
-  <script src="https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/index.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js"></script>
+  <script src="https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js"></script>
   ```
 
 > [!NOTE]  
