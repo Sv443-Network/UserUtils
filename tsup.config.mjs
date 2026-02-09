@@ -1,16 +1,40 @@
 import { defineConfig } from "tsup";
-import { dependencies } from "./package.json";
+import pkg from "./package.json";
 import { createUmdWrapper } from "./tools/umdWrapperPlugin.mjs";
 
-/** @typedef {import('tsup').Options} TsupOpts */
+/** @typedef {import("tsup").Options} TsupOpts */
 
 const clientName = "UserUtils";
-const externalDependencies = Object.keys(dependencies);
+const externalDependencies = Object.keys(pkg.dependencies);
 const isDevelopmentMode = process.env.NODE_ENV === "development";
+
+const userLibraryHeader = `\
+// ==UserScript==
+// @namespace    ${pkg.homepage}
+// @exclude      *
+// @author       ${pkg.author.name}
+// @supportURL   ${pkg.bugs.url}
+// @homepageURL  ${pkg.homepage}
+
+// ==UserLibrary==
+// @name         ${pkg.libName}
+// @description  ${pkg.description}
+// @version      ${pkg.version}
+// @license      ${pkg.license}
+// @copyright    ${pkg.author.name} (${pkg.author.url})
+
+// ==/UserScript==
+// ==/UserLibrary==
+
+// ==OpenUserJS==
+// @author       ${pkg.author.name}
+// ==/OpenUserJS==
+`;
 
 /** @type {(cliOpts: TsupOpts) => Promise<TsupOpts | TsupOpts[]> | TsupOpts | TsupOpts[]} */
 const getBaseConfig = (cliOpts) => {
-  return {
+  /** @type {TsupOpts} */
+  const opts = {
     entry: {
       [clientName]: "lib/index.ts",
     },
@@ -45,6 +69,7 @@ const getBaseConfig = (cliOpts) => {
     watch: cliOpts.watch,
     metafile: cliOpts.watch || isDevelopmentMode,
   };
+  return opts;
 };
 
 export default defineConfig((cliOpts) => ([
@@ -60,5 +85,17 @@ export default defineConfig((cliOpts) => ([
     target: "es6",
     plugins: [createUmdWrapper({ libraryName: clientName, external: [] })],
     onSuccess: "tsc --emitDeclarationOnly --declaration --outDir dist && node --import tsx ./tools/fix-dts.mts",
+  },
+  {
+    ...getBaseConfig(cliOpts),
+    format: ["umd"],
+    minify: false,
+    target: "es6",
+    plugins: [createUmdWrapper({ libraryName: clientName, external: [], banner: userLibraryHeader })],
+    outExtension() {
+      return { js: ".user.js" };
+    },
+    sourcemap: false,
+    clean: false,
   },
 ]));

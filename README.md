@@ -215,8 +215,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   
   Versioned (recommended):
   ```
-  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js
-  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js
+  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.user.js
+  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.user.js
   ```
   Non-versioned (not recommended because it auto-updates):
   ```
@@ -231,7 +231,7 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   ```
 
 > [!NOTE]  
-> In order for your script not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `8.3.2`) or the versioned URL that's shown [at the top of the GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
+> In order for your script not to break on a major library update, use one the versioned URLs above after replacing `INSERT_VERSION` with the desired version (e.g. `10.0.4`) or the versioned URL that's shown [at the top of the GreasyFork page.](https://greasyfork.org/scripts/472956-userutils)  
 
 <br>
 

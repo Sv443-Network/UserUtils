@@ -147,10 +147,12 @@ export const createUmdWrapper = opts => {
             const fileName = path.basename(file.name);
             const umdBanner = getUmdBanner({ ...opts, external: pluginExternalDependencies });
             const content = fs.readFileSync(filePath, "utf-8");
+            const hasSrcMap = content.includes(`//# sourceMappingURL=${fileName}.map`);
             const patchedFileContents = content.replace(`//# sourceMappingURL=${fileName}.map`, "");
             const scriptContent = `\n\n\n${patchedFileContents}\n\n\n`;
-            const wrappedContent = `${umdBanner}${scriptContent}${umdFooter}\n\n//# sourceMappingURL=${fileName}.map\n`;
-            const newContent = `/* umd */\n${wrappedContent}`;
+            const wrappedContent = `${umdBanner}${scriptContent}${umdFooter}${hasSrcMap ? `\n\n//# sourceMappingURL=${fileName}.map\n` : "\n"}`;
+            const prefix = opts.banner ? `${opts.banner}\n` : "";
+            const newContent = `${prefix}/* umd */\n${wrappedContent}`;
             fs.writeFileSync(filePath, newContent, "utf8");
           }
         });
