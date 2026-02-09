@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 10.0.5
+
+### Patch Changes
+
+- 0c63a9b: Added UMD bundle explicitly made for userscript usage (at `dist/UserUtils.user.js`).
+
 ## 10.0.4
 
 ### Patch Changes
