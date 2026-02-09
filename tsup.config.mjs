@@ -39,19 +39,13 @@ const getBaseConfig = (cliOpts) => {
       [clientName]: "lib/index.ts",
     },
     outDir: "dist",
-    outExtension({ format, options }) {
-      return {
-        js: `.${options.minify ? "min." : ""}${
-          (() => {
-            switch(format) {
-            case "cjs": return "cjs";
-            case "esm": return "mjs";
-            case "umd": return "umd.js";
-            }
-          })()
-        }`,
-      };
-    },
+    outExtension: ({ format, options }) => ({
+      js: `.${options.minify ? "min." : ""}${({
+        cjs: "cjs",
+        esm: "mjs",
+        umd: "umd.js",
+      })[format] ?? "js"}`,
+    }),
     platform: "browser",
     format: ["cjs", "esm"],
     noExternal: externalDependencies,
@@ -74,28 +68,37 @@ const getBaseConfig = (cliOpts) => {
 
 export default defineConfig((cliOpts) => ([
   {
+    // base CJS and ESM bundles
     ...getBaseConfig(cliOpts),
-    esbuildPlugins: [],
-    minify: false,
   },
   {
+    // regular UMD bundle
     ...getBaseConfig(cliOpts),
     format: ["umd"],
-    minify: false,
     target: "es6",
-    plugins: [createUmdWrapper({ libraryName: clientName, external: [] })],
-    onSuccess: "tsc --emitDeclarationOnly --declaration --outDir dist && node --import tsx ./tools/fix-dts.mts",
+    plugins: [
+      createUmdWrapper({
+        libraryName: clientName,
+        external: [],
+      })
+    ],
   },
   {
+    // UMD bundle for userscript usage
     ...getBaseConfig(cliOpts),
     format: ["umd"],
-    minify: false,
     target: "es6",
-    plugins: [createUmdWrapper({ libraryName: clientName, external: [], banner: userLibraryHeader })],
-    outExtension() {
-      return { js: ".user.js" };
-    },
+    plugins: [
+      createUmdWrapper({
+        libraryName: clientName,
+        external: [],
+        banner: userLibraryHeader,
+      }),
+    ],
+    outExtension: () => ({ js: ".user.js" }),
     sourcemap: false,
     clean: false,
+    // 
+    onSuccess: "tsc --emitDeclarationOnly --declaration --outDir dist && node --import tsx ./tools/fix-dts.mts",
   },
 ]));
