@@ -24,7 +24,7 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
 > **In version 10.0.0**, many of the platform-agnostic features were **moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)**  
 > <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
   
-> [!NOTE]  
+> [!TIP]  
 > If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
 > **For bug reports or feature requests, please use the [GitHub issue tracker.](https://github.com/Sv443-Network/UserUtils/issues)**
 
