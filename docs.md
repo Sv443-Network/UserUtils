@@ -10,24 +10,23 @@ If you like using this library, please consider [supporting the development ❤�
 
 <!-- #region Preamble -->
 ## Preamble:
-This library is written in TypeScript and contains builtin TypeScript declarations, but it will also work in plain JavaScript after removing the `: type` annotations in the example code snippets.  
+This library is written in TypeScript with builtin TypeScript declarations, but it works just as well in plain JavaScript after removing the `: type` annotations from the example code snippets.  
+The library supports importing an ESM, CommonJS or global variable definition bundle, depending on your use case.  
   
-Each feature's example code snippet can be expanded by clicking on the text "Example - click to view".  
-The signatures and examples are written in TypeScript and use ESM import syntax to show you which types need to be provided and will be returned.  
-The library itself supports importing an ESM, CommonJS or global variable definition bundle, depending on your use case.  
+The signatures and example snippets use TypeScript with ESM import syntax to show which types need to be provided and will be returned.  
+If the signature section contains multiple signatures, each one represents an overload. They will be further explained in the description below that section.  
   
-If the signature section contains multiple signatures of the function, each occurrence represents an overload and you can choose which one you want to use.  
-They will also be further explained in the description below that section.  
+Each feature's example code snippet can be expanded by clicking on the text `▷ Example - click to view` below its description.  
   
-Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header or have other specific requirements and limitations.  
-Those will be listed in a section marked by a warning emoji (⚠️) each.  
-  
-If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
-For submitting bug reports or feature requests, please use the [GitHub issue tracker.](https://github.com/Sv443-Network/UserUtils/issues)  
+Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header, or have other specific requirements and limitations. These will be listed in a section marked by a warning emoji (⚠️) each.    
   
 > [!NOTE]  
-> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> **In version 10.0.0**, many of the platform-agnostic features were **moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)**  
 > <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
+  
+> [!NOTE]  
+> If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
+> **For bug reports or feature requests, please use the [GitHub issue tracker.](https://github.com/Sv443-Network/UserUtils/issues)**
 
 <br>
 
