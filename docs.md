@@ -21,8 +21,12 @@ Each feature's example code snippet can be expanded by clicking on the text `▷
 Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header, or have other specific requirements and limitations. These will be listed in a section marked by a warning emoji (⚠️) each.    
   
 > [!NOTE]  
-> **In version 10.0.0**, many of the platform-agnostic features were **moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)**  
-> <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
+> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> <sub>
+> Everything in CoreUtils is re-exported by UserUtils for backwards compatibility, so installing both at the same time isn't usually necessary.  
+> Beware that when both are installed, class inheritance between the two libraries will only work if the installed version of CoreUtils matches the version of CoreUtils that is included in UserUtils (refer to `package.json`), so that the final bundler is able to deduplicate them correctly. See also [`const versions`](#const-versions)
+> 
+> </sub>
   
 > [!TIP]  
 > If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
@@ -54,6 +58,7 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
   - [**Misc:**](#misc)
     - 🟧 [`class GMStorageEngine`](#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
     - 🟧 [`class Mixins`](#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+    - 🟩 [`const versions`](#const-versions) - contains version information for UserUtils and CoreUtils
   - [**Translation:**](#translation)
     - 🟣 [`function tr.for()`](#function-trfor) - translates a key for the specified language
     - 🟣 [`function tr.use()`](#function-truse) - creates a translation function for the specified language
@@ -1291,6 +1296,20 @@ Configuration object for an individual mixin function.
 | `priority` | `number` | The higher, the earlier the mixin will be applied. Supports floating-point and negative numbers. Defaults to 0. |
 | `stopPropagation` | `boolean` | If true, no further mixins will be applied after this one. |
 | `signal?` | `AbortSignal \| undefined` | If set, the mixin will only be applied if the given signal is not aborted. |
+
+<br><br>
+
+### `const versions`
+An object containing the current version of the library and its re-exported dependency [CoreUtils.](https://github.com/Sv443-Network/CoreUtils)  
+These versions are [semver-compliant](https://semver.org/), without any prefix like `v` or range specifiers like `^`, but might still contain suffixes like `-beta.1` for pre-release versions.  
+  
+- ⚠️ If you want to install both libraries at the same time, make sure to use this object to check that your installed version of CoreUtils matches the one that UserUtils is re-exporting, to avoid potential compatibility issues like broken class inheritance or feature mismatches. For most use cases, it should suffice to just use the re-exported CoreUtils features.
+```ts
+{
+  UserUtils: string; // semver-compliant version of this library
+  CoreUtils: string; // semver-compliant version of the re-exported CoreUtils library
+}
+```
 
 <br><br>
 

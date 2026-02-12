@@ -33,7 +33,11 @@ View the documentation of previous major versions:
 
 > [!NOTE]  
 > In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
-> <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
+> <sub>
+> Everything in CoreUtils is re-exported by UserUtils for backwards compatibility, so installing both at the same time isn't usually necessary.  
+> Beware that when both are installed, class inheritance between the two libraries will only work if the installed version of CoreUtils matches the version of CoreUtils that is included in UserUtils (refer to `package.json`), so that the final bundler is able to deduplicate them correctly. See also [`const versions`](./docs.md#const-versions)
+> 
+> </sub>
 
 <br>
 
@@ -44,40 +48,41 @@ View the documentation of previous major versions:
 - [**Preamble** (info about the documentation)](./docs.md#preamble)
 - [**UserUtils Features**](./docs.md#features)
   - [**DOM:**](./docs.md#dom)
-    - 🟧 [`Dialog`](./docs.md#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
-    - 🟧 [`SelectorObserver`](./docs.md#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
-    - 🟣 [`getUnsafeWindow()`](./docs.md#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-    - 🟣 [`isDomLoaded()`](./docs.md#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
-    - 🟣 [`onDomLoad()`](./docs.md#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
-    - 🟣 [`addParent()`](./docs.md#function-addparent) - add a parent element around another element
-    - 🟣 [`addGlobalStyle()`](./docs.md#function-addglobalstyle) - add a global style to the page
-    - 🟣 [`preloadImages()`](./docs.md#function-preloadimages) - preload images into the browser cache for faster loading later on
-    - 🟣 [`openInNewTab()`](./docs.md#function-openinnewtab) - open a link in a new tab
-    - 🟣 [`interceptEvent()`](./docs.md#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-    - 🟣 [`interceptWindowEvent()`](./docs.md#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-    - 🟣 [`isScrollable()`](./docs.md#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
-    - 🟣 [`observeElementProp()`](./docs.md#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
-    - 🟣 [`getSiblingsFrame()`](./docs.md#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
-    - 🟣 [`setInnerHtmlUnsafe()`](./docs.md#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
-    - 🟣 [`probeElementStyle()`](./docs.md#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
+    - 🟧 [`class Dialog`](./docs.md#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+    - 🟧 [`class SelectorObserver`](./docs.md#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
+    - 🟣 [`function getUnsafeWindow()`](./docs.md#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+    - 🟣 [`function isDomLoaded()`](./docs.md#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
+    - 🟣 [`function onDomLoad()`](./docs.md#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
+    - 🟣 [`function addParent()`](./docs.md#function-addparent) - add a parent element around another element
+    - 🟣 [`function addGlobalStyle()`](./docs.md#function-addglobalstyle) - add a global style to the page
+    - 🟣 [`function preloadImages()`](./docs.md#function-preloadimages) - preload images into the browser cache for faster loading later on
+    - 🟣 [`function openInNewTab()`](./docs.md#function-openinnewtab) - open a link in a new tab
+    - 🟣 [`function interceptEvent()`](./docs.md#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+    - 🟣 [`function interceptWindowEvent()`](./docs.md#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+    - 🟣 [`function isScrollable()`](./docs.md#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
+    - 🟣 [`function observeElementProp()`](./docs.md#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+    - 🟣 [`function getSiblingsFrame()`](./docs.md#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+    - 🟣 [`function setInnerHtmlUnsafe()`](./docs.md#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+    - 🟣 [`function probeElementStyle()`](./docs.md#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
   - [**Misc:**](./docs.md#misc)
-    - 🟧 [`GMStorageEngine`](./docs.md#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
-    - 🟧 [`Mixins`](./docs.md#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+    - 🟧 [`class GMStorageEngine`](./docs.md#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
+    - 🟧 [`class Mixins`](./docs.md#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+    - 🟩 [`const versions`](./docs.md#const-versions) - contains version information for UserUtils and CoreUtils
   - [**Translation:**](./docs.md#translation)
-    - 🟣 [`tr.for()`](./docs.md#function-trfor) - translates a key for the specified language
-    - 🟣 [`tr.use()`](./docs.md#function-truse) - creates a translation function for the specified language
-    - 🟣 [`tr.hasKey()`](./docs.md#function-trhaskey) - checks if a key exists in the given language
-    - 🟣 [`tr.addTranslations()`](./docs.md#function-traddtranslations) - add a flat or recursive translation object for a language
-    - 🟣 [`tr.getTranslations()`](./docs.md#function-trgettranslations) - returns the translation object for a language
-    - 🟣 [`tr.deleteTranslations()`](./docs.md#function-trdeletetranslations) - delete the translation object for a language
-    - 🟣 [`tr.setFallbackLanguage()`](./docs.md#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
-    - 🟣 [`tr.getFallbackLanguage()`](./docs.md#function-trgetfallbacklanguage) - returns the fallback language
-    - 🟣 [`tr.addTransform()`](./docs.md#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
-    - 🟣 [`tr.deleteTransform()`](./docs.md#function-trdeletetransform) - removes a transform function
-    - 🟩 [`tr.transforms`](./docs.md#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
-    - 🔷 [`TrKeys`](./docs.md#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
+    - 🟣 [`function tr.for()`](./docs.md#function-trfor) - translates a key for the specified language
+    - 🟣 [`function tr.use()`](./docs.md#function-truse) - creates a translation function for the specified language
+    - 🟣 [`function tr.hasKey()`](./docs.md#function-trhaskey) - checks if a key exists in the given language
+    - 🟣 [`function tr.addTranslations()`](./docs.md#function-traddtranslations) - add a flat or recursive translation object for a language
+    - 🟣 [`function tr.getTranslations()`](./docs.md#function-trgettranslations) - returns the translation object for a language
+    - 🟣 [`function tr.deleteTranslations()`](./docs.md#function-trdeletetranslations) - delete the translation object for a language
+    - 🟣 [`function tr.setFallbackLanguage()`](./docs.md#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
+    - 🟣 [`function tr.getFallbackLanguage()`](./docs.md#function-trgetfallbacklanguage) - returns the fallback language
+    - 🟣 [`function tr.addTransform()`](./docs.md#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+    - 🟣 [`function tr.deleteTransform()`](./docs.md#function-trdeletetransform) - removes a transform function
+    - 🟩 [`const tr.transforms`](./docs.md#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - 🔷 [`type TrKeys`](./docs.md#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
   - [**Errors**](./docs.md#error-classes)
-    - 🟧 [`PlatformError`](./docs.md#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
+    - 🟧 [`class PlatformError`](./docs.md#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
 - [**CoreUtils Features** (re-exported for backwards compatibility)](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#table-of-contents)
   - [**Array:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#array)
     - 🟣 [`function randomItem()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomitem) - Returns a random item from the given array

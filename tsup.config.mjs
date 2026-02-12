@@ -1,6 +1,9 @@
 import { defineConfig } from "tsup";
 import pkg from "./package.json";
-import { createUmdWrapper } from "./tools/umdWrapperPlugin.mjs";
+import { createStringInjectPlugin } from "./tools/stringInjectPlugin.mjs";
+import { createUmdWrapperPlugin } from "./tools/umdWrapperPlugin.mjs";
+
+// #region types, consts, header
 
 /** @typedef {import("tsup").Options} TsupOpts */
 
@@ -31,6 +34,28 @@ const userLibraryHeader = `\
 // ==/OpenUserJS==
 `;
 
+// #region constant injection
+
+/** @type {() => TsupOpts["plugins"][number]} */
+const getStringInjectPlugin = () => {
+  const coreutilsVersion = pkg.dependencies["@sv443-network/coreutils"]?.replace(/^[^0-9]*/, "") ?? "ERR:unknown";
+  const userutilsVersion = pkg.version;
+
+  const isSemverBasic = (version) => /^\d+\.\d+\.\d+(-.+)?$/.test(version);
+
+  if(!isSemverBasic(coreutilsVersion))
+    throw new Error(`Invalid CoreUtils version: "${coreutilsVersion}"`);
+  if(!isSemverBasic(userutilsVersion))
+    throw new Error(`Invalid UserUtils version: "${userutilsVersion}"`);
+
+  return createStringInjectPlugin([
+    { pattern: /#\{\{COREUTILS_VERSION\}\}/, replacement: coreutilsVersion },
+    { pattern: /#\{\{USERUTILS_VERSION\}\}/, replacement: userutilsVersion },
+  ]);
+};
+
+// #region base config
+
 /** @type {(cliOpts: TsupOpts) => Promise<TsupOpts | TsupOpts[]> | TsupOpts | TsupOpts[]} */
 const getBaseConfig = (cliOpts) => {
   /** @type {TsupOpts} */
@@ -46,6 +71,9 @@ const getBaseConfig = (cliOpts) => {
         umd: "umd.js",
       })[format] ?? "js"}`,
     }),
+    plugins: [
+      getStringInjectPlugin(),
+    ],
     platform: "browser",
     format: ["cjs", "esm"],
     noExternal: externalDependencies,
@@ -66,6 +94,8 @@ const getBaseConfig = (cliOpts) => {
   return opts;
 };
 
+// #region bundle configs
+
 export default defineConfig((cliOpts) => ([
   {
     // base CJS and ESM bundles
@@ -77,10 +107,11 @@ export default defineConfig((cliOpts) => ([
     format: ["umd"],
     target: "es6",
     plugins: [
-      createUmdWrapper({
+      createUmdWrapperPlugin({
         libraryName: clientName,
         external: [],
-      })
+      }),
+      getStringInjectPlugin(),
     ],
   },
   {
@@ -89,11 +120,12 @@ export default defineConfig((cliOpts) => ([
     format: ["umd"],
     target: "es6",
     plugins: [
-      createUmdWrapper({
+      createUmdWrapperPlugin({
         libraryName: clientName,
         external: [],
         banner: userLibraryHeader,
       }),
+      getStringInjectPlugin(),
     ],
     outExtension: () => ({ js: ".user.js" }),
     sourcemap: false,
