@@ -129,7 +129,7 @@ export const umdWrapperSetup = build => {
   }
 };
 
-export const createUmdWrapper = opts => {
+export const createUmdWrapperPlugin = (opts) => {
   let pluginExternalDependencies = [];
 
   return {

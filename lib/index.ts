@@ -6,6 +6,7 @@
 // re-export CoreUtils for backwards compatibility
 export * from "@sv443-network/coreutils";
 
+export * from "./consts.js";
 export * from "./Dialog.js";
 export * from "./dom.js";
 export * from "./Errors.js";
