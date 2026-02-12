@@ -104,25 +104,25 @@ export const umdWrapperSetup = build => {
   const { initialOptions } = build;
   const external = initialOptions.external;
   const content = getUmdBanner({ libraryName: initialOptions.libraryName, external });
-  if (initialOptions.footer) {
-    if (initialOptions.footer.js) {
+  if(initialOptions.footer) {
+    if (initialOptions.footer.js)
       initialOptions.footer.js += umdFooter;
-    } else {
+    else
       initialOptions.footer.js = umdFooter;
-    }
-  } else {
+  }
+  else {
     initialOptions.footer = {
       js: umdFooter,
     };
   }
 
-  if (initialOptions.banner) {
-    if (initialOptions.banner.js) {
+  if(initialOptions.banner) {
+    if(initialOptions.banner.js)
       initialOptions.banner.js += content;
-    } else {
+    else
       initialOptions.banner.js = content;
-    }
-  } else {
+  }
+  else {
     initialOptions.banner = {
       js: content,
     };
@@ -143,7 +143,7 @@ export const createUmdWrapperPlugin = (opts) => {
       try {
         result.writtenFiles.forEach(file => {
           const filePath = path.join(process.cwd(), file.name);
-          if (file.name.endsWith(".js")) {
+          if(file.name.endsWith(".js")) {
             const fileName = path.basename(file.name);
             const umdBanner = getUmdBanner({ ...opts, external: pluginExternalDependencies });
             const content = fs.readFileSync(filePath, "utf-8");
@@ -156,9 +156,10 @@ export const createUmdWrapperPlugin = (opts) => {
             fs.writeFileSync(filePath, newContent, "utf8");
           }
         });
-      } catch (err) {
-         
+      }
+      catch(err) {
         console.error(err);
+        throw err;
       }
     },
   };
