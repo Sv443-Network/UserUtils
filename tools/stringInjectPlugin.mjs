@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 
 /**
  * @typedef {Object} StringInjectOptions
- * @property {RegExp | string} pattern  The regex or string pattern to match (applied globally). The `g` flag is automatically added to regex patterns if not present.
+ * @property {RegExp | string} pattern  The regex or raw regex string pattern to match (applied globally). The `g` flag is automatically added to regex patterns if not present.
  * @property {string} replacement       The replacement string (supports `$1`, `$&`, etc.).
  */
 
