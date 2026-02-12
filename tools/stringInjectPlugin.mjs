@@ -38,6 +38,7 @@ export function createStringInjectPlugin(replacements) {
       }
       catch(err) {
         console.error("[string-inject]", err);
+        throw err;
       }
     },
   };
