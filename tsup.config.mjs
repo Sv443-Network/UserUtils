@@ -1,7 +1,8 @@
 import { defineConfig } from "tsup";
-import pkg from "./package.json";
 import { createStringInjectPlugin } from "./tools/stringInjectPlugin.mjs";
 import { createUmdWrapperPlugin } from "./tools/umdWrapperPlugin.mjs";
+import pkg from "./package.json" with { type: "json" };
+import coreUtilsPkg from "./node_modules/@sv443-network/coreutils/package.json" with { type: "json" };
 
 // #region types, consts, header
 
@@ -38,7 +39,7 @@ const userLibraryHeader = `\
 
 /** @type {() => TsupOpts["plugins"][number]} */
 const getStringInjectPlugin = () => {
-  const coreutilsVersion = pkg.dependencies["@sv443-network/coreutils"]?.replace(/^[^0-9]*/, "") ?? "ERR:unknown";
+  const coreutilsVersion = coreUtilsPkg.version?.replace(/^[^0-9]*/, "") ?? "ERR:unknown";
   const userutilsVersion = pkg.version;
 
   const isSemverBasic = (version) => /^\d+\.\d+\.\d+(-.+)?$/.test(version);

@@ -1,6 +1,6 @@
 import { readdir, readFile, writeFile, lstat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import k from "kleur";
+import { styleText } from "node:util";
 
 const dtsPath = resolve("./dist/lib/");
 
@@ -33,11 +33,15 @@ async function processRecursive(directory: string): Promise<void> {
   }
 }
 
-try {
-  await processRecursive(dtsPath);
+async function run(): Promise<void> {
+  try {
+    await processRecursive(dtsPath);
 
-  console.log(k.green(`Fixed all .d.ts files in ${k.reset(`'${dtsPath}'`)}`));
+    console.log(styleText("green", `\nSuccessfully fixed all .d.ts files in ${styleText("reset", `'${dtsPath}'`)}`));
+  }
+  catch(err) {
+    console.error(styleText("red", `\nEncountered error while fixing .d.ts files in ${styleText("reset", `'${dtsPath}'`)}:\n`), err);
+  }
 }
-catch(err) {
-  console.error(k.red(`Encountered error while fixing .d.ts files in ${k.reset(`'${dtsPath}'`)}:\n`), err);
-}
+
+run();
