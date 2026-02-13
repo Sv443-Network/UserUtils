@@ -8,7 +8,7 @@ import coreUtilsPkg from "./node_modules/@sv443-network/coreutils/package.json" 
 
 /** @typedef {import("tsup").Options} TsupOpts */
 
-const clientName = "UserUtils";
+const libraryName = "UserUtils";
 const externalDependencies = Object.keys(pkg.dependencies);
 const isDevelopmentMode = process.env.NODE_ENV === "development";
 
@@ -62,7 +62,7 @@ const getBaseConfig = (cliOpts) => {
   /** @type {TsupOpts} */
   const opts = {
     entry: {
-      [clientName]: "lib/index.ts",
+      [libraryName]: "lib/index.ts",
     },
     outDir: "dist",
     outExtension: ({ format, options }) => ({
@@ -78,15 +78,15 @@ const getBaseConfig = (cliOpts) => {
     platform: "browser",
     format: ["cjs", "esm"],
     noExternal: externalDependencies,
-    target: ["chrome90", "edge90", "firefox90", "opera98", "safari15"],
+    target: ["firefox100", "chrome100", "safari15", "es2018"],
     name: "@sv443-network/userutils",
-    globalName: clientName,
+    globalName: libraryName,
     legacyOutput: false,
     bundle: true,
     esbuildPlugins: [],
     minify: false,
     splitting: false,
-    sourcemap: true,
+    sourcemap: false,
     dts: false,
     clean: true,
     watch: cliOpts.watch,
@@ -101,6 +101,7 @@ export default defineConfig((cliOpts) => ([
   {
     // base CJS and ESM bundles
     ...getBaseConfig(cliOpts),
+    splitting: false,
   },
   {
     // regular UMD bundle
@@ -109,7 +110,7 @@ export default defineConfig((cliOpts) => ([
     target: "es6",
     plugins: [
       createUmdWrapperPlugin({
-        libraryName: clientName,
+        libraryName,
         external: [],
       }),
       getStringInjectPlugin(),
@@ -122,16 +123,15 @@ export default defineConfig((cliOpts) => ([
     target: "es6",
     plugins: [
       createUmdWrapperPlugin({
-        libraryName: clientName,
+        libraryName,
         external: [],
         banner: userLibraryHeader,
       }),
       getStringInjectPlugin(),
     ],
     outExtension: () => ({ js: ".user.js" }),
-    sourcemap: false,
     clean: false,
-    // 
+    // generate declaration files after successful build
     onSuccess: "tsc --emitDeclarationOnly --declaration --outDir dist && node --import tsx ./tools/fix-dts.mts",
   },
 ]));
