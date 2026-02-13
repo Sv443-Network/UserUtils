@@ -65,6 +65,7 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
     - 🟣 [`function tr.hasKey()`](#function-trhaskey) - checks if a key exists in the given language
     - 🟣 [`function tr.addTranslations()`](#function-traddtranslations) - add a flat or recursive translation object for a language
     - 🟣 [`function tr.getTranslations()`](#function-trgettranslations) - returns the translation object for a language
+    - 🟣 [`function tr.getAllTranslations()`](#function-trgetalltranslations) - returns all registered translations
     - 🟣 [`function tr.deleteTranslations()`](#function-trdeletetranslations) - delete the translation object for a language
     - 🟣 [`function tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
     - 🟣 [`function tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
@@ -1457,6 +1458,34 @@ tr.getTranslations("de"); // undefined
 
 <br><br>
 
+### `function tr.getAllTranslations()`
+Signature:
+```ts
+getAllTranslations(asCopy = true): Record<string, TrObject>;
+```
+  
+Returns an object containing all registered translations, where keys are the language codes and values are the translation objects.  
+If `asCopy` is set to `true` (default), the returned object and all nested translation objects will be cloned using `JSON.parse(JSON.stringify())` to prevent external mutation. If set to `false`, the actual internal translation objects will be returned, so any changes to them will affect the translations used by the library and can be used as an alternative to [`tr.addTranslations()`](#function-traddtranslations) for modifying translations.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", { hello: "Hello, World!" });
+tr.addTranslations("de", { hello: "Hallo, Welt!" });
+
+tr.getAllTranslations(); // { en: { hello: "Hello, World!" }, de: { hello: "Hallo, Welt!" } }
+
+const translationsMutable = tr.getAllTranslations(false);
+translationsMutable.en.hello = "Hi, World!";
+
+tr.for("en", "hello"); // "Hi, World!"
+```
+</details>
+
+<br><br>
+
 ### `function tr.deleteTranslations()`
 Signature:
 ```ts
@@ -1541,6 +1570,8 @@ function tr.addTransform<TTrKey extends string = string>(
 Adds a transform function to the translation system. Transforms are applied after resolving a translation for any language.  
 Use this to enable dynamic values in translations, for example to insert custom values or to denote a section that could be encapsulated by rich text.  
 The `transform` argument is a tuple of `[RegExp, TransformFn]`.  
+  
+- ⚠️ If a transform function throws an error, it will propagate up through the translation functions (`tr.for()`, `tr.use()`, etc.), so make sure to either handle errors within the transform function itself or wrap translation calls in try/catch blocks.  
   
 The `TransformFn` receives an object with the following properties:
 | Property | Type | Description |

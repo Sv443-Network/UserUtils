@@ -72,6 +72,7 @@ View the documentation of previous major versions:
         - 🟣 [`function tr.hasKey()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trhaskey) - checks if a key exists in the given language
         - 🟣 [`function tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-traddtranslations) - add a flat or recursive translation object for a language
         - 🟣 [`function tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgettranslations) - returns the translation object for a language
+        - 🟣 [`function tr.getAllTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgetalltranslations) - returns all registered translations
         - 🟣 [`function tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trdeletetranslations) - delete the translation object for a language
         - 🟣 [`function tr.setFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
         - 🟣 [`function tr.getFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgetfallbacklanguage) - returns the fallback language

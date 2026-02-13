@@ -74,6 +74,7 @@ View the documentation of previous major versions:
     - 🟣 [`function tr.hasKey()`](./docs.md#function-trhaskey) - checks if a key exists in the given language
     - 🟣 [`function tr.addTranslations()`](./docs.md#function-traddtranslations) - add a flat or recursive translation object for a language
     - 🟣 [`function tr.getTranslations()`](./docs.md#function-trgettranslations) - returns the translation object for a language
+    - 🟣 [`function tr.getAllTranslations()`](./docs.md#function-trgetalltranslations) - returns all registered translations
     - 🟣 [`function tr.deleteTranslations()`](./docs.md#function-trdeletetranslations) - delete the translation object for a language
     - 🟣 [`function tr.setFallbackLanguage()`](./docs.md#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
     - 🟣 [`function tr.getFallbackLanguage()`](./docs.md#function-trgetfallbacklanguage) - returns the fallback language
