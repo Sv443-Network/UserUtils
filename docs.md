@@ -21,8 +21,12 @@ Each feature's example code snippet can be expanded by clicking on the text `▷
 Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header, or have other specific requirements and limitations. These will be listed in a section marked by a warning emoji (⚠️) each.    
   
 > [!NOTE]  
-> **In version 10.0.0**, many of the platform-agnostic features were **moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)**  
-> <sub>Everything is re-exported by UserUtils for backwards compatibility, but you may want to consider using CoreUtils directly if you don't need any of the DOM- or GreaseMonkey-specific features or want control over the installed version of CoreUtils.</sub>
+> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> <sub>
+> Everything in CoreUtils is re-exported by UserUtils for backwards compatibility, so installing both at the same time isn't usually necessary.  
+> Beware that when both are installed, class inheritance between the two libraries will only work if the installed version of CoreUtils matches the version of CoreUtils that is included in UserUtils (refer to `package.json`), so that the final bundler is able to deduplicate them correctly. See also [`const versions`](#const-versions)
+> 
+> </sub>
   
 > [!TIP]  
 > If you need help with something, please [create a new discussion](https://github.com/Sv443-Network/UserUtils/discussions) or [join my Discord server.](https://dc.sv443.net/)  
@@ -54,12 +58,14 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
   - [**Misc:**](#misc)
     - 🟧 [`class GMStorageEngine`](#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
     - 🟧 [`class Mixins`](#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+    - 🟩 [`const versions`](#const-versions) - contains version information for UserUtils and CoreUtils
   - [**Translation:**](#translation)
     - 🟣 [`function tr.for()`](#function-trfor) - translates a key for the specified language
     - 🟣 [`function tr.use()`](#function-truse) - creates a translation function for the specified language
     - 🟣 [`function tr.hasKey()`](#function-trhaskey) - checks if a key exists in the given language
     - 🟣 [`function tr.addTranslations()`](#function-traddtranslations) - add a flat or recursive translation object for a language
     - 🟣 [`function tr.getTranslations()`](#function-trgettranslations) - returns the translation object for a language
+    - 🟣 [`function tr.getAllTranslations()`](#function-trgetalltranslations) - returns all registered translations
     - 🟣 [`function tr.deleteTranslations()`](#function-trdeletetranslations) - delete the translation object for a language
     - 🟣 [`function tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
     - 🟣 [`function tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
@@ -1294,6 +1300,20 @@ Configuration object for an individual mixin function.
 
 <br><br>
 
+### `const versions`
+An object containing the current version of the library and its re-exported dependency [CoreUtils.](https://github.com/Sv443-Network/CoreUtils)  
+These versions are [semver-compliant](https://semver.org/), without any prefix like `v` or range specifiers like `^`, but might still contain suffixes like `-beta.1` for pre-release versions.  
+  
+- ⚠️ If you want to install both libraries at the same time, make sure to use this object to check that your installed version of CoreUtils matches the one that UserUtils is re-exporting, to avoid potential compatibility issues like broken class inheritance or feature mismatches. For most use cases, it should suffice to just use the re-exported CoreUtils features.
+```ts
+{
+  UserUtils: string; // semver-compliant version of this library
+  CoreUtils: string; // semver-compliant version of the re-exported CoreUtils library
+}
+```
+
+<br><br>
+
 <!-- #region Translation -->
 ## Translation:
 
@@ -1438,6 +1458,34 @@ tr.getTranslations("de"); // undefined
 
 <br><br>
 
+### `function tr.getAllTranslations()`
+Signature:
+```ts
+getAllTranslations(asCopy = true): Record<string, TrObject>;
+```
+  
+Returns an object containing all registered translations, where keys are the language codes and values are the translation objects.  
+If `asCopy` is set to `true` (default), the returned object and all nested translation objects will be cloned using `JSON.parse(JSON.stringify())` to prevent external mutation. If set to `false`, the actual internal translation objects will be returned, so any changes to them will affect the translations used by the library and can be used as an alternative to [`tr.addTranslations()`](#function-traddtranslations) for modifying translations.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr } from "@sv443-network/userutils";
+
+tr.addTranslations("en", { hello: "Hello, World!" });
+tr.addTranslations("de", { hello: "Hallo, Welt!" });
+
+tr.getAllTranslations(); // { en: { hello: "Hello, World!" }, de: { hello: "Hallo, Welt!" } }
+
+const translationsMutable = tr.getAllTranslations(false);
+translationsMutable.en.hello = "Hi, World!";
+
+tr.for("en", "hello"); // "Hi, World!"
+```
+</details>
+
+<br><br>
+
 ### `function tr.deleteTranslations()`
 Signature:
 ```ts
@@ -1522,6 +1570,8 @@ function tr.addTransform<TTrKey extends string = string>(
 Adds a transform function to the translation system. Transforms are applied after resolving a translation for any language.  
 Use this to enable dynamic values in translations, for example to insert custom values or to denote a section that could be encapsulated by rich text.  
 The `transform` argument is a tuple of `[RegExp, TransformFn]`.  
+  
+- ⚠️ If a transform function throws an error, it will propagate up through the translation functions (`tr.for()`, `tr.use()`, etc.), so make sure to either handle errors within the transform function itself or wrap translation calls in try/catch blocks.  
   
 The `TransformFn` receives an object with the following properties:
 | Property | Type | Description |
