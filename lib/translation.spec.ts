@@ -76,6 +76,7 @@ describe("Translation", () => {
       percent: "Hello, %1",
       percentMulti: "%1 %2 %3",
       templateLiteral: "Hello, ${name}",
+      i18n: "Hello, {{name}}",
     });
 
     expect(tr.for("en", "percent", "Jeff")).toBe("Hello, %1");
@@ -103,5 +104,9 @@ describe("Translation", () => {
 
     tr.deleteTransform(tr.transforms.templateLiteral[1]);
     expect(tr.for("en", "templateLiteral", "Jeff")).toBe("Hello, ${name}");
+
+    // i18n transform behaves the same as template literal transform, just with different delimiters:
+    tr.addTransform(tr.transforms.i18n);
+    expect(tr.for("en", "i18n", { name: "Jeff" })).toBe("Hello, Jeff");
   });
 });
