@@ -92,7 +92,7 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
 
   const trObj = trans[language];
 
-  if(typeof language !== "string" || language.length === 0 || typeof trObj !== "object" || trObj === null)
+  if(typeof language !== "string" || typeof trObj !== "object" || trObj === null)
     return fallbackLang && language !== fallbackLang ? translate(fallbackLang, key, ...trArgs) : key;
 
   /** Apply all transforms that match the translation string */
@@ -202,10 +202,11 @@ function hasKey<TTrKey extends string = string>(language = fallbackLang ?? "", k
 //#region manage translations
 
 /**
- * Registers a new language and its translations - if the language already exists, it will be overwritten.  
+ * Registers a new language and its translations - if the language already exists, it will be wholly replaced by the new one. If merging is necessary, it will have to be done before calling this function.  
+ *   
  * The translations are a key-value pair where the key is the translation key and the value is the translated text.  
  * The translations can also be infinitely nested objects, resulting in a dot-separated key.
- * @param language Language code or name to register - I recommend sticking to a standard like [ISO 639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) or [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+ * @param language Arbitrary language code or name to register for these translations. These should ideally stick to a standard like [IETF BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag) (the standard used by JavaScript), but could really be anything.
  * @param translations Translations for the specified language
  * @example ```ts
  * tr.addTranslations("en", {
@@ -228,6 +229,14 @@ function addTranslations(language: string, translations: TrObject): void {
  */
 function getTranslations(language = fallbackLang ?? ""): TrObject | undefined {
   return trans[language];
+}
+
+/**
+ * Returns all translations currently loaded into memory, indexed by language.  
+ * @param asCopy Set to `false` to get a reference to the actual translations object instead of a copy (default). Might be useful for modifying translations in-memory without using {@linkcode tr.addTranslations()} to replace the entire object.
+ */
+function getAllTranslations(asCopy = true): typeof trans {
+  return asCopy ? JSON.parse(JSON.stringify(trans)) : trans;
 }
 
 /**
@@ -334,109 +343,71 @@ function deleteTransform(patternOrFn: RegExp | TransformFn): boolean {
 
 //#region predef transforms
 
-/**
- * This transform will replace placeholders matching `${key}` with the value of the passed argument(s).  
- * The arguments can be passed in keyed object form or positionally via the spread operator:
- * - Keyed: If the first argument is an object and `key` is found in it, the value will be used for the replacement.
- * - Positional: If the first argument is not an object or has a `toString()` method that returns something that doesn't start with `[object`, the values will be positionally inserted in the order they were passed.
- *   
- * @example ```ts
- * tr.addTranslations("en", {
- *  "greeting": "Hello, ${user}!\nYou have ${notifs} notifications.",
- * });
- * tr.addTransform(tr.transforms.templateLiteral);
- * 
- * const t = tr.use("en");
- * 
- * // both calls return the same result:
- * t("greeting", { user: "John", notifs: 5 }); // "Hello, John!\nYou have 5 notifications."
- * t("greeting", "John", 5);                   // "Hello, John!\nYou have 5 notifications."
- * 
- * // when a key isn't found in the object, it will be left as-is:
- * t("greeting", { user: "John" }); // "Hello, John!\nYou have ${notifs} notifications."
- * ```
- */
+const commonKeyedTransform = ({ matches, trArgs, trValue }: TransformFnProps, patternRegex: RegExp, patternStart: string, patternEnd: string): string => {
+  let str = String(trValue);
+
+  const eachKeyInTrString = (keys: string[]): boolean => keys.every((key) => trValue.includes(`${patternStart}${key}${patternEnd}`));
+
+  const namedMapping = (): void => {
+    if(!str.includes(patternStart) || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
+      return;
+    for(const match of matches) {
+      const repl = match[1] !== undefined ? (trArgs[0] as Record<string, string>)[match[1]] : undefined;
+      if(typeof repl !== "undefined")
+        str = str.replace(match[0], String(repl));
+    }
+  };
+
+  const positionalMapping = (): void => {
+    if(!(patternRegex.test(str)) || !trArgs[0])
+      return;
+    let matchNum = -1;
+    for(const match of matches) {
+      matchNum++;
+      if(typeof trArgs[matchNum] !== "undefined")
+        str = str.replace(match[0], String(trArgs[matchNum]));
+    }
+  };
+
+  let notStringifiable = false;
+  try {
+    void `${trArgs[0]}`;
+  }
+  catch {
+    notStringifiable = true;
+  }
+
+  /** Whether the first args parameter is an object that doesn't implement a custom `toString` method */
+  const isArgsObject = trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && (notStringifiable || String(trArgs[0]).startsWith("[object"));
+
+  if(isArgsObject && eachKeyInTrString(Object.keys(trArgs[0]!)))
+    namedMapping();
+  else
+    positionalMapping();
+
+  return str;
+};
+
+/** Transform for template literals in the form `${key}` - supports both named and positional arguments, but will prioritize named mapping if the first argument is an object that doesn't implement a custom `toString` method. */
 const templateLiteralTransform: TransformTuple<string> = [
   /\$\{([a-zA-Z0-9$_-]+)\}/gm,
-  ({ matches, trArgs, trValue }) => {
-    const patternStart = "${",
-      patternEnd = "}",
-      patternRegex = /\$\{.+\}/m;
-
-    let str = String(trValue);
-
-    const eachKeyInTrString = (keys: string[]): boolean => keys.every((key) => trValue.includes(`${patternStart}${key}${patternEnd}`));
-
-    const namedMapping = (): void => {
-      if(!str.includes(patternStart) || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
-        return;
-      for(const match of matches) {
-        const repl = match[1] !== undefined ? (trArgs[0] as Record<string, string>)[match[1]] : undefined;
-        if(typeof repl !== "undefined")
-          str = str.replace(match[0], String(repl));
-      }
-    };
-
-    const positionalMapping = (): void => {
-      if(!(patternRegex.test(str)) || !trArgs[0])
-        return;
-      let matchNum = -1;
-      for(const match of matches) {
-        matchNum++;
-        if(typeof trArgs[matchNum] !== "undefined")
-          str = str.replace(match[0], String(trArgs[matchNum]));
-      }
-    };
-
-    let notStringifiable = false;
-    try {
-      String(trArgs[0]);
-    }
-    catch {
-      notStringifiable = true;
-    }
-
-    /** Whether the first args parameter is an object that doesn't implement a custom `toString` method */
-    const isArgsObject = trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && (notStringifiable || String(trArgs[0]).startsWith("[object"));
-
-    if(isArgsObject && eachKeyInTrString(Object.keys(trArgs[0]!)))
-      namedMapping();
-    else
-      positionalMapping();
-
-    return str;
-  },
+  (transProps) => commonKeyedTransform(transProps, /\$\{.+\}/m, "${", "}"),
 ] as const;
 
-/**
- * This transform will replace `%n` placeholders with the value of the passed arguments.  
- * The `%n` placeholders are 1-indexed, meaning `%1` will be replaced by the first argument (index 0), `%2` by the second (index 1), and so on.  
- * Objects will be stringified via `String()` before being inserted.  
- *   
- * @example ```ts
- * tr.addTranslations("en", {
- *  "greeting": "Hello, %1!\nYou have %2 notifications.",
- * });
- * tr.addTransform(tr.transforms.percent);
- * 
- * const t = tr.use("en");
- * 
- * // arguments are inserted in the order they're passed:
- * t("greeting", "John", 5); // "Hello, John!\nYou have 5 notifications."
- * 
- * // when a value isn't found, the placeholder will be left as-is:
- * t("greeting", "John"); // "Hello, John!\nYou have %2 notifications."
- * ```
- */
+/** Transforms in the default i18n form `{{key}}` - supports both named and positional arguments, but will prioritize named mapping if the first argument is an object that doesn't implement a custom `toString` method. */
+const i18nTransform: TransformTuple<string> = [
+  /\{\{([a-zA-Z0-9$_-]+)\}\}/gm,
+  (transProps) => commonKeyedTransform(transProps, /\{\{.+\}\}/m, "{{", "}}"),
+] as const;
+
+/** Transform for the pattern `%n`, where `n` is the 1-indexed argument number to replace it with. */
 const percentTransform: TransformTuple<string> = [
   /%(\d+)/gm,
   ({ matches, trArgs, trValue }) => {
     let str = String(trValue);
 
     for(const match of matches) {
-      const repl = match[1] !== undefined
-        ? (trArgs as Stringifiable[])?.[Number(match[1]) - 1]
-        : undefined;
+      const repl = (trArgs as Stringifiable[])?.[Number(match[1]!) - 1];
       if(typeof repl !== "undefined")
         str = str.replace(match[0], String(repl));
     }
@@ -456,13 +427,81 @@ const tr = {
     hasKey<TTrKey>(language, key),
   addTranslations,
   getTranslations,
+  getAllTranslations,
   deleteTranslations,
   setFallbackLanguage,
   getFallbackLanguage,
   addTransform,
   deleteTransform,
+  /** Collection of predefined transform functions that can be added via {@linkcode tr.addTransform()} */
   transforms: {
+    /**
+     * This transform will replace placeholders matching `${key}` with the value of the passed argument(s).  
+     * The arguments can be passed in keyed object form or positionally via the spread operator:
+     * - Keyed: If the first argument is an object and `key` is found in it, the value will be used for the replacement.
+     * - Positional: If the first argument is not an object or has a `toString()` method that returns something that doesn't start with `[object`, the values will be positionally inserted in the order they were passed.
+     *   
+     * @example ```ts
+     * tr.addTranslations("en", {
+     *  "greeting": "Hello, ${user}!\nYou have ${notifs} notifications.",
+     * });
+     * tr.addTransform(tr.transforms.templateLiteral);
+     * 
+     * const t = tr.use("en");
+     * 
+     * // both calls return the same result:
+     * t("greeting", { user: "John", notifs: 5 }); // "Hello, John!\nYou have 5 notifications."
+     * t("greeting", "John", 5);                   // "Hello, John!\nYou have 5 notifications."
+     * 
+     * // when a key isn't found in the object, it will be left as-is:
+     * t("greeting", { user: "John" }); // "Hello, John!\nYou have ${notifs} notifications."
+     * ```
+     */
     templateLiteral: templateLiteralTransform,
+    /**
+     * This transform will replace placeholders matching `{{key}}` with the value of the passed argument(s).  
+     * This format is commonly used in i18n libraries. Note that advanced syntax is not supported, only simple key replacement.  
+     * The arguments can be passed in keyed object form or positionally via the spread operator:
+     * - Keyed: If the first argument is an object and `key` is found in it, the value will be used for the replacement.
+     * - Positional: If the first argument is not an object or has a `toString()` method that returns something that doesn't start with `[object`, the values will be positionally inserted in the order they were passed.
+     *   
+     * @example ```ts
+     * tr.addTranslations("en", {
+     *  "greeting": "Hello, {{user}}!\nYou have {{notifs}} notifications.",
+     * });
+     * tr.addTransform(tr.transforms.i18n);
+     * 
+     * const t = tr.use("en");
+     * 
+     * // both calls return the same result:
+     * t("greeting", { user: "Alice", notifs: 5 }); // "Hello, Alice!\nYou have 5 notifications."
+     * t("greeting", "Alice", 5);                   // "Hello, Alice!\nYou have 5 notifications."
+     * 
+     * // when a key isn't found in the object, it will be left as-is:
+     * t("greeting", { user: "Alice" }); // "Hello, Alice!\nYou have {{notifs}} notifications."
+     * ```
+     */
+    i18n: i18nTransform,
+    /**
+     * This transform will replace `%n` placeholders with the value of the passed arguments.  
+     * The `%n` placeholders are 1-indexed, meaning `%1` will be replaced by the first argument (index 0), `%2` by the second (index 1), and so on.  
+     * Objects will be stringified via `String()` before being inserted.  
+     *   
+     * @example ```ts
+     * tr.addTranslations("en", {
+     *  "greeting": "Hello, %1!\nYou have %2 notifications.",
+     * });
+     * tr.addTransform(tr.transforms.percent);
+     * 
+     * const t = tr.use("en");
+     * 
+     * // arguments are inserted in the order they're passed:
+     * t("greeting", "Bob", 5); // "Hello, Bob!\nYou have 5 notifications."
+     * 
+     * // when a value isn't found, the placeholder will be left as-is:
+     * t("greeting", "Bob"); // "Hello, Bob!\nYou have %2 notifications."
+     * ```
+     */
     percent: percentTransform,
   },
 };

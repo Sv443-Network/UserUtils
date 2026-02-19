@@ -27,8 +27,8 @@
     "test-gm-serve": "node --import tsx ./test/TestPage/server.mts",
     "test-gm-dev": "cd test/TestScript && pnpm dev",
     "test-gm": "concurrently \"pnpm test-gm-serve\" \"pnpm test-gm-dev\"",
-    "test": "vitest",
-    "test-coverage": "vitest --coverage"
+    "test": "pnpm build && vitest",
+    "test-coverage": "pnpm build && vitest --coverage"
   },
   "repository": {
     "type": "git",
@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/Sv443-Network/UserUtils",
   "dependencies": {
-    "@sv443-network/coreutils": "3.0.5",
+    "@sv443-network/coreutils": "3.1.0",
     "nanoevents": "9.1.0"
   },
   "devDependencies": {
@@ -70,7 +70,6 @@
     "express": "4.22.1",
     "globals": "15.15.0",
     "jsdom": "26.1.0",
-    "kleur": "4.1.5",
     "tslib": "2.8.1",
     "tsup": "8.5.1",
     "tsx": "4.21.0",

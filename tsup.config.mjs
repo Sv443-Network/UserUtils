@@ -1,10 +1,14 @@
 import { defineConfig } from "tsup";
-import pkg from "./package.json";
-import { createUmdWrapper } from "./tools/umdWrapperPlugin.mjs";
+import { createStringInjectPlugin } from "./tools/stringInjectPlugin.mjs";
+import { createUmdWrapperPlugin } from "./tools/umdWrapperPlugin.mjs";
+import pkg from "./package.json" with { type: "json" };
+import coreUtilsPkg from "./node_modules/@sv443-network/coreutils/package.json" with { type: "json" };
+
+// #region types, consts, header
 
 /** @typedef {import("tsup").Options} TsupOpts */
 
-const clientName = "UserUtils";
+const libraryName = "UserUtils";
 const externalDependencies = Object.keys(pkg.dependencies);
 const isDevelopmentMode = process.env.NODE_ENV === "development";
 
@@ -31,12 +35,34 @@ const userLibraryHeader = `\
 // ==/OpenUserJS==
 `;
 
+// #region constant injection
+
+/** @type {() => TsupOpts["plugins"][number]} */
+const getStringInjectPlugin = () => {
+  const coreutilsVersion = coreUtilsPkg.version?.replace(/^[^0-9]*/, "") ?? "ERR:unknown";
+  const userutilsVersion = pkg.version;
+
+  const isSemverBasic = (version) => /^\d+\.\d+\.\d+(-.+)?$/.test(version);
+
+  if(!isSemverBasic(coreutilsVersion))
+    throw new Error(`Invalid CoreUtils version: "${coreutilsVersion}"`);
+  if(!isSemverBasic(userutilsVersion))
+    throw new Error(`Invalid UserUtils version: "${userutilsVersion}"`);
+
+  return createStringInjectPlugin([
+    { pattern: /#\{\{COREUTILS_VERSION\}\}/, replacement: coreutilsVersion },
+    { pattern: /#\{\{USERUTILS_VERSION\}\}/, replacement: userutilsVersion },
+  ]);
+};
+
+// #region base config
+
 /** @type {(cliOpts: TsupOpts) => Promise<TsupOpts | TsupOpts[]> | TsupOpts | TsupOpts[]} */
 const getBaseConfig = (cliOpts) => {
   /** @type {TsupOpts} */
   const opts = {
     entry: {
-      [clientName]: "lib/index.ts",
+      [libraryName]: "lib/index.ts",
     },
     outDir: "dist",
     outExtension: ({ format, options }) => ({
@@ -46,18 +72,21 @@ const getBaseConfig = (cliOpts) => {
         umd: "umd.js",
       })[format] ?? "js"}`,
     }),
+    plugins: [
+      getStringInjectPlugin(),
+    ],
     platform: "browser",
     format: ["cjs", "esm"],
     noExternal: externalDependencies,
-    target: ["chrome90", "edge90", "firefox90", "opera98", "safari15"],
+    target: ["firefox100", "chrome100", "safari15", "es2018"],
     name: "@sv443-network/userutils",
-    globalName: clientName,
+    globalName: libraryName,
     legacyOutput: false,
     bundle: true,
     esbuildPlugins: [],
     minify: false,
     splitting: false,
-    sourcemap: true,
+    sourcemap: false,
     dts: false,
     clean: true,
     watch: cliOpts.watch,
@@ -66,10 +95,13 @@ const getBaseConfig = (cliOpts) => {
   return opts;
 };
 
+// #region bundle configs
+
 export default defineConfig((cliOpts) => ([
   {
     // base CJS and ESM bundles
     ...getBaseConfig(cliOpts),
+    splitting: false,
   },
   {
     // regular UMD bundle
@@ -77,10 +109,11 @@ export default defineConfig((cliOpts) => ([
     format: ["umd"],
     target: "es6",
     plugins: [
-      createUmdWrapper({
-        libraryName: clientName,
+      createUmdWrapperPlugin({
+        libraryName,
         external: [],
-      })
+      }),
+      getStringInjectPlugin(),
     ],
   },
   {
@@ -89,16 +122,16 @@ export default defineConfig((cliOpts) => ([
     format: ["umd"],
     target: "es6",
     plugins: [
-      createUmdWrapper({
-        libraryName: clientName,
+      createUmdWrapperPlugin({
+        libraryName,
         external: [],
         banner: userLibraryHeader,
       }),
+      getStringInjectPlugin(),
     ],
     outExtension: () => ({ js: ".user.js" }),
-    sourcemap: false,
     clean: false,
-    // 
+    // generate declaration files after successful build
     onSuccess: "tsc --emitDeclarationOnly --declaration --outDir dist && node --import tsx ./tools/fix-dts.mts",
   },
 ]));

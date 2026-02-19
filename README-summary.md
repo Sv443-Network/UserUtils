@@ -32,44 +32,56 @@ View the documentation of previous major versions:
 
 <br>
 
+> [!NOTE]  
+> In version 10.0.0, many of the platform-agnostic features were moved to [the CoreUtils library.](https://github.com/Sv443-Network/CoreUtils)  
+> <sub>
+> Everything in CoreUtils is re-exported by UserUtils for backwards compatibility, so installing both at the same time isn't usually necessary.  
+> Beware that when both are installed, class inheritance between the two libraries will only work if the installed version of CoreUtils matches the version of CoreUtils that is included in UserUtils (refer to `package.json`), so that the final bundler is able to deduplicate them correctly. See also [`const versions`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#const-versions)
+> 
+> </sub>
+
+<br>
+
 <!-- https://github.com/Sv443-Network/UserUtils  < #foo    -->
 ## Feature Summary:
 - [**UserUtils Features**](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#features)
     - [**DOM:**](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dom)
-        - 🟧 [`Dialog`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
-        - 🟧 [`SelectorObserver`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
-        - 🟣 [`getUnsafeWindow()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
-        - 🟣 [`isDomLoaded()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
-        - 🟣 [`onDomLoad()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
-        - 🟣 [`addParent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-addparent) - add a parent element around another element
-        - 🟣 [`addGlobalStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-addglobalstyle) - add a global style to the page
-        - 🟣 [`preloadImages()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-preloadimages) - preload images into the browser cache for faster loading later on
-        - 🟣 [`openInNewTab()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-openinnewtab) - open a link in a new tab
-        - 🟣 [`interceptEvent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
-        - 🟣 [`interceptWindowEvent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
-        - 🟣 [`isScrollable()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
-        - 🟣 [`observeElementProp()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
-        - 🟣 [`getSiblingsFrame()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
-        - 🟣 [`setInnerHtmlUnsafe()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
-        - 🟣 [`probeElementStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
+        - 🟧 [`class Dialog`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-dialog) - class for creating custom modal dialogs with a promise-based API and a generic, default style
+        - 🟧 [`class SelectorObserver`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-selectorobserver) - class that manages listeners that are called when selectors are found in the DOM
+        - 🟣 [`function getUnsafeWindow()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-getunsafewindow) - get the unsafeWindow object or fall back to the regular window object
+        - 🟣 [`function isDomLoaded()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-isdomloaded) - check if the DOM has finished loading and can be queried and modified
+        - 🟣 [`function onDomLoad()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-ondomload) - run a function or pause async execution until the DOM has finished loading (or immediately if DOM is already loaded)
+        - 🟣 [`function addParent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-addparent) - add a parent element around another element
+        - 🟣 [`function addGlobalStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-addglobalstyle) - add a global style to the page
+        - 🟣 [`function preloadImages()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-preloadimages) - preload images into the browser cache for faster loading later on
+        - 🟣 [`function openInNewTab()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-openinnewtab) - open a link in a new tab
+        - 🟣 [`function interceptEvent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-interceptevent) - conditionally intercepts events registered by `addEventListener()` on any given EventTarget object
+        - 🟣 [`function interceptWindowEvent()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-interceptwindowevent) - conditionally intercepts events registered by `addEventListener()` on the window object
+        - 🟣 [`function isScrollable()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-isscrollable) - check if an element has a horizontal or vertical scroll bar
+        - 🟣 [`function observeElementProp()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-observeelementprop) - observe changes to an element's property that can't be observed with MutationObserver
+        - 🟣 [`function getSiblingsFrame()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-getsiblingsframe) - returns a frame of an element's siblings, with a given alignment and size
+        - 🟣 [`function setInnerHtmlUnsafe()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-setinnerhtmlunsafe) - set the innerHTML of an element using a [Trusted Types policy](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) without sanitizing or escaping it
+        - 🟣 [`function probeElementStyle()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-probeelementstyle) - probe the computed style of a temporary element (get default font size, resolve CSS variables, etc.)
     - [**Misc:**](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#misc)
-        - 🟧 [`GMStorageEngine`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
-        - 🟧 [`Mixins`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+        - 🟧 [`class GMStorageEngine`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-gmstorageengine) - storage engine class for [`DataStore`s](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) using the GreaseMonkey API
+        - 🟧 [`class Mixins`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-mixins) - class for creating mixin functions that allow multiple sources to modify a target value in a highly flexible way
+        - 🟩 [`const versions`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#const-versions) - contains version information for UserUtils and CoreUtils
     - [**Translation:**](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#translation)
-        - 🟣 [`tr.for()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trfor) - translates a key for the specified language
-        - 🟣 [`tr.use()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-truse) - creates a translation function for the specified language
-        - 🟣 [`tr.hasKey()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trhaskey) - checks if a key exists in the given language
-        - 🟣 [`tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-traddtranslations) - add a flat or recursive translation object for a language
-        - 🟣 [`tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgettranslations) - returns the translation object for a language
-        - 🟣 [`tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trdeletetranslations) - delete the translation object for a language
-        - 🟣 [`tr.setFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
-        - 🟣 [`tr.getFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgetfallbacklanguage) - returns the fallback language
-        - 🟣 [`tr.addTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
-        - 🟣 [`tr.deleteTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trdeletetransform) - removes a transform function
-        - 🟩 [`tr.transforms`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
-        - 🔷 [`TrKeys`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
+        - 🟣 [`function tr.for()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trfor) - translates a key for the specified language
+        - 🟣 [`function tr.use()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-truse) - creates a translation function for the specified language
+        - 🟣 [`function tr.hasKey()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trhaskey) - checks if a key exists in the given language
+        - 🟣 [`function tr.addTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-traddtranslations) - add a flat or recursive translation object for a language
+        - 🟣 [`function tr.getTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgettranslations) - returns the translation object for a language
+        - 🟣 [`function tr.getAllTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgetalltranslations) - returns all registered translations
+        - 🟣 [`function tr.deleteTranslations()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trdeletetranslations) - delete the translation object for a language
+        - 🟣 [`function tr.setFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
+        - 🟣 [`function tr.getFallbackLanguage()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trgetfallbacklanguage) - returns the fallback language
+        - 🟣 [`function tr.addTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+        - 🟣 [`function tr.deleteTransform()`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#function-trdeletetransform) - removes a transform function
+        - 🟩 [`const tr.transforms`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
+        - 🔷 [`type TrKeys`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
     - [**Errors**](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#error-classes)
-        - 🟧 [`PlatformError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
+        - 🟧 [`class PlatformError`](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
 - [**CoreUtils Features** (re-exported for backwards compatibility)](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#table-of-contents)
     - [**Array:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#array)
         - 🟣 [`function randomItem()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomitem) - Returns a random item from the given array
