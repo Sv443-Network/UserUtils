@@ -1567,37 +1567,82 @@ function tr.addTransform<TTrKey extends string = string>(
 ): void;
 ```
   
-Adds a transform function to the translation system. Transforms are applied after resolving a translation for any language.  
+Adds a transform function to the translation system.  
 Use this to enable dynamic values in translations, for example to insert custom values or to denote a section that could be encapsulated by rich text.  
-The `transform` argument is a tuple of `[RegExp, TransformFn]`.  
+The `transform` argument is a tuple of `[pattern: RegExp, callback: TransformFn]`.  
+
+- Transforms are applied after resolving a translation for any language.
+- Only when the given RegExp pattern was found inside a translation value, the corresponding TransformFn callback will be executed. As long as that function then correctly modifies and returns the `currentValue` property (which all the default ones do), it won't matter if transforms are mixed and matched across different translation values. Just make sure that you only use one type of interpolation pattern per translation value to avoid potential conflicts between positional and keyed arguments.
   
 - ⚠️ If a transform function throws an error, it will propagate up through the translation functions (`tr.for()`, `tr.use()`, etc.), so make sure to either handle errors within the transform function itself or wrap translation calls in try/catch blocks.  
   
 The `TransformFn` receives an object with the following properties:
 | Property | Type | Description |
 | :-- | :-- | :-- |
-| `language` | `string` | The current or fallback language |
-| `matches` | `RegExpExecArray[]` | All matches as returned by `RegExp.exec()` |
-| `trKey` | `TTrKey` | The translation key |
-| `trValue` | `string` | Translation value before any transformations |
-| `currentValue` | `string` | Current value, possibly in-between transformations |
-| `trArgs` | `(Stringifiable \| Record<string, Stringifiable>)[]` | Arguments passed to the translation function |
+| **`currentValue`** | `string` | Current value, possibly in-between transformations. Should be modified and returned by the transform function. |
+| **`matches`** | `RegExpExecArray[]` | All matches as returned by `RegExp.exec()` |
+| `language` | `string` | The current or fallback language code. |
+| `trKey` | `TTrKey` | The translation key for which the transform is currently being applied. |
+| `trValue` | `string` | Translation value before any transformations. Use with caution to avoid conflicts with other transforms. |
+| `trArgs` | `(Stringifiable \| Record<string, Stringifiable>)[]` | Array of all arguments passed to the translation function. |
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
 import { tr } from "@sv443-network/userutils";
 
+// >> using predefined transforms:
+// (scroll down for custom transform example)
+
 tr.addTranslations("en", {
+  // uses the templateLiteral transform:
   greeting: "Hello, ${name}!",
+  // uses the i18n transform:
+  notifications: "You have {{notifs}} notifications.",
+  // uses the percent transform:
+  status: "Status: %1",
 });
 
+// add multiple predefined transforms:
 tr.addTransform(tr.transforms.templateLiteral);
+tr.addTransform(tr.transforms.i18n);
+tr.addTransform(tr.transforms.percent);
 
 const t = tr.use("en");
 
+// the transforms that are both positional and keyed can be used via object or positional arguments:
+// templateLiteral transform:
 t("greeting", { name: "John" }); // "Hello, John!"
 t("greeting", "John");           // "Hello, John!"
+
+// i18n transform:
+t("notifications", { notifs: 42 }); // "You have 42 notifications."
+t("notifications", "notifs", 42);   // "You have 42 notifications."
+
+// transforms that only support positional arguments (like the percent transform) will try to stringify all arguments:
+// percent transform:
+t("status", "Online");                     // "Status: Online"
+t("status", { status: "Online" });         // "Status: [object Object]"
+t("status", { toString: () => "Online" }); // "Status: Online"
+
+
+// >> custom transform example:
+
+// creating a custom transform that resolves '<c #hex>text</c>' to '<span style="color: #hex;">text</span>':
+tr.addTransform([
+  // use g and m flags to match and replace all occurrences:
+  /<c\s+#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s?>(.*?)<\/c>/gm,
+  // grab values from the regex groups and return the transformed string:
+  ({ matches }) => `<span style="color: #${matches[1]}};">${matches[2]}</span>`,
+]);
+
+// add a new translation key while not overwriting the existing ones:
+tr.addTranslations("en", {
+  ...tr.getTranslations("en"),
+  colored: "<c #f00>This is red</c> and <c #0000ff>this is blue</c>.",
+});
+
+t("colored"); // "<span style="color: #f00;">This is red</span> and <span style="color: #0000ff;">this is blue</span>."
 ```
 </details>
 
@@ -1622,8 +1667,10 @@ const myTransform: TransformTuple = [
   ({ matches }) => matches[1] ?? "",
 ];
 
+tr.deleteTransform(myTransform[0]); // false
 tr.addTransform(myTransform);
 tr.deleteTransform(myTransform[0]); // true
+tr.deleteTransform(myTransform[0]); // false
 ```
 </details>
 
@@ -1636,6 +1683,7 @@ Currently available transforms:
 | Key | Pattern | Type(s) |
 | :-- | :-- | :-- |
 | `templateLiteral` | `${key}` | Keyed / Positional |
+| `i18n` | `{{key}}` | Keyed / Positional |
 | `percent` | `%n` | Positional |
   
 <details><summary><b>Example - click to view</b></summary>
