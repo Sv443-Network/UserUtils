@@ -69,9 +69,9 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
     - 🟣 [`function tr.deleteTranslations()`](#function-trdeletetranslations) - delete the translation object for a language
     - 🟣 [`function tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) - set the fallback language used when a key is not found in the given language
     - 🟣 [`function tr.getFallbackLanguage()`](#function-trgetfallbacklanguage) - returns the fallback language
-    - 🟣 [`function tr.addTransform()`](#function-traddtransform) - adds a transform function to the translation system for custom argument insertion and much more
+    - 🟣 [`function tr.addTransform()`](#function-traddtransform) - adds a transform function to the translation system for custom argument interpolation and much more
     - 🟣 [`function tr.deleteTransform()`](#function-trdeletetransform) - removes a transform function
-    - 🟩 [`const tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument insertion
+    - 🟩 [`const tr.transforms`](#const-trtransforms) - predefined transform functions for quickly adding custom argument interpolation
     - 🔷 [`type TrKeys`](#type-trkeys) - generic type that extracts all keys from a flat or recursive translation object into a union
   - [**Custom Error classes**](#error-classes)
     - 🟧 [`class PlatformError`](#class-platformerror) - thrown when the current platform doesn't support a certain feature, like calling a DOM function in a non-DOM environment
@@ -1316,6 +1316,15 @@ These versions are [semver-compliant](https://semver.org/), without any prefix l
 
 <!-- #region Translation -->
 ## Translation:
+UserUtils' translation system is simpler than other industry standard libraries, but still powerful and flexible. It features support for nested keys, pattern-based transformation functions (with some predefined ones included), and various utility functions for runtime translation management, as well as full TypeScript type safety and autocomplete for translation keys.  
+  
+The main translation functions are [`tr.for()`](#function-trfor) and [`tr.use()`](#function-truse), but there are also utility functions like [`tr.hasKey()`](#function-trhaskey), [`tr.addTranslations()`](#function-traddtranslations), [`tr.getTranslations()`](#function-trgettranslations), and more.  
+For fallbacks, [`tr.setFallbackLanguage()`](#function-trsetfallbacklanguage) can be used to default to a specific language when a translation key is not found for the requested language.  
+  
+Use the type [`TrKeys`](#type-trkeys) for creating a TS union type out of the keys of a translation object, which also works with nested keys, to provide better autocomplete and type safety when using `tr.for()` and `tr.use()`.  
+The type [`TrObject`](#type-trobject) defines the shape of the translation objects that are registered with `tr.addTranslations()`.
+
+<br>
 
 ### `function tr.for()`
 Signature:
@@ -1330,20 +1339,44 @@ function tr.for<TTrKey extends string = string>(
 Returns the translated text for the specified key in the specified language.  
 If the key is not found in the specified previously registered translation, the key itself is returned.  
   
-⚠️ Remember to register a language with `tr.addTranslations()` before using this function, otherwise it will always return the key itself.  
+- ⚠️ Remember to register a language with `tr.addTranslations()` before using this function, otherwise it will always return the key itself.  
+- By default, translation strings are returned as they are, but using the [function `tr.addTransform()`](#function-traddtransform) you can add functions that modify the translation string in various ways.  
+  UserUtils comes with [some predefined transforms](#const-trtransforms) out of the box, but custom ones are also easy to create for any other use case. Refer to the [type `TransformTuple`](#type-transformtuple) for details.
   
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr } from "@sv443-network/userutils";
+import { tr, type TrObject, type TrKeys } from "@sv443-network/userutils";
 
-tr.addTranslations("en", { hello: "Hello, World!" });
-tr.addTranslations("de", { hello: "Hallo, Welt!" });
+// create translation object:
+const transEn = {
+  hello: "Hello, World!",
+  nested: {
+    key: "This is a nested key",
+  },
+  foo: "Foo: %1",
+} as const satisfies TrObject;
+// ^ `as const satisfies` ensures that the literal structural type is the one used by TS, while also ensuring it still matches `TrObject`
 
+// create union type of all translation keys, including nested ones:
+type KeysEn = TrKeys<typeof transEn>; // "hello" | "nested.key" | "foo"
+// ^ it's recommended to create a type out of the keys of the most complete translation object (usually the same as the fallback language) and use that type for all calls to `tr.for()` and `tr.use()`, even for other languages that might have fewer keys.
+
+// add translations object for "en" language:
+tr.addTranslations("en", transEn);
+
+// register the %n positional argument transform:
+tr.addTransform(tr.transforms.percent);
+
+// use tr.for() with autocomplete for the keys:
+tr.for<KeysEn>("en", "hello");      // "Hello, World!"
+tr.for<KeysEn>("en", "nested.key"); // "This is a nested key"
+tr.for<KeysEn>("en", "foo", "bar"); // "Foo: bar" (using the predefined positional argument transform)
+
+// using fallback language:
+tr.for<KeysEn>("de", "hello"); // "hello" (key not found, returns key itself)
 tr.setFallbackLanguage("en");
-
-tr.for("en", "hello"); // "Hello, World!"
-tr.for("de", "hello"); // "Hallo, Welt!"
+tr.for<KeysEn>("de", "hello"); // "Hello, World!" (fallback to English)
 ```
 </details>
 
@@ -1360,20 +1393,41 @@ function tr.use<TTrKey extends string = string>(
 Creates a translation function for the specified language, allowing you to translate multiple strings without repeating the language parameter.  
 The returned function works exactly like `tr.for()`, minus the language parameter.  
   
+- ⚠️ Remember to register a language with `tr.addTranslations()` before using this function, otherwise it will always return the key itself.  
+- By default, translation strings are returned as they are, but using the [function `tr.addTransform()`](#function-traddtransform) you can add functions that modify the translation string in various ways.  
+  UserUtils comes with [some predefined transforms](#const-trtransforms) out of the box, but custom ones are also easy to create for any other use case. Refer to the [type `TransformTuple`](#type-transformtuple) for details.
+  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr, type TrKeys } from "@sv443-network/userutils";
+import { tr, type TrObject, type TrKeys } from "@sv443-network/userutils";
 
+// create translation object:
 const transEn = {
   hello: "Hello, World!",
-} as const;
+  nested: {
+    key: "This is a nested key",
+  },
+  foo: "Foo: %1",
+} as const satisfies TrObject;
+// ^ `as const satisfies` ensures that the literal structural type is the one used by TS, while also ensuring it still matches `TrObject`
 
+// create union type of all translation keys, including nested ones:
+type KeysEn = TrKeys<typeof transEn>; // "hello" | "nested.key" | "foo"
+// ^ it's recommended to create a type out of the keys of the most complete translation object (usually the same as the fallback language) and use that type for all calls to `tr.for()` and `tr.use()`, even for other languages that might have fewer keys.
+
+// add translations object for "en" language:
 tr.addTranslations("en", transEn);
 
-const t = tr.use<TrKeys<typeof transEn>>("en");
+// register the %n positional argument transform:
+tr.addTransform(tr.transforms.percent);
 
-t("hello"); // "Hello, World!"
+// create a translation function for "en" language with autocomplete for the keys:
+const t = tr.use<KeysEn>("en");
+
+t("hello");      // "Hello, World!"
+t("nested.key"); // "This is a nested key"
+t("foo", "bar"); // "Foo: bar" (using the predefined positional argument transform)
 ```
 </details>
 
@@ -1414,22 +1468,41 @@ function tr.addTranslations(language: string, translations: TrObject): void;
 Registers a new language and its translations. If the language already exists, it will be overwritten.  
 The translations can be a flat key-value object or infinitely nested objects, resulting in a dot-separated key.  
   
+Refer to the [type `TrObject`](#type-trobject) for more details on the expected shape of the translations object.  
+In general, the value can either be a string, or another object that follows the same rules, allowing for infinite nesting.  
+When using nested objects, the keys will be concatenated with dots to form the final translation key. For example, the translation object `{ nested: { key: "foo" } }` will create a translation key of `nested.key` with the value `"foo"`.
+  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
-import { tr } from "@sv443-network/userutils";
+import { tr, type TrObject, type TrKeys } from "@sv443-network/userutils";
 
-tr.addTranslations("en", {
+// create translation object:
+const transEn = {
   hello: "Hello, World!",
   nested: {
     key: "This is a nested key",
   },
-});
+  foo: "Foo: %1",
+} as const satisfies TrObject;
+// ^ `as const satisfies` ensures that the literal structural type is the one used by TS, while also ensuring it still matches `TrObject`
 
-const t = tr.use("en");
+// create union type of all translation keys, including nested ones:
+type KeysEn = TrKeys<typeof transEn>; // "hello" | "nested.key" | "foo"
+// ^ it's recommended to create a type out of the keys of the most complete translation object (usually the same as the fallback language) and use that type for all calls to `tr.for()` and `tr.use()`, even for other languages that might have fewer keys.
+
+// add translations object for "en" language:
+tr.addTranslations("en", transEn);
+
+// register the %n positional argument transform:
+tr.addTransform(tr.transforms.percent);
+
+// create a translation function for "en" language with autocomplete for the keys:
+const t = tr.use<KeysEn>("en");
 
 t("hello");      // "Hello, World!"
 t("nested.key"); // "This is a nested key"
+t("foo", "bar"); // "Foo: bar" (using the predefined positional argument transform)
 ```
 </details>
 
@@ -1569,14 +1642,13 @@ function tr.addTransform<TTrKey extends string = string>(
   
 Adds a transform function to the translation system.  
 Use this to enable dynamic values in translations, for example to insert custom values or to denote a section that could be encapsulated by rich text.  
-The `transform` argument is a tuple of `[pattern: RegExp, callback: TransformFn]`.  
-
-- Transforms are applied after resolving a translation for any language.
-- Only when the given RegExp pattern was found inside a translation value, the corresponding TransformFn callback will be executed. As long as that function then correctly modifies and returns the `currentValue` property (which all the default ones do), it won't matter if transforms are mixed and matched across different translation values. Just make sure that you only use one type of interpolation pattern per translation value to avoid potential conflicts between positional and keyed arguments.
+The `transform` argument is a tuple of `[pattern: RegExp, callback: TransformFn]`. See the [type `TransformTuple`](#type-transformtuple) for more details.  
   
+- Transforms are applied after resolving the initial translation string for any language, in the order they were added.
+- Only when the given RegExp pattern was found inside a translation value, the corresponding TransformFn callback will be executed. As long as that function then correctly modifies and returns the `currentValue` property (which all the default ones do), it won't matter if transforms are mixed and matched across different translation values. Just make sure that you only use one type of interpolation pattern per translation value to avoid potential conflicts between positional and keyed arguments.
 - ⚠️ If a transform function throws an error, it will propagate up through the translation functions (`tr.for()`, `tr.use()`, etc.), so make sure to either handle errors within the transform function itself or wrap translation calls in try/catch blocks.  
   
-The `TransformFn` receives an object with the following properties:
+The `TransformFn` receives a single parameter which is an object with the following properties:
 | Property | Type | Description |
 | :-- | :-- | :-- |
 | **`currentValue`** | `string` | Current value, possibly in-between transformations. Should be modified and returned by the transform function. |
@@ -1677,7 +1749,8 @@ tr.deleteTransform(myTransform[0]); // false
 <br>
 
 ### `const tr.transforms`
-Predefined transform functions for quickly adding custom argument insertion.  
+Predefined transform functions for quickly adding custom argument interpolation.  
+Enable them by passing them to [`tr.addTransform()`](#function-traddtransform).  
   
 Currently available transforms:
 | Key | Pattern | Type(s) |
@@ -1762,7 +1835,9 @@ Can be a flat object of identifier keys and translation text values, or an infin
 type TransformFn<TTrKey extends string = string> = (props: TransformFnProps<TTrKey>) => Stringifiable;
 ```
   
-Function that transforms a matched translation string into another string.
+Function that transforms a matched translation string into another string.  
+It is passed as the second item in the [type `TransformTuple`](#type-transformtuple) to the [function `tr.addTransform()`](#function-traddtransform).  
+When the function gets called, it receives a single object parameter. Refer to the [function `tr.addTransform()`](#function-traddtransform) documentation for the properties of this object and other important notes on using transform functions.
 
 <br>
 
@@ -1771,7 +1846,42 @@ Function that transforms a matched translation string into another string.
 type TransformTuple<TTrKey extends string = string> = [RegExp, TransformFn<TTrKey>];
 ```
   
-Transform pattern and function in tuple form, passed to `tr.addTransform()`.
+Translation transform pattern and function in tuple form, passed to `tr.addTransform()`.  
+Used when creating custom transforms that are not included in the [predefined transforms.](#const-trtransforms)  
+  
+The first item in the tuple is a RegExp pattern that is used to find matches in translation values.  
+Use groups `(...)` to capture values for later use in the TransformFn via the `matches` property. (You can also prevent capturing with `(?:...)` if you just need the parens for the pattern but don't need the values.)  
+Make sure to use the `g` and `m` flags so that the pattern can match multiple occurrences in a single translation value, including translation values that contain `\n` line breaks.  
+You can use a website like [regex101.com](https://regex101.com/) to test and debug your RegExp patterns. Just make sure the flavor is set to `ECMAScript (JavaScript)` and to include the appropriate flags.  
+  
+The second item is the `TransformFn` that transforms the matched translation string into another string.  
+It is a function that takes a single object parameter. Refer to the [function `tr.addTransform()`](#function-traddtransform) documentation for the properties of this object and other important notes on using transform functions.  
+  
+<details><summary><b>Example - click to view</b></summary>
+
+```ts
+import { tr, type TransformTuple } from "@sv443-network/userutils";
+
+// simple transform that turns '[icon:name]' into '<i class="icon" data-icon="name"></i>':
+const iconTransform: TransformTuple = [
+  /\[icon:([a-zA-Z0-9_-]+)\]/gm,
+  ({ matches }) => `<i class="icon" data-icon="${matches[1]}"></i>`,
+];
+
+// add the custom transform and the predefined templateLiteral transform:
+tr.addTransform(iconTransform);
+tr.addTransform(tr.transforms.templateLiteral);
+
+tr.addTranslations("en", {
+  warning: "[icon:warning] Warning: ${message}",
+});
+
+const t = tr.use("en");
+
+console.log(t("warning", { message: "This is a warning message!" }));
+// Output: "<i class="icon" data-icon="warning"></i> Warning: This is a warning message!"
+```
+</details>
 
 <br><br>
 
