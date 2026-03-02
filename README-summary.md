@@ -104,20 +104,22 @@ View the documentation of previous major versions:
         - 🟣 [`function randomId()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randomid) - Generates a random ID of the given length
     - [**DataStore:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastore) - Cross-platform, general-purpose, sync/async hybrid, JSON-serializable database infrastructure:
         - 🟧 [`class DataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastore) - The main class for the data store
-        - 🔷 [`type DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions) - Options for the data store
-        - 🔷 [`type DataMigrationsDict`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datamigrationsdict) - Dictionary of data migration functions
+            - 🔷 [`type DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions) - Options for the data store
+            - 🔷 [`type DataMigrationsDict`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datamigrationsdict) - Dictionary of data migration functions
+            - 🔷 [`type DataStoreData`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoredata) - The type of the serializable data
+            - 🔷 [`type DataStoreEventMap`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreeventmap) - Map of DataStore events
         - 🟧 [`class DataStoreSerializer`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastoreserializer) - Serializes and deserializes data for multiple DataStore instances
-        - 🔷 [`type DataStoreSerializerOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreserializeroptions) - Options for the DataStoreSerializer
-        - 🔷 [`type LoadStoresDataResult`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-loadstoresdataresult) - Result of calling [`loadStoresData()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastoreserializer-loadstoresdata)
-        - 🔷 [`type SerializedDataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-serializeddatastore) - Meta object and serialized data of a DataStore instance
-        - 🔷 [`type StoreFilter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-storefilter) - Filter for selecting data stores
+            - 🔷 [`type DataStoreSerializerOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreserializeroptions) - Options for the DataStoreSerializer
+            - 🔷 [`type LoadStoresDataResult`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-loadstoresdataresult) - Result of calling [`loadStoresData()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastoreserializer-loadstoresdata)
+            - 🔷 [`type SerializedDataStore`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-serializeddatastore) - Meta object and serialized data of a DataStore instance
+            - 🔷 [`type StoreFilter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-storefilter) - Filter for selecting data stores
         - 🟧 [`class DataStoreEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastoreengine) - Base class for DataStore storage engines, which handle the data storage
-        - 🔷 [`type DataStoreEngineDSOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreenginedsoptions) - Reduced version of [`DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions)
-        - [Storage Engines:](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#storage-engines)
-        - 🟧 [`class BrowserStorageEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-browserstorageengine) - Storage engine for browser environments (localStorage, sessionStorage)
-            - 🔷 [`type BrowserStorageEngineOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#browserstorageengineoptions) - Options for the browser storage engine
-        - 🟧 [`class FileStorageEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-FileStorageEngine) - File-based storage engine for Node.js and Deno
-            - 🔷 [`type FileStorageEngineOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#FileStorageEngineoptions) - Options for the file storage engine
+            - 🔷 [`type DataStoreEngineDSOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreenginedsoptions) - Reduced version of [`DataStoreOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-datastoreoptions)
+            - [Storage Engines:](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#storage-engines)
+                - 🟧 [`class BrowserStorageEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-browserstorageengine) - Storage engine for browser environments (localStorage, sessionStorage)
+                    - 🔷 [`type BrowserStorageEngineOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#browserstorageengineoptions) - Options for the browser storage engine
+                - 🟧 [`class FileStorageEngine`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-FileStorageEngine) - File-based storage engine for Node.js and Deno
+                    - 🔷 [`type FileStorageEngineOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#FileStorageEngineoptions) - Options for the file storage engine
     - [**Debouncer:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#debouncer)
         - 🟣 [`function debounce()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-debounce) - Function wrapper for the [`Debouncer` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-debouncer)
         - 🟧 [`class Debouncer`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-debouncer) - Class that manages listeners whose calls are rate-limited
@@ -135,7 +137,7 @@ View the documentation of previous major versions:
         - 🟣 [`function clamp()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-clamp) - Clamps a number between a given range
         - 🟣 [`function digitCount()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-digitcount) - Returns the number of digits in a number
         - 🟣 [`function formatNumber()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-formatnumber) - Formats a number to a string using the given locale and format identifier
-        - 🔷 [`type NumberFormat`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-numberformat) - Number format identifier
+            - 🔷 [`type NumberFormat`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-numberformat) - Number format identifier
         - 🟣 [`function mapRange()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-maprange) - Maps a number from one range to another
         - 🟣 [`function overflowVal()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-overflowVal) - Makes sure a number is in a range by over- & underflowing it
         - 🟣 [`function randRange()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-randrange) - Returns a random number in the given range
@@ -143,9 +145,9 @@ View the documentation of previous major versions:
         - 🟣 [`function valsWithin()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-valswithin) - Checks if the given numbers are within a certain range of each other
     - [**Misc:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#misc)
         - 🟣 [`function consumeGen()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-consumegen) - Consumes a [`ValueGen` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-valuegen)
-        - 🔷 [`type ValueGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-valuegen) - A value that can be either type T, or a sync or async function that returns T
+            - 🔷 [`type ValueGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-valuegen) - A value that can be either type T, or a sync or async function that returns T
         - 🟣 [`function consumeStringGen()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-consumestringgen) - Consumes a [`StringGen` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringgen)
-        - 🔷 [`type StringGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringgen) - A value that can be either of type string, or a sync or async function that returns a string
+            - 🔷 [`type StringGen`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-stringgen) - A value that can be either of type string, or a sync or async function that returns a string
         - 🟣 [`function fetchAdvanced()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-fetchadvanced) - Wrapper around [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with options like a timeout
         - 🔷 [`type FetchAdvancedOpts`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-fetchadvancedopts) - Options for the [`fetchAdvanced()` function](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-fetchadvanced)
         - 🟣 [`function getListLength()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-getlistlength) - Returns the length of a [`ListLike` object](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-listlike)
@@ -157,13 +159,13 @@ View the documentation of previous major versions:
         - 🟣 [`function getCallStack()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-getcallstack) - Returns the current call stack, starting at the caller of this function.
     - [**NanoEmitter:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#nanoemitter)
         - 🟧 [`class NanoEmitter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter) - Simple, lightweight event emitter class that can be used in both FP and OOP, inspired by [`EventEmitter` from `node:events`](https://nodejs.org/api/events.html#class-eventemitter), based on [`nanoevents`](https://npmjs.com/package/nanoevents)
-        - 🔷 [`type NanoEmitterOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nanoemitteroptions) - Options for the [`NanoEmitter` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter)
+            - 🔷 [`type NanoEmitterOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nanoemitteroptions) - Options for the [`NanoEmitter` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter)
     - [**Text:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#text)
         - 🟣 [`function autoPlural()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-autoplural) - Turns the given term into its plural form, depending on the given number or list length
         - 🟣 [`function capitalize()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-capitalize) - Capitalizes the first letter of the given string
         - 🟣 [`function createProgressBar()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-createprogressbar) - Creates a progress bar string with the given percentage and length
-        - 🟩 [`const defaultPbChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#const-defaultpbchars) - Default characters for the progress bar
-        - 🔷 [`type ProgressBarChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-progressbarchars) - Type for the progress bar characters object
+            - 🟩 [`const defaultPbChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#const-defaultpbchars) - Default characters for the progress bar
+            - 🔷 [`type ProgressBarChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-progressbarchars) - Type for the progress bar characters object
         - 🟣 [`function joinArrayReadable()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-joinarrayreadable) - Joins the given array into a string, using the given separators and last separator
         - 🟣 [`function secsToTimeStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-secstotimestr) - Turns the given number of seconds into a string in the format `(hh:)mm:ss` with intelligent zero-padding
         - 🟣 [`function truncStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-truncstr) - Truncates the given string to the given length
