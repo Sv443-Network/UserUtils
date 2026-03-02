@@ -1689,7 +1689,7 @@ t("greeting", "John");           // "Hello, John!"
 
 // i18n transform:
 t("notifications", { notifs: 42 }); // "You have 42 notifications."
-t("notifications", "notifs", 42);   // "You have 42 notifications."
+t("notifications", 42);             // "You have 42 notifications."
 
 // transforms that only support positional arguments (like the percent transform) will try to stringify all arguments:
 // percent transform:
