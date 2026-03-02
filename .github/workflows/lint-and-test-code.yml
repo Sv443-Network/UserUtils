@@ -53,6 +53,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
+      - name: Check for JSR issues
+        run: pnpm check-jsr
+
       - name: Lint
         run: pnpm lint
 

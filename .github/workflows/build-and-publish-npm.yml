@@ -61,6 +61,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
+      - name: Check for JSR issues
+        run: pnpm check-jsr
+
       - name: Build package
         run: pnpm build
 
