@@ -4,7 +4,7 @@ type ConstTypes = {
 };
 
 /** Raw (unparsed) constants, injected by `tsup.config.mjs` using `tools/stringInjectPlugin.mjs` */
-const rawConsts = {
+const rawConsts: ConstTypes = {
   coreUtilsVersion: "#{{COREUTILS_VERSION}}",
   userUtilsVersion: "#{{USERUTILS_VERSION}}",
 } as const satisfies ConstTypes;
@@ -16,9 +16,9 @@ function getConst<TKey extends keyof typeof rawConsts, TDefault extends string |
 }
 
 /** Contains the semver version strings of UserUtils and the bundled library CoreUtils. */
-export const versions = {
+export const versions: Record<"CoreUtils" | "UserUtils", string> = {
   /** Semver version string of the bundled library CoreUtils. */
   CoreUtils: getConst("coreUtilsVersion", "ERR:unknown"),
   /** Semver version string of UserUtils. */
   UserUtils: getConst("userUtilsVersion", "ERR:unknown"),
-};
+} as const;
