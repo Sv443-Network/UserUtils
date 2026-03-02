@@ -59,7 +59,7 @@ function getUmdBanner(opts) {
   const globalDeps = external?.map(x => `g["${x}"]`).join(", ") ?? "";
   const requireDeps = external?.map(x => `require('${x}')`).join(", ") ?? "";
   let deps = [];
-  if (external) {
+  if(external) {
     deps = external.map((x, i) => {
       return {
         key: alphabet[i],
@@ -105,7 +105,7 @@ export const umdWrapperSetup = build => {
   const external = initialOptions.external;
   const content = getUmdBanner({ libraryName: initialOptions.libraryName, external });
   if(initialOptions.footer) {
-    if (initialOptions.footer.js)
+    if(initialOptions.footer.js)
       initialOptions.footer.js += umdFooter;
     else
       initialOptions.footer.js = umdFooter;

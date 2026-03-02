@@ -343,13 +343,14 @@ function deleteTransform(patternOrFn: RegExp | TransformFn): boolean {
 
 //#region predef transforms
 
-const commonKeyedTransform = ({ matches, trArgs, trValue }: TransformFnProps, patternRegex: RegExp, patternStart: string, patternEnd: string): string => {
+const commonKeyedTransform = ({ matches, trArgs, trValue }: TransformFnProps, patternRegex: RegExp, quickMatchPattern: string): string => {
   let str = String(trValue);
 
-  const eachKeyInTrString = (keys: string[]): boolean => keys.every((key) => trValue.includes(`${patternStart}${key}${patternEnd}`));
+  /** Whether at least one placeholder key from the translation string exists as a property in the given object */
+  const someMatchKeyInArgs = (obj: Record<string, unknown>): boolean => matches.some((match) => match[1] !== undefined && match[1] in obj);
 
   const namedMapping = (): void => {
-    if(!str.includes(patternStart) || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
+    if(!str.includes(quickMatchPattern) || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !someMatchKeyInArgs(trArgs[0] as Record<string, unknown>))
       return;
     for(const match of matches) {
       const repl = match[1] !== undefined ? (trArgs[0] as Record<string, string>)[match[1]] : undefined;
@@ -359,7 +360,7 @@ const commonKeyedTransform = ({ matches, trArgs, trValue }: TransformFnProps, pa
   };
 
   const positionalMapping = (): void => {
-    if(!(patternRegex.test(str)) || !trArgs[0])
+    if(!patternRegex.test(str) || typeof trArgs[0] === "undefined")
       return;
     let matchNum = -1;
     for(const match of matches) {
@@ -380,7 +381,7 @@ const commonKeyedTransform = ({ matches, trArgs, trValue }: TransformFnProps, pa
   /** Whether the first args parameter is an object that doesn't implement a custom `toString` method */
   const isArgsObject = trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && (notStringifiable || String(trArgs[0]).startsWith("[object"));
 
-  if(isArgsObject && eachKeyInTrString(Object.keys(trArgs[0]!)))
+  if(isArgsObject && someMatchKeyInArgs(trArgs[0] as Record<string, unknown>))
     namedMapping();
   else
     positionalMapping();
@@ -391,13 +392,13 @@ const commonKeyedTransform = ({ matches, trArgs, trValue }: TransformFnProps, pa
 /** Transform for template literals in the form `${key}` - supports both named and positional arguments, but will prioritize named mapping if the first argument is an object that doesn't implement a custom `toString` method. */
 const templateLiteralTransform: TransformTuple<string> = [
   /\$\{([a-zA-Z0-9$_-]+)\}/gm,
-  (transProps) => commonKeyedTransform(transProps, /\$\{.+\}/m, "${", "}"),
+  (tfProps) => commonKeyedTransform(tfProps, /\$\{.+\}/m, "${"),
 ] as const;
 
 /** Transforms in the default i18n form `{{key}}` - supports both named and positional arguments, but will prioritize named mapping if the first argument is an object that doesn't implement a custom `toString` method. */
 const i18nTransform: TransformTuple<string> = [
   /\{\{([a-zA-Z0-9$_-]+)\}\}/gm,
-  (transProps) => commonKeyedTransform(transProps, /\{\{.+\}\}/m, "{{", "}}"),
+  (tfProps) => commonKeyedTransform(tfProps, /\{\{.+\}\}/m, "{{"),
 ] as const;
 
 /** Transform for the pattern `%n`, where `n` is the 1-indexed argument number to replace it with. */

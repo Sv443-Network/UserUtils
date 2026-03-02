@@ -108,5 +108,13 @@ describe("Translation", () => {
     // i18n transform behaves the same as template literal transform, just with different delimiters:
     tr.addTransform(tr.transforms.i18n);
     expect(tr.for("en", "i18n", { name: "Jeff" })).toBe("Hello, Jeff");
+
+    // named mapping should work when args object has extra properties not present in the translation string:
+    expect(tr.for("en", "i18n", { name: "Jeff", extraProp: "ignored" })).toBe("Hello, Jeff");
+    tr.deleteTransform(tr.transforms.i18n[0]);
+
+    tr.addTransform(tr.transforms.templateLiteral);
+    expect(tr.for("en", "templateLiteral", { name: "Jeff", extra: "value", another: 42 })).toBe("Hello, Jeff");
+    expect(tr.for("en", "templateLiteral", pureObj({ name: "Jeff", unused: "data" }))).toBe("Hello, Jeff");
   });
 });
