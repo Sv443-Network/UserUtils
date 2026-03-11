@@ -170,6 +170,13 @@ View the documentation of previous major versions:
             - 🔷 [`type ProgressBarChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-progressbarchars) - Type for the progress bar characters object
         - 🟣 [`function joinArrayReadable()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-joinarrayreadable) - Joins the given array into a string, using the given separators and last separator
         - 🟣 [`function secsToTimeStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-secstotimestr) - Turns the given number of seconds into a string in the format `(hh:)mm:ss` with intelligent zero-padding
+        - 🟣 [`function createTable()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-createtable) - Creates an ASCII table string from the given rows
+            - 🟩 [`const defaultTableLineCharset`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#const-defaulttablelinecharset) - Default line characters for the table
+            - 🔷 [`type TableOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tableoptions) - Options for the [`createTable()`](./docs.md#function-createtable) function
+            - 🔷 [`type TableLineStyle`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tablelinestyle) - The line style to use for the table border
+            - 🔷 [`type TableColumnAlign`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tablecolumnalign) - The alignment mode for a column
+            - 🔷 [`type TableLineCharset`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tablelinecharset) - The full charset used for table line characters
+            - 🔷 [`type TableLineStyleChars`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-tablelinestylechars) - The characters for one line style variant
         - 🟣 [`function truncStr()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-truncstr) - Truncates the given string to the given length
     - [**Misc. Types:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#types)
         - 🔷 [`type LooseUnion`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-looseunion) - A union type that allows for autocomplete suggestions as well as substitutions of the same type
