@@ -1,5 +1,11 @@
 # @sv443-network/userutils
 
+## 10.3.1
+
+### Patch Changes
+
+- 7cbeefc: Updated CoreUtils to v3.5.1 to fix a build error that led to a SyntaxError.
+
 ## 10.3.0
 
 ### Minor Changes
