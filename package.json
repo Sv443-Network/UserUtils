@@ -11,7 +11,8 @@
       "browser": "./dist/UserUtils.mjs",
       "types": "./dist/lib/index.d.ts",
       "require": "./dist/UserUtils.cjs",
-      "import": "./dist/UserUtils.mjs"
+      "import": "./dist/UserUtils.mjs",
+      "userscript": "./dist/UserUtils.user.js"
     }
   },
   "type": "module",
@@ -77,9 +78,10 @@
     "vitest": "3.2.4"
   },
   "files": [
-    "/dist/UserUtils.mjs",
     "/dist/UserUtils.cjs",
+    "/dist/UserUtils.mjs",
     "/dist/UserUtils.umd.js",
+    "/dist/UserUtils.user.js",
     "/dist/lib/**.d.ts",
     "/package.json",
     "/README.md",

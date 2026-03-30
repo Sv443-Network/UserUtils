@@ -232,8 +232,8 @@ Shameless plug: I made a [template for userscripts in TypeScript](https://github
   
   Versioned (recommended):
   ```
-  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.user.js
-  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.user.js
+  // @require https://cdn.jsdelivr.net/npm/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js
+  // @require https://unpkg.com/@sv443-network/userutils@INSERT_VERSION/dist/UserUtils.umd.js
   ```
   Non-versioned (not recommended because it auto-updates):
   ```

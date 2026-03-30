@@ -10,6 +10,7 @@
       "./dist/UserUtils.cjs",
       "./dist/UserUtils.mjs",
       "./dist/UserUtils.umd.js",
+      "./dist/UserUtils.user.js",
       "./dist/lib/*.d.ts",
       "./lib/**/*.ts",
       "./CHANGELOG.md",
