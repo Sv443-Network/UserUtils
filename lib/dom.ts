@@ -132,8 +132,7 @@ export function interceptEvent<
   eventName: Parameters<TEvtObj["addEventListener"]>[0],
   predicate: (event: TPredicateEvt) => boolean = () => true,
 ): void {
-  // @ts-expect-error
-  if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && (eventObject === window || eventObject === getUnsafeWindow()))
+  if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && ((eventObject as unknown as Window) === window || (eventObject as unknown as Window) === getUnsafeWindow()))
     throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript is forced to run in.");
 
   // default is 25 on FF so this should hopefully be more than enough
