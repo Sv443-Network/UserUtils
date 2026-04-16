@@ -454,11 +454,11 @@ The constructor takes a `baseElement`, which is a parent of the elements you wan
 If a selector string is passed instead, it will be used to find the element as soon as observation is enabled.  
 If you want to observe the entire document, you can pass `document.body` - ⚠️ you should only use this to initialize other SelectorObserver instances, and never run continuous listeners on this instance, as the performance impact can be massive!  
   
-The `options` parameter is optional and will be passed to the MutationObserver that is used internally.  
-The MutationObserver options present by default are `{ childList: true, subtree: true }` - you may see the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
-For example, if you want to trigger the listeners when certain attributes change, pass `{ attributeFilter: ["class", "data-my-attribute"] }`  
+The `options` parameter of [type `SelectorObserverConstructorOptions`](#type-selectorobserverconstructoroptions) is optional. It contains both own properties and ones that will be passed to the MutationObserver that is used internally.  
+The MutationObserver options set by default are `{ childList: true, subtree: true }` - refer to the [MutationObserver.observe() documentation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) for more information and a list of options.  
+For example, if you want to trigger the listeners when certain attributes change, you could pass `{ attributeFilter: ["class", "data-my-attribute"] }`  
   
-⚠️ Make sure to call `enable()` to actually start observing. This will need to be done after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired) **and** as soon as the `baseElement` or `baseElementSelector` is available.  
+⚠️ Make sure to only call `addListener()` after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired). Otherwise, set `enableOnAddListener` to false in the constructor options and call `enable()` manually after the DOM has loaded.  
   
 <details><summary><b>Example - click to view</b></summary>
 
@@ -466,58 +466,60 @@ For example, if you want to trigger the listeners when certain attributes change
 import { SelectorObserver } from "@sv443-network/userutils";
 
 // adding a single-shot listener before the element exists:
-const fooObserver = new SelectorObserver("body");
+const fooObserver = new SelectorObserver("body", {
+  // since the listener below will be added before DOMContentLoaded, the instance
+  // should stay disabled until the DOM is ready:
+  enableOnAddListener: false,
+});
 
+// add a listener before the DOM is available:
 fooObserver.addListener("#my-element", {
-  listener: (element) => {
-    console.log("Element found:", element);
+  listener(myElement) {
+    console.log("MyElement found:", myElement);
   },
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  // starting observation after the <body> element is available:
+  // start observation after the DOM and <body> element are available:
   fooObserver.enable();
 
 
-  // adding custom observer options:
-
   const barObserver = new SelectorObserver(document.body, {
-    // only check if the following attributes change:
-    attributeFilter: ["class", "style", "data-whatever"],
     // debounce all listeners by 100ms unless specified otherwise:
     defaultDebounce: 100,
-    defaultDebounceType: "immediate",
+    // add custom MutationObserver options:
+    // only check if the following attributes change:
+    attributeFilter: ["class", "style", "data-whatever"],
+    // override the subtree option to false, so only direct children of the base element will be observed:
+    subtree: false,
   });
 
   barObserver.addListener("#my-element", {
     listener: (element) => {
-      console.log("Element's attributes changed:", element);
+      console.log("An element's attributes changed:", element);
     },
   });
 
-  barObserver.enable();
+  // (no need to call enable() for barObserver, since enableOnAddListener is true by default)
 
 
   // using custom listener options:
-
   const bazObserver = new SelectorObserver(document.body);
 
-  // for TypeScript, specify that input elements are returned by the listener:
-  const unsubscribe = bazObserver.addListener<HTMLInputElement>("input", {
+  // in TypeScript, specify that input elements are returned by the listener via the generic type parameter:
+  const unsubscribeBaz = bazObserver.addListener<HTMLInputElement>("input", {
     all: true,        // use querySelectorAll() instead of querySelector()
     continuous: true, // don't remove the listener after it was called once
     debounce: 50,     // debounce the listener by 50ms
     listener: (elements) => {
-      // type of `elements` is NodeListOf<HTMLInputElement>
+      // the type of `elements` is now a NodeListOf<HTMLInputElement>
       console.log("Input elements found:", elements);
     },
   });
 
-  bazObserver.enable();
-
   window.addEventListener("something", () => {
     // remove the listener after the event "something" was dispatched:
-    unsubscribe();
+    unsubscribeBaz();
   });
 });
 ```
