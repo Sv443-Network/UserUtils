@@ -2,5 +2,9 @@ packages:
   - .
   - lib/**
 
-# only allow 14+ day old packages - helps somewhat against supply chain attacks
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+
+# only allow 14+ day old package releases - helps somewhat against supply chain attacks
 minimumReleaseAge: 20160
