@@ -154,6 +154,9 @@ Some features require the `@run-at` or `@grant` directives to be tweaked in the 
   - [**NanoEmitter:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#nanoemitter)
     - 🟧 [`class NanoEmitter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter) - Simple, lightweight event emitter class that can be used in both FP and OOP, inspired by [`EventEmitter` from `node:events`](https://nodejs.org/api/events.html#class-eventemitter), based on [`nanoevents`](https://npmjs.com/package/nanoevents)
       - 🔷 [`type NanoEmitterOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-nanoemitteroptions) - Options for the [`NanoEmitter` class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-nanoemitter)
+  - [**PicoEmitter:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#picoemitter)
+    - 🟧 [`class PicoEmitter`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-picoemitter) - Even simpler event emitter purely for bootstrapping event-emitting classes in OOP.
+      - 🔷 [`type PicoEmitterOptions`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#type-picoemitteroptions) - Options for the [`PicoEmitter` class](./docs.md#class-picoemitter)
   - [**Text:**](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#text)
     - 🟣 [`function autoPlural()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-autoplural) - Turns the given term into its plural form, depending on the given number or list length
     - 🟣 [`function capitalize()`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#function-capitalize) - Capitalizes the first letter of the given string
