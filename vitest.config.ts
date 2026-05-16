@@ -2,6 +2,11 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    poolOptions: {
+      forks: {
+        execArgv: ["--no-experimental-webstorage"],
+      },
+    },
     coverage: {
       enabled: true,
       provider: "v8",
