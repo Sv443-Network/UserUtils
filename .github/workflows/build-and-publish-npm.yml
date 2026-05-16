@@ -77,17 +77,20 @@ jobs:
 
       - name: Get version info
         id: get_version_info
+        continue-on-error: true
         run: |
+          npx changeset status --output=changeset-version.ignore.json
           LIB_VERSION=$(node tools/get-pkg-prop.mjs version)
           echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_OUTPUT
+          RELEASE_VERSION=$(node tools/get-changeset-version.mjs version)
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create release or publish package
-        uses: changesets/action@v1.6.0
+        uses: changesets/action@v1.8.0
         id: changesets
         with:
           publish: npm run publish-package
           commit: ${{ env.COMMIT_MSG }}
-          title: ${{ env.PR_TITLE }} v${{ steps.get_version_info.outputs.LIB_VERSION }}
+          title: ${{ env.PR_TITLE }} v${{ steps.get_version_info.outputs.RELEASE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: "" # needed so OIDC works while changesets/action@v1.7.0 isn't out - see https://github.com/changesets/action/pull/545
