@@ -1,0 +1,36 @@
+{
+  "changesets": [
+    {
+      "releases": [
+        {
+          "name": "@sv443-network/userutils",
+          "type": "minor"
+        }
+      ],
+      "summary": "`SelectorObserver` now publicly exposes the properties `baseElement` and `options` (though they are read-only). It also now has a generic type parameter to provide stricter types when an already resolved `Element` is passed.",
+      "id": "chatty-cities-study"
+    },
+    {
+      "releases": [
+        {
+          "name": "@sv443-network/userutils",
+          "type": "minor"
+        }
+      ],
+      "summary": "Updated to CoreUtils v3.7.0 - this comes with the following feature:\n- Added the abstract class `PicoEmitter`, which is now the base class of `NanoEmitter`. It's meant purely for bootstrapping a class, not for standalone use in a functional environment.  \nFor public methods it only provides the basic `on()`, `once()` and `onMulti()` for attaching listeners. Emitting events is done purely internal via `emitEvent()` calls in a subclass.",
+      "id": "clear-bushes-build"
+    }
+  ],
+  "releases": [
+    {
+      "name": "@sv443-network/userutils",
+      "type": "minor",
+      "oldVersion": "10.4.0",
+      "changesets": [
+        "chatty-cities-study",
+        "clear-bushes-build"
+      ],
+      "newVersion": "10.5.0"
+    }
+  ]
+}
