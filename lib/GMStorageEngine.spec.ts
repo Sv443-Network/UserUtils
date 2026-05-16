@@ -28,6 +28,7 @@ describe("GMStorageEngine", () => {
         return Promise.resolve(keys);
       },
     };
+    // @ts-ignore
     globalThis.GM = GM as any;
   });
   

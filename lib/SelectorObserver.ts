@@ -51,14 +51,17 @@ export type SelectorObserverOptions = {
 
 export type SelectorObserverConstructorOptions = Prettify<SelectorObserverOptions & MutationObserverInit>;
 
-/** Observes the children of the given element for changes */
-export class SelectorObserver {
+/** Observes the children of the given element for changes. */
+export class SelectorObserver<TElem extends Element | string = HTMLElement | string> {
   private enabled = false;
-  private baseElement: Element | string;
   private observer?: MutationObserver;
   private observerOptions: MutationObserverInit;
   private customOptions: SelectorObserverOptions;
   private listenerMap: Map<string, SelectorListenerOptions[]>;
+  /** The base element (or its selector) to observe the children of - can be set in the constructor and is read-only afterward. */
+  public readonly baseElement: TElem;
+  /** The options that were set in the constructor - read-only afterward. */
+  public readonly options: SelectorObserverConstructorOptions;
 
   /**
    * Creates a new SelectorObserver that will observe the children of the given base element selector for changes (only creation and deletion of elements by default)
@@ -72,8 +75,9 @@ export class SelectorObserver {
    * @param options Fine-tune what triggers the MutationObserver's checking function - `subtree` and `childList` are set to true by default
    */
   constructor(baseElement: Element, options?: SelectorObserverConstructorOptions)
-  constructor(baseElement: Element | string, options: SelectorObserverConstructorOptions = {}) {
+  constructor(baseElement: TElem, options: SelectorObserverConstructorOptions = {}) {
     this.baseElement = baseElement;
+    this.options = options;
 
     this.listenerMap = new Map<string, SelectorListenerOptions[]>();
 
@@ -122,7 +126,7 @@ export class SelectorObserver {
     if(!this.enabled)
       return;
 
-    const baseElement = typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement;
+    const baseElement = (typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement) as (TElem & Element) | null;
 
     if(!baseElement)
       return;
@@ -208,7 +212,7 @@ export class SelectorObserver {
    * @returns Returns true when the observation was enabled, false otherwise (e.g. when the base element wasn't found)
    */
   public enable(immediatelyCheckSelectors = true): boolean {
-    const baseElement = typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement;
+    const baseElement = (typeof this.baseElement === "string" ? document.querySelector(this.baseElement) : this.baseElement) as (TElem & Element) | null;
     if(this.enabled || !baseElement)
       return false;
     this.enabled = true;
