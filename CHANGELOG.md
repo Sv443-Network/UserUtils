@@ -1,5 +1,15 @@
 # @sv443-network/userutils
 
+## 10.6.0
+
+### Minor Changes
+
+- 38f8bdc: Made `SelectorObserver` extend from `PicoEmitter` and emit the events `enabled`, `disabled`, `checked` and `found`.
+
+### Patch Changes
+
+- 67f126b: Updated CoreUtils to v3.7.1 to fix a missing export for `PicoEmitter`.
+
 ## 10.5.0
 
 ### Minor Changes
