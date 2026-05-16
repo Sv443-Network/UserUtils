@@ -3,7 +3,7 @@
  * This module contains the SelectorObserver class, allowing you to register listeners that get called whenever the element(s) behind a selector exist in the DOM - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#selectorobserver)
  */
 
-import { Debouncer, debounce, type DebouncerType, type Prettify } from "@sv443-network/coreutils";
+import { Debouncer, debounce, PicoEmitter, type DebouncerType, type Prettify, type PicoEmitterOptions } from "@sv443-network/coreutils";
 import { isDomLoaded } from "./dom.js";
 
 void ["type only", Debouncer];
@@ -47,12 +47,29 @@ export type SelectorObserverOptions = {
   enableOnAddListener?: boolean;
   /** If set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored */
   checkInterval?: number;
+  /** Options for the {@linkcode PicoEmitter} superclass */
+  picoEmitterOptions?: PicoEmitterOptions;
 };
 
 export type SelectorObserverConstructorOptions = Prettify<SelectorObserverOptions & MutationObserverInit>;
 
+/** Events emitted by {@linkcode SelectorObserver} */
+export type SelectorObserverEventMap = {
+  /** Emitted when the observation of the child elements is enabled. */
+  enabled: () => void;
+  /** Emitted when the observation of the child elements is disabled. */
+  disabled: () => void;
+  /** Emitted after all selectors were checked and their listeners were called accordingly. */
+  checked: () => void;
+  /** Emitted when a selector is found in the DOM - the event object contains the selector and the element(s) that were found. */
+  found: (data: {
+    selector: string;
+    elements: NodeListOf<Element> | Element;
+  }) => void;
+};
+
 /** Observes the children of the given element for changes. */
-export class SelectorObserver<TElem extends Element | string = HTMLElement | string> {
+export class SelectorObserver<TElem extends Element | string = HTMLElement | string> extends PicoEmitter<SelectorObserverEventMap> {
   private enabled = false;
   private observer?: MutationObserver;
   private observerOptions: MutationObserverInit;
@@ -76,6 +93,8 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
    */
   constructor(baseElement: Element, options?: SelectorObserverConstructorOptions)
   constructor(baseElement: TElem, options: SelectorObserverConstructorOptions = {}) {
+    super(options?.picoEmitterOptions);
+
     this.baseElement = baseElement;
     this.options = options;
 
@@ -119,6 +138,8 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
 
     for(const [selector, listeners] of this.listenerMap.entries())
       this.checkSelector(selector, listeners);
+
+    this.emitEvent("checked");
   }
 
   /** Checks if the element(s) with the given {@linkcode selector} exist in the DOM and calls the respective {@linkcode listeners} accordingly */
@@ -141,6 +162,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       if(options.all) {
         if(allElements && allElements.length > 0) {
           options.listener(allElements);
+          this.emitEvent("found", { selector, elements: allElements });
           if(!options.continuous)
             this.removeListener(selector, options);
         }
@@ -148,6 +170,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       else {
         if(oneElement) {
           options.listener(oneElement);
+          this.emitEvent("found", { selector, elements: oneElement });
           if(!options.continuous)
             this.removeListener(selector, options);
         }
@@ -204,6 +227,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       return;
     this.enabled = false;
     this.observer?.disconnect();
+    this.emitEvent("disabled");
   }
 
   /**
@@ -217,6 +241,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       return false;
     this.enabled = true;
     this.observer?.observe(baseElement, this.observerOptions);
+    this.emitEvent("enabled");
     if(immediatelyCheckSelectors)
       this.checkAllSelectors();
     return true;

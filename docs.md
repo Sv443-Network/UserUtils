@@ -464,6 +464,14 @@ For example, if you want to trigger the listeners when certain attributes change
   
 ⚠️ Make sure to only call `addListener()` after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired). Otherwise, set `enableOnAddListener` to false in the constructor options and call `enable()` manually after the DOM has loaded.  
   
+The class extends from [the `PicoEmitter` base class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-picoemitter) and emits the following events:  
+| Event | Arguments | Description |
+| :-- | :-- | :-- |
+| `enabled` | - | Emitted when the observation of the child elements is enabled. |
+| `disabled` | - | Emitted when the observation of the child elements is disabled. |
+| `checked` | - | Emitted after all selectors were checked and their listeners were called accordingly. |
+| `found` | `{ selector: string; elements: NodeListOf<Element> \| Element; }` | Emitted when a selector is found in the DOM - the event object contains the selector and the element(s) that were found. |
+  
 <details><summary><b>Example - click to view</b></summary>
 
 ```ts
