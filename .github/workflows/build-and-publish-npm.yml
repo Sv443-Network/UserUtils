@@ -78,7 +78,8 @@ jobs:
       - name: Get version info
         id: get_version_info
         run: |
-          LIB_VERSION=$(node src/tools/get-pkg-prop.mjs version)
+          LIB_VERSION=$(node tools/get-pkg-prop.mjs version)
+          echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create release or publish package
         uses: changesets/action@v1.6.0

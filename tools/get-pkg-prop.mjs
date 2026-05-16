@@ -1,6 +1,6 @@
 // echoes the prop with the given name from package.json
 
-import pkgJson from "../../package.json" with { type: "json" };
+import pkgJson from "../package.json" with { type: "json" };
 
 const propName = process.argv[2];
 
