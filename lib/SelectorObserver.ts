@@ -4,7 +4,7 @@
  */
 
 import { Debouncer, debounce, PicoEmitter, type DebouncerType, type Prettify, type PicoEmitterOptions } from "@sv443-network/coreutils";
-import { isDomLoaded } from "./domHeadless.js";
+import { isDomLoaded } from "./dom.js";
 
 void ["type only", Debouncer];
 
