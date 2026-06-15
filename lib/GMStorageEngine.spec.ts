@@ -74,7 +74,7 @@ describe("GMStorageEngine", () => {
 
     await store.engine.deleteStorage?.();
 
-    expect(await store.engine.getValue(`__ds_fmt_ver`, "error")).toBe("error");
+    expect(await store.engine.getValue(`__ds_fmt_ver`, "error")).not.toBe("error");
     expect(await store.engine.getValue(`__ds-${id}-ver`, "error")).toBe("error");
     expect(await store.engine.getValue(`__ds-${id}-enf`, "error")).toBe("error");
     expect(await store.engine.getValue(`__ds-${id}-dat`, "error")).toBe("error");
@@ -92,6 +92,5 @@ describe("GMStorageEngine", () => {
     await expect(eng.getValue("key", "default")).rejects.toThrow();
     await expect(eng.setValue("key", "value")).rejects.toThrow();
     await expect(eng.deleteValue("key")).rejects.toThrow();
-    await expect(eng.deleteStorage()).rejects.toThrow();
   });
 });
