@@ -4,7 +4,7 @@
  */
 
 import { NanoEmitter } from "@sv443-network/coreutils";
-import { addGlobalStyle } from "./dom.js";
+import { addGlobalStyle } from "./domHeadless.js";
 
 export const defaultDialogCss: string = `\
 .uu-no-select {

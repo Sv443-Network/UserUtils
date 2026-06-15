@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { addGlobalStyle, observeElementProp, preloadImages, probeElementStyle } from "./dom.js";
+import { observeElementProp, preloadImages, probeElementStyle } from "./dom.js";
+import { addGlobalStyle } from "./domHeadless.js";
 
 // TODO:FIXME: jsdom's headless rendering doesn't allow any of these tests to pass:
 

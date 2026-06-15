@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptWindowEvent, isDomLoaded, onDomLoad, openInNewTab, setInnerHtmlUnsafe } from "./dom.js";
+import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptWindowEvent, isDomLoaded, onDomLoad, openInNewTab, setInnerHtmlUnsafe } from "./domHeadless.js";
 import { PlatformError } from "./Errors.js";
 
 //#region getUnsafeWindow
