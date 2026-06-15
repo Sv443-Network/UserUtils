@@ -71,19 +71,4 @@ export class GMStorageEngine<TData extends DataStoreData> extends DataStoreEngin
       throw err;
     }
   }
-
-  /** Deletes all values from GM storage. Use with caution! */
-  public async deleteStorage(): Promise<void> {
-    try {
-      if(!("GM" in globalThis))
-        throw new PlatformError("GM is not defined. Make sure to run this in a userscript environment and that the necessary grants are set.");
-      const keys = await globalThis.GM.listValues();
-      for(const key of keys)
-        await globalThis.GM.deleteValue(key);
-    }
-    catch(err) {
-      console.error("Error deleting storage:", err);
-      throw err;
-    }
-  }
 }
