@@ -9,6 +9,7 @@ export * from "@sv443-network/coreutils";
 export * from "./consts.js";
 export * from "./Dialog.js";
 export * from "./dom.js";
+export * from "./domHeadless.js";
 export * from "./Errors.js";
 export * from "./GMStorageEngine.js";
 export * from "./Mixins.js";
