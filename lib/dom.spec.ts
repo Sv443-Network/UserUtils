@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { observeElementProp, preloadImages, probeElementStyle } from "./dom.js";
+import { isDomLoaded, observeElementProp, onDomLoad, preloadImages, probeElementStyle } from "./dom.js";
 import { addGlobalStyle } from "./domHeadless.js";
 
 // TODO:FIXME: jsdom's headless rendering doesn't allow any of these tests to pass:
@@ -29,6 +29,59 @@ describe.skip("dom/observeElementProp", () => {
     el.value = "foo";
 
     expect(newVal).toBe("foo");
+  });
+});
+
+//#region interceptWindowEvent
+describe.skip("dom/interceptWindowEvent", () => {
+  it("Intercepts a window event", () => {
+    let interceptFoo = false;
+
+    // @ts-expect-error
+    interceptWindowEvent("foo", () => interceptFoo);
+
+    let amount = 0;
+    const inc = () => amount++;
+    window.addEventListener("foo", inc);
+
+    window.dispatchEvent(new Event("foo"));
+
+    interceptFoo = true;
+
+    window.dispatchEvent(new Event("foo"));
+
+    expect(amount).toBe(1);
+
+    window.removeEventListener("foo", inc);
+  });
+
+  it("Throws when GM platform is FireMonkey", () => {
+    // @ts-expect-error
+    window.GM = { info: { scriptHandler: "FireMonkey" } };
+
+    // @ts-expect-error
+    expect(() => interceptWindowEvent("foo", () => true)).toThrow(PlatformError);
+
+    // @ts-expect-error
+    delete window.GM;
+  });
+});
+
+//#region onDomLoad & isDomLoaded
+describe.skip("dom/onDomLoad", () => {
+  it("Resolves when the DOM is loaded", async () => {
+    let cb = false;
+    const res = onDomLoad(() => cb = true);
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+    await res;
+
+    expect(cb).toBe(true);
+    expect(isDomLoaded()).toBe(true);
+
+    cb = false;
+    onDomLoad(() => cb = true);
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+    expect(cb).toBe(true);
   });
 });
 

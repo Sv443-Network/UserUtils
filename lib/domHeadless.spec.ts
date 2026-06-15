@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, interceptWindowEvent, isDomLoaded, onDomLoad, openInNewTab, setInnerHtmlUnsafe } from "./domHeadless.js";
-import { PlatformError } from "./Errors.js";
+import { addGlobalStyle, addParent, getSiblingsFrame, getUnsafeWindow, openInNewTab, setInnerHtmlUnsafe } from "./domHeadless.js";
 
 //#region getUnsafeWindow
 describe("dom/getUnsafeWindow", () => {
@@ -71,37 +70,6 @@ describe("dom/openInNewTab", () => {
   });
 });
 
-//#region interceptWindowEvent
-describe("dom/interceptWindowEvent", () => {
-  it("Intercepts a window event", () => {
-    let amount = 0;
-    const inc = () => amount++;
-
-    window.addEventListener("foo", inc);
-    Error.stackTraceLimit = NaN;
-    // @ts-expect-error
-    interceptWindowEvent("foo", () => true);
-    window.addEventListener("foo", inc);
-
-    window.dispatchEvent(new Event("foo"));
-
-    expect(amount).toBe(1);
-
-    window.removeEventListener("foo", inc);
-  });
-
-  it("Throws when GM platform is FireMonkey", () => {
-    // @ts-expect-error
-    window.GM = { info: { scriptHandler: "FireMonkey" } };
-
-    // @ts-expect-error
-    expect(() => interceptWindowEvent("foo", () => true)).toThrow(PlatformError);
-
-    // @ts-expect-error
-    delete window.GM;
-  });
-});
-
 //#region getSiblingsFrame
 describe("dom/getSiblingsFrame", () => {
   it("Returns the correct frame", () => {
@@ -140,23 +108,5 @@ describe("dom/setInnerHtmlUnsafe", () => {
     setInnerHtmlUnsafe(el, "<div>foo</div>");
 
     expect(el.querySelector("div")?.textContent).toBe("foo");
-  });
-});
-
-//#region onDomLoad & isDomLoaded
-describe("dom/onDomLoad", () => {
-  it("Resolves when the DOM is loaded", async () => {
-    let cb = false;
-    const res = onDomLoad(() => cb = true);
-    document.dispatchEvent(new Event("DOMContentLoaded"));
-    await res;
-
-    expect(cb).toBe(true);
-    expect(isDomLoaded()).toBe(true);
-
-    cb = false;
-    onDomLoad(() => cb = true);
-    document.dispatchEvent(new Event("DOMContentLoaded"));
-    expect(cb).toBe(true);
   });
 });

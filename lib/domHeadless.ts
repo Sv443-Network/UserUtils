@@ -3,8 +3,6 @@
  * This module contains various functions for working with the DOM, without requiring anything to be fully rendered - [see the documentation for more info](https://github.com/Sv443-Network/UserUtils/blob/main/docs.md#dom)
  */
 
-import { PlatformError } from "./Errors.js";
-
 //#region unsafeWindow
 
 /**
@@ -98,74 +96,6 @@ export function openInNewTab(href: string, background?: boolean, additionalProps
   }
 }
 
-//#region interceptEvent
-
-/**
- * Intercepts the specified event on the passed object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
- * If no predicate is specified, all events will be discarded.  
- * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
- * Calling this function will set `Error.stackTraceLimit = 100` (if not already higher) to ensure the stack trace is preserved.
- */
-export function interceptEvent<
-  TEvtObj extends EventTarget,
-  TPredicateEvt extends Event
-> (
-  eventObject: TEvtObj,
-  eventName: Parameters<TEvtObj["addEventListener"]>[0],
-  predicate: (event: TPredicateEvt) => boolean = () => true,
-): void {
-  if(typeof window.GM === "object" && GM?.info?.scriptHandler && GM.info.scriptHandler === "FireMonkey" && ((eventObject as unknown as Window) === window || (eventObject as unknown as Window) === getUnsafeWindow()))
-    throw new PlatformError("Intercepting window events is not supported on FireMonkey due to the isolated context the userscript is forced to run in.");
-
-  // default is 25 on FF so this should hopefully be more than enough
-  if("stackTraceLimit" in Error) {
-    Error.stackTraceLimit = Math.max(Number(Error.stackTraceLimit), 100);
-    if(isNaN(Number(Error.stackTraceLimit)))
-      Error.stackTraceLimit = 100;
-  }
-
-  (function(original: typeof eventObject.addEventListener) {
-    // @ts-expect-error TS never likes proto fiddling
-    eventObject.__proto__.addEventListener = function(...args: Parameters<typeof eventObject.addEventListener>) {
-      const origListener = typeof args[1] === "function" ? args[1] : args[1]?.handleEvent ?? (() => void 0);
-      args[1] = function(...a) {
-        if(args[0] === eventName && predicate((Array.isArray(a) ? a[0] : a) as TPredicateEvt))
-          return;
-        else
-          return origListener.apply(this, a);
-      };
-      original.apply(this, args);
-    };
-    // @ts-expect-error same as above
-  })(eventObject.__proto__.addEventListener);
-}
-
-//#region interceptWindowEvent
-
-/**
- * Intercepts the specified event on the window object and prevents it from being called if the called {@linkcode predicate} function returns a truthy value.  
- * If no predicate is specified, all events will be discarded.  
- * This function should be called as soon as possible (I recommend using `@run-at document-start`), as it will only intercept events that are added after this function is called.  
- * Calling this function will set `Error.stackTraceLimit = 100` (if not already higher) to ensure the stack trace is preserved.
- */
-export function interceptWindowEvent<TEvtKey extends keyof WindowEventMap>(
-  eventName: TEvtKey,
-  predicate: (event: WindowEventMap[TEvtKey]) => boolean = () => true,
-): void {
-  return interceptEvent(getUnsafeWindow(), eventName, predicate);
-}
-
-//#region isScrollable
-
-/** Checks if an element is scrollable in the horizontal and vertical directions */
-export function isScrollable(element: Element): Record<"vertical" | "horizontal", boolean> {
-  const { overflowX, overflowY } = getComputedStyle(element);
-  return {
-    vertical: (overflowY === "scroll" || overflowY === "auto") && element.scrollHeight > element.clientHeight,
-    horizontal: (overflowX === "scroll" || overflowX === "auto") && element.scrollWidth > element.clientWidth,
-  };
-}
-
 //#region getSiblingsFrame
 
 /**
@@ -241,36 +171,4 @@ export function setInnerHtmlUnsafe<TElement extends Element = HTMLElement>(eleme
   element.innerHTML = ttPolicy?.createHTML?.(html) ?? html;
 
   return element;
-}
-
-//#region isDomLoaded
-
-let domReady = document.readyState !== "loading";
-!domReady && document.addEventListener("DOMContentLoaded", () => domReady = true, { once: true });
-
-/** Returns whether or not the DOM has finished loading */
-export function isDomLoaded(): boolean {
-  return domReady;
-}
-
-//#region onDomLoad
-
-/**
- * Executes a callback and/or resolves the returned Promise when the DOM has finished loading.  
- * Immediately executes/resolves if the DOM is already loaded.
- * @param cb Callback to execute when the DOM has finished loading
- * @returns Returns a Promise that resolves when the DOM has finished loading
- */
-export function onDomLoad(cb?: () => void): Promise<void> {
-  return new Promise((res) => {
-    if(domReady) {
-      cb?.();
-      res();
-    }
-    else
-      document.addEventListener("DOMContentLoaded", () => {
-        cb?.();
-        res();
-      }, { once: true });
-  });
 }
