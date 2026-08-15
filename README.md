@@ -14,9 +14,9 @@ If you like using this library, please consider [supporting the development ‚ù§Ô
 [![Code coverage percentage badge](https://img.shields.io/coverallsCoverage/github/Sv443-Network/UserUtils?branch=main)](https://coveralls.io/github/Sv443-Network/UserUtils)
 [![Bundle size badge](https://deno.bundlejs.com/badge?q=@sv443-network/userutils@latest)](https://bundlejs.com/?q=%40sv443-network%2Fuserutils%40latest)
 
-[![Discord server badge](https://badgen.net/discord/online-members/aBH4uRG?icon=discord)](https://dc.sv443.net/)
 [![Github stargazers badge](https://badgen.net/github/stars/Sv443-Network/UserUtils?icon=github)](https://github.com/Sv443-Network/UserUtils/stargazers)
 [![Support development on Github Sponsors badge](https://img.shields.io/github/sponsors/Sv443?icon=github)](https://github.com/sponsors/Sv443)
+[![Discord server badge](https://custom-icon-badges.demolab.com/badge/Join-Discord-blue.svg?logo=discord&logoColor=white)](https://dc.sv443.net/)
 
 <br>
 <sub>
