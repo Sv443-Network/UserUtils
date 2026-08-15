@@ -324,6 +324,7 @@ const tr = {
    * tr.addTranslations("en", {
    *   hello: "Hello, %1!",
    * });
+   * tr.addTransform(tr.transforms.percent);
    * const t = tr.useTr("en");
    * t("hello", "John"); // "Hello, John!"
    * ```
