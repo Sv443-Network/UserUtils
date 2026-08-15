@@ -1727,8 +1727,13 @@ t("status", { toString: () => "Online" }); // "Status: Online"
 tr.addTransform([
   // use g and m flags to match and replace all occurrences:
   /<c\s+#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s?>(.*?)<\/c>/gm,
-  // grab values from the regex groups and return the transformed string:
-  ({ matches }) => `<span style="color: #${matches[1]}};">${matches[2]}</span>`,
+  // grab values from the regex groups and replace each match in the current value:
+  ({ currentValue, matches }) => {
+    let result = currentValue;
+    for(const match of matches)
+      result = result.replace(match[0], `<span style="color: #${match[1]};">${match[2]}</span>`);
+    return result;
+  },
 ]);
 
 // add a new translation key while not overwriting the existing ones:
@@ -1759,7 +1764,12 @@ import { tr, type TransformTuple } from "@sv443-network/userutils";
 
 const myTransform: TransformTuple = [
   /\$\{([a-zA-Z0-9$_-]+)\}/gm,
-  ({ matches }) => matches[1] ?? "",
+  ({ currentValue, matches }) => {
+    let result = currentValue;
+    for(const match of matches)
+      result = result.replace(match[0], match[1] ?? "");
+    return result;
+  },
 ];
 
 tr.deleteTransform(myTransform[0]); // false
@@ -1798,11 +1808,11 @@ tr.addTransform(tr.transforms.percent);
 const t = tr.use("en");
 
 // templateLiteral supports both keyed and positional:
-t("greeting", { name: "John", notifs: 42 }); // "Hello, John! You have 42 notifications."
-t("greeting", "John", 42);                   // "Hello, John! You have 42 notifications."
+t("greeting", { name: "Alice", notifs: 42 }); // "Hello, Alice! You have 42 notifications."
+t("greeting", "Alice", 42);                   // "Hello, Alice! You have 42 notifications."
 
 // percent is positional only:
-t("message", "John", 42); // "Hello, John! You have 42 notifications."
+t("message", "Bob", 42); // "Hello, Bob! You have 42 notifications."
 ```
 </details>
 
@@ -1888,7 +1898,12 @@ import { tr, type TransformTuple } from "@sv443-network/userutils";
 // simple transform that turns '[icon:name]' into '<i class="icon" data-icon="name"></i>':
 const iconTransform: TransformTuple = [
   /\[icon:([a-zA-Z0-9_-]+)\]/gm,
-  ({ matches }) => `<i class="icon" data-icon="${matches[1]}"></i>`,
+  ({ currentValue, matches }) => {
+    let result = currentValue;
+    for(const match of matches)
+      result = result.replace(match[0], `<i class="icon" data-icon="${match[1]}"></i>`);
+    return result;
+  },
 ];
 
 // add the custom transform and the predefined templateLiteral transform:
