@@ -1,5 +1,31 @@
 # @sv443-network/userutils
 
+## 11.0.0
+
+### Major Changes
+
+- 7e2022f: Removed `deleteStorage()` implementation in `GMStorageEngine`, which would delete data from all other `DataStore`s in previous versions of UserUtils.
+  This means that calling `deleteData()` on a `DataStore` will now only delete the instance's own data (the three keys ending in `-dat`, `-ver` and `-enf`), and not affect any other `DataStore` instances.
+  If you relied on deleting all storage before, consider using a [`DataStoreSerializer`](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-datastoreserializer) to manage all `DataStore` instances, and calling its [`deleteStoresData()` method](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#datastoreserializerdeletestoresdata) instead.
+
+### Minor Changes
+
+- 55894f2: Updated the included version of [CoreUtils to v3.8.0](https://github.com/Sv443-Network/CoreUtils/releases/tag/%40sv443-network%2Fcoreutils%403.8.0), which comes with the following changes:
+  - Added new `DataStore` engine `IndexedDBStorageEngine` for DOM environments with access to [`indexedDB`](https://developer.mozilla.org/en-US/docs/Web/API/Window/indexedDB).
+    This engine allows for larger storage limits and more complex data structures, including non-JSON-serializable and binary ([Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File)) data.
+  - `DataStoreSerializer` now extends `PicoEmitter` and emits these events:
+    - `loadedAllStores`: Emitted once, whenever all contained DataStore instances have finished loading at least once. No arguments.
+    - `loadedStore`: Emitted once, whenever a contained DataStore instance has finished loading at least once. Gets passed the instance as the only argument.
+    - `resetStores`: Emitted whenever one or more stores have had their data reset to the default value. Gets passed an array of all instances that were reset.
+    - `deletedStores`: Emitted whenever one or more stores have had their persistent data cleared. Gets passed an array of all instances that were cleared.
+  - `NanoEmitterOptions.publicEmit` is no longer a required property in all CoreUtils and UserUtils classes that extend `NanoEmitter`.
+  - `createProgressBar()` now correctly uses the 25% and 75% characters.
+
+### Patch Changes
+
+- b7c508b: Fixed all translation transformation example code snippets in the documentation.
+  Previously, the examples showed transform functions that would wrongly return a modified RegExp match instead of transforming the actual `currentValue` property like the docs state.
+
 ## 10.6.0
 
 ### Minor Changes
