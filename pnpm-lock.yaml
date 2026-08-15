@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@sv443-network/coreutils':
-        specifier: 3.7.1
-        version: 3.7.1
+        specifier: 3.8.0
+        version: 3.8.0
       nanoevents:
         specifier: 9.1.0
         version: 9.1.0
@@ -610,8 +610,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sv443-network/coreutils@3.7.1':
-    resolution: {integrity: sha512-CqcYNyCqX9QZcLdYQpOX9xxmqCfQQcyZp7Fe5TPtNxzHTfxEFHQ6jnbUIKhJsTCYt0s/Yx/nMxlogn8WP73jHw==}
+  '@sv443-network/coreutils@3.8.0':
+    resolution: {integrity: sha512-Ro3v4iSf13QqxndVH9O4G1rYt33PJaIfyk+wl6qMWGx4iO54sKKUXGyxfaTcAmmcxZVDjNoOUnO4q6txeLVQQg==}
 
   '@swc/core-darwin-arm64@1.15.11':
     resolution: {integrity: sha512-QoIupRWVH8AF1TgxYyeA5nS18dtqMuxNwchjBIwJo3RdwLEFiJq6onOx9JAxHtuPwUkIVuU2Xbp+jCJ7Vzmgtg==}
@@ -2795,7 +2795,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.2':
     optional: true
 
-  '@sv443-network/coreutils@3.7.1':
+  '@sv443-network/coreutils@3.8.0':
     dependencies:
       nanoevents: 9.1.0
 
