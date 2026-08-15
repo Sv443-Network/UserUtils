@@ -79,6 +79,7 @@ jobs:
         id: get_version_info
         continue-on-error: true
         run: |
+          changeset add --empty
           npx changeset status --output=changeset-version.ignore.json
           LIB_VERSION=$(node tools/get-pkg-prop.mjs version)
           echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_OUTPUT
