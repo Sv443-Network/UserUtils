@@ -1187,16 +1187,6 @@ Deletes a value from persistent GM storage.
 
 <br>
 
-### `GMStorageEngine.deleteStorage()`
-Signature:
-```ts
-public async deleteStorage(): Promise<void>;
-```
-  
-Deletes all values from the GM storage.
-
-<br>
-
 ### Types
 
 ### `type GMStorageEngineOptions`
