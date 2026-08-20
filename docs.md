@@ -10,13 +10,18 @@ If you like using this library, please consider [supporting the development ❤�
 
 <!-- #region Preamble -->
 ## Preamble:
-This library is written in TypeScript with builtin TypeScript declarations, but it works just as well in plain JavaScript after removing the `: type` annotations from the example code snippets.  
-The library supports importing an ESM, CommonJS or global variable definition bundle, depending on your use case.  
+Every bit of code exported by the library comes with included TSDoc documentation, meaning you can just fully rely on your IDE's autocomplete. However this document goes more in-depth and offers more hands-on code examples than the integrated documentation.  
   
-The signatures and example snippets use TypeScript with ESM import syntax to show which types need to be provided and will be returned.  
-If the signature section contains multiple signatures, each one represents an overload. They will be further explained in the description below that section.  
+Though this library is written in TypeScript and contains builtin TypeScript declarations, it will also work in plain JavaScript after removing the `: type` annotations in the example code snippets.  
   
-Each feature's example code snippet can be expanded by clicking on the text `▷ Example - click to view` below its description.  
+Each feature's example code snippet can be expanded by clicking on the text "Example - click to view".  
+The signatures and examples are written in TypeScript and use ESM import syntax to show you which types need to be provided and will be returned.  
+The library itself supports importing an ESM, CommonJS or global variable definition bundle, depending on your use case.  
+  
+If the signature section contains multiple signatures of the function, each occurrence represents an overload and you can choose which one you want to use.  
+They will also be further explained in the description below that section.  
+  
+Warning emojis (⚠️) denote special cautions or important notes that you should be aware of when using the feature.  
   
 Some features require the `@run-at` or `@grant` directives to be tweaked in the userscript header, or have other specific requirements and limitations. These will be listed in a section marked by a warning emoji (⚠️) each.    
   
@@ -439,14 +444,14 @@ These are the properties:
 ### `class SelectorObserver`
 Signature:
 ```ts
-class SelectorObserver;
+class SelectorObserver extends PicoEmitter<SelectorObserverEventMap>;
 ```
   
 Usage:
 ```ts
 // using a valid, mounted Element as the base element:
 new SelectorObserver(baseElement: Element, options?: SelectorObserverConstructorOptions);
-// using a selector string to find the base element when needed:
+// using a selector string to dynamically find the base element:
 new SelectorObserver(baseElementSelector: string, options?: SelectorObserverConstructorOptions);
 ```
   
@@ -455,7 +460,7 @@ It is useful for userscripts that need to wait for elements to be added to the D
 By default, it uses the MutationObserver API to observe for any element changes, and as such is highly customizable, but can also be configured to run on a fixed interval.  
   
 The constructor takes a `baseElement`, which is a parent of the elements you want to observe.  
-If a selector string is passed instead, it will be used to find the element as soon as observation is enabled.  
+If a [CSS selector string](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Selectors#guides) is passed instead, it will be used to find the element as soon as observation is enabled.  
 If you want to observe the entire document, you can pass `document.body` - ⚠️ you should only use this to initialize other SelectorObserver instances, and never run continuous listeners on this instance, as the performance impact can be massive!  
   
 The `options` parameter of [type `SelectorObserverConstructorOptions`](#type-selectorobserverconstructoroptions) is optional. It contains both own properties and ones that will be passed to the MutationObserver that is used internally.  
@@ -464,7 +469,7 @@ For example, if you want to trigger the listeners when certain attributes change
   
 ⚠️ Make sure to only call `addListener()` after the DOM has loaded (when using `@run-at document-end` or after `DOMContentLoaded` has fired). Otherwise, set `enableOnAddListener` to false in the constructor options and call `enable()` manually after the DOM has loaded.  
   
-The class extends from [the `PicoEmitter` base class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-picoemitter) and emits the following events:  
+The SelectorObserver class extends from [the `PicoEmitter` base class](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-picoemitter) and emits the following events:  
 | Event | Arguments | Description |
 | :-- | :-- | :-- |
 | `enabled` | - | Emitted when the observation of the child elements is enabled. |
@@ -480,7 +485,7 @@ import { SelectorObserver } from "@sv443-network/userutils";
 // adding a single-shot listener before the element exists:
 const fooObserver = new SelectorObserver("body", {
   // since the listener below will be added before DOMContentLoaded, the instance
-  // should stay disabled until the DOM is ready:
+  // needs to stay disabled until the DOM is ready:
   enableOnAddListener: false,
 });
 
@@ -519,19 +524,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const bazObserver = new SelectorObserver(document.body);
 
   // in TypeScript, specify that input elements are returned by the listener via the generic type parameter:
-  const unsubscribeBaz = bazObserver.addListener<HTMLInputElement>("input", {
+  const unsubscribeBazInputs = bazObserver.addListener<HTMLInputElement>("input", {
     all: true,        // use querySelectorAll() instead of querySelector()
     continuous: true, // don't remove the listener after it was called once
     debounce: 50,     // debounce the listener by 50ms
     listener: (elements) => {
-      // the type of `elements` is now a NodeListOf<HTMLInputElement>
-      console.log("Input elements found:", elements);
+      // the type of `elements` is now a proper `NodeListOf<HTMLInputElement>`:
+      console.log(`Found ${elements.length} input elements with values:`, elements.map(el => el.value));
     },
   });
 
   window.addEventListener("something", () => {
     // remove the listener after the event "something" was dispatched:
-    unsubscribeBaz();
+    unsubscribeBazInputs();
   });
 });
 ```
