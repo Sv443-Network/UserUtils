@@ -546,6 +546,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 ### Methods
 
+### `SelectorObserver.setOption()`
+Signature:
+```ts
+public setOption<
+  TKey extends keyof SelectorObserverOptionsMutable
+>(
+  modifiableOptionKey: TKey,
+  newValue: SelectorObserverOptionsMutable[TKey]
+): void;
+```
+  
+Sets one of the mutable options to a new value.  
+Not all options can be modified after instantiation - refer to the [`SelectorObserverConstructorOptions` type](#type-selectorobserverconstructoroptions) (or `SelectorObserverOptionsMutable` in TSDoc) for more info.
+
+<br>
+
 ### `SelectorObserver.addListener()`
 Signature:
 ```ts
@@ -658,13 +674,14 @@ Returns all listeners for the given `selector` or undefined if there are none.
 ### `type SelectorObserverConstructorOptions`
 Options object passed to the [`SelectorObserver` constructor.](#class-selectorobserver)  
 Extends [`MutationObserverInit`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) with the following additional properties:
-| Property | Type | Description |
-| :-- | :-- | :-- |
-| `defaultDebounce?` | `number \| undefined` | If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set |
-| `defaultDebounceType?` | `DebouncerType \| undefined` | If set, applies this debounce edge type to all listeners that don't have their own set - defaults to "immediate" |
-| `disableOnNoListeners?` | `boolean \| undefined` | Whether to disable the observer when no listeners are present - defaults to false |
-| `enableOnAddListener?` | `boolean \| undefined` | Whether to ensure the observer is enabled when a new listener is added - defaults to true |
-| `checkInterval?` | `number \| undefined` | If set to a number, the checks will be run on interval instead of on mutation events - all MutationObserverInit props will be ignored |
+| Property | Type | Mutable? | Description |
+| :-- | :-- | :-- | :-- |
+| `defaultDebounce?` | `number \| undefined` | mutable | If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set |
+| `defaultDebounceType?` | `DebouncerType \| undefined` | mutable | If set, applies this debounce edge type to all listeners that don't have their own set - defaults to "immediate" |
+| `disableOnNoListeners?` | `boolean \| undefined` | mutable | Whether to disable the observer when no listeners are present - defaults to false |
+| `enableOnAddListener?` | `boolean \| undefined` | mutable | Whether to ensure the observer is enabled when a new listener is added - defaults to true |
+| `checkInterval?` | `number \| undefined` | immutable | If set to a number, the checks will be run on interval instead of on mutation events - all MutationObserverInit props will be ignored |
+| `picoEmitterOptions?` | `PicoEmitterOptions \| undefined` | immutable | Options for the underlying [`PicoEmitter` instance](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-picoemitter) |
 
 <br>
 
