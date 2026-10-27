@@ -3,3 +3,5 @@ dist/
 test.ts
 coverage/
 .env
+*.ignore.*
+*.ignore
