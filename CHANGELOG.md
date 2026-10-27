@@ -1,5 +1,15 @@
 # @sv443-network/userutils
 
+## 11.1.0
+
+### Minor Changes
+
+- f472e19: Updated the included library CoreUtils to [v3.9.0](https://github.com/Sv443-Network/CoreUtils/releases/tag/%40sv443-network%2Fcoreutils%403.9.0), which comes with the following feature:
+  - Added type `ExtractKeysOfType<TObj, TType>` to create a union of all property keys of the given object type whose values are of the given type.
+- db195a0: Added `SelectorObserver.setOption()` to change a few of the options after class instantiation.
+  This comes with the new type `SelectorObserverOptionsMutable`, which contains all options of the `SelectorObserver` that can be modified using this new method.
+  The types `SelectorObserverOptions` and `SelectorObserverConstructorOptions` were updated to reference this new type. These changes should be backwards-compatible.
+
 ## 11.0.0
 
 ### Major Changes
