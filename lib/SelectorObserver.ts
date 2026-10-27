@@ -36,7 +36,8 @@ export type SelectorOptionsCommon = {
 
 export type UnsubscribeFunction = () => void;
 
-export type SelectorObserverOptions = {
+/** All main options for the {@linkcode SelectorObserver} that can be modified after its instantiation. */
+export type SelectorObserverOptionsMutable = {
   /** If set, applies this debounce in milliseconds to all listeners that don't have their own debounce set */
   defaultDebounce?: number;
   /** If set, applies this debounce edge type to all listeners that don't have their own set - refer to {@linkcode Debouncer} for more info */
@@ -45,13 +46,25 @@ export type SelectorObserverOptions = {
   disableOnNoListeners?: boolean;
   /** Whether to ensure the observer is enabled when a new listener is added - default is true */
   enableOnAddListener?: boolean;
-  /** If set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored */
-  checkInterval?: number;
-  /** Options for the {@linkcode PicoEmitter} superclass */
-  picoEmitterOptions?: PicoEmitterOptions;
 };
 
-export type SelectorObserverConstructorOptions = Prettify<SelectorObserverOptions & MutationObserverInit>;
+/** Main options for the {@linkcode SelectorObserver} */
+export type SelectorObserverOptions =
+  & SelectorObserverOptionsMutable
+  & {
+    /** If set to a number, the checks will be run on interval instead of on mutation events - in that case all MutationObserverInit props will be ignored */
+    checkInterval?: number;
+  };
+
+/** Options for the {@linkcode SelectorObserver} constructor. */
+export type SelectorObserverConstructorOptions = Prettify<
+  & SelectorObserverOptions
+  & MutationObserverInit
+  & {
+    /** Options for the {@linkcode PicoEmitter} superclass */
+    picoEmitterOptions?: PicoEmitterOptions;
+  }
+>;
 
 /** Events emitted by {@linkcode SelectorObserver} */
 export type SelectorObserverEventMap = {
@@ -77,8 +90,8 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
   private listenerMap: Map<string, SelectorListenerOptions[]>;
   /** The base element (or its selector) to observe the children of - can be set in the constructor and is read-only afterward. */
   public readonly baseElement: TElem;
-  /** The options that were set in the constructor - read-only afterward. */
-  public readonly options: SelectorObserverConstructorOptions;
+  /** The options that were set in the constructor. Can be modified with {@linkcode SelectorObserver.setOptions()} */
+  public options: SelectorObserverConstructorOptions;
 
   /**
    * Creates a new SelectorObserver that will observe the children of the given base element selector for changes (only creation and deletion of elements by default)
@@ -129,6 +142,14 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       this.checkAllSelectors();
       setInterval(() => this.checkAllSelectors(), this.customOptions.checkInterval);
     }
+  }
+
+  /** Sets one of the mutable options to a new value. Not all options can be modified after instantiation. Refer to the types {@linkcode SelectorObserverOptions} and {@linkcode SelectorObserverOptionsMutable} for more info. */
+  public setOption<TKey extends keyof SelectorObserverOptionsMutable>(modifiableOptionKey: TKey, newValue: SelectorObserverOptionsMutable[TKey]): void {
+    if(modifiableOptionKey in this.options)
+      this.options[modifiableOptionKey] = newValue;
+    else if(modifiableOptionKey in this.customOptions)
+      this.customOptions[modifiableOptionKey] = newValue;
   }
 
   /** Call to check all selectors in the {@linkcode listenerMap} using {@linkcode checkSelector()} */
