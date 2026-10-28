@@ -680,6 +680,7 @@ Extends [`MutationObserverInit`](https://developer.mozilla.org/en-US/docs/Web/AP
 | `defaultDebounceType?` | `DebouncerType \| undefined` | mutable | If set, applies this debounce edge type to all listeners that don't have their own set - defaults to "immediate" |
 | `disableOnNoListeners?` | `boolean \| undefined` | mutable | Whether to disable the observer when no listeners are present - defaults to false |
 | `enableOnAddListener?` | `boolean \| undefined` | mutable | Whether to ensure the observer is enabled when a new listener is added - defaults to true |
+| `debounceChecks?` | `boolean \| undefined` | mutable | Whether to debounce the selector checks too (true), or only the passed listener function (false) - defaults to true |
 | `checkInterval?` | `number \| undefined` | immutable | If set to a number, the checks will be run on interval instead of on mutation events - all MutationObserverInit props will be ignored |
 | `picoEmitterOptions?` | `PicoEmitterOptions \| undefined` | immutable | Options for the underlying [`PicoEmitter` instance](https://github.com/Sv443-Network/CoreUtils/blob/main/docs.md#class-picoemitter) |
 

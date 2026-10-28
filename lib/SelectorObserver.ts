@@ -46,6 +46,8 @@ export type SelectorObserverOptionsMutable = {
   disableOnNoListeners?: boolean;
   /** Whether to ensure the observer is enabled when a new listener is added - default is true */
   enableOnAddListener?: boolean;
+  /** Whether to also debounce when a selector is checked for (true), or to only debounce the provided listener functions (false) - defaults to true */
+  debounceChecks?: boolean;
 };
 
 /** Main options for the {@linkcode SelectorObserver} */
@@ -88,6 +90,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
   private observerOptions: MutationObserverInit;
   private customOptions: SelectorObserverOptions;
   private listenerMap: Map<string, SelectorListenerOptions[]>;
+  private checkSelectorDebouncer: Debouncer<() => void>;
   /** The base element (or its selector) to observe the children of - can be set in the constructor and is read-only afterward. */
   public readonly baseElement: TElem;
   /** The options that were set in the constructor. Can be modified with {@linkcode SelectorObserver.setOptions()} */
@@ -118,6 +121,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       defaultDebounceType,
       disableOnNoListeners,
       enableOnAddListener,
+      debounceChecks,
       ...observerOptions
     } = options;
 
@@ -132,15 +136,19 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       defaultDebounceType: defaultDebounceType ?? "immediate",
       disableOnNoListeners: disableOnNoListeners ?? false,
       enableOnAddListener: enableOnAddListener ?? true,
+      debounceChecks: debounceChecks ?? true,
     };
+
+    this.checkSelectorDebouncer = new Debouncer(this.customOptions.defaultDebounce, this.customOptions.defaultDebounceType);
+    this.checkSelectorDebouncer.on("call", () => this.checkAllSelectors());
 
     if(typeof this.customOptions.checkInterval !== "number") {
       // if the arrow func isn't there, `this` will be undefined in the callback
-      this.observer = new MutationObserver(() => this.checkAllSelectors());
+      this.observer = new MutationObserver(() => this.checkAllSelectorsDebounced());
     }
     else {
-      this.checkAllSelectors();
-      setInterval(() => this.checkAllSelectors(), this.customOptions.checkInterval);
+      this.checkAllSelectorsDebounced();
+      setInterval(() => this.checkAllSelectorsDebounced(), this.customOptions.checkInterval);
     }
   }
 
@@ -150,6 +158,14 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       this.options[modifiableOptionKey] = newValue;
     else if(modifiableOptionKey in this.customOptions)
       this.customOptions[modifiableOptionKey] = newValue;
+  }
+
+  /** Call to check all selectors in the {@linkcode listenerMap} using {@linkcode checkSelector()} - uses this instance's debounce settings for checking selectors, if enabled. */
+  protected checkAllSelectorsDebounced(): void {
+    if(this.options.debounceChecks)
+      return this.checkSelectorDebouncer.call();
+    else
+      return this.checkAllSelectors();
   }
 
   /** Call to check all selectors in the {@linkcode listenerMap} using {@linkcode checkSelector()} */
