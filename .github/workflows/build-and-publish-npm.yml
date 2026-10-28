@@ -73,11 +73,11 @@ jobs:
         run: |
           npx changeset add --empty
           npx changeset status --output=changeset-version.ignore.json
-          node tools/get-pkg-prop.mjs
-          node tools/get-changeset-version.mjs
+          node tools/get-pkg-prop.mjs version
+          node tools/get-changeset-version.mjs version
           LIB_VERSION=$(node tools/get-pkg-prop.mjs version)
           echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_OUTPUT
-          RELEASE_VERSION=$(node tools/get-changeset-version.mjs version)
+          RELEASE_VERSION=$(node tools/get-changeset-version.mjs)
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create artifact
