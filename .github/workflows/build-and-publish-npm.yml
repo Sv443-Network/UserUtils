@@ -68,12 +68,16 @@ jobs:
       - name: Build package
         run: pnpm build
 
+      - run: npx changeset add --empty
+        continue-on-error: true
+
+      - run: npx changeset status --output=changeset-version.ignore.json
+        continue-on-error: true
+
       - name: Get version info
         id: get_version_info
         continue-on-error: true
         run: |
-          npx changeset add --empty
-          npx changeset status --output=changeset-version.ignore.json
           LIB_VERSION=$(node tools/get-pkg-prop.mjs version)
           echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_OUTPUT
           RELEASE_VERSION=$(node tools/get-changeset-version.mjs version)
