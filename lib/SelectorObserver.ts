@@ -122,6 +122,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       disableOnNoListeners,
       enableOnAddListener,
       debounceChecks,
+      checkInterval,
       ...observerOptions
     } = options;
 
@@ -137,6 +138,7 @@ export class SelectorObserver<TElem extends Element | string = HTMLElement | str
       disableOnNoListeners: disableOnNoListeners ?? false,
       enableOnAddListener: enableOnAddListener ?? true,
       debounceChecks: debounceChecks ?? true,
+      checkInterval,
     };
 
     this.checkSelectorDebouncer = new Debouncer(this.customOptions.defaultDebounce, this.customOptions.defaultDebounceType);
