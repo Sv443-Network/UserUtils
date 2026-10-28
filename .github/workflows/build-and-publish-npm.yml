@@ -68,15 +68,21 @@ jobs:
       - name: Build package
         run: pnpm build
 
-      - name: Get version info
-        id: get_version_info
+      - name: Prepare version info
         run: |
           npx changeset add --empty
           npx changeset status --output=changeset-version.ignore.json
-          node tools/get-pkg-prop.mjs version
-          node tools/get-changeset-version.mjs version
+
+      - name: Get library version
+        id: get_lib_version
+        run: |
           LIB_VERSION=$(node tools/get-pkg-prop.mjs version)
           echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get release version
+        id: get_release_version
+        continue-on-error: true
+        run: |
           RELEASE_VERSION=$(node tools/get-changeset-version.mjs)
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
 
@@ -84,7 +90,7 @@ jobs:
         if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v6
         with:
-          name: UserUtils-${{ steps.get_version_info.outputs.RELEASE_VERSION }}
+          name: UserUtils-${{ steps.get_release_version.outputs.RELEASE_VERSION || steps.get_lib_version.outputs.LIB_VERSION }}
           path: dist/
           retention-days: ${{ env.RETENTION_DAYS }}
 
@@ -94,6 +100,6 @@ jobs:
         with:
           publish: npm run publish-package
           commit: ${{ env.COMMIT_MSG }}
-          title: ${{ env.PR_TITLE }} v${{ steps.get_version_info.outputs.RELEASE_VERSION }}
+          title: ${{ env.PR_TITLE }} v${{ steps.get_release_version.outputs.RELEASE_VERSION || steps.get_lib_version.outputs.LIB_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
