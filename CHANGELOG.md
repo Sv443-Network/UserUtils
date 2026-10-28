@@ -1,5 +1,15 @@
 # @sv443-network/userutils
 
+## 11.2.0
+
+### Minor Changes
+
+- 7fe0892: For better performance, the selector checks in the `SelectorObserver` class will now also be debounced with the given default settings. The new option `debounceChecks` can be used to turn this off, so only the listener function is debounced, as before.
+
+### Patch Changes
+
+- 89ac84a: Fixed issue where `checkInterval` was never properly assigned in `SelectorObserver`.
+
 ## 11.1.0
 
 ### Minor Changes
